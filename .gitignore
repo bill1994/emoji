@@ -1,6 +1,8 @@
 # =============== #
 # Unity generated #
 # =============== #
+Assets/**/*.cmd.meta
+Assets/**/*.cmd
 Temp/
 Obj/
 UnityGenerated/
