@@ -1,11 +1,12 @@
 {
   "name": "com.kyub.async",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Kyub Async",
   "description": "Useful methods to manage web files",
   "unity": "2019.1",
 	"dependencies": {
-		"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core"
+		"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core",
+		"com.kyub.serialization": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.serialization"
 	},
   "keywords": [
 			"Async",

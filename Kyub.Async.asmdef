@@ -1,10 +1,16 @@
 {
     "name": "Kyub.Async",
     "references": [
-        "Kyub.Core"
+        "GUID:af50b871d983fd2498bf363097906a11",
+        "GUID:a67e29f1d69c1394e878fb4ae191318f"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
