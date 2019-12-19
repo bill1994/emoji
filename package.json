@@ -1,0 +1,21 @@
+{
+  "name": "com.kyub.async",
+  "version": "1.0.0",
+  "displayName": "Kyub Async",
+  "description": "Useful methods to manage web files",
+  "unity": "2019.1",
+	"dependencies": {
+		"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core"
+	},
+  "keywords": [
+			"Async",
+			"External Resources"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}
