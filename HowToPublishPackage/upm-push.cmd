@@ -19,9 +19,11 @@ FOR /f "tokens=1,2 delims=," %%a IN ("%gitRootPath%") do ( set relativePath=Asse
 
 cd "%gitRootPath%"
 git subtree split --prefix="%relativePath:\=/%" --branch %name%
-git tag "%branchTag%" %name%
+git tag -d %branchTag%
 git rm --cached ".\%relativePath%\upm-push.cmd"
 git rm --cached ".\%relativePath%\upm-push.cmd.meta"
+git push origin :refs/tags/%branchTag%
+git tag "%branchTag%" %name%
 git push origin %name% --tags
 
 SET /p exit=Press any key to exit
