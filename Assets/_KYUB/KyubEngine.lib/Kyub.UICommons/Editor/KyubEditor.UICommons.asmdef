@@ -1,0 +1,17 @@
+{
+    "name": "KyubEditor.UICommons",
+    "references": [
+        "GUID:0f58c067a5870e34eadeb4a2055fb4ce"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

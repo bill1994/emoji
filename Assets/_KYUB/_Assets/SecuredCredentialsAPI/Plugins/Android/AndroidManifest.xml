@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kyub.biometricsdemo" xmlns:tools="http://schemas.android.com/tools" android:installLocation="preferExternal">
+  <supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true" android:anyDensity="true" />
+  <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="23" />
+
+  <!-- android:theme="@style/UnityThemeSelector" -->
+  <!-- android:theme="@style/UnityStatusBarTheme" -->
+  <!-- android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" -->
+  <application android:theme="@style/UnityThemeSelector" android:icon="@drawable/app_icon" android:label="@string/app_name">
+    <activity android:name="com.unity3d.player.UnityPlayerActivity" android:label="@string/app_name">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+        <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+      </intent-filter>
+      <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+    </activity>
+  </application>
+
+  <!-- FingerPrint -->
+  <uses-feature android:name="android.hardware.fingerprint" android:required="false"/>
+  <uses-permission android:name="android.permission.USE_BIOMETRIC" android:requiredFeature="false"/>
+  <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+</manifest>

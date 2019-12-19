@@ -1,0 +1,11 @@
+{
+    "name": "Kyub.Performance",
+    "references": [
+        "Kyub.Geometry",
+        "Kyub.Core"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

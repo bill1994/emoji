@@ -1,0 +1,2316 @@
+//  Copyright 2017 MaterialUI for Unity http://materialunity.com
+//  Please see license file for terms and conditions of use, and more information.
+
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using System;
+using TMPro;
+using UnityEngine.Events;
+
+namespace MaterialUI
+{
+#if UNITY_EDITOR
+    [InitializeOnLoad]
+#endif
+    [ExecuteInEditMode]
+    [RequireComponent(typeof(CanvasGroup))]
+    [AddComponentMenu("MaterialUI/Material Input Field", 100)]
+    public class MaterialInputField : StyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, ISelectHandler, IDeselectHandler
+    {
+        public enum BackgroundSizeMode
+        {
+            TextOnly,
+            TextAndHint,
+            TextAndCounter,
+            All,
+            Manual
+        }
+
+        public enum ColorSelectionState
+        {
+            EnabledSelected,
+            EnabledDeselected,
+            DisabledSelected,
+            DisabledDeselected
+        }
+
+        #region Private Varibles
+
+        [SerializeField, SerializeStyleProperty]
+        BackgroundSizeMode m_BackgroundSizeMode = BackgroundSizeMode.TextOnly;
+        [SerializeField]
+        private string m_HintText = null;
+        [SerializeField, SerializeStyleProperty]
+        private bool m_FloatingHint = true;
+        [SerializeField]
+        private bool m_HasValidation = true;
+        [SerializeField]
+        private bool m_ValidateOnStart = false;
+        [SerializeField]
+        private bool m_HasCharacterCounter = true;
+        [SerializeField]
+        private bool m_MatchInputFieldCharacterLimit = true;
+        [SerializeField]
+        private int m_CharacterLimit = 0;
+        [SerializeField, SerializeStyleProperty]
+        private int m_FloatingHintFontSize = 12;
+        [SerializeField, SerializeStyleProperty]
+        private bool m_FitHeightToContent = true;
+        [SerializeField, SerializeStyleProperty]
+        private Vector2 m_LeftContentOffset = Vector2.zero;
+        [SerializeField, SerializeStyleProperty]
+        private Vector2 m_RightContentOffset = Vector2.zero;
+        [SerializeField, SerializeStyleProperty]
+        private bool m_ManualPreferredWidth = false;
+        [SerializeField, SerializeStyleProperty]
+        private bool m_ManualPreferredHeight = false;
+        [SerializeField, SerializeStyleProperty]
+        private Vector2 m_ManualSize = Vector2.zero;
+        [SerializeField]
+        private GameObject m_TextValidator = null;
+        [SerializeField]
+        private RectTransform m_RectTransform = null;
+        [SerializeField]
+        private Selectable m_InputField = null;
+        [SerializeField]
+        private RectTransform m_InputTextTransform = null;
+        [SerializeField]
+        private RectTransform m_HintTextTransform = null;
+        [SerializeField]
+        private RectTransform m_CounterTextTransform = null;
+        [SerializeField]
+        private RectTransform m_ValidationTextTransform = null;
+        [SerializeField]
+        private RectTransform m_LineTransform = null;
+        [SerializeField]
+        private RectTransform m_ActiveLineTransform = null;
+        [SerializeField]
+        private RectTransform m_LeftContentTransform = null;
+        [SerializeField]
+        private RectTransform m_RightContentTransform = null;
+        [SerializeField]
+        private CanvasGroup m_ActiveLineCanvasGroup = null;
+        [SerializeField]
+        private CanvasGroup m_HintTextCanvasGroup = null;
+        [SerializeField]
+        private CanvasGroup m_ValidationCanvasGroup = null;
+
+        [SerializeField, SerializeStyleProperty]
+        private Graphic m_InputText = null;
+        [SerializeField, SerializeStyleProperty]
+        private Graphic m_HintTextObject = null;
+        [SerializeField]
+        private Graphic m_CounterText = null;
+        [SerializeField]
+        private Graphic m_ValidationText = null;
+        [SerializeField, SerializeStyleProperty]
+        private Graphic m_BackgroundGraphic = null;
+        [SerializeField, SerializeStyleProperty]
+        private Graphic m_OutlineGraphic = null;
+        [SerializeField, SerializeStyleProperty]
+        private Image m_LineImage = null;
+
+        [SerializeField, SerializeStyleProperty]
+        private Color m_LeftContentActiveColor = MaterialColor.iconDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_LeftContentInactiveColor = MaterialColor.disabledDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_RightContentActiveColor = MaterialColor.iconDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_RightContentInactiveColor = MaterialColor.disabledDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_HintTextActiveColor = MaterialColor.textHintDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_HintTextInactiveColor = MaterialColor.disabledDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_LineActiveColor = Color.black;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_LineInactiveColor = MaterialColor.disabledDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_BackgroundActiveColor = MaterialColor.iconDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_BackgroundInactiveColor = MaterialColor.disabledDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_OutlineActiveColor = MaterialColor.iconDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_OutlineInactiveColor = MaterialColor.disabledDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_ValidationActiveColor = MaterialColor.red500;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_ValidationInactiveColor = MaterialColor.disabledDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_CounterActiveColor = MaterialColor.textSecondaryDark;
+        [SerializeField, SerializeStyleProperty]
+        private Color m_CounterInactiveColor = MaterialColor.disabledDark;
+
+        [SerializeField]
+        private Graphic m_LeftContentGraphic = null;
+        [SerializeField]
+        private Graphic m_RightContentGraphic = null;
+        [SerializeField]
+        private float m_HintTextFloatingValue = 0;
+        [SerializeField]
+        private bool m_Interactable = true;
+        //[SerializeField]
+        //private bool m_LastCounterState = false;
+        [SerializeField, SerializeStyleProperty]
+        float m_AnimationDuration = 0.25f;
+        [SerializeField, SerializeStyleProperty]
+        private RectOffset m_Padding = new RectOffset();
+
+        private RectTransform m_CaretTransform;
+        private CanvasGroup m_CanvasGroup;
+        private static Sprite m_LineDisabledSprite;
+        private ITextValidator m_CustomTextValidator;
+
+        private bool m_AnimateHintText;
+        private bool m_HasBeenSelected;
+
+        private int m_BackgroundTweener;
+        private int m_OutlineTweener;
+        private int m_LeftContentTweener;
+        private int m_RightContentTweener;
+        private int m_HintTextTweener;
+        private int m_ValidationColorTweener;
+        private int m_CounterTweener;
+
+
+        private Vector2 m_LastSize;
+        private bool m_LastFocussedState;
+        private ColorSelectionState m_CurrentSelectionState;
+        private ColorSelectionState m_LastSelectionState;
+
+        private float m_TopSectionHeight;
+        private float m_BottomSectionHeight;
+        private float m_LeftSectionWidth;
+        private float m_RightSectionWidth;
+
+        private int m_ActiveLinePosTweener;
+        private int m_ActiveLineSizeTweener;
+        private int m_ActiveLineAlphaTweener;
+        private int m_HintTextFloatingValueTweener;
+        private int m_ValidationTweener;
+
+        private Vector2 m_LastRectPosition;
+        private Vector2 m_LastRectSize;
+        private Vector2 m_LayoutSize;
+
+#if UNITY_EDITOR
+        private string m_LastHintText;
+#endif
+        #endregion
+
+        #region InputField Callbacks
+
+        public UnityEvent<string> onValueChanged
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.onValueChanged as UnityEvent<string> : (tmpInputField != null ? tmpInputField.onValueChanged as UnityEvent<string> : (promptInputField != null ? promptInputField.onValueChanged as UnityEvent<string> : null));
+            }
+        }
+
+        public UnityEvent<string> onEndEdit
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.onEndEdit as UnityEvent<string> : (tmpInputField != null ? tmpInputField.onEndEdit as UnityEvent<string> : (promptInputField != null ? promptInputField.onEndEdit as UnityEvent<string> : null));
+            }
+        }
+
+        #endregion
+
+        #region Public Properties
+
+        public UnityEngine.UI.InputField.ContentType contentType
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.contentType : (tmpInputField != null ? (InputField.ContentType)((int)tmpInputField.contentType) : (promptInputField != null ? promptInputField.contentType : InputField.ContentType.Standard));
+            }
+            set
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                    unityInputField.contentType = value;
+                else if (tmpInputField != null)
+                    tmpInputField.contentType = (TMP_InputField.ContentType)((int)value);
+                else if (promptInputField != null)
+                    promptInputField.contentType = value;
+            }
+        }
+
+        [SerializeStyleProperty]
+        public Color selectionColor
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+
+                return unityInputField != null ? unityInputField.selectionColor : (tmpInputField != null ? tmpInputField.selectionColor : Color.clear);
+            }
+            set
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+
+                if (unityInputField != null)
+                    unityInputField.selectionColor = value;
+                else if (tmpInputField != null)
+                    tmpInputField.selectionColor = value;
+            }
+        }
+
+        [SerializeStyleProperty]
+        public int fontSize
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null && unityInputField.textComponent != null ? unityInputField.textComponent.fontSize : (tmpInputField != null ? (int)tmpInputField.pointSize : (promptInputField != null ? (int)promptInputField.fontSize : 0));
+            }
+            set
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null && unityInputField.textComponent != null)
+                    unityInputField.textComponent.fontSize = value;
+                else if (tmpInputField != null)
+                    tmpInputField.pointSize = value;
+                else if (promptInputField != null)
+                    promptInputField.fontSize = value;
+            }
+        }
+
+        [SerializeStyleProperty]
+        public UnityEngine.Object fontAsset
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null && unityInputField.textComponent != null ? (UnityEngine.Object)unityInputField.textComponent.font : (tmpInputField != null ? tmpInputField.fontAsset : (promptInputField != null ? promptInputField.fontAsset : null));
+            }
+            set
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null && unityInputField.textComponent != null && (value is Font || value == (UnityEngine.Object)null))
+                    unityInputField.textComponent.font = value as Font;
+                else if (tmpInputField != null && (value is TMP_FontAsset || value == (UnityEngine.Object)null))
+                    tmpInputField.fontAsset = value as TMP_FontAsset;
+                else if (promptInputField != null)
+                    promptInputField.fontAsset = value;
+            }
+        }
+
+        [SerializeStyleProperty]
+        public char asteriskChar
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.asteriskChar : (tmpInputField != null ? tmpInputField.asteriskChar : (promptInputField != null ? promptInputField.asteriskChar : '•'));
+            }
+            set
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                    unityInputField.asteriskChar = value;
+                else if (tmpInputField != null)
+                    tmpInputField.asteriskChar = value;
+                else if (promptInputField != null)
+                    promptInputField.asteriskChar = value;
+            }
+        }
+
+        public bool multiLine
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.multiLine : (tmpInputField != null ? tmpInputField.multiLine : (promptInputField != null ? promptInputField.multiLine : false));
+            }
+        }
+
+        public string text
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.text : (tmpInputField != null ? tmpInputField.text : (promptInputField != null ? promptInputField.text : ""));
+            }
+            set
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                    unityInputField.text = value;
+                else if (tmpInputField != null)
+                    tmpInputField.text = value;
+                else if (promptInputField != null)
+                    promptInputField.text = value;
+            }
+        }
+
+        public bool isFocused
+        {
+            get
+            {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.isFocused : (tmpInputField != null ? tmpInputField.isFocused : (promptInputField != null ? promptInputField.isFocused : false));
+            }
+        }
+
+        public float animationDuration
+        {
+            get
+            {
+                return m_AnimationDuration;
+            }
+
+            set
+            {
+                m_AnimationDuration = value;
+            }
+        }
+
+        public string hintText
+        {
+            get { return m_HintText; }
+            set
+            {
+                m_HintText = value;
+                hintTextObject.SetGraphicText(value);
+
+#if UNITY_EDITOR
+                m_LastHintText = value;
+#endif
+            }
+        }
+
+        public bool floatingHint
+        {
+            get { return m_FloatingHint; }
+            set
+            {
+                m_FloatingHint = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public bool hasValidation
+        {
+            get { return m_HasValidation; }
+            set
+            {
+                m_HasValidation = value;
+                SetLayoutDirty();
+                ValidateText();
+            }
+        }
+
+        public bool validateOnStart
+        {
+            get { return m_ValidateOnStart; }
+            set
+            {
+                m_ValidateOnStart = value;
+                if (value)
+                {
+                    ValidateText();
+                }
+            }
+        }
+
+        public bool hasCharacterCounter
+        {
+            get { return m_HasCharacterCounter; }
+            set
+            {
+                m_HasCharacterCounter = value;
+                m_CounterText.gameObject.SetActive(m_HasCharacterCounter);
+                SetLayoutDirty();
+                UpdateCounter();
+            }
+        }
+
+        public bool matchInputFieldCharacterLimit
+        {
+            get { return m_MatchInputFieldCharacterLimit; }
+            set
+            {
+                m_MatchInputFieldCharacterLimit = value;
+                SetLayoutDirty();
+                UpdateCounter();
+            }
+        }
+
+        public int characterLimit
+        {
+            get {
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                var limit = m_MatchInputFieldCharacterLimit ?
+                    (unityInputField != null ? unityInputField.characterLimit :
+                    (tmpInputField != null ? tmpInputField.characterLimit :
+                    (promptInputField != null ? promptInputField.characterLimit : m_CharacterLimit))) :
+                    m_CharacterLimit;
+
+                if (limit != m_CharacterLimit)
+                {
+                    m_CharacterLimit = limit;
+                    SetLayoutDirty();
+                    UpdateCounter();
+                }
+
+                return m_CharacterLimit;
+
+            }
+            set
+            {
+                if (m_CharacterLimit == value)
+                    return;
+
+                var unityInputField = m_InputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                m_CharacterLimit = value;
+                if (m_MatchInputFieldCharacterLimit)
+                {
+                    if (unityInputField != null)
+                        unityInputField.characterLimit = m_CharacterLimit;
+                    else if (tmpInputField != null)
+                        tmpInputField.characterLimit = m_CharacterLimit;
+                    else if (promptInputField != null)
+                        promptInputField.characterLimit = m_CharacterLimit;
+                }
+
+                SetLayoutDirty();
+                UpdateCounter();
+            }
+        }
+
+        public int floatingHintFontSize
+        {
+            get { return m_FloatingHintFontSize; }
+            set
+            {
+                m_FloatingHintFontSize = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public bool fitHeightToContent
+        {
+            get { return m_FitHeightToContent; }
+            set
+            {
+                m_FitHeightToContent = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public bool manualPreferredWidth
+        {
+            get { return m_ManualPreferredWidth; }
+            set
+            {
+                m_ManualPreferredWidth = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public bool manualPreferredHeight
+        {
+            get { return m_ManualPreferredHeight; }
+            set
+            {
+                m_ManualPreferredHeight = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public Vector2 manualSize
+        {
+            get { return m_ManualSize; }
+            set
+            {
+                m_ManualSize = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public GameObject textValidator
+        {
+            get { return m_TextValidator; }
+            set
+            {
+                m_TextValidator = value;
+                ValidateText();
+            }
+        }
+
+        public RectTransform rectTransform
+        {
+            get
+            {
+                if (m_RectTransform == null)
+                {
+                    m_RectTransform = (RectTransform)transform;
+                }
+                return m_RectTransform;
+            }
+        }
+
+        public Selectable inputField
+        {
+            get
+            {
+                if (m_InputField == null)
+                {
+                    m_InputField = GetComponent<Selectable>();
+                    if (m_InputField != null)
+                        RegisterEvents();
+                }
+                return m_InputField;
+            }
+        }
+
+        public RectTransform inputTextTransform
+        {
+            get
+            {
+                if (m_InputTextTransform == null)
+                {
+                    if (m_InputField != null)
+                    {
+                        var unityInputField = m_InputField as InputField;
+                        var tmpInputField = m_InputField as TMP_InputField;
+                        var promptInputField = m_InputField as InputPromptField;
+
+                        if (unityInputField != null && unityInputField.textComponent != null)
+                        {
+                            m_InputTextTransform = unityInputField.textComponent.GetComponent<RectTransform>();
+                        }
+                        else if (tmpInputField != null && tmpInputField.textComponent != null)
+                        {
+                            m_InputTextTransform = tmpInputField.textComponent.GetComponent<RectTransform>();
+                        }
+                        else if (promptInputField != null && promptInputField.textComponent != null)
+                        {
+                            m_InputTextTransform = promptInputField.textComponent.GetComponent<RectTransform>();
+                        }
+                    }
+                }
+
+                return m_InputTextTransform;
+            }
+        }
+
+        public RectTransform hintTextTransform
+        {
+            get { return m_HintTextTransform; }
+            set
+            {
+                m_HintTextTransform = value;
+                SetLayoutDirty();
+                UpdateCounter();
+                RefreshVisualStyles();
+                ValidateText();
+            }
+        }
+
+        public RectTransform counterTextTransform
+        {
+            get { return m_CounterTextTransform; }
+            set
+            {
+                m_CounterTextTransform = value;
+                SetLayoutDirty();
+                UpdateCounter();
+                RefreshVisualStyles();
+                ValidateText();
+            }
+        }
+
+        public RectTransform validationTextTransform
+        {
+            get { return m_ValidationTextTransform; }
+            set
+            {
+                m_ValidationTextTransform = value;
+                SetLayoutDirty();
+                UpdateCounter();
+                RefreshVisualStyles();
+                ValidateText();
+            }
+        }
+
+        public RectTransform lineTransform
+        {
+            get { return m_LineTransform; }
+            set
+            {
+                m_LineTransform = value;
+                SetLayoutDirty();
+                RefreshVisualStyles();
+            }
+        }
+
+        public RectTransform activeLineTransform
+        {
+            get { return m_ActiveLineTransform; }
+            set
+            {
+                m_ActiveLineTransform = value;
+                SetLayoutDirty();
+                RefreshVisualStyles();
+            }
+        }
+
+        public RectTransform leftContentTransform
+        {
+            get { return m_LeftContentTransform; }
+            set
+            {
+                m_LeftContentTransform = value;
+                SetLayoutDirty();
+                RefreshVisualStyles();
+            }
+        }
+
+        public RectTransform rightContentTransform
+        {
+            get { return m_RightContentTransform; }
+            set
+            {
+                m_RightContentTransform = value;
+                SetLayoutDirty();
+                RefreshVisualStyles();
+            }
+        }
+
+        public Graphic inputText
+        {
+            get
+            {
+                if (m_InputText == null)
+                {
+                    if (inputTextTransform != null)
+                    {
+                        m_InputText = inputTextTransform.GetComponentInChildren<Graphic>();
+                        if (m_InputField != null)
+                        {
+                            var tmpInputField = m_InputField as TMP_InputField;
+                            if (tmpInputField != null && tmpInputField.textComponent != m_InputText)
+                                tmpInputField.textComponent = m_InputText as TMP_Text;
+
+                            var unityInputField = m_InputField as InputField;
+                            if (unityInputField != null && unityInputField.textComponent != m_InputText)
+                                unityInputField.textComponent = m_InputText as Text;
+                        }
+                    }
+                }
+                return m_InputText;
+            }
+        }
+
+        [SerializeStyleProperty]
+        public Color inputTextColor
+        {
+            get
+            {
+                return inputText != null ? inputText.color : Color.black;
+            }
+            set
+            {
+                if (inputText != null)
+                    inputText.color = value;
+            }
+        }
+
+        public Graphic hintTextObject
+        {
+            get
+            {
+                if (m_HintTextObject == null)
+                {
+                    if (m_HintTextTransform != null)
+                    {
+                        m_HintTextObject = m_HintTextTransform.GetComponent<Graphic>();
+                    }
+                }
+                return m_HintTextObject;
+            }
+        }
+
+        public Graphic counterText
+        {
+            get
+            {
+                if (m_CounterText == null)
+                {
+                    if (m_CounterTextTransform != null)
+                    {
+                        m_CounterText = m_CounterTextTransform.GetComponent<Graphic>();
+                    }
+                }
+                return m_CounterText;
+            }
+        }
+
+        public Graphic validationText
+        {
+            get
+            {
+                if (m_ValidationText == null)
+                {
+                    if (m_ValidationTextTransform != null)
+                    {
+                        m_ValidationText = m_ValidationTextTransform.GetComponent<Graphic>();
+                    }
+                }
+                return m_ValidationText;
+            }
+        }
+
+        public Graphic backgroundGraphic
+        {
+            get
+            {
+                return m_BackgroundGraphic;
+            }
+        }
+
+        public Graphic outlineGraphic
+        {
+            get
+            {
+                return m_OutlineGraphic;
+            }
+        }
+
+        public Image lineImage
+        {
+            get
+            {
+                if (m_LineImage == null)
+                {
+                    if (m_LineTransform != null)
+                    {
+                        m_LineImage = m_LineTransform.GetComponent<Image>();
+                    }
+                }
+                return m_LineImage;
+            }
+        }
+
+        public CanvasGroup activeLineCanvasGroup
+        {
+            get
+            {
+                if (m_ActiveLineCanvasGroup == null)
+                {
+                    if (m_ActiveLineTransform != null)
+                    {
+                        m_ActiveLineCanvasGroup = m_ActiveLineTransform.GetComponent<CanvasGroup>();
+                    }
+                }
+                return m_ActiveLineCanvasGroup;
+            }
+        }
+
+        public CanvasGroup hintTextCanvasGroup
+        {
+            get
+            {
+                if (m_HintTextCanvasGroup == null)
+                {
+                    if (m_HintTextTransform != null)
+                    {
+                        m_HintTextCanvasGroup = m_HintTextTransform.GetComponent<CanvasGroup>();
+                    }
+                }
+                return m_HintTextCanvasGroup;
+            }
+        }
+
+        public CanvasGroup validationCanvasGroup
+        {
+            get
+            {
+                if (m_ValidationCanvasGroup == null)
+                {
+                    if (m_ValidationTextTransform != null)
+                    {
+                        m_ValidationCanvasGroup = m_ValidationTextTransform.GetComponent<CanvasGroup>();
+                    }
+                }
+                return m_ValidationCanvasGroup;
+            }
+        }
+
+        public RectTransform caretTransform
+        {
+            get
+            {
+                if (m_CaretTransform == null)
+                {
+                    LayoutElement[] elements = GetComponentsInChildren<LayoutElement>();
+
+                    for (int i = 0; i < elements.Length; i++)
+                    {
+                        if (elements[i].name == name + " Input Caret")
+                        {
+                            m_CaretTransform = (RectTransform)elements[i].transform;
+                        }
+                    }
+                }
+                return m_CaretTransform;
+            }
+        }
+
+        public Color leftContentActiveColor
+        {
+            get { return m_LeftContentActiveColor; }
+            set { m_LeftContentActiveColor = value; }
+        }
+
+        public Color leftContentInactiveColor
+        {
+            get { return m_LeftContentInactiveColor; }
+            set { m_LeftContentInactiveColor = value; }
+        }
+
+        public Color rightContentActiveColor
+        {
+            get { return m_RightContentActiveColor; }
+            set { m_RightContentActiveColor = value; }
+        }
+
+        public Color rightContentInactiveColor
+        {
+            get { return m_RightContentInactiveColor; }
+            set { m_RightContentInactiveColor = value; }
+        }
+
+        public Color hintTextActiveColor
+        {
+            get { return m_HintTextActiveColor; }
+            set { m_HintTextActiveColor = value; }
+        }
+
+        public Color hintTextInactiveColor
+        {
+            get { return m_HintTextInactiveColor; }
+            set { m_HintTextInactiveColor = value; }
+        }
+
+        public Color lineActiveColor
+        {
+            get { return m_LineActiveColor; }
+            set { m_LineActiveColor = value; }
+        }
+
+        public Color lineInactiveColor
+        {
+            get { return m_LineInactiveColor; }
+            set { m_LineInactiveColor = value; }
+        }
+
+        public Color backgroundActiveColor
+        {
+            get { return m_BackgroundActiveColor; }
+            set { m_BackgroundActiveColor = value; }
+        }
+
+        public Color backgroundInactiveColor
+        {
+            get { return m_BackgroundInactiveColor; }
+            set { m_BackgroundInactiveColor = value; }
+        }
+
+        public Color outlineActiveColor
+        {
+            get { return m_OutlineActiveColor; }
+            set { m_OutlineActiveColor = value; }
+        }
+
+        public Color outlineInactiveColor
+        {
+            get { return m_OutlineInactiveColor; }
+            set { m_OutlineInactiveColor = value; }
+        }
+
+        public Color validationActiveColor
+        {
+            get { return m_ValidationActiveColor; }
+            set { m_ValidationActiveColor = value; }
+        }
+
+        public Color validationInactiveColor
+        {
+            get { return m_ValidationInactiveColor; }
+            set { m_ValidationInactiveColor = value; }
+        }
+
+        public Color counterActiveColor
+        {
+            get { return m_CounterActiveColor; }
+            set { m_CounterActiveColor = value; }
+        }
+
+        public Color counterInactiveColor
+        {
+            get { return m_CounterInactiveColor; }
+            set { m_CounterInactiveColor = value; }
+        }
+
+        public Graphic leftContentGraphic
+        {
+            get { return m_LeftContentGraphic; }
+            set { m_LeftContentGraphic = value; }
+        }
+
+        public Graphic rightContentGraphic
+        {
+            get { return m_RightContentGraphic; }
+            set { m_RightContentGraphic = value; }
+        }
+
+        public float hintTextFloatingValue
+        {
+            get { return m_HintTextFloatingValue; }
+            set { m_HintTextFloatingValue = value; }
+        }
+
+        public bool interactable
+        {
+            get { return m_Interactable; }
+            set
+            {
+                m_Interactable = value;
+                RefreshVisualStyles();
+                inputField.interactable = value;
+            }
+        }
+
+        public CanvasGroup canvasGroup
+        {
+            get
+            {
+                if (!m_CanvasGroup)
+                {
+                    m_CanvasGroup = gameObject.GetComponent<CanvasGroup>();
+                }
+                return m_CanvasGroup;
+            }
+        }
+
+        private static Sprite lineDisabledSprite
+        {
+            get
+            {
+                if (m_LineDisabledSprite == null)
+                {
+                    Color[] colors =
+                    {
+                        Color.white,
+                        Color.white,
+                        Color.clear,
+                        Color.clear,
+                        Color.white,
+                        Color.white,
+                        Color.clear,
+                        Color.clear
+                    };
+
+                    Texture2D texture = new Texture2D(4, 2, TextureFormat.ARGB32, false);
+                    texture.filterMode = FilterMode.Point;
+                    texture.SetPixels(colors);
+                    texture.hideFlags = HideFlags.HideAndDontSave;
+
+                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, 4, 2), new Vector2(0.5f, 0.5f));
+                    sprite.hideFlags = HideFlags.HideAndDontSave;
+
+                    m_LineDisabledSprite = sprite;
+                }
+
+                return m_LineDisabledSprite;
+            }
+        }
+
+        public ITextValidator customTextValidator
+        {
+            get { return m_CustomTextValidator; }
+            set
+            {
+                m_CustomTextValidator = value;
+
+                if (m_CustomTextValidator != null)
+                {
+                    m_CustomTextValidator.Init(this);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Unity Functions
+
+        protected override void Awake()
+        {
+            if (inputField != null)
+                RegisterEvents();
+            base.Awake();
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            OnTextChanged();
+            CheckHintText();
+            SetLayoutDirty();
+        }
+
+        protected override void Start()
+        {
+            RefreshVisualStyles();
+            OnTextChanged();
+            CheckHintText();
+            SetLayoutDirty();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            CheckHintText();
+            SetLayoutDirty();
+        }
+
+        protected override void OnDestroy()
+        {
+            UnregisterEvents();
+            base.OnDestroy();
+        }
+
+        protected override void OnRectTransformDimensionsChange()
+        {
+            base.OnRectTransformDimensionsChange();
+            SetLayoutDirty();
+        }
+
+        protected override void OnDidApplyAnimationProperties()
+        {
+            base.OnDidApplyAnimationProperties();
+            RefreshVisualStyles();
+            OnTextChanged();
+            CheckHintText();
+            SetLayoutDirty();
+        }
+
+#if UNITY_EDITOR
+        protected override void OnValidateDelayed()
+        {
+            base.OnValidateDelayed();
+            OnTextChanged();
+            SetLayoutDirty();
+
+            if (hintTextObject)
+            {
+                if (m_HintText != hintTextObject.GetGraphicText())
+                {
+                    if (m_LastHintText != hintText)
+                    {
+                        hintTextObject.SetGraphicText(m_HintText);
+                        m_LastHintText = m_HintText;
+                    }
+                }
+            }
+
+            canvasGroup.alpha = inputField.interactable ? 1 : 0.5f;
+            canvasGroup.interactable = inputField.interactable;
+            canvasGroup.blocksRaycasts = inputField.interactable;
+        }
+#endif
+
+        protected virtual void Update()
+        {
+            if (Application.isPlaying)
+            {
+                var changed = m_LastFocussedState != isFocused;
+                if (isFocused)
+                {
+                    m_LastFocussedState = true;
+                }
+                else
+                {
+                    if (m_LastFocussedState)
+                    {
+                        m_LastFocussedState = false;
+                        OnDeselect(new PointerEventData(EventSystem.current));
+                    }
+                }
+
+                if (changed)
+                    RefreshVisualStyles();
+                CheckHintText();
+
+                if (m_AnimateHintText)
+                {
+                    SetHintLayoutToFloatingValue();
+                }
+            }
+        }
+
+        public void OnSelect(BaseEventData eventData)
+        {
+            m_HasBeenSelected = true;
+
+            AnimateActiveLineSelect();
+            AnimateHintTextSelect();
+            RefreshVisualStyles();
+
+            ValidateText();
+        }
+
+        public void OnDeselect(BaseEventData eventData)
+        {
+            m_LastFocussedState = false;
+            AnimateActiveLineDeselect();
+            AnimateHintTextDeselect();
+            RefreshVisualStyles();
+        }
+
+        #endregion
+
+        #region Receivers
+
+        protected virtual void HandleOnTextChanged(string value)
+        {
+            OnTextChanged();
+        }
+
+        #endregion
+
+        #region Other Functions
+
+        public void RegisterEvents()
+        {
+            UnregisterEvents();
+
+            var unityInputField = m_InputField as InputField;
+            var tmpInputField = m_InputField as TMP_InputField;
+            var promptInputField = m_InputField as InputPromptField;
+
+            if (unityInputField != null)
+                unityInputField.onValueChanged.AddListener(HandleOnTextChanged);
+            if (tmpInputField != null)
+                tmpInputField.onValueChanged.AddListener(HandleOnTextChanged);
+            if (promptInputField != null)
+                promptInputField.onValueChanged.AddListener(HandleOnTextChanged);
+        }
+
+        public void UnregisterEvents()
+        {
+            var unityInputField = m_InputField as InputField;
+            var tmpInputField = m_InputField as TMP_InputField;
+            var promptInputField = m_InputField as InputPromptField;
+
+            if (unityInputField != null)
+                unityInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
+            if (tmpInputField != null)
+                tmpInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
+            if (promptInputField != null)
+                promptInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
+        }
+
+        public void ClearText()
+        {
+            var unityInputField = m_InputField as InputField;
+            var tmpInputField = m_InputField as TMP_InputField;
+            var promptInputField = m_InputField as InputPromptField;
+
+            if (unityInputField != null)
+                unityInputField.text = "";
+            if (tmpInputField != null)
+                tmpInputField.text = "";
+            if (promptInputField != null)
+                promptInputField.text = "";
+
+            OnTextChanged();
+            SetLayoutDirty();
+        }
+
+        public void OnTextChanged()
+        {
+            SetLayoutDirty();
+            UpdateCounter();
+            ValidateText();
+            if (!m_FloatingHint)
+                SetHintLayoutToFloatingValue();
+        }
+
+        private void CheckHintText()
+        {
+            if (hintTextObject == null) return;
+
+            if (m_HintText != hintTextObject.GetGraphicText())
+            {
+                m_HintText = hintTextObject.GetGraphicText();
+
+#if UNITY_EDITOR
+                m_LastHintText = m_HintText;
+#endif
+            }
+        }
+
+        private void ValidateText()
+        {
+            if (validationText == null) return;
+
+            if (!m_ValidateOnStart && !m_HasBeenSelected) return;
+
+            m_ValidationText.color = IsSelected() ? m_ValidationActiveColor : m_ValidationInactiveColor;
+
+            ITextValidator validator = null;
+            if (m_TextValidator != null && m_TextValidator.GetComponent<ITextValidator>() != null)
+            {
+                validator = m_TextValidator.GetComponent<ITextValidator>();
+                validator.Init(this);
+            }
+
+            if (m_CustomTextValidator != null)
+            {
+                validator = customTextValidator;
+                m_HasValidation = true;
+            }
+
+            if (validationCanvasGroup != null)
+            {
+                if (m_HasValidation != validationCanvasGroup.gameObject.activeSelf)
+                {
+                    validationCanvasGroup.alpha = 0;
+                    validationCanvasGroup.interactable = false;
+                    validationCanvasGroup.blocksRaycasts = false;
+                    validationCanvasGroup.gameObject.SetActive(m_HasValidation);
+                }
+
+                if (validator != null && m_HasValidation)
+                {
+                    TweenManager.EndTween(m_ValidationTweener);
+
+                    if (!validator.IsTextValid())
+                    {
+                        if (Application.isPlaying)
+                        {
+                            validationCanvasGroup.interactable = true;
+                            validationCanvasGroup.blocksRaycasts = true;
+
+                            m_ValidationTweener = TweenManager.TweenFloat(
+                                f =>
+                                {
+                                    if (validationCanvasGroup != null)
+                                        validationCanvasGroup.alpha = f;
+                                },
+                                validationCanvasGroup.alpha, 1f,
+                                m_AnimationDuration / 2,
+                                tweenType: Tween.TweenType.Linear);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (Application.isPlaying)
+                        {
+                            m_ValidationTweener = TweenManager.TweenFloat(
+                                f =>
+                                {
+                                    if (validationCanvasGroup != null)
+                                        validationCanvasGroup.alpha = f;
+                                },
+                                validationCanvasGroup.alpha, 0f, m_AnimationDuration / 2, 0, () =>
+                                {
+                                    validationCanvasGroup.interactable = false;
+                                    validationCanvasGroup.blocksRaycasts = false;
+                                },
+                                false,
+                                Tween.TweenType.Linear);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    validationCanvasGroup.alpha = 0;
+                    validationCanvasGroup.interactable = false;
+                    validationCanvasGroup.blocksRaycasts = false;
+                }
+            } 
+        }
+
+        private void UpdateCounter()
+        {
+            if (counterText == null)
+            {
+                return;
+            }
+
+            int limit = characterLimit;
+
+            string outOf = limit > 0 ? " / " + limit : "";
+
+            counterText.SetGraphicText(text.Length + outOf);
+        }
+
+        private void UpdateSelectionState()
+        {
+            if (m_CounterText != null)
+                m_CounterText.gameObject.SetActive(m_HasCharacterCounter);
+            if (m_ValidationText != null)
+                m_ValidationText.gameObject.SetActive(m_HasValidation);
+
+            if (m_Interactable)
+            {
+                m_CurrentSelectionState = isFocused ? ColorSelectionState.EnabledSelected : ColorSelectionState.EnabledDeselected;
+
+                if (lineImage != null)
+                {
+                    lineImage.sprite = null;
+                }
+            }
+            else
+            {
+                m_CurrentSelectionState = isFocused ? ColorSelectionState.DisabledSelected : ColorSelectionState.DisabledDeselected;
+
+                if (lineImage != null)
+                {
+                    lineImage.sprite = lineDisabledSprite;
+                    lineImage.type = Image.Type.Tiled;
+                }
+            }
+
+            if (m_CurrentSelectionState != m_LastSelectionState)
+            {
+                m_LastSelectionState = m_CurrentSelectionState;
+
+                TweenManager.EndTween(m_BackgroundTweener);
+
+                if (Application.isPlaying)
+                {
+                    if (m_BackgroundGraphic)
+                    {
+                        m_BackgroundTweener = TweenManager.TweenColor(color => m_BackgroundGraphic.color = color,
+                            m_BackgroundGraphic.color,
+                            IsSelected() ? m_BackgroundActiveColor : m_BackgroundInactiveColor, m_AnimationDuration);
+                    }
+                }
+                else
+                {
+                    if (m_BackgroundGraphic)
+                    {
+                        m_BackgroundGraphic.color = IsSelected()
+                            ? m_BackgroundActiveColor
+                            : m_BackgroundInactiveColor;
+                    }
+                }
+
+                TweenManager.EndTween(m_OutlineTweener);
+
+                if (Application.isPlaying)
+                {
+                    if (m_OutlineGraphic)
+                    {
+                        m_OutlineTweener = TweenManager.TweenColor(color => m_OutlineGraphic.color = color,
+                            m_OutlineGraphic.color,
+                            IsSelected() ? m_OutlineActiveColor : m_OutlineInactiveColor, m_AnimationDuration);
+                    }
+                }
+                else
+                {
+                    if (m_OutlineGraphic)
+                    {
+                        m_OutlineGraphic.color = IsSelected()
+                            ? m_OutlineActiveColor
+                            : m_OutlineInactiveColor;
+                    }
+                }
+
+                TweenManager.EndTween(m_LeftContentTweener);
+
+                if (Application.isPlaying)
+                {
+                    if (m_LeftContentGraphic)
+                    {
+                        m_LeftContentTweener = TweenManager.TweenColor(color => m_LeftContentGraphic.color = color,
+                            m_LeftContentGraphic.color,
+                            IsSelected() ? m_LeftContentActiveColor : m_LeftContentInactiveColor, m_AnimationDuration);
+                    }
+                }
+                else
+                {
+                    if (m_LeftContentGraphic)
+                    {
+                        m_LeftContentGraphic.color = IsSelected()
+                            ? m_LeftContentActiveColor
+                            : m_LeftContentInactiveColor;
+                    }
+                }
+
+                TweenManager.EndTween(m_RightContentTweener);
+
+                if (Application.isPlaying)
+                {
+                    if (m_RightContentGraphic)
+                    {
+                        m_RightContentTweener = TweenManager.TweenColor(color => m_RightContentGraphic.color = color,
+                            m_RightContentGraphic.color,
+                            IsSelected() ? m_RightContentActiveColor : m_RightContentInactiveColor, m_AnimationDuration);
+                    }
+                }
+                else
+                {
+                    if (m_RightContentGraphic)
+                    {
+                        m_RightContentGraphic.color = IsSelected()
+                            ? m_RightContentActiveColor
+                            : m_RightContentInactiveColor;
+                    }
+                }
+
+                TweenManager.EndTween(m_HintTextTweener);
+
+                if (m_HintTextObject != null)
+                {
+                    if (Application.isPlaying)
+                    {
+                        m_HintTextTweener = TweenManager.TweenColor(color => m_HintTextObject.color = color,
+                            m_HintTextObject.color, IsSelected() && m_FloatingHint ? m_HintTextActiveColor : m_HintTextInactiveColor,
+                            m_AnimationDuration);
+                    }
+                    else
+                    {
+                        m_HintTextObject.color = IsSelected() && m_FloatingHint ? m_HintTextActiveColor : m_HintTextInactiveColor;
+                    }
+                }
+
+                TweenManager.EndTween(m_CounterTweener);
+
+                if (m_CounterText != null)
+                {
+                    if (Application.isPlaying)
+                    {
+                        m_CounterTweener = TweenManager.TweenColor(color => m_CounterText.color = color,
+                            m_CounterText.color, IsSelected() ? m_CounterActiveColor : m_CounterInactiveColor,
+                            m_AnimationDuration);
+                    }
+                    else
+                    {
+                        m_CounterText.color = IsSelected() ? m_CounterActiveColor : m_CounterInactiveColor;
+                    }
+                }
+                TweenManager.EndTween(m_ValidationColorTweener);
+
+                if (m_ValidationText != null)
+                {
+                    if (Application.isPlaying)
+                    {
+
+                        m_ValidationColorTweener = TweenManager.TweenColor(color => m_ValidationText.color = color,
+                            m_ValidationText.color, IsSelected() ? m_ValidationActiveColor : m_ValidationInactiveColor,
+                            m_AnimationDuration);
+                    }
+                    else
+                    {
+                        m_ValidationText.color = IsSelected() ? m_ValidationActiveColor : m_ValidationInactiveColor;
+                    }
+                }
+
+                if (m_LineTransform != null)
+                    m_LineTransform.GetComponent<Graphic>().color = m_LineInactiveColor;
+                if (m_ActiveLineTransform)
+                    m_ActiveLineTransform.GetComponent<Graphic>().color = m_LineActiveColor;
+
+                canvasGroup.alpha = m_Interactable ? 1 : 0.5f;
+                canvasGroup.interactable = m_Interactable;
+                canvasGroup.blocksRaycasts = m_Interactable;
+            }
+        }
+
+        public bool IsSelected()
+        {
+            return m_CurrentSelectionState == ColorSelectionState.DisabledSelected ||
+                   m_CurrentSelectionState == ColorSelectionState.EnabledSelected;
+        }
+
+        private float GetTextHeight()
+        {
+            /*string layoutText = text;
+
+            if (!multiLine)
+            {
+                generationSize = new Vector2(float.MaxValue, float.MaxValue);
+                layoutText = layoutText.Replace("\n", "");
+            }
+            else
+            {
+                generationSize = new Vector2(inputText.rectTransform.rect.width, float.MaxValue);
+            }
+
+            TextGenerator textGenerator = inputText.GetGraphicTextGeneratorForLayout();
+            TextGenerationSettings textGenerationSettings = inputText.GetGraphicGenerationSettings(generationSize);
+
+            float fontAssetSize = inputText.GetGraphicFontAssetFontSize();
+            float fontScale = fontAssetSize == 0? ((float)inputText.GetGraphicFontSize() / fontAssetSize) : 1.0f; //inputText.font.fontSize > 0 && !inputText.font.dynamic? ((float)inputText.GetGraphicFontSize() / inputText.GetGraphicFontAssetFontSize()) : 1.0f;
+
+            textGenerationSettings.scaleFactor = 1f;
+            if (inputText.font.dynamic)
+                textGenerationSettings.fontSize = inputText.fontSize;*/
+
+            return m_InputText != null && !HasIgnoreLayout(m_InputText) ? LayoutUtility.GetPreferredHeight(m_InputText.rectTransform) :  0; // textGenerator.GetPreferredHeight(layoutText, textGenerationSettings) * fontScale;
+        }
+
+        private float GetSmallHintTextHeight()
+        {
+            if (hintTextObject == null || HasIgnoreLayout(hintTextObject))
+            {
+                return 0;
+            }
+
+            /*TextGenerator textGenerator = hintTextObject.GetGraphicTextGeneratorForLayout();
+            TextGenerationSettings textGenerationSettings = inputText.GetGraphicGenerationSettings(new Vector2(float.MaxValue, float.MaxValue));
+
+            float fontAssetSize = hintTextObject.GetGraphicFontAssetFontSize();
+            float fontScale = fontAssetSize == 0 ? ((float)hintTextObject.GetGraphicFontSize() / fontAssetSize) : 1.0f; //hintTextObject.font.fontSize > 0 && !hintTextObject.font.dynamic? ((float)hintTextObject.fontSize / m_FloatingHintFontSize) : 1.0f;
+
+            textGenerationSettings.scaleFactor = 1f;
+            if(hintTextObject.font.dynamic)
+                textGenerationSettings.fontSize = m_FloatingHintFontSize;*/
+
+            var fontSize = hintTextObject.GetGraphicFontSize();
+            ILayoutElement hintLayoutElement = hintTextObject as ILayoutElement;
+
+            var isHintLayoutDirty = false;
+            if (floatingHint && hintLayoutElement != null)
+            {
+                //Calculate preferredHeight of FloatingHintFontSize and revert to old fontsize value
+                if (fontSize != floatingHintFontSize)
+                {
+                    isHintLayoutDirty = true;
+                    hintTextObject.SetGraphicFontSize(floatingHintFontSize);
+                    hintLayoutElement.CalculateLayoutInputHorizontal();
+                    hintLayoutElement.CalculateLayoutInputVertical();
+
+                }
+            }
+
+            var preferredHeight = hintTextObject != null ? LayoutUtility.GetPreferredHeight(hintTextObject.rectTransform) : 0; //textGenerator.GetPreferredHeight(hintTextObject.GetGraphicText(), textGenerationSettings) * fontScale;
+
+            //Revert to original font size and preferredHeight
+            if (isHintLayoutDirty)
+            {
+                hintTextObject.SetGraphicFontSize(fontSize);
+                hintLayoutElement.CalculateLayoutInputHorizontal();
+                hintLayoutElement.CalculateLayoutInputVertical();
+            }
+
+            return preferredHeight;
+        }
+
+        private void AnimateHintTextSelect()
+        {
+            CancelHintTextTweeners();
+
+            var isInsideOutline = IsHintInsideOutline();
+            m_HintTextFloatingValueTweener = TweenManager.TweenFloat(f => hintTextFloatingValue = f, hintTextFloatingValue, 1f, m_AnimationDuration, 0, () =>
+            {
+                m_AnimateHintText = false;
+                SetHintLayoutToFloatingValue(isInsideOutline);
+            });
+            m_AnimateHintText = true;
+        }
+
+        private void AnimateHintTextDeselect()
+        {
+            CancelHintTextTweeners();
+
+            if (!isFocused && text.Length == 0)
+            {
+                m_HintTextFloatingValueTweener = TweenManager.TweenFloat(f => hintTextFloatingValue = f,
+                    () => hintTextFloatingValue, 0f, m_AnimationDuration, 0f, () =>
+                    {
+                        m_AnimateHintText = false;
+                        SetHintLayoutToFloatingValue();
+                    });
+                m_AnimateHintText = true;
+            }
+        }
+
+        private void AnimateActiveLineSelect(bool instant = false)
+        {
+            CancelActivelineTweeners();
+
+            if (m_LineTransform == null || m_ActiveLineTransform == null) return;
+
+            if (instant)
+            {
+                m_ActiveLineTransform.anchoredPosition = Vector2.zero;
+                m_ActiveLineTransform.sizeDelta = new Vector2(m_LineTransform.GetProperSize().x, m_ActiveLineTransform.sizeDelta.y);
+                activeLineCanvasGroup.alpha = 1;
+            }
+            else
+            {
+                float lineLength = m_LineTransform.GetProperSize().x;
+
+                m_ActiveLineTransform.sizeDelta = new Vector2(0, m_ActiveLineTransform.sizeDelta.y);
+                m_ActiveLineTransform.position = Input.mousePosition;
+                m_ActiveLineTransform.anchoredPosition = new Vector2(Mathf.Clamp(m_ActiveLineTransform.anchoredPosition.x, -lineLength / 2, lineLength / 2), 0);
+                activeLineCanvasGroup.alpha = 1;
+
+                m_ActiveLinePosTweener = TweenManager.TweenFloat(f => m_ActiveLineTransform.anchoredPosition = new Vector2(f, m_ActiveLineTransform.anchoredPosition.y), m_ActiveLineTransform.anchoredPosition.x, 0f, m_AnimationDuration);
+
+                m_ActiveLineSizeTweener = TweenManager.TweenFloat(f => m_ActiveLineTransform.sizeDelta = new Vector2(f, m_ActiveLineTransform.sizeDelta.y), m_ActiveLineTransform.sizeDelta.x, m_LineTransform.GetProperSize().x, m_AnimationDuration);
+            }
+        }
+
+        private void AnimateActiveLineDeselect(bool instant = false)
+        {
+            CancelActivelineTweeners();
+
+            if (activeLineTransform == null) return;
+
+            if (instant)
+            {
+                activeLineCanvasGroup.alpha = 0;
+            }
+            else
+            {
+                activeLineCanvasGroup.alpha = 1;
+
+                m_ActiveLineAlphaTweener = TweenManager.TweenFloat(f => activeLineCanvasGroup.alpha = f, activeLineCanvasGroup.alpha, 0f, m_AnimationDuration);
+            }
+        }
+
+        private void CancelHintTextTweeners()
+        {
+            TweenManager.EndTween(m_HintTextFloatingValueTweener);
+            m_AnimateHintText = false;
+        }
+
+        private void CancelActivelineTweeners()
+        {
+            TweenManager.EndTween(m_ActiveLineSizeTweener);
+            TweenManager.EndTween(m_ActiveLinePosTweener);
+            TweenManager.EndTween(m_ActiveLineAlphaTweener);
+        }
+
+        protected virtual bool IsCounterInsideOutline()
+        {
+            var isInsideOutline = m_BackgroundSizeMode != BackgroundSizeMode.TextOnly && m_BackgroundSizeMode == BackgroundSizeMode.TextAndHint;
+            if (isInsideOutline)
+            {
+                //check if background or outline is valid
+                isInsideOutline = (m_OutlineGraphic != null && !HasIgnoreLayout(m_OutlineGraphic) && m_BackgroundGraphic.transform != this.transform && m_OutlineGraphic.gameObject.activeInHierarchy && m_OutlineGraphic.enabled) ||
+                    (m_BackgroundGraphic != null && !HasIgnoreLayout(m_BackgroundGraphic) && m_BackgroundGraphic.transform != this && m_BackgroundGraphic.gameObject.activeInHierarchy && m_BackgroundGraphic.enabled);
+            }
+            return isInsideOutline;
+        }
+
+        protected virtual bool IsHintInsideOutline()
+        {
+            var isInsideOutline = m_FloatingHint && m_BackgroundSizeMode != BackgroundSizeMode.TextOnly && m_BackgroundSizeMode == BackgroundSizeMode.TextAndCounter;
+            if (isInsideOutline)
+            {
+                //check if background or outline is valid
+                isInsideOutline = (m_OutlineGraphic != null && !HasIgnoreLayout(m_OutlineGraphic) && m_BackgroundGraphic.transform != this.transform && m_OutlineGraphic.gameObject.activeInHierarchy && m_OutlineGraphic.enabled) ||
+                    (m_BackgroundGraphic != null && !HasIgnoreLayout(m_BackgroundGraphic) && m_BackgroundGraphic.transform != this && m_BackgroundGraphic.gameObject.activeInHierarchy && m_BackgroundGraphic.enabled);
+            }
+            return isInsideOutline;
+        }
+
+        protected void SetHintLayoutToFloatingValue()
+        {
+            SetHintLayoutToFloatingValue(IsHintInsideOutline());
+        }
+
+        protected void SetHintLayoutToFloatingValue(bool isInsideOutline)
+        {
+            if (m_HintTextTransform == null || HasIgnoreLayout(m_HintTextTransform)) return;
+
+            if (m_FloatingHint)
+            {
+                var hintTopPosition = isInsideOutline ? m_Padding.top : 4;
+                m_HintTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_BottomSectionHeight);
+                m_HintTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, -Tween.Linear(m_TopSectionHeight, hintTopPosition, hintTextFloatingValue, 1));
+                hintTextObject.SetGraphicFontSize(Mathf.RoundToInt(Tween.Linear(inputText.GetGraphicFontSize(), m_FloatingHintFontSize, hintTextFloatingValue, 1)));
+
+                float realFontSize = Tween.Linear(inputText.GetGraphicFontSize(), m_FloatingHintFontSize, hintTextFloatingValue, 1);
+
+                float hintFontSize = hintTextObject.GetGraphicFontSize();
+                float scaleFactor = hintFontSize == 0? 0 : realFontSize / hintFontSize;
+
+                m_HintTextTransform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+                hintTextCanvasGroup.alpha = 1;
+            }
+            else
+            {
+                //m_HintTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_BottomSectionHeight);
+                //m_HintTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, -m_TopSectionHeight);
+                hintTextObject.SetGraphicFontSize(inputText.GetGraphicFontSize());
+                m_HintTextTransform.localScale = Vector3.one;
+
+                m_HintTextTransform.pivot = inputTextTransform.pivot;
+                m_HintTextTransform.anchorMin = inputTextTransform.anchorMin;
+                m_HintTextTransform.anchorMax = inputTextTransform.anchorMax;
+                m_HintTextTransform.anchoredPosition = inputTextTransform.anchoredPosition;
+                m_HintTextTransform.sizeDelta = inputTextTransform.sizeDelta;
+
+                hintTextCanvasGroup.alpha = m_InputField != null && text.Length > 0 ? 0 : 1;
+            }
+        }
+
+        public void SetBackgroundAndOutlineLayout(bool isVertical)
+        {
+            if (m_BackgroundGraphic != null || m_OutlineGraphic != null)
+            {
+                Vector2 offsetMin = Vector2.zero;
+                Vector2 offsetMax = Vector2.zero;
+                if (m_BackgroundSizeMode == BackgroundSizeMode.TextOnly)
+                {
+                    offsetMin = new Vector2(0, (m_BottomSectionHeight - m_Padding.bottom));
+                    offsetMax = new Vector2(0, -(m_TopSectionHeight - m_Padding.top));
+                }
+                else if (m_BackgroundSizeMode == BackgroundSizeMode.TextAndCounter)
+                {
+                    offsetMin = new Vector2(0, 0);
+                    offsetMax = new Vector2(0, -(m_TopSectionHeight - m_Padding.top));
+                }
+                else if (m_BackgroundSizeMode == BackgroundSizeMode.TextAndHint)
+                {
+                    offsetMin = new Vector2(0, (m_BottomSectionHeight - m_Padding.bottom));
+                    offsetMax = new Vector2(0, 0);
+                }
+                else if (m_BackgroundSizeMode == BackgroundSizeMode.All)
+                {
+                    offsetMin = Vector2.zero;
+                    offsetMax = Vector2.zero;
+                }
+                else
+                {
+                    return;
+                }
+
+                if (m_BackgroundGraphic != null && m_BackgroundGraphic.transform != this.transform && !HasIgnoreLayout(m_BackgroundGraphic))
+                {
+                    m_BackgroundGraphic.rectTransform.offsetMin = isVertical ? offsetMin : new Vector2(0, m_BackgroundGraphic.rectTransform.offsetMin.y);
+                    m_BackgroundGraphic.rectTransform.offsetMax = isVertical ? offsetMax : new Vector2(0, m_BackgroundGraphic.rectTransform.offsetMax.y);
+                }
+
+                if (m_OutlineGraphic != null && m_OutlineGraphic.transform != this.transform && !HasIgnoreLayout(m_OutlineGraphic))
+                {
+                    m_OutlineGraphic.rectTransform.offsetMin = isVertical ? offsetMin : new Vector2(0, m_OutlineGraphic.rectTransform.offsetMin.y);
+                    m_OutlineGraphic.rectTransform.offsetMax = isVertical ? offsetMax : new Vector2(0, m_OutlineGraphic.rectTransform.offsetMax.y);
+                }
+            }
+        }
+
+        public void SetCounterAndValidationLayout(bool isVertical)
+        {
+            if (isVertical)
+            {
+                if (m_ValidationTextTransform != null || m_CounterTextTransform != null)
+                {
+                    var counterIsInsideBG = IsCounterInsideOutline();
+                    var defaultOffset = 0;
+                    if (m_ValidationTextTransform != null && validationText != null && !HasIgnoreLayout(m_ValidationTextTransform))
+                    {
+                        m_ValidationTextTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, counterIsInsideBG ? m_Padding.bottom : defaultOffset, m_ValidationText != null ? LayoutUtility.GetPreferredHeight(m_ValidationText.rectTransform) : 0);
+                    }
+
+                    if (m_CounterTextTransform != null && counterText != null && !HasIgnoreLayout(m_CounterTextTransform))
+                    {
+                        m_CounterTextTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, counterIsInsideBG ? m_Padding.bottom : defaultOffset, m_CounterText != null? LayoutUtility.GetPreferredHeight(m_CounterText.rectTransform) : 0);
+                    }
+                }
+            }
+            else
+            {
+                if (m_ValidationTextTransform != null && !HasIgnoreLayout(m_ValidationTextTransform))
+                {
+                    m_ValidationTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_ValidationTextTransform.offsetMin.y);
+                    m_ValidationTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, m_ValidationTextTransform.offsetMax.y);
+                }
+
+                if (m_CounterTextTransform != null && !HasIgnoreLayout(m_CounterTextTransform))
+                {
+                    m_CounterTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_CounterTextTransform.offsetMin.y);
+                    m_CounterTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, m_CounterTextTransform.offsetMax.y);
+                }
+            }
+        }
+
+        protected bool HasIgnoreLayout(Component p_component)
+        {
+            if (p_component != null)
+            {
+                var v_layout = p_component.GetComponent<LayoutElement>();
+                return v_layout != null && v_layout.ignoreLayout;
+            }
+            return false;
+        }
+
+        /*protected float GetPreferredHeight(Component p_component)
+        {
+            if (p_component != null)
+            {
+                var v_layout = p_component.GetComponent<LayoutElement>();
+                if(v_layout != null && v_layout.preferredHeight >= 0)
+                    return v_layout.preferredHeight;
+                else
+                {
+                    ILayoutElement v_layoutElement = p_component as ILayoutElement;
+                    if (v_layoutElement != null)
+                        return v_layoutElement.preferredHeight;
+                }
+            }
+            return 0;
+        }*/
+
+        #endregion
+
+        #region Layout Functions
+
+        public void SetLayoutDirty()
+        {
+            LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
+        }
+
+        public void SetLayoutHorizontal()
+        {
+            if (!TweenManager.TweenIsActive(m_HintTextFloatingValueTweener))
+            {
+                hintTextFloatingValue = (isFocused || text.Length > 0) ? 1 : 0;
+                SetHintLayoutToFloatingValue();
+            }
+
+            if (inputTextTransform != null && !HasIgnoreLayout(inputTextTransform))
+            {
+                inputTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, inputTextTransform.offsetMin.y);
+                inputTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, inputTextTransform.offsetMax.y);
+            }
+
+            if (m_LineTransform != null && !HasIgnoreLayout(m_LineTransform))
+            {
+                m_LineTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_LineTransform.offsetMin.y);
+                m_LineTransform.offsetMax = new Vector2(-m_RightSectionWidth, m_LineTransform.offsetMax.y);
+            }
+
+            /*if (caretTransform != null)
+            {
+                caretTransform.offsetMin = new Vector2(inputTextTransform.offsetMin.x, caretTransform.offsetMin.y);
+                caretTransform.offsetMax = new Vector2(inputTextTransform.offsetMax.x, caretTransform.offsetMax.y);
+            }*/
+
+            SetBackgroundAndOutlineLayout(false);
+            SetCounterAndValidationLayout(false);
+        }
+
+        public void SetLayoutVertical()
+        {
+            if (inputTextTransform != null && !HasIgnoreLayout(inputTextTransform))
+            {
+                inputTextTransform.offsetMin = new Vector2(inputTextTransform.offsetMin.x, m_BottomSectionHeight);
+                inputTextTransform.offsetMax = new Vector2(inputTextTransform.offsetMax.x, -m_TopSectionHeight);
+            }
+
+            if (!TweenManager.TweenIsActive(m_HintTextFloatingValueTweener))
+            {
+                hintTextFloatingValue = (isFocused || text.Length > 0) ? 1 : 0;
+                SetHintLayoutToFloatingValue();
+            }
+
+            if (m_LeftContentTransform != null && !HasIgnoreLayout(m_LeftContentTransform))
+            {
+                ILayoutController[] controllers = m_LeftContentTransform.GetComponentsInChildren<ILayoutController>();
+                for (int i = 0; i < controllers.Length; i++)
+                {
+                    controllers[i].SetLayoutVertical();
+                }
+
+                m_LeftContentTransform.anchoredPosition = new Vector2(m_LeftContentOffset.x + m_Padding.left, (inputTextTransform.offsetMax.y - (m_InputText.GetGraphicFontSize() / 2) - 2) + m_LeftContentOffset.y /*+ (m_Padding.bottom)*/);
+            }
+
+            if (m_RightContentTransform != null && !HasIgnoreLayout(m_RightContentTransform))
+            {
+                ILayoutController[] controllers = m_RightContentTransform.GetComponentsInChildren<ILayoutController>();
+                for (int i = 0; i < controllers.Length; i++)
+                {
+                    controllers[i].SetLayoutVertical();
+                }
+
+                m_RightContentTransform.anchoredPosition = new Vector2(m_RightContentOffset.x - m_Padding.right, (inputTextTransform.offsetMax.y - (m_InputText.GetGraphicFontSize() / 2) - 2) + m_RightContentOffset.y /*+ (m_Padding.bottom)*/);
+            }
+
+            if (m_LineTransform != null && !HasIgnoreLayout(m_LineTransform))
+            {
+                m_LineTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, m_BottomSectionHeight, 1);
+            }
+
+            if (inputField is InputField)
+            {
+                if (caretTransform != null)
+                {
+                    caretTransform.localPosition = inputText.rectTransform.localPosition;
+                    caretTransform.localRotation = inputText.rectTransform.localRotation;
+                    caretTransform.localScale = inputText.rectTransform.localScale;
+                    caretTransform.anchorMin = inputText.rectTransform.anchorMin;
+                    caretTransform.anchorMax = inputText.rectTransform.anchorMax;
+                    caretTransform.anchoredPosition = inputText.rectTransform.anchoredPosition;
+                    caretTransform.sizeDelta = inputText.rectTransform.sizeDelta;
+                    caretTransform.pivot = inputText.rectTransform.pivot;
+                    caretTransform.offsetMin = inputText.rectTransform.offsetMin;
+                    caretTransform.offsetMax = inputText.rectTransform.offsetMax;
+                }
+            }
+
+            SetBackgroundAndOutlineLayout(true);
+            SetCounterAndValidationLayout(true);
+        }
+
+        public void CalculateLayoutInputHorizontal()
+        {
+            m_LayoutSize.x = m_ManualPreferredWidth ? m_ManualSize.x : -1;
+
+            m_LeftSectionWidth = 0;
+            m_RightSectionWidth = 0;
+
+            if (m_LeftContentTransform != null && !HasIgnoreLayout(m_LeftContentTransform))
+            {
+                if (m_LeftContentTransform.gameObject.activeSelf)
+                {
+                    m_LeftSectionWidth = m_LeftContentTransform.GetProperSize().x;
+                    m_LeftSectionWidth += 8;
+                }
+            }
+
+            if (m_RightContentTransform != null && !HasIgnoreLayout(m_RightContentTransform))
+            {
+                if (m_RightContentTransform.gameObject.activeSelf)
+                {
+                    m_RightSectionWidth = m_RightContentTransform.GetProperSize().x;
+                    m_RightSectionWidth += 8;
+                }
+            }
+
+            SumPaddingHorizontal();
+        }
+
+        public void CalculateLayoutInputVertical()
+        {
+            if (m_FloatingHint)
+            {
+                m_TopSectionHeight = GetSmallHintTextHeight();
+                if(m_TopSectionHeight > 0)
+                    m_TopSectionHeight += 4;
+            }
+            else
+            {
+                m_TopSectionHeight = 0;
+            }
+
+            if (m_HasCharacterCounter || m_HasValidation)
+            {
+                m_BottomSectionHeight = 0;
+
+                if (m_HasCharacterCounter && counterText != null && !HasIgnoreLayout(counterText))
+                {
+                    m_BottomSectionHeight += 4;
+                    m_BottomSectionHeight = counterText != null? LayoutUtility.GetPreferredHeight(counterText.rectTransform) : 0;
+                }
+                else if (m_HasValidation && validationText != null && !HasIgnoreLayout(validationText))
+                {
+                    m_BottomSectionHeight += 4;
+                    m_BottomSectionHeight = validationText != null ? LayoutUtility.GetPreferredHeight(validationText.rectTransform) : 0;
+                }
+            }
+            else
+            {
+                m_BottomSectionHeight = 0;
+            }
+            SumPaddingVertical();
+
+            if (m_FitHeightToContent)
+            {
+                m_LayoutSize.y = GetTextHeight() + 4;
+                m_LayoutSize.y += m_TopSectionHeight;
+                m_LayoutSize.y += m_BottomSectionHeight;
+            }
+            else
+            {
+                m_LayoutSize.y = m_ManualPreferredHeight ? m_ManualSize.y : -1;
+            }
+
+            if (m_LeftContentTransform != null && !HasIgnoreLayout(m_LeftContentTransform))
+            {
+                ILayoutElement[] elements = m_LeftContentTransform.GetComponentsInChildren<ILayoutElement>();
+                elements = elements.Reverse().ToArray();
+                for (int i = 0; i < elements.Length; i++)
+                {
+                    elements[i].CalculateLayoutInputVertical();
+                }
+            }
+
+            if (m_RightContentTransform != null && !HasIgnoreLayout(m_RightContentTransform))
+            {
+                ILayoutElement[] elements = m_RightContentTransform.GetComponentsInChildren<ILayoutElement>();
+                elements = elements.Reverse().ToArray();
+                for (int i = 0; i < elements.Length; i++)
+                {
+                    elements[i].CalculateLayoutInputVertical();
+                }
+            }
+        }
+
+        protected void SumPaddingHorizontal()
+        {
+            m_LeftSectionWidth += m_Padding.left;
+            m_RightSectionWidth += m_Padding.right;
+        }
+
+        protected void SumPaddingVertical()
+        {
+            m_TopSectionHeight += m_Padding.top;
+            m_BottomSectionHeight += m_Padding.bottom;
+        }
+
+        public float minWidth { get { return -1; } }
+        public float preferredWidth { get { return m_LayoutSize.x; } }
+        public float flexibleWidth { get { return -1; } }
+        public float minHeight { get { return -1; } }
+        public float preferredHeight { get { return m_LayoutSize.y; } }
+        public float flexibleHeight { get { return -1; } }
+        public int layoutPriority { get { return 1; } }
+
+        #endregion
+
+        #region BaseStyleElement Overrides
+
+        public override void RefreshVisualStyles(bool p_canAnimate = true)
+        {
+            UpdateSelectionState();
+            SetStylePropertyColorsActive_Internal(p_canAnimate, m_AnimationDuration);
+        }
+
+        #endregion
+
+        #region BaseStyleElement Helper Classes
+
+        [System.Serializable]
+        public class InputFieldStyleProperty : StyleProperty
+        {
+            #region Private Variables
+
+            [SerializeField, SerializeStyleProperty]
+            protected Color m_colorActive = Color.white;
+            [SerializeField, SerializeStyleProperty]
+            protected Color m_colorInactive = Color.gray;
+
+            #endregion
+
+            #region Public Properties
+
+            public Color ColorActive
+            {
+                get
+                {
+                    return m_colorActive;
+                }
+
+                set
+                {
+                    m_colorActive = value;
+                }
+            }
+
+            public Color ColorInactive
+            {
+                get
+                {
+                    return m_colorInactive;
+                }
+
+                set
+                {
+                    m_colorInactive = value;
+                }
+            }
+
+            #endregion
+
+            #region Constructor
+
+            public InputFieldStyleProperty()
+            {
+            }
+
+            public InputFieldStyleProperty(string p_name, Component p_target, Color p_colorActive, Color p_colorInactive, bool p_useStyleGraphic)
+            {
+                m_target = p_target != null ? p_target.transform : null;
+                m_name = p_name;
+                m_colorActive = p_colorActive;
+                m_colorInactive = p_colorInactive;
+                m_useStyleGraphic = p_useStyleGraphic;
+            }
+
+            #endregion
+
+            #region Helper Functions
+
+            public override void Tween(BaseStyleElement p_sender, bool p_canAnimate, float p_animationDuration)
+            {
+                TweenManager.EndTween(_tweenId);
+
+                var v_graphic = GetTarget<Graphic>();
+                if (v_graphic != null)
+                {
+                    var v_inputField = p_sender as MaterialInputField;
+                    var v_isActive = v_inputField != null ? v_inputField.IsSelected() : true;
+
+                    var v_endColor = v_isActive ? m_colorActive : m_colorInactive;
+                    if (p_canAnimate && Application.isPlaying)
+                    {
+                        _tweenId = TweenManager.TweenColor(
+                                (color) =>
+                                {
+                                    if (v_graphic != null)
+                                        v_graphic.color = color;
+                                },
+                                v_graphic.color,
+                                v_endColor,
+                                p_animationDuration
+                            );
+                    }
+                    else
+                    {
+                        v_graphic.color = v_endColor;
+                    }
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Editor Conversors
+
+#if UNITY_EDITOR
+        [ContextMenu("Convert To TextView Model", true)]
+        bool ConvertToViewportModelValidate()
+        {
+            return m_InputText != null && (m_InputText.rectTransform == m_InputTextTransform || m_InputTextTransform == null);
+        }
+
+        [ContextMenu("Convert To TextView Model", false)]
+        void ConvertToViewportModel()
+        {
+            if (m_InputText != null && (m_InputText.rectTransform == m_InputTextTransform || m_InputTextTransform == null))
+            {
+                RectMask2D textView = new GameObject("TextView").AddComponent<RectMask2D>();
+                textView.transform.SetParent(m_InputText.transform.parent, false);
+
+                //Set Property of TextViewport
+                if (inputField != null)
+                {
+                    var textViewportMetaProperty = inputField.GetType().GetProperty("textViewport", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                    if (textViewportMetaProperty != null)
+                        textViewportMetaProperty.SetValue(inputField, textView.rectTransform, null);
+                }
+
+                //Create ViewPort
+                textView.rectTransform.SetSiblingIndex(inputText.rectTransform.GetSiblingIndex());
+                textView.rectTransform.localPosition = inputText.rectTransform.localPosition;
+                textView.rectTransform.localRotation = inputText.rectTransform.localRotation;
+                textView.rectTransform.localScale = inputText.rectTransform.localScale;
+                textView.rectTransform.anchorMin = inputText.rectTransform.anchorMin;
+                textView.rectTransform.anchorMax = inputText.rectTransform.anchorMax;
+                textView.rectTransform.anchoredPosition = inputText.rectTransform.anchoredPosition;
+                textView.rectTransform.sizeDelta = inputText.rectTransform.sizeDelta;
+                textView.rectTransform.pivot = new Vector2(0.5f, 0.5f); //inputText.rectTransform.pivot;
+                textView.rectTransform.offsetMin = inputText.rectTransform.offsetMin;
+                textView.rectTransform.offsetMax = inputText.rectTransform.offsetMax;
+
+                //Change InputText to ViewPort Parent
+                inputText.transform.SetParent(textView.rectTransform, true);
+                inputText.rectTransform.localPosition = Vector2.zero;
+                inputText.rectTransform.localRotation = Quaternion.identity;
+                inputText.rectTransform.localScale = Vector3.one;
+                inputText.rectTransform.anchorMin = Vector2.zero;
+                inputText.rectTransform.anchorMax = Vector2.one;
+                inputText.rectTransform.anchoredPosition = inputText.rectTransform.anchoredPosition;
+                inputText.rectTransform.sizeDelta = Vector2.zero;
+                inputText.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+                inputText.rectTransform.offsetMin = Vector2.zero;
+                inputText.rectTransform.offsetMax = Vector2.zero;
+
+                m_InputTextTransform = textView.rectTransform;
+            }
+        }
+#endif
+
+        #endregion
+    }
+}
