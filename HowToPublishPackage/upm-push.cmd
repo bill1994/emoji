@@ -9,11 +9,9 @@ for /f "tokens=1,2 delims=:," %%a in ('findstr "name" "%cd%\package.json"') do (
 :break2
 
 if not defined name (
-@echo on
 goto :endBreak
 )
 if not defined version (
-@echo on
 goto :endBreak
 )
 set name=%name:"=%
@@ -27,7 +25,6 @@ FOR /f "tokens=1,2 delims=," %%a IN ("%gitRootPath%") do ( set relativePath=Asse
 :break3
 
 @echo on
-
 cd "%gitRootPath%"
 git subtree split --prefix="%relativePath:\=/%" --branch %name%
 git tag -d %branchTag%
@@ -38,4 +35,5 @@ git tag "%branchTag%" %name%
 git push origin %name% --tags
 
 :endBreak
+@echo off
 SET /p exit=Press any key to exit
