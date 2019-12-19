@@ -126,7 +126,7 @@ namespace Kyub.UI
             }
         }
 
-        public float spacingBetweenGroups
+        public float spacingBetween
         {
             get
             {
@@ -264,7 +264,7 @@ namespace Kyub.UI
             float totalFlexible = 0;
 
             bool alongOtherAxis = (isVertical ^ (axis == 1));
-            var axisSpacing = alongOtherAxis ? spacing : spacingBetweenGroups;
+            var axisSpacing = alongOtherAxis ? spacingBetween : spacing;
             for (int i = 0; i < _Groups.Count; i++)
             {
                 LinearGroup group = _Groups[i];
@@ -283,8 +283,8 @@ namespace Kyub.UI
 
             if (!alongOtherAxis && rectChildren.Count > 0)
             {
-                totalMin -= spacing;
-                totalPreferred -= spacing;
+                totalMin -= axisSpacing;
+                totalPreferred -= axisSpacing;
             }
             totalPreferred = Mathf.Max(totalMin, totalPreferred);
             SetLayoutInputForAxis(totalMin, totalPreferred, totalFlexible, axis);
@@ -374,7 +374,7 @@ namespace Kyub.UI
                 SetChildrenAlongGroupAxis(axis, isVertical, group);
 
                 if (alongOtherAxis)
-                    pos += groupSize[axis] + spacingBetweenGroups;
+                    pos += groupSize[axis] + spacingBetween;
             }
         }
         protected void SetChildrenAlongGroupAxis(int axis, bool isVertical, LinearGroup group)
