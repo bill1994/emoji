@@ -1,0 +1,10 @@
+{
+    "name": "Kyub.Async",
+    "references": [
+        "Kyub.Core"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

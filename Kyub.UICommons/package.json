@@ -1,0 +1,22 @@
+{
+  "name": "com.kyub.uicommons",
+  "version": "1.0.0",
+  "displayName": "Kyub UI Commons",
+  "description": "Contains new/better UGUIs components",
+  "unity": "2019.1",
+  "dependencies": {
+    "com.unity.ugui": "1.0.0"
+  },
+  "keywords": [
+    "UGUI",
+    "Canvas",
+    "UI"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}

@@ -1,0 +1,296 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
+using UnityEngine.Events;
+using Kilt.Async;
+
+namespace Kilt.UI
+{
+	public class ExternalResourcesImage : ExternalResourcesReceiver 
+	{
+		#region Private Variables
+
+		[SerializeField]
+		Sprite m_defaultSprite = null;
+		[SerializeField]
+		MaskableGraphic m_imageComponent = null;
+		[SerializeField]
+		bool m_forceUnloadWhenRefCountEmpty = true;
+
+		//aux
+		Sprite _sprite = null;
+		
+		#endregion
+
+		#region Callbacks
+
+		public UnityEvent OnBeginDownloadImageCallback;
+		public UnityEvent OnEndApplyImageCallback;
+
+		#endregion
+
+		#region Public Properties
+
+		public Sprite DefaultSprite
+		{
+			get
+			{
+				return m_defaultSprite;
+			}
+			set
+			{
+				if(m_defaultSprite == value)
+					return;
+				m_defaultSprite = value;
+			}
+		}
+		
+		public Sprite Sprite
+		{
+			get
+			{
+				return GetSpriteFromImageComponent();
+			}
+			set
+			{
+				SetSpriteToImageComponent(value);
+			}
+		}
+		
+		public override string Key
+		{
+			get
+			{
+				return base.Key;
+			}
+			set
+			{
+				if(base.Key == value)
+					return;
+				base.Key = value;
+			}
+		}
+		
+		public bool ForceUnloadWhenRefCountEmpty
+		{
+			get
+			{
+				return m_forceUnloadWhenRefCountEmpty;
+			}
+			set
+			{
+				if(m_forceUnloadWhenRefCountEmpty == value)
+					return;
+				m_forceUnloadWhenRefCountEmpty = value;
+			}
+		}
+		
+		public MaskableGraphic ImageComponent
+		{
+			get
+			{
+				return m_imageComponent;
+			}
+			set
+			{
+				if(m_imageComponent == value)
+					return;
+				m_imageComponent = value;
+				_sprite = GetSpriteFromImageComponent();
+			}
+		}
+		
+		#endregion
+
+		#region Internal Helper Functions
+
+		protected Sprite GetSpriteFromImageComponent()
+		{
+			if(m_imageComponent != null)
+			{
+				Image v_image = m_imageComponent as Image;
+				if(v_image != null)
+				{
+					_sprite = v_image.sprite;
+				}
+				else
+				{
+					RawImage v_rawImage = m_imageComponent as RawImage;
+					if(v_rawImage != null)
+					{
+						Texture2D v_texture = _sprite != null? _sprite.texture : null;
+						if(v_rawImage.texture != v_texture)
+							_sprite = v_texture != null? Sprite.Create(v_texture, new Rect(0,0, v_texture.width, v_texture.height), new Vector2(0.5f, 0.5f)) : null;
+					}
+					else
+					{
+						m_imageComponent = null;
+						_sprite = null;
+					}
+				}
+			}
+			else
+				_sprite = null;
+			return _sprite;
+		}
+
+		protected void SetSpriteToImageComponent(Sprite p_sprite)
+		{
+			if(m_imageComponent != null)
+			{
+				Image v_image = m_imageComponent as Image;
+				if(v_image != null)
+				{
+					v_image.sprite = p_sprite;
+					_sprite = p_sprite;
+				}
+				else
+				{
+					RawImage v_rawImage = m_imageComponent as RawImage;
+					if(v_rawImage != null)
+					{
+						Texture2D v_texture = p_sprite != null? p_sprite.texture : null;
+						v_rawImage.texture = v_texture;
+						_sprite = p_sprite;
+					}
+					else
+					{
+						m_imageComponent = null;
+						_sprite = null;
+					}
+				}
+			}
+			else
+				_sprite = null;
+		}
+
+		#endregion
+		
+		#region Unity Functions
+		
+		protected virtual void OnEnable()
+		{
+			RegisterEvents();
+		}
+		
+		protected virtual void Start()
+		{
+			TryApplyImage();
+		}
+		
+		protected virtual void OnDisable()
+		{
+			if(_canUnregisterOnDisable)
+				UnregisterEvents();
+		}
+
+		protected override void OnDestroy()
+		{
+			UnregisterEvents();
+			base.OnDestroy();
+		}
+		
+		protected virtual void Update()
+		{
+			if(_needTryApplyImage)
+				TryApplyImage();
+		}
+		
+		#endregion
+		
+		#region Receivers
+		
+		protected virtual void HandleOnImageLoaded (WWWImageCallback p_imageCallback)
+		{
+			if(ImageComponent != null && (p_imageCallback.Sprite != null || p_imageCallback.Error == null)&& 
+			   string.Equals(p_imageCallback.Url, Key) && !string.IsNullOrEmpty(Key))
+			{
+				Sprite = p_imageCallback.Sprite;
+			}
+			if(Sprite == null)
+			{
+				ApplyDefaultSpriteInImageComponent();
+			}
+			if(OnEndApplyImageCallback != null)
+                OnEndApplyImageCallback.Invoke();
+			if(!_canUnregisterOnDisable)
+			{
+				_canUnregisterOnDisable = true;
+				if(!gameObject.activeInHierarchy || !gameObject.activeSelf || !enabled)
+					UnregisterEvents();
+			}
+		}
+		
+		#endregion
+		
+		#region Helper Functions
+		
+		protected override void RegisterReceiver () 
+		{
+			base.RegisterReceiver();
+		}
+		
+		protected override void UnregisterReceiver () 
+		{
+			base.UnregisterReceiver();
+			if(ForceUnloadWhenRefCountEmpty && ExternalResources.IsUselessResources(Key))
+				ExternalResources.UnloadImage(Key);
+		}
+		
+		protected virtual void RegisterEvents()
+		{
+			UnregisterEvents();
+			ExternalResources.OnImageLoaded += HandleOnImageLoaded;
+		}
+		
+		protected virtual void UnregisterEvents()
+		{
+			ExternalResources.OnImageLoaded -= HandleOnImageLoaded;
+		}
+
+		public virtual void ApplyEmptySpriteInImageComponent()
+		{
+			Sprite = null;
+		}
+
+		public virtual void ApplyDefaultSpriteInImageComponent()
+		{
+			Sprite = DefaultSprite;
+		}
+
+		public virtual void ApplySprite(Sprite p_sprite)
+		{
+			Sprite = p_sprite;
+		}
+		
+		protected bool _needTryApplyImage = false;
+		protected bool _canUnregisterOnDisable = true;
+		public virtual void TryApplyImage()
+		{
+			if(ImageComponent != null)
+			{
+				if(!ExternalResources.IsDownloading(Key))
+				{
+					WWWImageCallback v_callback = !ExternalResources.IsLoaded(Key)? 
+						ExternalResources.ReloadSpriteAsync(Key, ApplySprite): ExternalResources.LoadSpriteAsync(Key, ApplySprite);
+					if(v_callback != null && v_callback.IsProcessing())
+					{
+						_canUnregisterOnDisable = false;
+						if(OnDownloadImageCallback != null)
+                            OnDownloadImageCallback.Invoke();
+					}
+					_needTryApplyImage = false;
+				}
+				else
+				{
+					_needTryApplyImage = true;
+				}
+			}
+			else
+				_needTryApplyImage = false;
+		}
+		
+		#endregion
+	}
+}
