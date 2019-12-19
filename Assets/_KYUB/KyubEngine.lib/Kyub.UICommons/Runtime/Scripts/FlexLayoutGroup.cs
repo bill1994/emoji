@@ -209,7 +209,7 @@ namespace Kyub.UI
 
                 float childSize = Mathf.Max(min, preferred);
                 childSize += flexible * itemFlexibleMultiplier;
-                
+
                 //Fit in current group
                 if (pos + childSize <= innerSize)
                 {
@@ -373,7 +373,7 @@ namespace Kyub.UI
 
                 SetChildrenAlongGroupAxis(axis, isVertical, group);
 
-                if(alongOtherAxis)
+                if (alongOtherAxis)
                     pos += groupSize[axis] + spacingBetweenGroups;
             }
         }
@@ -418,7 +418,7 @@ namespace Kyub.UI
                 if (surplusSpace > 0)
                 {
                     if (group.GetTotalFlexibleSize(axis) == 0)
-                        pos = group.GetStartOffset(axis, group.GetTotalPreferredSize(axis), alignmentOnAxis);
+                        pos += group.GetStartOffset(axis, group.GetTotalPreferredSize(axis), alignmentOnAxis);
                     else if (group.GetTotalFlexibleSize(axis) > 0)
                         itemFlexibleMultiplier = surplusSpace / group.GetTotalFlexibleSize(axis);
                 }
