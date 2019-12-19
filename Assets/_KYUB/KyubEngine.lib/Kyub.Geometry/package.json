@@ -1,0 +1,20 @@
+{
+  "name": "com.kyub.geometry",
+  "version": "1.0.0",
+  "displayName": "Kyub Geometry",
+  "description": "Geometry Math Support API",
+  "unity": "2019.1",
+  "dependencies": {
+	"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core"
+  },
+  "keywords": [
+    "Geometry"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}
