@@ -5,7 +5,7 @@
   "description": "This package allows unity to disable Canvas to cutoff drawcalls in runtime. Useful to optimize performance in Default UI Apps",
   "unity": "2019.1",
   "dependencies": {
-	"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core"
+	"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core",
 	"com.kyub.geometry": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.geometry"
   },
   "keywords": [
