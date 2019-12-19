@@ -17,15 +17,11 @@ UnityGenerated/
 .DS_Store
 *.swp
 *.Trashes
-/Assets/Ferr2DTerrainMeshes
-/Assets/Ferr2DTerrainMeshes.meta
 /Library
 /BuildApk
 /BuildXCode
-/Assets/Resources/baseKeyAndSaveOldFormatBackup.rar
 /ELAN.src.zip
 /BuildExe
-/Assets/Resources/baseKeyAndSaveOldFormatBackup.rar.meta
 /BuildWeb
 /UnityPackage
 /.vs/Ropes2D/v14/*.suo
