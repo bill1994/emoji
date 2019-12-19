@@ -1,0 +1,10 @@
+{
+    "name": "Kyub.Geometry",
+    "references": [
+        "Kyub.Core"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
