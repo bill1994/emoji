@@ -1,0 +1,20 @@
+{
+  "name": "com.kyub.serialization",
+  "version": "1.0.0",
+  "displayName": "Kyub Serialization",
+  "description": "This package contains Kyub Serialization JSON Api",
+  "unity": "2019.1",
+	"dependencies": {
+		"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core"
+	},
+  "keywords": [
+    "JSON"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}
