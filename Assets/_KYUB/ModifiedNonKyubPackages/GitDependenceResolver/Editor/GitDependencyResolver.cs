@@ -19,16 +19,16 @@ namespace Coffee.PackageManager.DependencyResolver
 		
 		static PackageMeta[] GetInstalledPackages()
 		{
-			return Directory.GetDirectories ("./Library/PackageCache")
+			/*return Directory.GetDirectories ("./Library/PackageCache")
 				.Concat (Directory.GetDirectories ("./Packages"))
 				.Select (PackageMeta.FromPackageDir)    // Convert to PackageMeta
 				.Where (x => x != null)                 // Skip null
-				.ToArray ();
-			/*return AssetDatabase.GetAllAssetPaths()
+				.ToArray ();*/
+			return AssetDatabase.GetAllAssetPaths()
 				.Where(x => x.StartsWith("Packages/", Ordinal) && x.EndsWith("/package.json", Ordinal))
 				.Select(PackageMeta.FromPackageJson)	// Convert to PackageMeta
 				.Where (x => x != null)					// Skip null
-				.ToArray();*/
+				.ToArray();
 		}
 
 		/// <summary>

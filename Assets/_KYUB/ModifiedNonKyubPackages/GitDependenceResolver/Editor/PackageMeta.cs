@@ -74,8 +74,8 @@ namespace Coffee.PackageManager.DependencyResolver
 					meta.path = first;
 					meta.branch = 0 < second.Length ? second : "HEAD";
                     SemVersion version;
-                    if(!SemVersion.TryParse(meta.branch, out version))
-                        version = new SemVersion(0); //empty version
+                    if (!SemVersion.TryParse(meta.branch, out version))
+                        version = null;//new SemVersion(0); //empty version
                     meta.version = version;
                     //meta.version = meta.branch;
                 }
