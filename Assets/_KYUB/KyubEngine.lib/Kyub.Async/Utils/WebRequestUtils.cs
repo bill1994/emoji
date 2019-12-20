@@ -11,7 +11,7 @@ namespace Kyub.Async
 
         public static UnityWebRequest CreatePutWebRequest(string p_url, WWWRequestForm p_formData, int p_timeout)
         {
-            //p_url = FormatUrl(p_url, p_formData);
+            p_url = FormatUrl(p_url, p_formData);
 
             UnityWebRequest www = new UnityWebRequest(p_url, UnityWebRequest.kHttpVerbPUT,
                 (DownloadHandler)new DownloadHandlerBuffer(),
@@ -47,7 +47,7 @@ namespace Kyub.Async
 
         public static UnityWebRequest CreateGetWebRequest(string p_url, WWWRequestForm p_formData, int p_timeout)
         {
-            //p_url = FormatUrl(p_url, p_formData);
+            p_url = FormatUrl(p_url, p_formData);
 
             UnityWebRequest www = UnityWebRequest.Get(p_url);
             if (p_timeout > 0)
@@ -64,7 +64,7 @@ namespace Kyub.Async
 
         public static UnityWebRequest CreateDeleteWebRequest(string p_url, WWWRequestForm p_formData, int p_timeout)
         {
-            //p_url = FormatUrl(p_url, p_formData);
+            p_url = FormatUrl(p_url, p_formData);
 
             UnityWebRequest www = UnityWebRequest.Delete(p_url);
             www.downloadHandler = new DownloadHandlerBuffer();
