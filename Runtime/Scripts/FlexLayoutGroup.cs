@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace Kyub.UI
 {
     [AddComponentMenu("Kyub UI/Flex Layout Group")]
-    public class FlexLayoutGroup : HorizontalOrVerticalLayoutGroup
+    public class FlexLayoutGroup : HorizontalOrVerticalLayoutGroupEx
     {
         #region Helper Classes
 
@@ -199,7 +199,6 @@ namespace Kyub.UI
 
             float pos = startPos;
 
-
             LinearGroup currentGroup = new LinearGroup();
             for (int i = 0; i < rectChildren.Count; i++)
             {
@@ -350,6 +349,9 @@ namespace Kyub.UI
             float innerSize = size - (axis == 0 ? padding.horizontal : padding.vertical);
             bool alongOtherAxis = (isVertical ^ (axis == 1));
 
+            bool controlSize = (axis == 0 ? m_ChildControlWidth : m_ChildControlHeight);
+            bool childForceExpandSize = (axis == 0 ? m_ChildForceExpandWidth : m_ChildForceExpandHeight);
+
             //Calculate initial position
             float pos = (axis == 0 ? padding.left : padding.top);
             float surplusSpace = size - GetTotalPreferredSize(axis);
@@ -357,7 +359,10 @@ namespace Kyub.UI
             if (surplusSpace > 0)
             {
                 if (GetTotalFlexibleSize(axis) == 0)
-                    pos = GetStartOffset(axis, GetTotalPreferredSize(axis) - (axis == 0 ? padding.horizontal : padding.vertical));
+                {
+                    if (!controlSize || !childForceExpandSize)
+                        pos = GetStartOffset(axis, GetTotalPreferredSize(axis) - (axis == 0 ? padding.horizontal : padding.vertical));
+                }
             }
 
             for (int i = 0; i < _Groups.Count; i++)
@@ -416,10 +421,16 @@ namespace Kyub.UI
                 float itemFlexibleMultiplier = 0;
                 float surplusSpace = size - group.GetTotalPreferredSize(axis);
 
+                var useFlexibleSpacing = false;
                 if (surplusSpace > 0)
                 {
                     if (group.GetTotalFlexibleSize(axis) == 0)
-                        pos += group.GetStartOffset(axis, group.GetTotalPreferredSize(axis), alignmentOnAxis);
+                    {
+                        if (!controlSize || !childForceExpandSize)
+                            pos += group.GetStartOffset(axis, group.GetTotalPreferredSize(axis), alignmentOnAxis);
+                        else
+                            useFlexibleSpacing = true;
+                    }
                     else if (group.GetTotalFlexibleSize(axis) > 0)
                         itemFlexibleMultiplier = surplusSpace / group.GetTotalFlexibleSize(axis);
                 }
@@ -428,6 +439,7 @@ namespace Kyub.UI
                 if (group.GetTotalMinSize(axis) != group.GetTotalPreferredSize(axis))
                     minMaxLerp = Mathf.Clamp01((size - group.GetTotalMinSize(axis)) / (group.GetTotalPreferredSize(axis) - group.GetTotalMinSize(axis)));
 
+                var currentSpacing = useFlexibleSpacing && group.RectChildren.Count - 1 > 0 ? Mathf.Max(spacing, surplusSpace / (group.RectChildren.Count - 1)) : spacing;
                 for (int i = 0; i < group.RectChildren.Count; i++)
                 {
                     RectTransform child = group.RectChildren[i];
@@ -446,29 +458,9 @@ namespace Kyub.UI
                         float offsetInCell = (childSize - child.sizeDelta[axis]) * alignmentOnAxis;
                         SetChildAlongAxisWithScale(child, axis, pos + offsetInCell, scaleFactor);
                     }
-                    pos += childSize * scaleFactor + spacing;
+                    pos += childSize * scaleFactor + currentSpacing;
                 }
             }
-        }
-
-        protected void GetChildSizes(RectTransform child, int axis, bool controlSize, bool childForceExpand,
-            out float min, out float preferred, out float flexible)
-        {
-            if (!controlSize)
-            {
-                min = child.sizeDelta[axis];
-                preferred = min;
-                flexible = 0;
-            }
-            else
-            {
-                min = LayoutUtility.GetMinSize(child, axis);
-                preferred = LayoutUtility.GetPreferredSize(child, axis);
-                flexible = LayoutUtility.GetFlexibleSize(child, axis);
-            }
-
-            if (childForceExpand)
-                flexible = Mathf.Max(flexible, 1);
         }
 
         #endregion
