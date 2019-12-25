@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace Kyub.UI
 {
+    [AddComponentMenu("Kyub UI/Linear Layout Group")]
     public class LinearLayoutGroup : HorizontalOrVerticalLayoutGroup
     {
         #region Private Variables

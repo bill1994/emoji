@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace Kyub.UI
 {
+    [AddComponentMenu("Kyub UI/Flex Layout Group")]
     public class FlexLayoutGroup : HorizontalOrVerticalLayoutGroup
     {
         #region Helper Classes
