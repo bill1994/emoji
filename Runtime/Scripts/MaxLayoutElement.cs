@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace Kyub.UI
 {
+    [AddComponentMenu("Kyub UI/Max Layout Element")]
     public class MaxLayoutElement : LayoutElement
     {
         #region Private Variables

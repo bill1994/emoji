@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace Kyub.UI
 {
+    [AddComponentMenu("Kyub UI/Nested Scroll Rect")]
     public class NestedScrollRect : ScrollRect
     {
         #region Private Variables
