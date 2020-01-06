@@ -64,19 +64,24 @@ namespace KyubEditor.UI
                 LayoutElementField(m_FlexibleHeight, 1);
                 EditorGUILayout.PropertyField(m_LayoutPriority);
                 EditorGUILayout.Space();
-                
-                LayoutElementField(m_MaxWidth, t => t.rect.width);
-                LayoutElementField(m_MaxHeight, t => t.rect.height);
 
-                var oldGuiEnabled = GUI.enabled;
-                if (m_MaxWidth.floatValue <= 0)
-                    GUI.enabled = false;
-                EditorGUILayout.PropertyField(m_MaxWidthMode);
-                GUI.enabled = oldGuiEnabled;
-                if (m_MaxHeight.floatValue <= 0)
-                    GUI.enabled = false;
-                EditorGUILayout.PropertyField(m_MaxHeightMode);
-                GUI.enabled = oldGuiEnabled;
+                LayoutElementField(m_MaxWidth, t => t.rect.width);
+                if (m_MaxWidth.floatValue >= 0)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(m_MaxWidthMode);
+                    EditorGUI.indentLevel--;
+                    EditorGUILayout.Space(2);
+                }
+
+                LayoutElementField(m_MaxHeight, t => t.rect.height);
+                if (m_MaxHeight.floatValue >= 0)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(m_MaxHeightMode);
+                    EditorGUI.indentLevel--;
+                    EditorGUILayout.Space(2);
+                }
             }
 
             serializedObject.ApplyModifiedProperties();
