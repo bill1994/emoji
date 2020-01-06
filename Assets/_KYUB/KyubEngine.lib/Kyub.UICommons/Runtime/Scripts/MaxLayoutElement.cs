@@ -12,7 +12,9 @@ namespace Kyub.UI
 
         #region Private Variables
         [SerializeField, Tooltip("* DefaultMode : RectTransform Width/Height\n* ParentPercent : Percent value of parent rect size (0 to 1)\n* ParentOffset : Parent rect size - offset")]
-        MaxLayoutMode m_MaxLayoutMode = MaxLayoutMode.Default;
+        MaxLayoutMode m_MaxWidthMode = MaxLayoutMode.Default;
+        [SerializeField, Tooltip("* DefaultMode : RectTransform Width/Height\n* ParentPercent : Percent value of parent rect size (0 to 1)\n* ParentOffset : Parent rect size - offset")]
+        MaxLayoutMode m_MaxHeightMode = MaxLayoutMode.Default;
         [SerializeField]
         protected float m_MaxWidth = -1;
         [SerializeField]
@@ -27,18 +29,34 @@ namespace Kyub.UI
 
         #region Public Properties
 
-        public virtual MaxLayoutMode maxLayoutMode
+        public virtual MaxLayoutMode maxWidthMode
         {
             get
             {
-                return m_MaxLayoutMode;
+                return m_MaxWidthMode;
             }
 
             set
             {
-                if (m_MaxLayoutMode == value)
+                if (m_MaxWidthMode == value)
                     return;
-                m_MaxLayoutMode = value;
+                m_MaxWidthMode = value;
+                SetDirty();
+            }
+        }
+
+        public virtual MaxLayoutMode maxHeightMode
+        {
+            get
+            {
+                return m_MaxHeightMode;
+            }
+
+            set
+            {
+                if (m_MaxHeightMode == value)
+                    return;
+                m_MaxHeightMode = value;
                 SetDirty();
             }
         }
@@ -315,40 +333,44 @@ namespace Kyub.UI
 
         protected float CalculateConvertedMaxWidth()
         {
-            if (m_MaxWidth > 0)
-                return CalculateConvertedMaxSize().x;
-            else
-                return 0;
-        }
-
-        protected float CalculateConvertedMaxHeight()
-        {
-            if (m_MaxHeight > 0)
-                return CalculateConvertedMaxSize().y;
-            else
-                return 0;
-        }
-
-        protected Vector2 CalculateConvertedMaxSize()
-        {
-            if (m_MaxLayoutMode != MaxLayoutMode.Default)
+            if (m_MaxWidth > 0 && m_MaxWidthMode != MaxLayoutMode.Default)
             {
-
                 var rectTransform = transform as RectTransform;
                 if (rectTransform != null)
                 {
                     var parentTransform = rectTransform.parent as RectTransform;
-                    var parentRectSize = parentTransform != null ? parentTransform.rect.size : Vector2.zero;
+                    var parentRectWidth = parentTransform != null ? parentTransform.rect.width : 0;
 
-                    var size = m_MaxLayoutMode == MaxLayoutMode.ParentPercent ?
-                        new Vector2(parentRectSize.x * Mathf.Clamp01(m_MaxWidth), parentRectSize.y * Mathf.Clamp01(m_MaxHeight)) :
-                        new Vector2(Mathf.Max(0, parentRectSize.x - m_MaxWidth), Mathf.Max(0, parentRectSize.y - m_MaxHeight));
+                    var width = m_MaxWidthMode == MaxLayoutMode.ParentPercent ?
+                        Mathf.Max(0, parentRectWidth * Mathf.Clamp01(m_MaxWidth)) :
+                        Mathf.Max(0, parentRectWidth - m_MaxWidth);
 
-                    return size;
+                    return width;
                 }
             }
 
-            return new Vector2(m_MaxWidth, m_MaxHeight);
+            return 0;
+        }
+
+        protected float CalculateConvertedMaxHeight()
+        {
+            if (m_MaxHeight > 0 && m_MaxHeightMode != MaxLayoutMode.Default)
+            {
+                var rectTransform = transform as RectTransform;
+                if (rectTransform != null)
+                {
+                    var parentTransform = rectTransform.parent as RectTransform;
+                    var parentRectHeight = parentTransform != null ? parentTransform.rect.height : 0;
+
+                    var height = m_MaxHeightMode == MaxLayoutMode.ParentPercent ?
+                        Mathf.Max(0, parentRectHeight * Mathf.Clamp01(m_MaxHeight)) :
+                        Mathf.Max(0, parentRectHeight - m_MaxHeight);
+
+                    return height;
+                }
+            }
+
+            return 0;
         }
 
         protected virtual bool CheckMaxSize()
@@ -363,9 +385,8 @@ namespace Kyub.UI
             var rectTransform = transform as RectTransform;
             var rectSize = rectTransform != null ? rectTransform.rect.size : Vector2.zero;
 
-            var convertedMaxSize = CalculateConvertedMaxSize();
-            var maxWidth = Mathf.Max(convertedMaxSize.x, minWidth);
-            var maxHeight = Mathf.Max(convertedMaxSize.y, minHeight);
+            var maxWidth = Mathf.Max(CalculateConvertedMaxWidth(), minWidth);
+            var maxHeight = Mathf.Max(CalculateConvertedMaxHeight(), minHeight);
             
             if (rectTransform != null && (maxWidth > 0 || maxHeight > 0))
             {
