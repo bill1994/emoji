@@ -22,6 +22,7 @@ namespace KyubEditor.UI
         SerializedProperty m_FlexibleHeight;
         SerializedProperty m_LayoutPriority;
 
+        SerializedProperty m_MaxLayoutMode;
         SerializedProperty m_MaxWidth;
         SerializedProperty m_MaxHeight;
 
@@ -38,6 +39,7 @@ namespace KyubEditor.UI
             m_FlexibleHeight = serializedObject.FindProperty("m_FlexibleHeight");
             m_LayoutPriority = serializedObject.FindProperty("m_LayoutPriority");
 
+            m_MaxLayoutMode = serializedObject.FindProperty("m_MaxLayoutMode");
             m_MaxWidth = serializedObject.FindProperty("m_MaxWidth");
             m_MaxHeight = serializedObject.FindProperty("m_MaxHeight");
         }
@@ -60,6 +62,7 @@ namespace KyubEditor.UI
                 LayoutElementField(m_FlexibleHeight, 1);
                 EditorGUILayout.PropertyField(m_LayoutPriority);
                 EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(m_MaxLayoutMode);
                 LayoutElementField(m_MaxWidth, t => t.rect.width);
                 LayoutElementField(m_MaxHeight, t => t.rect.height);
             }
@@ -72,12 +75,22 @@ namespace KyubEditor.UI
             LayoutElementField(property, _ => defaultValue);
         }
 
+        protected void LayoutElementField(SerializedProperty property, GUIContent contentLabel, float defaultValue)
+        {
+            LayoutElementField(property, contentLabel, _ => defaultValue);
+        }
+
         protected void LayoutElementField(SerializedProperty property, System.Func<RectTransform, float> defaultValue)
+        {
+            LayoutElementField(property, null, defaultValue);
+        }
+
+        protected void LayoutElementField(SerializedProperty property, GUIContent contentLabel, System.Func<RectTransform, float> defaultValue)
         {
             Rect position = EditorGUILayout.GetControlRect();
 
             // Label
-            GUIContent label = EditorGUI.BeginProperty(position, null, property);
+            GUIContent label = EditorGUI.BeginProperty(position, contentLabel, property);
 
             // Rects
             Rect fieldPosition = EditorGUI.PrefixLabel(position, label);
