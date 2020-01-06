@@ -349,7 +349,7 @@ namespace Kyub.UI
                 }
             }
 
-            return 0;
+            return m_MaxWidth;
         }
 
         protected float CalculateConvertedMaxHeight()
@@ -370,7 +370,7 @@ namespace Kyub.UI
                 }
             }
 
-            return 0;
+            return m_MaxHeight;
         }
 
         protected virtual bool CheckMaxSize()
