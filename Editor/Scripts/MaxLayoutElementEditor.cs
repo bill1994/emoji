@@ -22,7 +22,8 @@ namespace KyubEditor.UI
         SerializedProperty m_FlexibleHeight;
         SerializedProperty m_LayoutPriority;
 
-        SerializedProperty m_MaxLayoutMode;
+        SerializedProperty m_MaxWidthMode;
+        SerializedProperty m_MaxHeightMode;
         SerializedProperty m_MaxWidth;
         SerializedProperty m_MaxHeight;
 
@@ -39,7 +40,8 @@ namespace KyubEditor.UI
             m_FlexibleHeight = serializedObject.FindProperty("m_FlexibleHeight");
             m_LayoutPriority = serializedObject.FindProperty("m_LayoutPriority");
 
-            m_MaxLayoutMode = serializedObject.FindProperty("m_MaxLayoutMode");
+            m_MaxWidthMode = serializedObject.FindProperty("m_MaxWidthMode");
+            m_MaxHeightMode = serializedObject.FindProperty("m_MaxHeightMode");
             m_MaxWidth = serializedObject.FindProperty("m_MaxWidth");
             m_MaxHeight = serializedObject.FindProperty("m_MaxHeight");
         }
@@ -62,9 +64,19 @@ namespace KyubEditor.UI
                 LayoutElementField(m_FlexibleHeight, 1);
                 EditorGUILayout.PropertyField(m_LayoutPriority);
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(m_MaxLayoutMode);
+                
                 LayoutElementField(m_MaxWidth, t => t.rect.width);
                 LayoutElementField(m_MaxHeight, t => t.rect.height);
+
+                var oldGuiEnabled = GUI.enabled;
+                if (m_MaxWidth.floatValue <= 0)
+                    GUI.enabled = false;
+                EditorGUILayout.PropertyField(m_MaxWidthMode);
+                GUI.enabled = oldGuiEnabled;
+                if (m_MaxHeight.floatValue <= 0)
+                    GUI.enabled = false;
+                EditorGUILayout.PropertyField(m_MaxHeightMode);
+                GUI.enabled = oldGuiEnabled;
             }
 
             serializedObject.ApplyModifiedProperties();
