@@ -19,7 +19,7 @@ namespace UnityEditorInternal
         }
 
         const BindingFlags kBfAll = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy;
-		static readonly FieldInfo s_FiReorderableList = typeof(UnityEventExDrawer).GetField("m_ReorderableList", kBfAll);
+		static readonly FieldInfo s_FiReorderableList = typeof(BaseUnityEventExDrawer).GetField("m_ReorderableList", kBfAll);
 		static readonly FieldInfo s_FiCalls = typeof(UnityEventBase).GetField("m_Calls", kBfAll);
 		static readonly FieldInfo s_FiRuntimeCalls = typeof(UnityEngine.Events.InvokableCallList).GetField("m_RuntimeCalls", kBfAll);
 		static GUIStyle s_CachedStyleToggle;
