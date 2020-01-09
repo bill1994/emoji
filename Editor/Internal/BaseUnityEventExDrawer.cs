@@ -12,6 +12,7 @@ using UnityEngine.Events;
 
 namespace UnityEditorInternal
 {
+    //[CustomPropertyDrawer(typeof(UnityEventBaseEx), true)]
     public class BaseUnityEventExDrawer : PropertyDrawer
     {
         protected class State
@@ -166,7 +167,7 @@ namespace UnityEditorInternal
         protected virtual void DrawEventHeader(Rect headerRect)
         {
             headerRect.height = EditorGUIUtility.singleLineHeight;
-            string text = (string.IsNullOrEmpty(m_Text) ? "Event Ex" : m_Text + " Ex") + GetEventParams(m_DummyEvent);
+            string text = (string.IsNullOrEmpty(m_Text) ? "Event" : m_Text) + GetEventParams(m_DummyEvent);
             GUI.Label(headerRect, text);
         }
 
