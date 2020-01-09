@@ -115,21 +115,29 @@ namespace UnityEditorInternal
 
 				// Draw the target if possible.
 				var obj = target as UnityEngine.Object;
-				if (obj)
+                var oldGuiEnabled = GUI.enabled;
+                GUI.enabled = false;
+                if (obj)
 				{
 					EditorGUI.ObjectField(r, obj, obj.GetType(), true);
 				}
 				else if (target != null)
 				{
-					EditorGUI.LabelField(r, string.Format("{0} ({1})", target.ToString(), target.GetType()), EditorStyles.miniLabel);
+                    if (target is Color || target is Color32)
+                        EditorGUI.ColorField(r, (Color)target);
+                    else if (target is Enum)
+                        EditorGUI.EnumPopup(r, (Enum)target);
+                    else
+					    EditorGUI.LabelField(r, string.Format("{0} ({1})", target.ToString(), target.GetType()), EditorStyles.miniLabel);
 				}
 				else
 				{
 					EditorGUI.LabelField(r, "null", EditorStyles.miniLabel);
 				}
+                GUI.enabled = oldGuiEnabled;
 
-				// Draw the method name.
-				r.x += r.width;
+                // Draw the method name.
+                r.x += r.width;
 				r.width = position.width - r.width;
 				EditorGUI.LabelField(r, method.ReflectedType + "." + method.Name, EditorStyles.miniLabel);
 			}
