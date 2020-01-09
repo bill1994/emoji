@@ -269,14 +269,14 @@ namespace UnityEditorInternal
                     {
                         if (desiredDataType.IsSubclassOf(typeof(Color)) || desiredDataType == typeof(Color) || desiredDataType.IsSubclassOf(typeof(Color32)) || desiredDataType == typeof(Color32))
                         {
-                            var color = string.IsNullOrEmpty(argument.stringValue)? Color.white : (Color)ArgumentCacheEx.FromJson(argument.stringValue, desiredDataType);
+                            var color = string.IsNullOrEmpty(argument.stringValue) ? Color.clear : (Color)ArgumentCacheEx.FromJson(argument.stringValue, desiredDataType);
                             var newColor = EditorGUI.ColorField(argRect, color);
                             if (color != newColor)
                                 argument.stringValue = ArgumentCacheEx.ToJson(newColor);
                         }
                         else if (desiredDataType.IsEnum)
                         {
-                            var enumValue = string.IsNullOrEmpty(argument.stringValue) ? (System.Enum)System.Enum.ToObject(desiredDataType, 0): (System.Enum)ArgumentCacheEx.FromJson(argument.stringValue, desiredDataType);
+                            var enumValue = string.IsNullOrEmpty(argument.stringValue) ? (System.Enum)System.Enum.ToObject(desiredDataType, 0) : (System.Enum)ArgumentCacheEx.FromJson(argument.stringValue, desiredDataType);
                             var newValue = EditorGUI.EnumPopup(argRect, enumValue);
                             if (enumValue != newValue)
                                 argument.stringValue = ArgumentCacheEx.ToJson(newValue);
@@ -284,8 +284,13 @@ namespace UnityEditorInternal
                         else
                             drawDefault = true;
                     }
+                    catch (UnityEngine.ExitGUIException)
+                    {
+                        throw;
+                    }
                     catch
                     {
+                        argument.stringValue = "";
                         drawDefault = true;
                     }
                 }
@@ -769,16 +774,16 @@ namespace UnityEditorInternal
                 methodName.stringValue = m_Method.Name;
                 mode.enumValueIndex = (int)m_Mode;
 
-                if (m_Mode == UnityEngine.Events.PersistentListenerMode.Object || m_Mode == UnityEngine.Events.PersistentListenerMode.String)
+                if (m_Mode == UnityEngine.Events.PersistentListenerMode.Object)
                 {
-                    var fullArgumentType = arguments.FindPropertyRelative(m_Mode == UnityEngine.Events.PersistentListenerMode.String? kObjectArgumentAssemblyTypeName : kSerializedDataArgumentAssemblyTypeName);
+                    var fullArgumentType = arguments.FindPropertyRelative(kObjectArgumentAssemblyTypeName);
                     var argParams = m_Method.GetParameters();
                     if (argParams.Length == 1 && typeof(Object).IsAssignableFrom(argParams[0].ParameterType))
                         fullArgumentType.stringValue = argParams[0].ParameterType.AssemblyQualifiedName;
                     else
                         fullArgumentType.stringValue = typeof(Object).AssemblyQualifiedName;
                 }
-                if (m_Mode == UnityEngine.Events.PersistentListenerMode.String)
+                else if (m_Mode == UnityEngine.Events.PersistentListenerMode.String)
                 {
                     var fullArgumentType = arguments.FindPropertyRelative(kSerializedDataArgumentAssemblyTypeName);
                     var argParams = m_Method.GetParameters();

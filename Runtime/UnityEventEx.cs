@@ -39,7 +39,7 @@ namespace UnityEngine.Events
                 if (type == typeof(Color32) || type.IsAssignableFrom(typeof(Color32)))
                     return (Color32)GetSerializedDataArgumentInstance();
 
-                return Color.white;
+                return Color.clear;
             }
             set
             {
@@ -110,7 +110,7 @@ namespace UnityEngine.Events
 
                 try
                 {
-                    if (type.IsValueType || type.IsEnum)
+                    if (type.IsPrimitive || type.IsEnum)
                     {
                         int value;
                         if (!int.TryParse(data, out value))
@@ -120,6 +120,16 @@ namespace UnityEngine.Events
                             return System.Enum.ToObject(type, value);
                         else
                             return value;
+                    }
+                    else if (type == typeof(Color) || type == typeof(Color32))
+                    {
+                        var color = Color.clear;
+                        ColorUtility.TryParseHtmlString(data, out color);
+
+                        if (type == typeof(Color32))
+                            return (Color32)color;
+                        else
+                            return color;
                     }
                     else if (type != typeof(string))
                         return JsonUtility.FromJson(data, type);
@@ -150,8 +160,10 @@ namespace UnityEngine.Events
                 try
                 {
                     var type = instance.GetType();
-                    if (type.IsValueType || type.IsEnum)
+                    if (type.IsPrimitive || type.IsEnum)
                         return Convert.ToInt64(instance).ToString();
+                    else if (type == typeof(Color) || type == typeof(Color32))
+                        return "#"+ ColorUtility.ToHtmlStringRGBA((Color)instance);
                     else if (type != typeof(string))
                         return JsonUtility.ToJson(instance);
                 }
@@ -982,11 +994,11 @@ namespace UnityEngine.Events
             return ci.Invoke(new object[] { target, method, castedObject }) as BaseInvokableCall;
         }
 
-        public virtual void RegisterPersistentListener(UnityEngine.Object target, Type targetType, string mmethodName)
+        public virtual void RegisterPersistentListener(UnityEngine.Object target, Type targetType, string methodName)
         {
             m_Target =target;
             m_TargetAssemblyTypeName = UnityEventTools.TidyAssemblyTypeName(targetType.AssemblyQualifiedName);
-            m_MethodName = mmethodName;
+            m_MethodName = methodName;
         }
 
         public virtual void UnregisterPersistentListener()
