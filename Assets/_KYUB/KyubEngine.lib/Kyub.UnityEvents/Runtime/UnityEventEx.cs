@@ -66,7 +66,7 @@ namespace UnityEngine.Events
 
         public Type GetSerializedDataType()
         {
-            var type = typeof(object);
+            var type = typeof(string);
             if (!string.IsNullOrEmpty(m_SerializedDataArgumentAssemblyTypeName))
                 type = Type.GetType(m_SerializedDataArgumentAssemblyTypeName, false) ?? type;
 
