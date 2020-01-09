@@ -34,9 +34,9 @@ namespace UnityEngine.Events
             get
             {
                 var type = GetSerializedDataType();
-                if (type == typeof(Color) || type.IsAssignableFrom(typeof(Color)))
+                if (type == typeof(Color))
                     return (Color)GetSerializedDataArgumentInstance();
-                if (type == typeof(Color32) || type.IsAssignableFrom(typeof(Color32)))
+                if (type == typeof(Color32))
                     return (Color32)GetSerializedDataArgumentInstance();
 
                 return Color.clear;
@@ -67,8 +67,8 @@ namespace UnityEngine.Events
         public Type GetSerializedDataType()
         {
             var type = typeof(object);
-            if (!string.IsNullOrEmpty(m_SerializedDataArgument))
-                type = Type.GetType(m_SerializedDataArgument, false) ?? type;
+            if (!string.IsNullOrEmpty(m_SerializedDataArgumentAssemblyTypeName))
+                type = Type.GetType(m_SerializedDataArgumentAssemblyTypeName, false) ?? type;
 
             return type;
         }
