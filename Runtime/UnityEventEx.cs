@@ -82,7 +82,14 @@ namespace UnityEngine.Events
         protected object GetSerializedDataArgumentInstance()
         {
             var type = GetSerializedDataType();
-            return string.IsNullOrEmpty(m_SerializedDataArgument)? null : ArgumentCacheEx.FromJson(m_SerializedDataArgument, type);
+            if(string.IsNullOrEmpty(m_SerializedDataArgument))
+            {
+                if (type.IsValueType)
+                    return Activator.CreateInstance(type);
+
+                return null;
+            }
+            return ArgumentCacheEx.FromJson(m_SerializedDataArgument, type);
         }
 
         public override void OnBeforeSerialize()
