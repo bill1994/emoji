@@ -1,0 +1,19 @@
+{
+  "name": "com.kyub.unityevent",
+  "version": "1.0.0",
+  "displayName": "Kyub Unity Events Ex",
+  "description": "Better Unity Events (Support to Color and Enums)",
+  "unity": "2019.1",
+  "dependencies": {},
+  "keywords": [
+    "Events",
+    "UnityEvent"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}
