@@ -215,7 +215,7 @@ namespace UnityEngine.Events
                         if (type == typeof(Color32) || type.IsAssignableFrom(typeof(Color32)))
                             return new CachedInvokableCall<Color32>(targetObject, method, m_Arguments.colorArgument);
                         if (type != typeof(string) && !type.IsAssignableFrom(typeof(string)))
-                            return new CachedInvokableCall<object>(targetObject, method, m_Arguments.serializedDataArgument);
+                            return GetSerializedDataCall(targetObject, method, m_Arguments.serializedDataArgument, type);
                         else
                             return new CachedInvokableCall<string>(targetObject, method, m_Arguments.stringArgument);
                     }
@@ -225,6 +225,16 @@ namespace UnityEngine.Events
                     return new InvokableCall(targetObject, method);
             }
             return null;
+        }
+
+        internal static BaseInvokableCall GetSerializedDataCall(UnityEngine.Object target, MethodInfo method, object data, Type type)
+        {
+            var generic = typeof(CachedInvokableCall<>);
+            var specific = generic.MakeGenericType(type);
+            var ci = specific.GetConstructor(new[] { typeof(UnityEngine.Object), typeof(MethodInfo), type });
+
+            // need to pass explicit null here!
+            return ci.Invoke(new object[] { target, method, data }) as BaseInvokableCall;
         }
     }
 
