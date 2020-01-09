@@ -286,16 +286,16 @@ namespace UnityEngine.Events
         internal virtual MethodInfo FindMethod(PersistentCall call)
         {
             var type = typeof(UnityEngine.Object);
-            if (call.mode == PersistentListenerMode.Object)
+            if (call.mode == PersistentListenerMode.String)
+            {
+                type = typeof(string);
+                if (!string.IsNullOrEmpty(call.arguments.serializedDataArgumentAssemblyTypeName))
+                    type = Type.GetType(call.arguments.serializedDataArgumentAssemblyTypeName, false) ?? typeof(string);
+            }
+            else if (call.mode == PersistentListenerMode.Object)
             {
                 if (!string.IsNullOrEmpty(call.arguments.unityObjectArgumentAssemblyTypeName))
                     type = Type.GetType(call.arguments.unityObjectArgumentAssemblyTypeName, false) ?? typeof(UnityEngine.Object);
-            }
-            else
-            {
-                type = typeof(string);
-                if(!string.IsNullOrEmpty(call.arguments.serializedDataArgumentAssemblyTypeName))
-                    type = Type.GetType(call.arguments.serializedDataArgumentAssemblyTypeName, false) ?? typeof(string);
             }
 
             var targetType = call.target != null ? call.target.GetType() : Type.GetType(call.targetAssemblyTypeName, false);
