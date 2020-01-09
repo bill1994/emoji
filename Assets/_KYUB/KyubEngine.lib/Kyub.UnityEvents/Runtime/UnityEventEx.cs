@@ -210,11 +210,11 @@ namespace UnityEngine.Events
                 case PersistentListenerMode.String:
                     {
                         var type = m_Arguments.GetSerializedDataType();
-                        if (type == typeof(Color) || type.IsAssignableFrom(typeof(Color)))
+                        if (type == typeof(Color))
                             return new CachedInvokableCall<Color>(targetObject, method, m_Arguments.colorArgument);
-                        if (type == typeof(Color32) || type.IsAssignableFrom(typeof(Color32)))
+                        if (type == typeof(Color32))
                             return new CachedInvokableCall<Color32>(targetObject, method, m_Arguments.colorArgument);
-                        if (type != typeof(string) && !type.IsAssignableFrom(typeof(string)))
+                        if (type != typeof(string))
                             return GetSerializedDataCall(targetObject, method, m_Arguments.serializedDataArgument, type);
                         else
                             return new CachedInvokableCall<string>(targetObject, method, m_Arguments.stringArgument);
