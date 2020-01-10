@@ -51,7 +51,7 @@ namespace Kyub
                     }
 
                     if (s_instance == null)
-                        Debug.Log("Deu Ruim");
+                        Debug.Log(string.Format("(singleton) Failed to create instance from type '{0}'", typeof(T)));
 
                     return s_instance;
                 }
