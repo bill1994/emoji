@@ -8,7 +8,7 @@
 Now you a ready to add it as dependence in Packages/manifest.json (in your current project)
 
 the pattern of the Gitlab clone repository is:
-https://gitlab-ci-token:<PersonalAcessToke>@gitlab.com/<CLONE_REPOSITORY_PATH>.git#<PACKAGE_NAME>-<VERSION>
+https://gitlab-ci-token:<PersonalAccessToken>@gitlab.com/<CLONE_REPOSITORY_PATH>.git#<PACKAGE_NAME>-<VERSION>
 
 Example:
 package 'com.kyub.core'can be accessed using link below (Head Version)
