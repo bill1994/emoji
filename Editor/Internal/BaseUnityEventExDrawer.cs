@@ -230,11 +230,11 @@ namespace UnityEditorInternal
                         var desiredDataTypeName = arguments.FindPropertyRelative(kSerializedDataArgumentAssemblyTypeName).stringValue;
                         desiredDataType = typeof(object);
                         if (!string.IsNullOrEmpty(desiredDataTypeName))
-                            desiredDataType = Type.GetType(desiredDataTypeName, false) ?? typeof(object);
+                            desiredDataType = Type.GetType(desiredDataTypeName, false) ?? typeof(string);
                         else
                             desiredDataType = typeof(string);
 
-                        if (desiredDataType != null && !desiredDataType.IsSubclassOf(typeof(string)) && desiredDataType != typeof(string))
+                        if (desiredDataType != null && desiredDataType != typeof(string))
                             argument = arguments.FindPropertyRelative(kSerializedDataArgument);
                         else
                             argument = arguments.FindPropertyRelative(kStringArgument);
@@ -263,7 +263,7 @@ namespace UnityEditorInternal
             else if (modeEnum != UnityEngine.Events.PersistentListenerMode.Void && modeEnum != UnityEngine.Events.PersistentListenerMode.EventDefined)
             {
                 var drawDefault = false;
-                if (modeEnum == UnityEngine.Events.PersistentListenerMode.String && desiredDataType != null && !desiredDataType.IsSubclassOf(typeof(string)) && desiredDataType != typeof(string))
+                if (modeEnum == UnityEngine.Events.PersistentListenerMode.String && desiredDataType != null && desiredDataType != typeof(string))
                 {
                     try
                     {
