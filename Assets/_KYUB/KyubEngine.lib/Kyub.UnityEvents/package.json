@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.unityevents",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "Kyub Unity Events Ex",
   "description": "Better Unity Events (Support to Color and Enums)",
   "unity": "2019.1",
