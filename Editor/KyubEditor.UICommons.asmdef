@@ -1,7 +1,8 @@
 {
     "name": "KyubEditor.UICommons",
     "references": [
-        "GUID:0f58c067a5870e34eadeb4a2055fb4ce"
+        "GUID:0f58c067a5870e34eadeb4a2055fb4ce",
+        "GUID:6546d7765b4165b40850b3667f981c26"
     ],
     "includePlatforms": [
         "Editor"

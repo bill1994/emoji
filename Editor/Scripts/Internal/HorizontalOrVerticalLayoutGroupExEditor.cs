@@ -10,21 +10,22 @@ using Kyub.UI;
 
 namespace KyubEditor.UI
 {
-    [CustomEditor(typeof(LinearLayoutGroup), true)]
-    public class LinearLayoutGroupEditor : HorizontalOrVerticalLayoutGroupExEditor
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(HorizontalOrVerticalLayoutGroupEx), true)]
+    public class HorizontalOrVerticalLayoutGroupExEditor : HorizontalOrVerticalLayoutGroupEditor
     {
-        SerializedProperty m_IsVertical = null;
+        SerializedProperty m_ReverseOrder = null;
 
         protected override void OnEnable()
         {
-            m_IsVertical = serializedObject.FindProperty("m_IsVertical");
+            m_ReverseOrder = serializedObject.FindProperty("m_ReverseOrder");
             base.OnEnable();
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            EditorGUILayout.PropertyField(m_IsVertical);
+            EditorGUILayout.PropertyField(m_ReverseOrder);
             EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();
             //EditorGUILayout.Space();

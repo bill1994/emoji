@@ -11,6 +11,16 @@ namespace Kyub.UI
     [ExecuteAlways]
     public abstract class HorizontalOrVerticalLayoutGroupEx : HorizontalOrVerticalLayoutGroup
     {
+        [SerializeField]
+        bool m_ReverseOrder = true;
+
+        public override void CalculateLayoutInputHorizontal()
+        {
+            base.CalculateLayoutInputHorizontal();
+            if (m_ReverseOrder)
+                rectChildren.Reverse();
+        }
+
         /// <summary>
         /// Calculate the layout element properties for this layout element along the given axis.
         /// </summary>
