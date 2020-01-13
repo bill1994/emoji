@@ -7,21 +7,24 @@ using UnityEngine.UI;
 
 namespace MaterialUI
 {
-    public class ReloadableDialogDatePickerYearItem : DialogDatePickerYearItem, IReloadableDataViewElement
+    public class ReloadableDialogDatePickerYearItem : DialogDatePickerYearItem
     {
-        #region Helper Functions
+        #region Overrides
 
-        public void Reload(ScrollDataView.ReloadEventArgs p_args)
+        public override int index { get { return DataIndex; } set { } }
+
+        #endregion
+
+        #region Reload Functions
+
+        protected override void ApplyReload(ScrollDataView.ReloadEventArgs oldArgs, ScrollDataView.ReloadEventArgs newArgs)
         {
-            year = (int)p_args.Data;
-            index = p_args.DataIndex;
-            
-            var sender = p_args.Sender != null ? p_args.Sender.GetComponentInParent<ReloadableDialogDatePickerYearList>() : null;
+            base.ApplyReload(oldArgs, newArgs);
+            year = (int)Data;
+
+            var sender = Sender != null ? Sender.GetComponentInParent<ReloadableDialogDatePickerYearList>() : null;
             if (sender != null)
             {
-                //Register click event
-                onClickAction -= sender.OnItemClick;
-                onClickAction += sender.OnItemClick;
                 //Update color
                 selectedImage.color = sender.AccentColor;
 
@@ -32,11 +35,15 @@ namespace MaterialUI
 
         #endregion
 
-        #region IReloadableDataViewElement Functions
+        #region Receivers Functions
 
-        bool IReloadableDataViewElement.IsDestroyed()
+        protected override void HandleOnItemClicked()
         {
-            return this == null;
+            base.HandleOnItemClicked();
+
+            var sender = Sender != null ? Sender.GetComponentInParent<ReloadableDialogDatePickerYearList>() : null;
+            if (sender != null)
+                sender.OnItemClick(DataIndex);
         }
 
         #endregion

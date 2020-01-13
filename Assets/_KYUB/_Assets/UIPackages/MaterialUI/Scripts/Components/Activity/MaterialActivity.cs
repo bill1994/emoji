@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 namespace MaterialUI
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(RectTransform))]
     public abstract class MaterialActivity : UIBehaviour
     {
         #region Private Variables

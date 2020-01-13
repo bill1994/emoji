@@ -35,8 +35,8 @@ namespace MaterialUI
                     m_ActionButton.textText = snackbar.actionName.ToUpper();
                 }
 
-                m_ActionButton.OnClick.RemoveListener(OnActionButtonClicked);
-                m_ActionButton.OnClick.AddListener(OnActionButtonClicked);
+                m_ActionButton.onClick.RemoveListener(OnActionButtonClicked);
+                m_ActionButton.onClick.AddListener(OnActionButtonClicked);
             }
 
 

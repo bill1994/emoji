@@ -125,7 +125,7 @@ namespace MaterialUI
         /// Path to the simple list dialog prefab.
         /// </summary>
         [SerializeField]
-        PrefabAddress m_dialogSimpleList = new PrefabAddress() { AssetPath = "Dialogs/DialogSimpleList" };
+        PrefabAddress m_dialogSimpleList = new PrefabAddress() { AssetPath = "Dialogs/DialogRadioList" };
         
         /// <summary>
         /// Path to the checkbox list dialog prefab.

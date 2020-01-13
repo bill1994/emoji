@@ -101,23 +101,16 @@ namespace MaterialUI
         }
 
 
-        /// <summary>
-        /// The MaterialUIScaler used to get scaling values.
-        /// </summary>
-        private MaterialUIScaler m_Scaler;
-
-        /// <summary>
-        /// The MaterialUIScaler used to get scaling values.
-        /// </summary>
-        public MaterialUIScaler scaler
+        protected Canvas _RootCanvas;
+        public Canvas rootCanvas
         {
             get
             {
-                if (m_Scaler == null)
+                if (_RootCanvas == null)
                 {
-                    m_Scaler = MaterialUIScaler.GetRootScaler(rectTransform);
+                    _RootCanvas = rectTransform.GetRootCanvas();
                 }
-                return m_Scaler;
+                return _RootCanvas;
             }
         }
 
@@ -469,24 +462,17 @@ namespace MaterialUI
         {
             float size = (rectTransform.GetProperSize().x + rectTransform.GetProperSize().y) / 2f;
 
-            if (scaler != null)
+            if (rootCanvas != null)
             {
-                if (scaler.canvas.renderMode == RenderMode.WorldSpace)
+                if (rootCanvas.renderMode == RenderMode.WorldSpace)
                 {
-                    size /= scaler.canvas.transform.localScale.x;
-                    if (scaler.scalerMode == MaterialUIScaler.ScalerMode.DontChangeScale)
-                    {
-                        var v_originalScaler = GetComponentInParent<CanvasScaler>();
-                        if(v_originalScaler != null)
-                            size *= v_originalScaler.dynamicPixelsPerUnit;
-                    }
-                    else
-                        size *= scaler.dynamicPixelsPerUnit;
+                    size /= rootCanvas.transform.localScale.x;
+                    size *= rootCanvas.referencePixelsPerUnit;
                     
                 }
                 else
                 {
-                    size *= scaler.canvas.scaleFactor;
+                    size *= rootCanvas.scaleFactor;
                 }
             }
 

@@ -15,6 +15,7 @@ namespace MaterialUI
     {
         private TabView m_TabView;
 
+        private SerializedProperty m_AnimateTabs;
         private SerializedProperty m_AutoTrackPages;
         private SerializedProperty m_Pages;
         private SerializedProperty m_OnlyShowSelectedPage;
@@ -31,12 +32,13 @@ namespace MaterialUI
 
         private AnimBool m_PagesAnimBool;
 
-        void OnEnable()
+        protected virtual void OnEnable()
         {
             OnBaseEnable();
 
             m_TabView = (TabView)target;
 
+            m_AnimateTabs = serializedObject.FindProperty("m_AnimateTabs");
             m_AutoTrackPages = serializedObject.FindProperty("m_AutoTrackPages");
             m_Pages = serializedObject.FindProperty("m_Pages");
             m_OnlyShowSelectedPage = serializedObject.FindProperty("m_OnlyShowSelectedPage");
@@ -53,17 +55,13 @@ namespace MaterialUI
 
             m_PagesAnimBool = new AnimBool { value = !m_AutoTrackPages.boolValue };
             m_PagesAnimBool.valueChanged.AddListener(Repaint);
-
-            Selection.selectionChanged += () => m_TabView.TrackPages();
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
             OnBaseDisable();
 
             m_PagesAnimBool.valueChanged.RemoveListener(Repaint);
-            Selection.selectionChanged -= () => m_TabView.TrackPages();
-
         }
 
         public override void OnInspectorGUI()
@@ -83,7 +81,7 @@ namespace MaterialUI
 
             TabPage[] pages = m_TabView.pages;
 
-            if (pages.Length > 0)
+            if (pages != null && pages.Length > 0)
             {
                 string[] names = new string[pages.Length];
 
@@ -93,7 +91,15 @@ namespace MaterialUI
                     names[i] = v_tabName;
                 }
 
+                var oldPage = m_TabView.currentPage;
                 m_TabView.currentPage = EditorGUILayout.Popup("Current page", m_TabView.currentPage, names);
+
+                if (m_TabView.currentPage != oldPage)
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                    EditorUtility.SetDirty(m_TabView);
+                }
 
                 m_TabView.SetPagesDirty();
 
@@ -103,6 +109,7 @@ namespace MaterialUI
             m_TabView.TrackPages();
 
             EditorGUILayout.PropertyField(m_ForceSameTabSize);
+            EditorGUILayout.PropertyField(m_AnimateTabs);
             //EditorGUILayout.PropertyField(m_ShrinkTabsToFitThreshold);
             //EditorGUILayout.PropertyField(m_ForceStretchTabsOnLanscape);
             //EditorGUILayout.PropertyField(m_LowerUnselectedTabAlpha);
@@ -128,6 +135,19 @@ namespace MaterialUI
             EditorGUILayout.PropertyField(m_PagesContainer);
             EditorGUILayout.PropertyField(m_Indicator);
             EditorGUI.indentLevel--;
+        }
+
+        protected virtual void HandleOnSelectionChanged()
+        {
+            EditorApplication.update -= TrackPages;
+            EditorApplication.update += TrackPages;
+        }
+
+        protected virtual void TrackPages()
+        {
+            EditorApplication.update -= TrackPages;
+            if (m_TabView != null)
+                m_TabView.TrackPages();
         }
     }
 }

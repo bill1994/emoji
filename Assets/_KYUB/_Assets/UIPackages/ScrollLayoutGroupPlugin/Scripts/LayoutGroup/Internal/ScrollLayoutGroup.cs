@@ -10,6 +10,7 @@ namespace Kyub.UI
 {
     [DisallowMultipleComponent]
     [ExecuteInEditMode]
+    [RequireComponent(typeof(RectTransform))]
     public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ICanvasElement
     {
         #region Helper Classes
@@ -576,6 +577,11 @@ namespace Kyub.UI
         #endregion
 
         #region Internal Layout Functions
+
+        protected virtual bool IsFullRecalcRequired()
+        {
+            return _lastFrameVisibleElementIndexes.x < 0 && _lastFrameVisibleElementIndexes.y < 0 && _cachedMinMaxIndex.x < 0 && _cachedMinMaxIndex.y < 0;
+        }
 
         protected void RecalculateAfterDragRebuild()
         {
@@ -1264,13 +1270,13 @@ namespace Kyub.UI
             }
         }
 
-        Vector2 _layoutSize = new Vector2(-1, -1);
-        public void CalculateLayoutInputHorizontal()
+        protected Vector2 _layoutSize = new Vector2(-1, -1);
+        public virtual void CalculateLayoutInputHorizontal()
         {
             _layoutSize = new Vector2(GetLocalWidth(Content), _layoutSize.y);
         }
 
-        public void CalculateLayoutInputVertical()
+        public virtual void CalculateLayoutInputVertical()
         {
             _layoutSize = new Vector2(_layoutSize.x, GetLocalHeight(Content));
         }

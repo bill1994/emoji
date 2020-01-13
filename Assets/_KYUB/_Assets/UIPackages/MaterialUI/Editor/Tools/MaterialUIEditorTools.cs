@@ -20,17 +20,23 @@ namespace MaterialUI
         {
             if (s_cachedMainFolderPath == null)
             {
-                string[] files = System.IO.Directory.GetFiles(Application.dataPath, "MaterialUIEditorTools.cs", System.IO.SearchOption.AllDirectories);
+                var packagePath = "Packages/com.kyub.materialui";
+                 //Try discover if script is inside Package or in AssetFolder
+                var fullPackagePath = System.IO.Path.GetFullPath(packagePath).Replace("\\", "/");
+                if (!System.IO.Directory.Exists(fullPackagePath))
+                    fullPackagePath = "";
+
+                string[] files = System.IO.Directory.GetFiles(string.IsNullOrEmpty(fullPackagePath) ? Application.dataPath : fullPackagePath, "MaterialUIEditorTools.cs", System.IO.SearchOption.AllDirectories);
 
                 var folderPath = files.Length > 0 ? files[0].Replace("\\", "/") : "";
                 if (!string.IsNullOrEmpty(folderPath))
                 {
                     folderPath = folderPath.Split(new string[] { "/MaterialUI/" }, System.StringSplitOptions.None)[0] + "/MaterialUI/Prefabs/";
-                    folderPath = folderPath.Replace(Application.dataPath, "Assets");
+                    if(string.IsNullOrEmpty(fullPackagePath))
+                        folderPath = folderPath.Replace(Application.dataPath, "Assets");
+                    else
+                        folderPath = folderPath.Replace(fullPackagePath, packagePath); //Support new Package Manager file system
                 }
-
-                if (string.IsNullOrEmpty(folderPath))
-                    folderPath = "Assets/MaterialUITempFolder/MaterialUI/Prefabs/";
 
                 s_cachedMainFolderPath = folderPath;
             }

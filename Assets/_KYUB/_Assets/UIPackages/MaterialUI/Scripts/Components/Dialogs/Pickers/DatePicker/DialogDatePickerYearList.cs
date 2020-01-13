@@ -108,7 +108,8 @@ namespace MaterialUI
 
 			yearItem.year = year;
 			yearItem.index = i;
-			yearItem.onClickAction += OnItemClick;
+            yearItem.onItemClicked.RemoveListener(OnItemClick);
+            yearItem.onItemClicked.AddListener(OnItemClick);
 			
 			return yearItem;
 		}
@@ -167,5 +168,6 @@ namespace MaterialUI
         }
 
         #endregion
+
     }
 }

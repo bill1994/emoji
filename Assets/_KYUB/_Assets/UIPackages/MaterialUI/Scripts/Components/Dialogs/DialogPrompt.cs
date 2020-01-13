@@ -192,9 +192,9 @@ namespace MaterialUI
 
         #region Receivers
 
-        protected internal override void OnActivityShow()
+        protected internal override void OnActivityEndShow()
         {
-            base.OnActivityShow();
+            base.OnActivityEndShow();
 
             if (firstInputField) firstInputField.inputField.Select();
         }

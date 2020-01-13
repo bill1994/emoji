@@ -136,7 +136,7 @@ namespace MaterialUI
 
         public bool optionsControlledByScreenView
         {
-            get { return m_OptionsControlledByScreenView; }
+            get { return screenView != null? m_OptionsControlledByScreenView : false; }
             set { m_OptionsControlledByScreenView = value; }
         }
 
@@ -403,13 +403,13 @@ namespace MaterialUI
                         TryRegisterInScreenView();
                 }
 
-                return m_ScreenView;
+                return m_ScreenView != null && m_ScreenView.content == this.transform.parent? m_ScreenView : null;
             }
         }
 
         public int screenIndex
         {
-            get { return screenView != null && screenView.materialScreen != null ?m_ScreenView.materialScreen.IndexOf(this) : -1; }
+            get { return screenView != null && screenView.materialScreen != null ? screenView.materialScreen.IndexOf(this) : -1; }
         }
 
         #endregion
@@ -434,12 +434,21 @@ namespace MaterialUI
             UnregisterFrameAnimatorEvents();
 
             //Prevent Errors while deleting screen
-            if (m_ScreenView != null)
+            TryUnregisterInScreenView();
+        }
+
+        protected override void OnTransformParentChanged()
+        {
+            base.OnTransformParentChanged();
+
+            var newScreenView = GetComponentInParent<ScreenView>();
+            newScreenView = newScreenView != null && newScreenView.content == this.transform.parent ? newScreenView : null;
+
+            if (screenView != newScreenView)
             {
-                var v_index = screenIndex;
-                if (m_ScreenView.materialScreen.Count > v_index)
-                    m_ScreenView.materialScreen[v_index] = null;
-                m_ScreenView.RemoveInvalidScreens();
+                TryUnregisterInScreenView();
+                m_ScreenView = newScreenView;
+                TryRegisterInScreenView();
             }
         }
 
@@ -470,13 +479,24 @@ namespace MaterialUI
 
         protected virtual void TryRegisterInScreenView()
         {
-            if (m_ScreenView != null)
+            if (screenView != null)
             {
-                var v_index = m_ScreenView.materialScreen.IndexOf(this);
+                var v_index = screenView.materialScreen.IndexOf(this);
                 if (v_index < 0)
                 {
-                    m_ScreenView.materialScreen.Add(this);
+                    screenView.materialScreen.Add(this);
                 }
+            }
+        }
+
+        protected virtual void TryUnregisterInScreenView()
+        {
+            if (screenView != null)
+            {
+                var v_index = screenIndex;
+                if (screenView.materialScreen.Count > v_index)
+                    screenView.materialScreen[v_index] = null;
+                screenView.RemoveInvalidScreens();
             }
         }
 
@@ -539,12 +559,40 @@ namespace MaterialUI
                 if (forceHide || selfScreenIndex == screenView.currentScreenIndex)
                 {
                     //Add next screen to stack before current screen (so we can call Hide and Destroy)
-                    screenView.PushToScreenStack(screenIndexToShow);
-                    screenView.RemoveFromScreenStack(selfScreenIndex);
-
-                    if (selfScreenIndex != screenIndexToShow && screenView.currentScreen != null)
+                    var screen = screenView.PushToScreenStack(screenIndexToShow);
+                    if (screen != this)
                     {
-                        Hide(forceHide);
+                        screenView.RemoveFromScreenStack(selfScreenIndex);
+                        if (screenView.currentScreen != null)
+                        {
+                            Hide(forceHide);
+                        }
+                    }
+                }
+            }
+        }
+
+        public virtual void HideToScreenWithName(string screenName)
+        {
+            HideToScreenWithName(screenName, false);
+        }
+
+        public virtual void HideToScreenWithName(string screenName, bool forceHide)
+        {
+            if (screenView != null)
+            {
+                var selfScreenIndex = screenIndex;
+                if (forceHide || selfScreenIndex == screenView.currentScreenIndex)
+                {
+                    //Add next screen to stack before current screen (so we can call Hide and Destroy)
+                    var screen = screenView.PushToScreenStack(screenName);
+                    if (screen != this)
+                    {
+                        screenView.RemoveFromScreenStack(selfScreenIndex);
+                        if (screenView.currentScreen != null)
+                        {
+                            Hide(forceHide);
+                        }
                     }
                 }
             }

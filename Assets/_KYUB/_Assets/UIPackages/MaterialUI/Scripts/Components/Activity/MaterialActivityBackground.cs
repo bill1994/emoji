@@ -66,7 +66,7 @@ namespace MaterialUI
 
                 if (targetGraphic != null)
                 {
-                    targetGraphic.color = backgroundColor;
+                    targetGraphic.color = value;
                 }
             }
         }

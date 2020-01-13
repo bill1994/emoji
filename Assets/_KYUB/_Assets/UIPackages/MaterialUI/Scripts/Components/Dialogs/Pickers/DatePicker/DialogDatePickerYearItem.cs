@@ -1,6 +1,7 @@
 ﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using Kyub.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,6 +24,8 @@ namespace MaterialUI
         #endregion
 
         #region Public Properties
+
+        public virtual int index { get; set; }
 
         public Graphic text
         {

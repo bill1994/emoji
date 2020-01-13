@@ -63,6 +63,7 @@ namespace Kyub.UI
 
         #region Callbacks
 
+        public UnityEvent OnSetup = new UnityEvent();
         public ReloadUnityEvent OnReloadElement = new ReloadUnityEvent();
 
         #endregion
@@ -174,6 +175,11 @@ namespace Kyub.UI
             TryRemapIndexes();
         }
 
+        protected virtual void OnRectTransformDimensionsChange()
+        {
+            SetLayoutDirty();
+        }
+
         #endregion
 
         #region Main Functions
@@ -244,6 +250,9 @@ namespace Kyub.UI
 
                 if (m_emptyDataObject != null)
                     m_emptyDataObject.SetActive(m_data.Count == 0);
+
+                if (OnSetup != null)
+                    OnSetup.Invoke();
             }
             else
             {

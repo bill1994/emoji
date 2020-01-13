@@ -24,10 +24,9 @@ namespace MaterialUI
         [SerializeField]
         private VectorImageSizeMode m_SizeMode = VectorImageSizeMode.MatchMin;
         [SerializeField]
-        private MaterialUIScaler m_MaterialUiScaler = null;
-        [SerializeField]
         private VectorImageData m_VectorImageData = new VectorImageData();
 
+        private Canvas _RootCanvas = null;
         private float m_LocalScaleFactor;
         private DrivenRectTransformTracker m_Tracker = new DrivenRectTransformTracker();
 
@@ -59,17 +58,19 @@ namespace MaterialUI
                 SetLayoutDirty();
             }
         }
-        public MaterialUIScaler materialUiScaler
+
+        public Canvas rootCanvas
         {
             get
             {
-                if (m_MaterialUiScaler == null)
+                if (_RootCanvas == null)
                 {
-                    m_MaterialUiScaler = MaterialUIScaler.GetRootScaler(transform);
+                    _RootCanvas = transform.GetRootCanvas();
                 }
-                return m_MaterialUiScaler;
+                return _RootCanvas;
             }
         }
+
         public VectorImageData vectorImageData
         {
             get { return m_VectorImageData; }
@@ -248,8 +249,10 @@ namespace MaterialUI
             if (!gameObject.scene.IsValid()) return;
 #endif
 
-            if (materialUiScaler == null) // When instantiating the icon for the first time
+            if (rootCanvas == null) // When instantiating the icon for the first time
             {
+                m_ScaledSize = size;
+                fontSize = Mathf.RoundToInt(size);
                 return;
             }
 
@@ -257,6 +260,7 @@ namespace MaterialUI
 
             if (size == 0 && sizeMode == VectorImageSizeMode.Manual)
             {
+                m_ScaledSize = 0;
                 fontSize = 0;
                 return;
             }
@@ -265,19 +269,19 @@ namespace MaterialUI
 
             if (sizeMode == VectorImageSizeMode.Manual)
             {
-                m_ScaledSize = tempSize * materialUiScaler.scaleFactor;
+                m_ScaledSize = tempSize * rootCanvas.scaleFactor;
             }
             else if (sizeMode == VectorImageSizeMode.MatchWidth)
             {
                 m_ScaledSize = rectTransform.rect.width;
                 tempSize = m_ScaledSize;
-                m_ScaledSize *= materialUiScaler.scaleFactor;
+                m_ScaledSize *= rootCanvas.scaleFactor;
             }
             else if (sizeMode == VectorImageSizeMode.MatchHeight)
             {
                 m_ScaledSize = rectTransform.rect.height;
                 tempSize = m_ScaledSize;
-                m_ScaledSize *= materialUiScaler.scaleFactor;
+                m_ScaledSize *= rootCanvas.scaleFactor;
             }
             else if (sizeMode == VectorImageSizeMode.MatchMin)
             {
@@ -285,7 +289,7 @@ namespace MaterialUI
 
                 m_ScaledSize = Mathf.Min(tempVector2.x, tempVector2.y);
                 tempSize = m_ScaledSize;
-                m_ScaledSize *= materialUiScaler.scaleFactor;
+                m_ScaledSize *= rootCanvas.scaleFactor;
             }
             else if (sizeMode == VectorImageSizeMode.MatchMax)
             {
@@ -293,7 +297,7 @@ namespace MaterialUI
 
                 m_ScaledSize = Mathf.Max(tempVector2.x, tempVector2.y);
                 tempSize = m_ScaledSize;
-                m_ScaledSize *= materialUiScaler.scaleFactor;
+                m_ScaledSize *= rootCanvas.scaleFactor;
             }
 
             if (m_ScaledSize > 500)
@@ -318,7 +322,8 @@ namespace MaterialUI
 
             m_LocalScaleFactor *= (size / Mathf.Max(size));
 
-            if (m_LocalScaleFactor != float.NaN && new Vector3(m_LocalScaleFactor, m_LocalScaleFactor, m_LocalScaleFactor) != rectTransform.localScale)
+            
+            if (!float.IsInfinity(m_LocalScaleFactor) && !float.IsNaN(m_LocalScaleFactor) && new Vector3(m_LocalScaleFactor, m_LocalScaleFactor, m_LocalScaleFactor) != rectTransform.localScale)
             {
                 m_Tracker.Add(this, rectTransform, DrivenTransformProperties.Scale);
                 rectTransform.localScale = new Vector3(m_LocalScaleFactor, m_LocalScaleFactor, m_LocalScaleFactor);

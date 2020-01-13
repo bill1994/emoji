@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MaterialUI
@@ -226,7 +227,7 @@ namespace MaterialUI
         /// <param name="options">The strings to use for the list item labels.</param>
         /// <param name="onItemClick">Called when an option is selected.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public DialogSimpleList ShowSimpleList(string[] options, Action<int> onItemClick)
+        public DialogRadioList ShowSimpleList(string[] options, Action<int> onItemClick)
         {
             return ShowSimpleList(options, onItemClick, null, null);
         }
@@ -241,17 +242,17 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public DialogSimpleList ShowSimpleList(string[] options, Action<int> onItemClick, string titleText, ImageData icon)
+        public DialogRadioList ShowSimpleList(string[] options, Action<int> onItemClick, string titleText, ImageData icon)
         {
-            OptionDataList optionDataList = new OptionDataList();
+            List<OptionData> optionsData = new List<OptionData>();
 
             for (int i = 0; i < options.Length; i++)
             {
                 OptionData optionData = new OptionData(options[i], null);
-                optionDataList.options.Add(optionData);
+                optionsData.Add(optionData);
             }
 
-            return ShowSimpleList(optionDataList, onItemClick, titleText, icon);
+            return ShowSimpleList(optionsData.ToArray(), onItemClick, titleText, icon);
         }
 
         /// <summary>
@@ -262,9 +263,9 @@ namespace MaterialUI
         /// <param name="optionDataList">The data to use for the option list.</param>
         /// <param name="onItemClick">Called when an option is selected.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public DialogSimpleList ShowSimpleList(OptionDataList optionDataList, Action<int> onItemClick)
+        public DialogRadioList ShowSimpleList(OptionData[] options, Action<int> onItemClick)
         {
-            return ShowSimpleList(optionDataList, onItemClick, null, null);
+            return ShowSimpleList(options, onItemClick, null, null);
         }
 
         /// <summary>
@@ -277,10 +278,10 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public DialogSimpleList ShowSimpleList(OptionDataList optionDataList, Action<int> onItemClick, string titleText, ImageData icon)
+        public DialogRadioList ShowSimpleList(OptionData[] options, Action<int> onItemClick, string titleText, ImageData icon)
         {
-            DialogSimpleList dialog = CreateSimpleList();
-            dialog.Initialize(optionDataList, onItemClick, titleText, icon);
+            DialogRadioList dialog = CreateSimpleList();
+            dialog.Initialize(options, onItemClick, null, titleText, icon, null, null, -1, true);
             dialog.Show();
             return dialog;
         }
@@ -288,14 +289,14 @@ namespace MaterialUI
         /// <summary>
         /// Creates a simple list dialog that can be modified or stored before showing.
         /// <para></para>
-        /// Before calling <see cref="DialogSimpleList.Show"/>, call <see cref="DialogSimpleList.Initialize(OptionDataList,Action{int},string,ImageData)"/>.
+        /// Before calling <see cref="DialogRadioList.Show"/>, call <see cref="DialogRadioList.Initialize(OptionDataList,Action{int},string,ImageData)"/>.
         /// <para></para>
         /// For a simpler solution with less customizability, use <see cref="ShowSimpleList(OptionDataList,Action{int},string,ImageData)"/>.
         /// </summary>
         /// <returns>The instance of the created dialog.</returns>
-        public DialogSimpleList CreateSimpleList()
+        public DialogRadioList CreateSimpleList()
         {
-            DialogSimpleList dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogSimpleList, GetContentTransform()).GetComponent<DialogSimpleList>();
+            DialogRadioList dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogSimpleList, GetContentTransform()).GetComponent<DialogRadioList>();
             DialogManager.CreateActivity(dialog, dialog.transform.parent);
             //dialog.Initialize();
             return dialog;
@@ -310,7 +311,7 @@ namespace MaterialUI
         /// <param name="onAffirmativeButtonClicked">Called when the affirmative button is clicked.</param>
         /// <param name="affirmativeButtonText">The affirmative button text.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public DialogCheckboxList ShowCheckboxList(string[] options, Action<bool[]> onAffirmativeButtonClicked, string affirmativeButtonText = "OK")
+        public DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText = "OK")
         {
             return ShowCheckboxList(options, onAffirmativeButtonClicked, affirmativeButtonText, null, null);
         }
@@ -326,7 +327,7 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public DialogCheckboxList ShowCheckboxList(string[] options, Action<bool[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon)
+        public DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon)
         {
             return ShowCheckboxList(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, null, null);
         }
@@ -344,10 +345,10 @@ namespace MaterialUI
         /// <param name="onDismissiveButtonClicked">Called when the dismissive button is clicked.</param>
         /// <param name="dismissiveButtonText">The dismissive button text. Make null for no dismissive button.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public DialogCheckboxList ShowCheckboxList(string[] options, Action<bool[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
+        public DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
         {
             DialogCheckboxList dialog = CreateCheckboxList();
-            dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
+            dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, null);
             dialog.Show();
             return dialog;
         }

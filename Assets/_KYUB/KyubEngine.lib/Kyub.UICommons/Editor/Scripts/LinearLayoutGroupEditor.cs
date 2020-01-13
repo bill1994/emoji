@@ -11,7 +11,7 @@ using Kyub.UI;
 namespace KyubEditor.UI
 {
     [CustomEditor(typeof(LinearLayoutGroup), true)]
-    public class LinearLayoutGroupEditor : HorizontalOrVerticalLayoutGroupEditor
+    public class LinearLayoutGroupEditor : HorizontalOrVerticalLayoutGroupExEditor
     {
         SerializedProperty m_IsVertical = null;
 

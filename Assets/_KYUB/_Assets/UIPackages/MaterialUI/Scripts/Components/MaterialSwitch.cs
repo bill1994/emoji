@@ -25,13 +25,16 @@ namespace MaterialUI
         private Graphic m_BackImage;
         [SerializeField, SerializeStyleProperty]
         private Graphic m_ShadowImage;
+        [SerializeField]
+        private RectTransform m_Trail;
 
         [SerializeField, SerializeStyleProperty]
         private bool m_SlideSwitch = true;
+        [SerializeField]
+        Slider.Direction m_SlideDirection = Slider.Direction.LeftToRight;
 
         private RectTransform m_SwitchRectTransform;
 
-        private float m_CurrentSwitchPosition;
         private Color m_CurrentBackColor;
 
         #endregion
@@ -61,6 +64,12 @@ namespace MaterialUI
             set { m_SwitchImage = value; }
         }
 
+        public RectTransform trail
+        {
+            get { return m_Trail == null && m_BackImage != null? m_BackImage.rectTransform : m_Trail; }
+            set { m_Trail = value; }
+        }
+
         public Graphic backImage
         {
             get { return m_BackImage; }
@@ -76,6 +85,11 @@ namespace MaterialUI
         public bool slideSwitch
         {
             get { return m_SlideSwitch; }
+        }
+
+        public Slider.Direction slideDirection
+        {
+            get { return m_SlideDirection; }
         }
 
         public RectTransform switchRectTransform
@@ -122,7 +136,6 @@ namespace MaterialUI
 
         public override void TurnOn()
         {
-            m_CurrentSwitchPosition = switchRectTransform.anchoredPosition.x;
             if (switchImage) m_CurrentColor = switchImage.color;
             m_CurrentBackColor = backImage.color;
 
@@ -139,12 +152,12 @@ namespace MaterialUI
                 if (backImage) backImage.color = backOnColor;
             }
 
-            if(slideSwitch) switchRectTransform.anchoredPosition = new Vector2(8f, 0f);
+            if (slideSwitch)
+                switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(true);
         }
 
         public override void TurnOff()
         {
-            m_CurrentSwitchPosition = switchRectTransform.anchoredPosition.x;
             if(switchImage) m_CurrentColor = switchImage.color;
             m_CurrentBackColor = backImage.color;
 
@@ -161,7 +174,8 @@ namespace MaterialUI
                 if (backImage) backImage.color = backOffColor;
             }
 
-            if (slideSwitch) switchRectTransform.anchoredPosition = new Vector2(-8f, 0f);
+            if (slideSwitch)
+                switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(false);
         }
 
         protected override void ApplyInteractableOn()
@@ -199,7 +213,8 @@ namespace MaterialUI
             if (switchImage) switchImage.color = Tween.QuintOut(m_CurrentColor, m_OnColor, m_AnimDeltaTime, m_AnimationDuration);
             if (backImage) backImage.color = Tween.QuintOut(m_CurrentBackColor, backOnColor, m_AnimDeltaTime, m_AnimationDuration);
 
-            if (slideSwitch) switchRectTransform.anchoredPosition = Tween.SeptSoftOut(new Vector2(m_CurrentSwitchPosition, 0f), new Vector2(8f, 0f), m_AnimDeltaTime, m_AnimationDuration);
+            if (slideSwitch)
+                switchRectTransform.anchoredPosition = Tween.SeptSoftOut(switchRectTransform.anchoredPosition, GetSlideAnchoredPosition(true), m_AnimDeltaTime, m_AnimationDuration);
         }
 
         protected override void AnimOnComplete()
@@ -209,7 +224,8 @@ namespace MaterialUI
             if (switchImage) switchImage.color = m_OnColor;
             if (backImage) backImage.color = backOnColor;
 
-            if (slideSwitch) switchRectTransform.anchoredPosition = new Vector2(8f, 0f);
+            if (slideSwitch)
+                switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(true);
         }
 
         protected override void AnimOff()
@@ -219,7 +235,8 @@ namespace MaterialUI
             switchImage.color = Tween.QuintOut(m_CurrentColor, m_OffColor, m_AnimDeltaTime, m_AnimationDuration);
             backImage.color = Tween.QuintOut(m_CurrentBackColor, backOffColor, m_AnimDeltaTime, m_AnimationDuration);
 
-            if (slideSwitch) switchRectTransform.anchoredPosition = Tween.SeptSoftOut(new Vector2(m_CurrentSwitchPosition, 0f), new Vector2(-8f, 0f), m_AnimDeltaTime, m_AnimationDuration);
+            if (slideSwitch)
+                switchRectTransform.anchoredPosition = Tween.SeptSoftOut(switchRectTransform.anchoredPosition, GetSlideAnchoredPosition(false), m_AnimDeltaTime, m_AnimationDuration);
         }
 
         protected override void AnimOffComplete()
@@ -229,7 +246,24 @@ namespace MaterialUI
             switchImage.color = m_OffColor;
             backImage.color = backOffColor;
 
-            if (slideSwitch) switchRectTransform.anchoredPosition = new Vector2(-8f, 0f);
+            if (slideSwitch)
+                switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(false);
+        }
+
+        protected Vector2 GetSlideAnchoredPosition(bool isOn)
+        {
+            if (trail == null)
+                return Vector2.zero;
+            else if ((m_SlideDirection == Slider.Direction.LeftToRight && isOn) || (m_SlideDirection == Slider.Direction.RightToLeft && !isOn))
+                return new Vector2(trail.rect.xMax, 0);
+            else if ((m_SlideDirection == Slider.Direction.RightToLeft && isOn) || (m_SlideDirection == Slider.Direction.LeftToRight && !isOn))
+                return new Vector2(trail.rect.xMin, 0);
+            else if ((m_SlideDirection == Slider.Direction.BottomToTop && isOn) || (m_SlideDirection == Slider.Direction.TopToBottom && !isOn))
+                return new Vector2(0, trail.rect.yMax);
+            else if ((m_SlideDirection == Slider.Direction.TopToBottom && isOn) || (m_SlideDirection == Slider.Direction.BottomToTop && !isOn))
+                return new Vector2(0, trail.rect.yMin);
+
+            return Vector2.zero;
         }
 
         #endregion

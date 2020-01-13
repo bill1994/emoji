@@ -458,9 +458,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE5DB"
   m_Size: 48
-  m_ScaledSize: 48
+  m_ScaledSize: 38.550003
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: arrow_downward
@@ -673,9 +672,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE5D8"
   m_Size: 48
-  m_ScaledSize: 48
+  m_ScaledSize: 38.550003
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: arrow_upward
@@ -722,6 +720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AutoTrackPages: 1
   m_OnlyShowSelectedPage: 1
+  m_AnimateTabs: 1
   m_ForceSameTabSize: 1
   m_TabsContainer: {fileID: 1589283558}
   m_Pages:
@@ -904,7 +903,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 880127542}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -1134,9 +1132,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE88F"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: info_outline
@@ -1500,6 +1497,7 @@ MonoBehaviour:
       m_Calls: []
   m_ChangeIconColor: 0
   m_ItemIcon: {fileID: 911729164}
+  m_ItemIndex: {fileID: 0}
   m_TabView: {fileID: 727630045}
 --- !u!222 &1036773126
 CanvasRenderer:
@@ -1824,23 +1822,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1217785370}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
+  m_Script: {fileID: 11500000, guid: e53aeec3e93c0424d9e290b4209ef433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 1217785374}
-  m_ScalerMode: 0
-  m_ScaleFactor: 1
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 360, y: 640}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 1
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 160
+  m_DefaultSpriteDPI: 160
   m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 0}
-  m_OnCanvasAreaChanged:
+  m_EditorForceDPI: 1
+  m_EditorForceDPIValue: 160
+  m_UseLegacyPhysicalSizeCalc: 0
+  m_SupportSafeArea: 1
+  onCanvasAreaChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &1217785372

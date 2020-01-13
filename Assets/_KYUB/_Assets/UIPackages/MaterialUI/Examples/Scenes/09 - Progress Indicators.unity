@@ -191,9 +191,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE8F4"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: visibility
@@ -526,9 +525,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE906"
   m_Size: 24
-  m_ScaledSize: 32
+  m_ScaledSize: 25.7
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1590595754}
   m_VectorImageData:
     m_Glyph:
       m_Name: radio_ring
@@ -684,9 +682,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE8F5"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: visibility_off
@@ -847,9 +844,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE041"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: repeat_one
@@ -1027,7 +1023,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 127333985}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
@@ -1094,12 +1089,10 @@ MonoBehaviour:
   m_Text: {fileID: 1140507963}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 72, y: 16}
-  m_Size: {x: 102, y: 34}
+  m_ContentSize: {x: 73.08949, y: 16}
+  m_Size: {x: 103.08949, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &315635870
 MonoBehaviour:
@@ -1709,9 +1702,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE629"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: sync_problem
@@ -1795,9 +1787,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE3B7"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: color_lens
@@ -2186,7 +2177,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1599780842}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
@@ -2253,12 +2243,10 @@ MonoBehaviour:
   m_Text: {fileID: 1221984203}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 63, y: 16}
-  m_Size: {x: 93, y: 34}
+  m_ContentSize: {x: 61.88327, y: 16}
+  m_Size: {x: 91.88327, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &949362808
 MonoBehaviour:
@@ -2467,7 +2455,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 543160007}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
@@ -2534,12 +2521,10 @@ MonoBehaviour:
   m_Text: {fileID: 369194341}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 236, y: 16}
-  m_Size: {x: 266, y: 34}
+  m_ContentSize: {x: 236.20233, y: 16}
+  m_Size: {x: 266.20233, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1038628295
 MonoBehaviour:
@@ -2662,7 +2647,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 195474831}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
@@ -2729,12 +2713,10 @@ MonoBehaviour:
   m_Text: {fileID: 271886983}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 138, y: 16}
-  m_Size: {x: 168, y: 34}
+  m_ContentSize: {x: 136.59143, y: 16}
+  m_Size: {x: 166.59143, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1047742213
 MonoBehaviour:
@@ -2802,7 +2784,6 @@ GameObject:
   - component: {fileID: 1121940674}
   - component: {fileID: 1121940673}
   - component: {fileID: 1121940672}
-  - component: {fileID: 1121940675}
   m_Layer: 5
   m_Name: Circle Progress Indicator - Raised
   m_TagString: Untagged
@@ -2899,34 +2880,6 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
---- !u!114 &1121940675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1121940670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 1121940672}
-  m_ScalerMode: 2
-  m_ScaleFactor: 1
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
-  m_ReferencePixelsPerUnit: 100
-  m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 0}
-  m_OnCanvasAreaChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1140507961
 GameObject:
   m_ObjectHideFlags: 0
@@ -3112,23 +3065,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1217785370}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
+  m_Script: {fileID: 11500000, guid: e53aeec3e93c0424d9e290b4209ef433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 1217785374}
-  m_ScalerMode: 0
-  m_ScaleFactor: 1
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 360, y: 640}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 1
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 160
+  m_DefaultSpriteDPI: 160
   m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 0}
-  m_OnCanvasAreaChanged:
+  m_EditorForceDPI: 1
+  m_EditorForceDPIValue: 160
+  m_UseLegacyPhysicalSizeCalc: 0
+  m_SupportSafeArea: 1
+  onCanvasAreaChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &1217785372
@@ -3333,7 +3287,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1432193233}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
@@ -3400,12 +3353,10 @@ MonoBehaviour:
   m_Text: {fileID: 692496654}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 165, y: 16}
-  m_Size: {x: 195, y: 34}
+  m_ContentSize: {x: 165.22957, y: 16}
+  m_Size: {x: 195.22957, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1229931942
 MonoBehaviour:
@@ -3677,7 +3628,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1369455808}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -4130,9 +4080,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 48
-  m_ScaledSize: 48
+  m_ScaledSize: 38.550003
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -4288,9 +4237,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE906"
   m_Size: 24
-  m_ScaledSize: 32
+  m_ScaledSize: 25.7
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1121940675}
   m_VectorImageData:
     m_Glyph:
       m_Name: radio_ring
@@ -4316,7 +4264,6 @@ GameObject:
   - component: {fileID: 1590595753}
   - component: {fileID: 1590595752}
   - component: {fileID: 1590595751}
-  - component: {fileID: 1590595754}
   m_Layer: 5
   m_Name: Circle Progress Indicator - Flat
   m_TagString: Untagged
@@ -4411,34 +4358,6 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
---- !u!114 &1590595754
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1590595749}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 1590595751}
-  m_ScalerMode: 2
-  m_ScaleFactor: 1
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
-  m_ReferencePixelsPerUnit: 100
-  m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 0}
-  m_OnCanvasAreaChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1599780839
 GameObject:
   m_ObjectHideFlags: 0
@@ -4837,7 +4756,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1036818953}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
@@ -4904,12 +4822,10 @@ MonoBehaviour:
   m_Text: {fileID: 97226483}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 140, y: 16}
-  m_Size: {x: 170, y: 34}
+  m_ContentSize: {x: 139.08171, y: 16}
+  m_Size: {x: 169.08171, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1688811342
 MonoBehaviour:
@@ -5035,9 +4951,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 48
-  m_ScaledSize: 48
+  m_ScaledSize: 38.550003
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -5158,9 +5073,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE040"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: repeat

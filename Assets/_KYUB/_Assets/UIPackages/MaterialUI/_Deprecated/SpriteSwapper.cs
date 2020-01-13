@@ -34,23 +34,16 @@ namespace MaterialUI
             }
         }
 
-        /// <summary>
-        /// The root scaler to get the scale factor from.
-        /// </summary>
-        [SerializeField]
-        private MaterialUIScaler m_RootScaler = null;
-        /// <summary>
-        /// The root scaler to get the scale factor from.
-        /// </summary>
-        public MaterialUIScaler rootScaler
+        protected Canvas _RootCanvas;
+        public Canvas rootCanvas
         {
             get
             {
-                if (m_RootScaler == null)
+                if (_RootCanvas == null)
                 {
-                    m_RootScaler = MaterialUIScaler.GetRootScaler(transform as RectTransform);
+                    _RootCanvas = transform.GetRootCanvas();
                 }
-                return m_RootScaler;
+                return _RootCanvas;
             }
         }
 
@@ -139,15 +132,20 @@ namespace MaterialUI
         /// </summary>
         protected override void Start()
         {
-            if (rootScaler == null) return;
-            rootScaler.onCanvasAreaChanged.AddListener((scaleChanged, orientationChanged) =>
+            if (rootCanvas == null) return;
+
+            var scaler = rootCanvas.GetComponent<MaterialCanvasScaler>();
+            if (scaler != null)
             {
-                if (scaleChanged)
+                scaler.onCanvasAreaChanged.AddListener((scaleChanged, orientationChanged) =>
                 {
-                    SwapSprite(rootScaler.scaleFactor);
-                }
-            });
-            RefreshSprite();
+                    if (scaleChanged)
+                    {
+                        SwapSprite(scaler.scaleFactor);
+                    }
+                });
+                RefreshSprite();
+            }
         }
 
 #if UNITY_EDITOR
@@ -165,8 +163,8 @@ namespace MaterialUI
         /// </summary>
         public void RefreshSprite()
         {
-            if (rootScaler == null) return;
-            SwapSprite(rootScaler.scaleFactor);
+            if (rootCanvas == null) return;
+            SwapSprite(rootCanvas.scaleFactor);
         }
 
         /// <summary>

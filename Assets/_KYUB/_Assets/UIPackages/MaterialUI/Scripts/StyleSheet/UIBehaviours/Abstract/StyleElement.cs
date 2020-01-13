@@ -457,6 +457,10 @@ namespace MaterialUI
                 var v_metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
                 v_metaType.ApplyStyleDataToTarget(this, p_styleData);
 
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
+
                 return true;
             }
             return false;
@@ -531,6 +535,11 @@ namespace MaterialUI
                 }
             }
 
+#if UNITY_EDITOR
+            if(v_sucess)
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
+
             return v_sucess;
         }
 
@@ -562,6 +571,14 @@ namespace MaterialUI
     }
 
     #region Helper Classes
+
+    public class EmptyStyleProperty : StyleProperty
+    {
+        public override void Tween(BaseStyleElement p_sender, bool p_canAnimate, float p_animationDuration)
+        {
+            TweenManager.EndTween(_tweenId);
+        }
+    }
 
     [System.Serializable]
     public abstract class StyleProperty

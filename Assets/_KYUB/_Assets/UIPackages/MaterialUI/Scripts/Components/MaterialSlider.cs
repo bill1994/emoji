@@ -100,8 +100,6 @@ namespace MaterialUI
         private float m_LastSliderValue;
         private float m_CurrentInputValue;
 
-        private MaterialUIScaler scaler;
-
         #endregion
 
         #region Properties
@@ -487,7 +485,7 @@ namespace MaterialUI
         {
             SetTracker();
 
-            scaler = MaterialUIScaler.GetRootScaler(transform);
+            var scaler = rootCanvas != null? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
 
             if (scaler != null)
             {
@@ -497,6 +495,8 @@ namespace MaterialUI
 
         protected override void OnDisable()
         {
+            var scaler = rootCanvas != null ? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
+
             if (scaler != null)
             {
                 scaler.onCanvasAreaChanged.RemoveListener(OnCanvasChanged);
@@ -777,7 +777,7 @@ namespace MaterialUI
                     TweenManager.TweenFloat(
                         f => m_HandleGraphicTransform.anchoredPosition = new Vector2(m_HandleGraphicTransform.anchoredPosition.x, f),
                         m_HandleGraphicTransform.anchoredPosition.y,
-                        MaterialUIScaler.GetRootScaler(transform).canvas.pixelPerfect ? 1f : 0f, m_AnimationDuration, 0, null, false, Tween.TweenType.EaseOutCubed);
+                        rootCanvas.pixelPerfect ? 1f : 0f, m_AnimationDuration, 0, null, false, Tween.TweenType.EaseOutCubed);
 
                 m_PopupScaleTweener = TweenManager.TweenVector3(vector3 => m_PopupTransform.localScale = vector3,
                     m_PopupTransform.localScale, Vector3.zero, m_AnimationDuration);

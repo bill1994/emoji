@@ -289,9 +289,9 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 3
   m_firstOverflowCharacterIndex: -1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
@@ -1109,7 +1109,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
@@ -1269,7 +1269,6 @@ MonoBehaviour:
   m_Size: 24
   m_ScaledSize: 32
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: radio_ring
@@ -1654,7 +1653,6 @@ MonoBehaviour:
   m_Size: 24
   m_ScaledSize: 24
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: info_outline
@@ -1672,6 +1670,7 @@ GameObject:
   - component: {fileID: 11418484}
   - component: {fileID: 11407758}
   - component: {fileID: 11414194}
+  - component: {fileID: 8584424675265091012}
   m_Layer: 5
   m_Name: DialogProgress
   m_TagString: Untagged
@@ -1695,10 +1694,10 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &11418484
 MonoBehaviour:
@@ -1737,7 +1736,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
+  m_HorizontalFit: 2
   m_VerticalFit: 2
 --- !u!114 &11414194
 MonoBehaviour:
@@ -1760,7 +1759,7 @@ MonoBehaviour:
   m_UseFocusGroup: 1
   m_HasBackground: 1
   m_Background: {fileID: 0}
-  m_BackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  m_BackgroundColor: {r: 0, g: 0, b: 0, a: 0.5019608}
   m_DestroyOnHide: 1
   m_ChangeSibling: 1
   m_IsModal: 0
@@ -1772,3 +1771,27 @@ MonoBehaviour:
   m_BodyText: {fileID: 11445930}
   m_LinearIndicator: {fileID: 11446822}
   m_CircularIndicator: {fileID: 11482840}
+--- !u!114 &8584424675265091012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c247ef0ba6353641907e1e4c1934b14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 300
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
+  m_MaxWidthMode: 2
+  m_MaxHeightMode: 2
+  m_MaxWidth: 20
+  m_MaxHeight: 20

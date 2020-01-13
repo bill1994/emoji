@@ -1,6 +1,7 @@
 ﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using Kyub.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,208 +10,113 @@ using UnityEngine.UI;
 namespace MaterialUI
 {
     [AddComponentMenu("MaterialUI/Dialogs/Radio List", 1)]
-    public class DialogRadioList : MaterialDialogCompat
+    public class DialogRadioList : BaseDialogList
     {
-        [SerializeField]
-        private DialogTitleSection m_TitleSection = null;
-        public DialogTitleSection titleSection
-        {
-            get { return m_TitleSection; }
-            set { m_TitleSection = value; }
-        }
+        #region Private Variables
 
         [SerializeField]
-        private DialogButtonSection m_ButtonSection = null;
-        public DialogButtonSection buttonSection
-        {
-            get { return m_ButtonSection; }
-            set { m_ButtonSection = value; }
-        }
+        protected bool m_AllowSwitchOff = false;
 
-        [SerializeField]
-        private MaterialToggleGroup m_ToggleGroup = null;
-        public MaterialToggleGroup toggleGroup
-        {
-            get { return m_ToggleGroup; }
-            set { m_ToggleGroup = value; }
-        }
+        protected int _SelectedIndex = 0;
 
-        private List<DialogCheckboxOption> m_SelectionItems;
-        public List<DialogCheckboxOption> selectionItems
-        {
-            get { return m_SelectionItems; }
-            protected set { m_SelectionItems = value; }
-        }
+        protected System.Action<int> _onAffirmativeButtonClicked = null;
+        #endregion
 
-		private int m_SelectedIndex;
+        #region Callbacks
+
+        public DialogClickableOption.IntUnityEvent onSelectedIndexChanged = new DialogClickableOption.IntUnityEvent();
+
+        #endregion
+
+        #region Properties
+
         public int selectedIndex
         {
-            get { return m_SelectedIndex; }
-            protected set { m_SelectedIndex = value; }
-        }
-
-        private string[] m_OptionList;
-        public string[] optionList
-        {
-            get { return m_OptionList; }
-            set { m_OptionList = value; }
-        }
-
-		private Action<int> m_OnAffirmativeButtonClicked;
-		public Action<int> onAffirmativeButtonClicked
-		{
-			get { return m_OnAffirmativeButtonClicked; }
-			set { m_OnAffirmativeButtonClicked = value; }
-		}
-
-        private Action<int> m_onItemClick;
-        public Action<int> onItemClick
-        {
-            get { return m_onItemClick; }
-            set { m_onItemClick = value; }
-        }
-
-        [SerializeField]
-        private GameObject m_OptionTemplate = null;
-        protected GameObject optionTemplate
-        {
-            get { return m_OptionTemplate; }
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            OverscrollConfig overscrollConfig = GetComponentInChildren<OverscrollConfig>();
-
-            if (overscrollConfig != null)
+            get { return _SelectedIndex; }
+            protected set
             {
-                overscrollConfig.Setup();
+                value = value < 0 ? (!m_AllowSwitchOff ? _SelectedIndex : -1) : value;
+                value = Mathf.Clamp(value, -1, (_Options != null? _Options.Length : 0) - 1);
+                if (_SelectedIndex == value)
+                    return;
+                _SelectedIndex = value;
+                if (onSelectedIndexChanged != null)
+                    onSelectedIndexChanged.Invoke(_SelectedIndex);
+                if (m_ScrollDataView)
+                    m_ScrollDataView.FullReloadAll();
             }
         }
 
-		public virtual void Initialize(string[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart)
+        public override OptionData[] options
         {
-            ClearRadioList();
-
-            m_OptionList = options;
-            m_SelectionItems = new List<DialogCheckboxOption>();
-            
-            for (int i = 0; i < m_OptionList.Length; i++)
+            get
             {
-                m_SelectionItems.Add(CreateSelectionItem(i));
+                if (_Options == null)
+                    _Options = new OptionData[0];
+                return _Options;
             }
-
-			if (selectedIndexStart < 0) selectedIndexStart = 0;
-			if (selectedIndexStart >= m_SelectionItems.Count) selectedIndexStart = m_SelectionItems.Count - 1;
-			m_SelectionItems[selectedIndexStart].itemCheckbox.toggle.isOn = true;
-			m_SelectedIndex = selectedIndexStart;
-
-            m_OptionTemplate.SetActive(false);
-
-            if(m_TitleSection != null)
-                m_TitleSection.SetTitle(titleText, icon);
-
-            if (m_ButtonSection != null)
+            protected set
             {
-                m_ButtonSection.SetButtons(null, affirmativeButtonText, onDismissiveButtonClicked, dismissiveButtonText);
-                m_ButtonSection.SetupButtonLayout(rectTransform);
-            }
+                if (_Options == value)
+                    return;
+                _Options = value;
 
-			m_OnAffirmativeButtonClicked = onAffirmativeButtonClicked;
-
-            float availableHeight = DialogManager.rectTransform.rect.height;
-
-            if (m_TitleSection != null && m_TitleSection.text != null)
-            {
-                LayoutGroup textAreaRectTransform = m_TitleSection.text.transform.parent.GetComponent<LayoutGroup>();
-
-                if (textAreaRectTransform.gameObject.activeSelf)
+                selectedIndex = -1;
+                if (m_ScrollDataView != null)
                 {
-                    textAreaRectTransform.CalculateLayoutInputVertical();
-                    availableHeight -= textAreaRectTransform.preferredHeight;
+                    m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
+                    m_ScrollDataView.Setup(options);
                 }
             }
-
-            /*if(AutoSize && m_ListScrollLayoutElement != null)
-            {
-                m_ListScrollLayoutElement.maxHeight = availableHeight - 98f;
-            }*/
-
-            //Initialize();
         }
 
-        protected virtual DialogCheckboxOption CreateSelectionItem(int i)
+        #endregion
+
+        #region Public Functions
+
+        public virtual void Initialize(string[] optionsStr, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff = false)
         {
-            DialogCheckboxOption option = Instantiate(m_OptionTemplate).GetComponent<DialogCheckboxOption>();
-            option.rectTransform.SetParent(m_OptionTemplate.transform.parent);
-            option.rectTransform.localScale = Vector3.one;
-            option.rectTransform.localEulerAngles = Vector3.zero;
-            option.rectTransform.localPosition = new Vector3(option.rectTransform.localPosition.x, option.rectTransform.localPosition.y, 0f);
-
-            Graphic text = option.itemText;
-
-            text.SetGraphicText(m_OptionList[i]);
-
-            option.index = i;
-            option.onClickAction += OnItemClick;
-
-            option.itemCheckbox.group = m_ToggleGroup;
-            option.itemCheckbox.isOn = false;
-            option.gameObject.SetActive(true);
-
-            return option;
-        }
-
-        public virtual void OnItemClick(int index)
-        {
-            Toggle toggle = m_SelectionItems[index].itemCheckbox.toggle;
-            toggle.isOn = !toggle.isOn;
-            m_SelectedIndex = index;
-
-            if(onItemClick != null)
+            OptionData[] options = new OptionData[optionsStr != null? optionsStr.Length : 0];
+            for(int i=0; i<optionsStr.Length; i++)
             {
-                onItemClick(index);
+                options[i] = new OptionData(optionsStr[i], null);
             }
+            Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexStart);
         }
 
-        public virtual void AffirmativeButtonClicked()
+        public virtual void Initialize(OptionData[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff = false)
         {
-			m_OnAffirmativeButtonClicked.InvokeIfNotNull(m_SelectedIndex);
+            _onAffirmativeButtonClicked = onAffirmativeButtonClicked;
+            BaseInitialize(options, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
+            _SelectedIndex = selectedIndexStart < 0 ? (!m_AllowSwitchOff && options.Length > 0? 0 : -1) : selectedIndexStart;
+            _SelectedIndex = Mathf.Clamp(_SelectedIndex, -1, (_Options != null ? _Options.Length : 0) - 1);
+        }
+
+        public override void AffirmativeButtonClicked()
+        {
+            var canvasGroup = this.GetAddComponent<CanvasGroup>();
+            canvasGroup.blocksRaycasts = false;
+
+            if (_onAffirmativeButtonClicked != null)
+                _onAffirmativeButtonClicked.InvokeIfNotNull(_SelectedIndex);
             Hide();
         }
 
-        public virtual void DismissiveButtonClicked()
+        public override bool IsDataIndexSelected(int dataIndex)
         {
-            if (m_ButtonSection != null)
-            {
-                m_ButtonSection.OnDismissiveButtonClicked();
-            }
-
-            Hide();
-		}
-
-        public virtual void ClearRadioList()
-        {
-            if (m_SelectionItems == null) return;
-
-            foreach(DialogCheckboxOption option in m_SelectionItems)
-            {
-                Destroy(option.gameObject);
-            }
-
-            m_SelectionItems.Clear();
+            return dataIndex >= 0 && dataIndex < options.Length && dataIndex == selectedIndex;
         }
 
-		/*void Update()
-		{
-			if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
-			{
-				AffirmativeButtonClicked();
-			}
-			else if (Input.GetKeyDown(KeyCode.Escape))
-			{
-				DismissiveButtonClicked();
-			}
-		}*/
+        #endregion
+
+        #region Receivers
+
+        protected override void HandleOnItemClicked(int dataIndex)
+        {
+            selectedIndex = selectedIndex == dataIndex? (!m_AllowSwitchOff ? selectedIndex : -1) : dataIndex;
+        }
+
+        #endregion
+
     }
 }

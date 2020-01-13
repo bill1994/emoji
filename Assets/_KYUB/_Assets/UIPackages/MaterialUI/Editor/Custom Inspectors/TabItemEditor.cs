@@ -14,14 +14,16 @@ namespace MaterialUI
         private SerializedProperty m_OffColor;
         private SerializedProperty m_DisabledColor;
 
+        private SerializedProperty m_ItemIndex;
         private SerializedProperty m_ItemIcon;
 		private SerializedProperty m_TabView;
 
         protected override void OnEnable()
         {
 			base.OnEnable();
-            
-			m_ItemIcon = serializedObject.FindProperty("m_ItemIcon");
+
+            m_ItemIndex = serializedObject.FindProperty("m_ItemIndex");
+            m_ItemIcon = serializedObject.FindProperty("m_ItemIcon");
 			m_TabView = serializedObject.FindProperty("m_TabView");
 
             m_ChangeIconColor = serializedObject.FindProperty("m_ChangeIconColor");
@@ -56,7 +58,8 @@ namespace MaterialUI
 			EditorGUI.indentLevel++;
             LayoutStyle_PropertyField(m_ItemIcon);
             LayoutStyle_PropertyField(m_TabView);
-			EditorGUI.indentLevel--;
+            LayoutStyle_PropertyField(m_ItemIndex);
+            EditorGUI.indentLevel--;
 		}
     }
 }

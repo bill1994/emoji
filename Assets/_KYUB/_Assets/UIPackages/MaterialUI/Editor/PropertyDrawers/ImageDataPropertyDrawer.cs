@@ -105,8 +105,9 @@ namespace MaterialUI
                 if (GUI.Button(new Rect((pos.x + pos.width) - pickButtonPadding, pos.y, pickButtonWidth, pos.height),
                     "Pick Icon"))
                 {
+                    var fieldValue = MaterialSerializedPropertyExtensions.GetFieldValue(property);
                     VectorImagePickerWindow.Show(
-                        ((ImageData)fieldInfo.GetValue(m_VectorImageData.serializedObject.targetObject))
+                        ((ImageData)fieldValue)
                             .vectorImageData, property.serializedObject.targetObject);
                 }
 
@@ -117,9 +118,8 @@ namespace MaterialUI
                     IconDecoder.Decode(@"\ue14c"), v_guiButtonFont
                     ))
                 {
-                    VectorImageData data =
-                        (((ImageData)fieldInfo.GetValue(m_VectorImageData.serializedObject.targetObject))
-                            .vectorImageData);
+                    var fieldValue = MaterialSerializedPropertyExtensions.GetFieldValue(property);
+                    VectorImageData data = ((ImageData)fieldValue).vectorImageData;
                     data.vectorFont = null;
                     data.glyph = null;
                     EditorUtility.SetDirty(property.serializedObject.targetObject);

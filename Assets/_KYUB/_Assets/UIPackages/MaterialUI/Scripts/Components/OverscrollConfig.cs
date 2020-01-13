@@ -385,6 +385,7 @@ namespace MaterialUI
         protected virtual HashSet<int> GetValidIndexes(Vector2 normalizedValue, Vector2? delta)
         {
             HashSet<int> indexes = new HashSet<int>();
+
             if (normalizedValue.x == 0 && (delta == null || delta.Value.x < 0))
             {
                 if (m_OverscrollObjects[0] != null)
@@ -396,12 +397,12 @@ namespace MaterialUI
                     indexes.Add(1);
             }
 
-            if (normalizedValue.y == 0 && (delta == null || delta.Value.y < 0))
+            if (normalizedValue.y == 1 && (delta == null || delta.Value.y > 0))
             {
                 if (m_OverscrollObjects[2] != null)
                     indexes.Add(2);
             }
-            else if (normalizedValue.y == 1 && (delta == null || delta.Value.y > 0))
+            else if (normalizedValue.y == 0 && (delta == null || delta.Value.y < 0))
             {
                 if (m_OverscrollObjects[3] != null)
                     indexes.Add(3);

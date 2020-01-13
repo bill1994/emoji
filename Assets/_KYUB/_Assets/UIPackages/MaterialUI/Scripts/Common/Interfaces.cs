@@ -36,11 +36,25 @@ namespace MaterialUI
         /// </summary>
         /// <param name="materialInputField">The material input field.</param>
         void Init(MaterialInputField materialInputField);
+
+        /// <summary>
+        /// Dispose Validator
+        /// </summary>
+        void Dispose();
+
         /// <summary>
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns></returns>
         bool IsTextValid();
+    }
+
+    public interface IAutoFormatTextValidator : ITextValidator
+    {
+        /// <summary>
+        /// Format Text into a specific validator format
+        /// </summary>
+        bool FormatText();
     }
 
     /// <summary>

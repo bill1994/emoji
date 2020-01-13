@@ -97,7 +97,11 @@ namespace MaterialUI
             {
                 if (text == null)
                     text = "";
-                text = textParameters == null || textParameters.Length == 0? text : string.Format(text, textParameters);
+                try
+                {
+                    text = textParameters == null || textParameters.Length == 0 ? text : string.Format(text, textParameters);
+                }
+                catch { }
                 if (textGraphic is TMPro.TMP_Text)
                 {
                     var oldText = ((TMPro.TMP_Text)textGraphic).text;
@@ -109,6 +113,10 @@ namespace MaterialUI
                 }
                 else if (textGraphic is Text)
                     ((Text)textGraphic).text = text;
+
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(textGraphic);
+#endif
             }
         }
 
@@ -313,19 +321,19 @@ namespace MaterialUI
             CanvasScaler mainScaler = canvas.GetComponent<CanvasScaler>();
             if (mainScaler != null)
             {
-                CanvasScaler scaler = dupCanvas.gameObject.GetAddComponent<CanvasScaler>();
+                CanvasScaler scaler = dupCanvas.gameObject.GetAddComponent<MaterialCanvasScaler>();
                 scaler.uiScaleMode = mainScaler.uiScaleMode;
                 scaler.referenceResolution = mainScaler.referenceResolution;
                 scaler.screenMatchMode = mainScaler.screenMatchMode;
                 scaler.matchWidthOrHeight = mainScaler.matchWidthOrHeight;
                 scaler.referencePixelsPerUnit = mainScaler.referencePixelsPerUnit;
             }
-            MaterialUIScaler mainMaterialScaler = canvas.GetComponent<MaterialUIScaler>();
+            MaterialCanvasScaler mainMaterialScaler = mainScaler as MaterialCanvasScaler;
             if (mainMaterialScaler != null)
             {
-                MaterialUIScaler materialScaler = dupCanvas.gameObject.GetAddComponent<MaterialUIScaler>();
-                materialScaler.scalerMode = MaterialUIScaler.ScalerMode.CopyOtherScaler;
-                materialScaler.targetScaler = mainMaterialScaler;
+                MaterialCanvasScaler materialScaler = dupCanvas.gameObject.GetAddComponent<MaterialCanvasScaler>();
+                materialScaler.useLegacyPhysicalSize = mainMaterialScaler.useLegacyPhysicalSize;
+                materialScaler.supportSafeArea = mainMaterialScaler.supportSafeArea;
             }
 
             Kyub.Performance.SustainedCanvasView mainSustainedCanvasView = canvas.GetComponent<Kyub.Performance.SustainedCanvasView>();
@@ -337,7 +345,6 @@ namespace MaterialUI
                 sustainedCanvasView.MinimumSupportedFps = mainSustainedCanvasView.MinimumSupportedFps;
             }
 
-            dupCanvas.gameObject.GetAddComponent<MaterialUIScaler>();
             dupCanvas.renderMode = canvas.renderMode;
 
             return dupCanvas;
@@ -364,7 +371,7 @@ namespace MaterialUI
             CanvasScaler mainScaler = canvas.GetComponent<CanvasScaler>();
             if (mainScaler != null)
             {
-                CanvasScaler scaler = otherCanvas.gameObject.GetAddComponent<CanvasScaler>();
+                CanvasScaler scaler = otherCanvas.gameObject.GetAddComponent<MaterialCanvasScaler>();
                 scaler.uiScaleMode = mainScaler.uiScaleMode;
                 scaler.referenceResolution = mainScaler.referenceResolution;
                 scaler.screenMatchMode = mainScaler.screenMatchMode;
@@ -373,14 +380,13 @@ namespace MaterialUI
                 scaler.scaleFactor = mainScaler.scaleFactor;
                 otherCanvas.scaleFactor = scaler.scaleFactor;
             }
-            MaterialUIScaler mainMaterialScaler = canvas.GetComponent<MaterialUIScaler>();
+            MaterialCanvasScaler mainMaterialScaler = mainScaler as MaterialCanvasScaler;
             if (mainMaterialScaler != null)
             {
-                MaterialUIScaler materialScaler = otherCanvas.gameObject.GetAddComponent<MaterialUIScaler>();
-                materialScaler.scalerMode = MaterialUIScaler.ScalerMode.CopyOtherScaler;
-                materialScaler.targetScaler = mainMaterialScaler;
+                MaterialCanvasScaler materialScaler = otherCanvas.gameObject.GetAddComponent<MaterialCanvasScaler>();
+                materialScaler.useLegacyPhysicalSize = mainMaterialScaler.useLegacyPhysicalSize;
+                materialScaler.supportSafeArea = mainMaterialScaler.supportSafeArea;
             }
-            otherCanvas.gameObject.GetAddComponent<MaterialUIScaler>();
             otherCanvas.renderMode = canvas.renderMode;
             otherCanvas.targetDisplay = canvas.targetDisplay;
             otherCanvas.worldCamera = canvas.worldCamera;
@@ -762,23 +768,23 @@ namespace MaterialUI
         {
             IVectorImage vectorImage = graphic as IVectorImage;
 
-            if (vectorImage != null && imageData != null)
+            if (vectorImage != null)
             {
-                if (imageData.imageDataType == ImageDataType.VectorImage)
-                {
+                if (imageData != null && imageData.imageDataType == ImageDataType.VectorImage)
                     vectorImage.vectorImageData = imageData.vectorImageData;
-                }
+                else
+                    vectorImage.vectorImageData = null;
                 return;
             }
 
             Image spriteImage = graphic as Image;
 
-            if (spriteImage != null && imageData != null)
+            if (spriteImage != null)
             {
                 if (imageData.imageDataType == ImageDataType.Sprite)
-                {
                     spriteImage.sprite = imageData.sprite;
-                }
+                else
+                    vectorImage.vectorImageData = null;
             }
         }
 

@@ -4,6 +4,9 @@
 using UnityEngine.UI;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using UnityEngine;
+using System.Collections;
 
 namespace MaterialUI
 {
@@ -12,20 +15,147 @@ namespace MaterialUI
     /// </summary>
     public class BaseTextValidator
 	{
-        /// <summary>
-        /// The material input field.
-        /// </summary>
+        #region Private Variables
+
         protected MaterialInputField m_MaterialInputField;
+
+        #endregion
+
+        #region Public Properties
+
+        public virtual MaterialInputField materialInputField { get { return m_MaterialInputField; } }
+
+        #endregion
+
+        #region Public Functions
+
+        public virtual bool IsTextValid()
+        {
+            return true;
+        }
 
         /// <summary>
         /// Initializes the validator for the specified material input field.
         /// </summary>
         /// <param name="materialInputField">The material input field.</param>
-        public void Init(MaterialInputField materialInputField)
-		{
-			m_MaterialInputField = materialInputField;
-		}
-	}
+        public virtual void Init(MaterialInputField materialInputField)
+        {
+            Dispose();
+            m_MaterialInputField = materialInputField;
+        }
+
+        public virtual void Dispose()
+        {
+            m_MaterialInputField = null;
+        }
+
+        #endregion
+    }
+
+    public class BaseAutoFormatTextValidator : BaseTextValidator
+    {
+        #region Public Functions
+
+        public override void Init(MaterialInputField materialInputField)
+        {
+            Dispose();
+
+            m_MaterialInputField = materialInputField;
+
+            RegisterEvents();
+        }
+
+        public override void Dispose()
+        {
+            UnregisterEvents();
+            _formatTextCoroutine = null;
+            if (_formatTextCoroutine != null)
+                m_MaterialInputField.StopCoroutine(_formatTextCoroutine);
+            base.Dispose();
+        }
+
+        public virtual bool FormatText()
+        {
+            return false;
+        }
+
+        #endregion
+
+        #region Helper Functions
+
+        protected virtual void RegisterEvents()
+        {
+            UnregisterEvents();
+            if (Application.isPlaying && m_MaterialInputField != null)
+            {
+                if (TouchScreenKeyboard.isSupported)
+                {
+                    if (m_MaterialInputField.onEndEdit != null)
+                        m_MaterialInputField.onEndEdit.AddListener(HandleonValueChanged);
+                }
+                else
+                {
+                    if (m_MaterialInputField.onValueChanged != null)
+                        m_MaterialInputField.onValueChanged.AddListener(HandleonValueChanged);
+                }
+            }
+        }
+
+        protected virtual void UnregisterEvents()
+        {
+            if (m_MaterialInputField != null)
+            {
+                if (TouchScreenKeyboard.isSupported)
+                {
+                    if (m_MaterialInputField.onEndEdit != null)
+                        m_MaterialInputField.onEndEdit.RemoveListener(HandleonValueChanged);
+                }
+                else
+                {
+                    if (m_MaterialInputField.onEndEdit != null)
+                        m_MaterialInputField.onEndEdit.RemoveListener(HandleonValueChanged);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Events
+
+        Coroutine _formatTextCoroutine = null;
+        protected virtual void HandleonValueChanged(string text)
+        {
+            if (m_MaterialInputField != null)
+            {
+                if (_formatTextCoroutine != null)
+                    m_MaterialInputField.StopCoroutine(_formatTextCoroutine);
+
+                if (m_MaterialInputField.enabled && m_MaterialInputField.gameObject.activeInHierarchy)
+                {
+                    _formatTextCoroutine = m_MaterialInputField.StartCoroutine(FormatTextDelayedRoutine());
+                }
+                else
+                {
+                    _formatTextCoroutine = null;
+                    UnregisterEvents();
+                    FormatText();
+                    IsTextValid();
+                    RegisterEvents();
+                }
+            }
+        }
+
+        protected IEnumerator FormatTextDelayedRoutine()
+        {
+            yield return null;
+            _formatTextCoroutine = null;
+            UnregisterEvents();
+            FormatText();
+            RegisterEvents(); 
+        }
+
+        #endregion
+    }
 
     /// <summary>
     /// Text validator that checks for empty text.
@@ -52,7 +182,7 @@ namespace MaterialUI
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text contains characters, otherwise false.</returns>
-        public bool IsTextValid()
+        public override bool IsTextValid()
 		{
 			if (string.IsNullOrEmpty(m_MaterialInputField.text))
 			{
@@ -63,7 +193,7 @@ namespace MaterialUI
 
 			return true;
 		}
-	}
+    }
 
     /// <summary>
     /// Text validator that checks for emails.
@@ -90,7 +220,7 @@ namespace MaterialUI
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text appears to be an email, otherwise false.</returns>
-        public bool IsTextValid()
+        public override bool IsTextValid()
 		{
 			Regex regex = new Regex(@"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*" + "@" + @"((([\-\w]+\.)+[a-zA-Z]{2,4})|(([0-9]{1,3}\.){3}[0-9]{1,3}))$");
 			Match match = regex.Match(m_MaterialInputField.text);
@@ -145,7 +275,7 @@ namespace MaterialUI
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text appears to be a name, otherwise false.</returns>
-        public bool IsTextValid()
+        public override bool IsTextValid()
 		{
 			if (m_MaterialInputField.text.Length < m_MinimumLength)
 			{
@@ -198,7 +328,7 @@ namespace MaterialUI
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text is at least the length of or longer than m_MinimumLength, otherwise false.</returns>
-        public bool IsTextValid()
+        public override bool IsTextValid()
 		{
 			if (m_MaterialInputField.text.Length < m_MinimumLength)
 			{
@@ -250,7 +380,7 @@ namespace MaterialUI
 		/// Determines whether the text is valid.
 		/// </summary>
 		/// <returns>True if the text is lower than m_MaximumLength, otherwise false.</returns>
-		public bool IsTextValid()
+		public override bool IsTextValid()
 		{
 			if (m_MaterialInputField.text.Length > m_MaximumLength)
 			{
@@ -294,7 +424,7 @@ namespace MaterialUI
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text in the two fields match, otherwise false.</returns>
-        public bool IsTextValid()
+        public override bool IsTextValid()
 		{
             
 			if (!m_MaterialInputField.text.Equals(m_OriginalPasswordInputField.text))
@@ -332,7 +462,7 @@ namespace MaterialUI
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the directory given by the text value exists, otherwise false.</returns>
-        public bool IsTextValid()
+        public override bool IsTextValid()
 		{
 			bool directoryExists = Directory.Exists(m_MaterialInputField.text);
 			if (!directoryExists)
@@ -369,7 +499,7 @@ namespace MaterialUI
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the filepath given by the text value exists, otherwise false.</returns>
-        public bool IsTextValid()
+        public override bool IsTextValid()
 		{
 			bool fileExists = File.Exists(m_MaterialInputField.text);
 			if (!fileExists)
@@ -381,4 +511,142 @@ namespace MaterialUI
 		}
 	}
 
+    public abstract class CustomFormatValidator : BaseAutoFormatTextValidator, IAutoFormatTextValidator
+    {
+        #region Private Fields
+
+        protected string m_ErrorMessage;
+        protected string m_ValidatorFormat = "";
+
+        public CustomFormatValidator(string validatorFormat, string errorMessage = "Format is invalid")
+        {
+            m_ErrorMessage = errorMessage;
+            m_ValidatorFormat = validatorFormat == null ? string.Empty : validatorFormat;
+        }
+
+        #endregion
+
+        #region Public Functions
+
+        /// <summary>
+        /// Determines whether the text is valid.
+        /// </summary>
+        /// <returns>True if the filepath given by the text value exists, otherwise false.</returns>
+        public override bool IsTextValid()
+        {
+            if (!string.IsNullOrEmpty(m_ValidatorFormat))
+            {
+                Regex regex = new Regex(m_ValidatorFormat);
+                Match match = regex.Match(m_MaterialInputField.text);
+                if (!match.Success)
+                {
+                    m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override bool FormatText()
+        {
+            var lastValidIndex = m_MaterialInputField != null ? m_MaterialInputField.caretPosition : -1;
+            var formattedText = m_MaterialInputField == null || string.IsNullOrEmpty(m_MaterialInputField.text) ? string.Empty : CalculateFormattedText(m_MaterialInputField.text, ref lastValidIndex);
+            if (m_MaterialInputField != null && formattedText != m_MaterialInputField.text)
+            {
+                UnregisterEvents();
+                m_MaterialInputField.text = formattedText;
+                m_MaterialInputField.caretPosition = Mathf.Clamp(lastValidIndex, 0, formattedText.Length);
+                RegisterEvents();
+
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+        #region Mask Functions
+
+        protected virtual string CalculateFormattedText(string text, ref int caretPosition)
+        {
+            return text;
+        }
+
+        protected string ApplyMask(string text, string mask, char[] specialChars, char[] validTextChars, ref int caretPosition)
+        {
+            return ApplyMask(text, mask, specialChars != null ? new string(specialChars) : string.Empty, validTextChars != null ? new string(validTextChars) : string.Empty, ref caretPosition);
+        }
+
+        protected string ApplyMask(string text, string mask, string maskSpecialChars, string validTextChars, ref int caretPosition)
+        {
+            if (text == null)
+                text = string.Empty;
+            if (string.IsNullOrEmpty(mask))
+                return text;
+
+            char[] maskChars = mask.ToCharArray();
+            
+            //Calculate valid text chars nad converted caret position
+            List<char> textChars = new List<char>();
+            var lastValidIndex = -1;
+            var convertedCaretPosition = -1;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char sh = text[i];
+
+                if (string.IsNullOrEmpty(validTextChars) || Regex.IsMatch(sh.ToString(), "[" + validTextChars + "]"))
+                {
+                    textChars.Add(sh);
+                    lastValidIndex = textChars.Count-1;
+                }
+                if (caretPosition - 1 == i)
+                    convertedCaretPosition = lastValidIndex;
+            }
+
+            //Empty Text
+            if (textChars.Count == 0)
+            {
+                caretPosition = 0;
+                return "";
+            }
+
+            //Run on all elements of the mark
+            for (int i = 0, j = 0; i < maskChars.Length; i++)
+            {
+                char ch = maskChars[i];
+
+                if (string.IsNullOrEmpty(maskSpecialChars) || Regex.IsMatch(ch.ToString(), "[" + maskSpecialChars + "]"))
+                {
+                    if (j < textChars.Count)
+                    {
+
+                        char sh = textChars[j]; //j < textChars.Count ? textChars[j] : maskChars[i];
+
+                        if (convertedCaretPosition == j)
+                            caretPosition = i + 1;
+
+                        //Replace character of original text to the mask char text
+                        maskChars[i] = sh;
+                        j++;
+                    }
+                    //Amount of special chars invalid
+                    else
+                    {
+                        var subConvertedText = i ==0? string.Empty : new string(maskChars, 0, i);
+                        caretPosition = Mathf.Clamp(caretPosition, 0, subConvertedText.Length);
+                        return subConvertedText;
+                    }
+                }
+            }
+
+            //Finished
+            var convertedText = new string(maskChars).Trim();
+            caretPosition = Mathf.Clamp(caretPosition, 0, convertedText.Length);
+
+            return convertedText;
+        }
+
+        #endregion
+    }
 }

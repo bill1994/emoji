@@ -6,16 +6,9 @@ using MaterialUI;
 using UnityEngine.UI;
 using UnityEngine;
 
-public class Example07LetterValidation : MonoBehaviour, ITextValidator
+public class Example07LetterValidation : BaseTextValidator, ITextValidator
 {
-	private MaterialInputField m_MaterialInputField;
-
-	public void Init(MaterialInputField materialInputField)
-	{
-		m_MaterialInputField = materialInputField;
-	}
-
-	public bool IsTextValid()
+	public override bool IsTextValid()
     {
 		if (new Regex("[^a-zA-Z ]").IsMatch(m_MaterialInputField.text))
         {

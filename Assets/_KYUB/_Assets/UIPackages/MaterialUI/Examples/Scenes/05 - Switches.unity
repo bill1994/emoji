@@ -184,7 +184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -204,9 +204,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -255,7 +254,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &13116952
@@ -291,9 +290,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -504,9 +502,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -555,7 +552,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &96248261
@@ -571,7 +568,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7411765, g: 0.7411765, b: 0.7411765, a: 1}
+  m_Color: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -591,9 +588,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -680,9 +676,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -831,7 +826,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &141751058
@@ -847,7 +842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7411765, g: 0.7411765, b: 0.7411765, a: 1}
+  m_Color: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -867,9 +862,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -966,9 +960,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -1163,7 +1156,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 212653571}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -1273,9 +1265,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -1362,9 +1353,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -1542,7 +1532,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &275843070
@@ -1578,9 +1568,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -1667,9 +1656,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -1719,7 +1707,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998703}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &286173726
@@ -1901,9 +1889,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -2069,7 +2056,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 13116952}
   m_BackImage: {fileID: 1854205326}
   m_ShadowImage: {fileID: 2074176723}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &405240627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2187,9 +2176,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -2363,9 +2351,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -2449,9 +2436,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE0C8"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: location_on
@@ -2612,9 +2598,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE0C8"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: location_on
@@ -2865,7 +2850,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998703}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &768260982
@@ -3021,7 +3006,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 812388038}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -3221,9 +3205,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -3530,7 +3513,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998703}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1053407709
@@ -3675,9 +3658,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -3872,9 +3854,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -3923,7 +3904,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8, y: 0}
+  m_AnchoredPosition: {x: -12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1067814790
@@ -3959,9 +3940,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -4048,9 +4028,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -4334,7 +4313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_Color: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -4354,9 +4333,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -4381,8 +4359,7 @@ GameObject:
   - component: {fileID: 1217785375}
   - component: {fileID: 1217785374}
   - component: {fileID: 1217785372}
-  - component: {fileID: 1217785376}
-  - component: {fileID: 1217785377}
+  - component: {fileID: 1217785371}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -4390,6 +4367,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1217785371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1217785370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e53aeec3e93c0424d9e290b4209ef433, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 360, y: 640}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 1
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 160
+  m_DefaultSpriteDPI: 160
+  m_DynamicPixelsPerUnit: 1
+  m_EditorForceDPI: 1
+  m_EditorForceDPIValue: 160
+  m_UseLegacyPhysicalSizeCalc: 0
+  m_SupportSafeArea: 1
+  onCanvasAreaChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1217785372
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4448,51 +4454,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1217785376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1217785370}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f0dcef36f7974cbe91bf74bdc9fd5f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_GutterColor: {r: 0.588, g: 0.706, b: 1, a: 0.5}
-  m_GutterWidth: 24
-  m_MarginWidth: 24
-  m_NumberOfColums: 12
-  m_FullScreenHeight: 0
---- !u!114 &1217785377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1217785370}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 1217785374}
-  m_ScalerMode: 0
-  m_ScaleFactor: 1
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
-  m_ReferencePixelsPerUnit: 100
-  m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 0}
-  m_OnCanvasAreaChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1228046217
 GameObject:
   m_ObjectHideFlags: 0
@@ -4645,7 +4606,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 1350222427}
   m_BackImage: {fileID: 1777742}
   m_ShadowImage: {fileID: 1330082085}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1228046222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4787,9 +4750,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -4876,9 +4838,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -4927,7 +4888,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1260018371
@@ -4943,7 +4904,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7411765, g: 0.7411765, b: 0.7411765, a: 1}
+  m_Color: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -4963,9 +4924,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -5052,9 +5012,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -5214,7 +5173,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1303675757
@@ -5250,9 +5209,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -5349,9 +5307,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -5401,7 +5358,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998722}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1330082083
@@ -5549,9 +5506,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -5600,7 +5556,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8, y: 0}
+  m_AnchoredPosition: {x: -12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1350222427
@@ -5616,7 +5572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7411765, g: 0.7411765, b: 0.7411765, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -5636,9 +5592,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -5804,7 +5759,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 1260018371}
   m_BackImage: {fileID: 1794262710}
   m_ShadowImage: {fileID: 286173728}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1383407717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5899,7 +5856,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998703}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1401819251
@@ -6047,9 +6004,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -6146,9 +6102,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -6232,9 +6187,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE0C8"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: location_on
@@ -6321,9 +6275,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -6489,7 +6442,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 1067814790}
   m_BackImage: {fileID: 1431506882}
   m_ShadowImage: {fileID: 1914795080}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1495455073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6689,7 +6644,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 275843070}
   m_BackImage: {fileID: 853693096}
   m_ShadowImage: {fileID: 1401819253}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1502485315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6807,9 +6764,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -6958,7 +6914,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8, y: 0}
+  m_AnchoredPosition: {x: -12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1585172201
@@ -6994,9 +6950,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -7046,7 +7001,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998703}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1617112005
@@ -7193,7 +7148,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1653414478
@@ -7229,9 +7184,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -7315,9 +7269,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -7412,7 +7365,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1702547769}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -7535,9 +7487,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -7714,9 +7665,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -7883,7 +7833,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_Color: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -7903,9 +7853,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -8084,9 +8033,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -8252,7 +8200,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 1831512655}
   m_BackImage: {fileID: 1238238291}
   m_ShadowImage: {fileID: 1054908689}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1819670831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8335,7 +8285,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1831512655
@@ -8371,9 +8321,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -8457,9 +8406,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -8556,9 +8504,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -8642,9 +8589,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -8810,7 +8756,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 1303675757}
   m_BackImage: {fileID: 1736133483}
   m_ShadowImage: {fileID: 1617112007}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1863544438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9010,7 +8958,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 1585172201}
   m_BackImage: {fileID: 158649681}
   m_ShadowImage: {fileID: 2005232129}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1876068365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9131,9 +9081,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -9299,7 +9248,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 96248261}
   m_BackImage: {fileID: 2092438644}
   m_ShadowImage: {fileID: 1053407711}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1895693297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9394,7 +9345,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998722}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1914795078
@@ -9539,9 +9490,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE903"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
@@ -9744,7 +9694,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 1653414478}
   m_BackImage: {fileID: 1303999743}
   m_ShadowImage: {fileID: 768260984}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &1959117069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9828,7 +9780,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998722}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &2005232127
@@ -10055,7 +10007,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 141751058}
   m_BackImage: {fileID: 1183706783}
   m_ShadowImage: {fileID: 732890943}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &2008653566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10239,7 +10193,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2059480063
@@ -10275,9 +10229,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 20
-  m_ScaledSize: 20
+  m_ScaledSize: 16.0625
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -10327,7 +10280,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998703}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &2074176721
@@ -10465,7 +10418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_Color: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -10485,9 +10438,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE908"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
@@ -10574,9 +10526,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785377}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -10742,7 +10693,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 2059480063}
   m_BackImage: {fileID: 1804435369}
   m_ShadowImage: {fileID: 1270776565}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &2122118334
 MonoBehaviour:
   m_ObjectHideFlags: 0

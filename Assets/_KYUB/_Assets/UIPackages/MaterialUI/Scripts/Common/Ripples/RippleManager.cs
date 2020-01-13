@@ -69,12 +69,49 @@ namespace MaterialUI
         /// </summary>
         private Queue<Ripple> m_QueuedRipples = new Queue<Ripple>();
 
+        [SerializeField]
+        protected Canvas m_Canvas = null;
+
+        protected virtual void Awake()
+        {
+            FindCanvas();
+        }
+
         /// <summary>
         /// See MonoBehaviour.OnApplicationQuit.
         /// </summary>
-        void OnApplicationQuit()
+        protected virtual void OnApplicationQuit()
         {
             Ripple.ResetMaterial();
+        }
+
+        protected void FindCanvas()
+        {
+            if (m_Canvas == null)
+            {
+                m_Canvas = GetComponentInParent<Canvas>();
+                if (m_Canvas == null)
+                {
+                    //Find canvas in scene
+                    var canvasArray = FindObjectsOfType<Canvas>();
+                    foreach (var canvasMember in canvasArray)
+                    {
+                        if (canvasMember != null &&
+                            canvasMember.gameObject.scene.IsValid() &&
+                            canvasMember.enabled &&
+                            canvasMember.gameObject.activeInHierarchy)
+                        {
+                            m_Canvas = canvasMember;
+                            break;
+                        }
+                    }
+                }
+
+                if (m_Canvas != null)
+                    m_Canvas = m_Canvas.rootCanvas;
+            }
+
+            transform.localPosition = Vector3.zero;
         }
 
         /// <summary>
@@ -100,7 +137,10 @@ namespace MaterialUI
         /// </summary>
         private void CreateRipple()
         {
-            Ripple ripple = PrefabManager.InstantiateGameObject("Ripple", FindObjectOfType<MaterialUIScaler>().transform).GetComponent<Ripple>();
+            if (m_Canvas == null)
+                FindCanvas();
+
+            Ripple ripple = PrefabManager.InstantiateGameObject("Ripple", m_Canvas != null? m_Canvas.transform : null).GetComponent<Ripple>();
             ripple.Create(rippleCount, rippleImageData);
             rippleCount++;
 

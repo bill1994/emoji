@@ -48,7 +48,7 @@ namespace MaterialUI
         {
             if (m_Text == null) return;
 
-            if (!string.IsNullOrEmpty(titleText) || icon != null)
+            if (!string.IsNullOrEmpty(titleText) || (icon != null && icon.ContainsData(true)))
             {
                 if (!string.IsNullOrEmpty(titleText))
                 {
@@ -59,7 +59,7 @@ namespace MaterialUI
                     m_Text.gameObject.SetActive(false);
                 }
 
-				if (icon == null)
+				if (icon == null || !icon.ContainsData(true))
 				{
                     if (m_Sprite != null && m_VectorImageData != null)
                     {

@@ -14,48 +14,48 @@ namespace MaterialUI
         #region Private Variables
 
         [SerializeField]
-        bool m_UseFocusGroup = true;
+        protected bool m_UseFocusGroup = true;
         [SerializeField]
-        private bool m_leftToRight = true;
+        protected bool m_leftToRight = true;
         [SerializeField]
-        private Image m_BackgroundImage = null;
+        protected Image m_BackgroundImage = null;
         [SerializeField]
-        private Image m_ShadowImage = null;
+        protected Image m_ShadowImage = null;
         [SerializeField]
-        private GameObject m_PanelLayer = null;
+        protected GameObject m_PanelLayer = null;
         [SerializeField]
-        private bool m_DarkenBackground = true;
+        protected bool m_DarkenBackground = true;
         [SerializeField]
-        private float m_DragDeltaTolerance = 0.5f;
+        protected float m_DragDeltaTolerance = 0.5f;
         [SerializeField]
-        private bool m_DragToOpenOrClose = true;
+        protected bool m_DragToOpenOrClose = true;
         [SerializeField]
-        private bool m_TapBackgroundToClose = true;
+        protected bool m_TapBackgroundToClose = true;
         [SerializeField]
-        private bool m_OpenOnStart = false;
+        protected bool m_OpenOnStart = false;
         [SerializeField]
-        private float m_AnimationDuration = 0.5f;
+        protected float m_AnimationDuration = 0.5f;
 
-        private MaterialUIScaler m_Scaler;
+        protected Canvas _RootCanvas;
 
-        private float m_MaxPosition;
-        private float m_MinPosition;
+        protected float m_MaxPosition;
+        protected float m_MinPosition;
 
-        private RectTransform m_RectTransform;
-        private GameObject m_BackgroundGameObject;
-        private RectTransform m_BackgroundRectTransform;
-        private CanvasGroup m_BackgroundCanvasGroup;
-        private GameObject m_ShadowGameObject;
-        private CanvasGroup m_ShadowCanvasGroup;
+        protected RectTransform m_RectTransform;
+        protected GameObject m_BackgroundGameObject;
+        protected RectTransform m_BackgroundRectTransform;
+        protected CanvasGroup m_BackgroundCanvasGroup;
+        protected GameObject m_ShadowGameObject;
+        protected CanvasGroup m_ShadowCanvasGroup;
 
-        private byte m_AnimState;
-        private float m_AnimStartTime;
-        private float m_AnimDeltaTime;
+        protected byte m_AnimState;
+        protected float m_AnimStartTime;
+        protected float m_AnimDeltaTime;
 
-        private Vector2 m_CurrentPos;
-        private float m_CurrentBackgroundAlpha;
-        private float m_CurrentShadowAlpha;
-        private Vector2 m_TempVector2;
+        protected Vector2 m_CurrentPos;
+        protected float m_CurrentBackgroundAlpha;
+        protected float m_CurrentShadowAlpha;
+        protected Vector2 m_TempVector2;
 
         #endregion
 
@@ -134,15 +134,15 @@ namespace MaterialUI
             set { m_AnimationDuration = value; }
         }
 
-        public MaterialUIScaler scaler
+        public Canvas rootCanvas
         {
             get
             {
-                if (m_Scaler == null)
+                if (_RootCanvas == null)
                 {
-                    m_Scaler = MaterialUIScaler.GetRootScaler(transform as RectTransform);
+                    _RootCanvas = transform.GetRootCanvas();
                 }
-                return m_Scaler;
+                return _RootCanvas;
             }
         }
 
@@ -267,7 +267,7 @@ namespace MaterialUI
         {
             Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             m_TempVector2 = m_RectTransform.anchoredPosition;
-            m_TempVector2.x += data.delta.x / scaler.scaleFactor;
+            m_TempVector2.x += data.delta.x / rootCanvas.scaleFactor;
 
             m_RectTransform.anchoredPosition = m_TempVector2;
 
@@ -390,7 +390,7 @@ namespace MaterialUI
 
         private void RefreshBackgroundSize()
         {
-            m_BackgroundRectTransform.sizeDelta = new Vector2((Screen.width / scaler.scaleFactor) + 1f, m_BackgroundRectTransform.sizeDelta.y);
+            m_BackgroundRectTransform.sizeDelta = new Vector2((Screen.width / rootCanvas.scaleFactor) + 1f, m_BackgroundRectTransform.sizeDelta.y);
             //MaterialActivity.Inflate(m_BackgroundRectTransform, true);
         }
 

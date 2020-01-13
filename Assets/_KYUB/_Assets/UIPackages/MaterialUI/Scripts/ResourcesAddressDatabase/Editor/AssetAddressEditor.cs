@@ -10,7 +10,6 @@ namespace MaterialUI
 {
     public class AssetAdressEditor : MonoBehaviour
     {
-        
         [CustomPropertyDrawer(typeof(PrefabAddress))]
         public class PrefabAddressDrawer : GenericAssetAddressDrawer<GameObject>
         {
@@ -68,7 +67,7 @@ namespace MaterialUI
                     if (!string.IsNullOrEmpty(v_loader.AssetPath))
                     {
                         var v_size = 40;
-                        var v_miniRect = new Rect(v_rect.xMax - v_size - 19, v_rect.y, v_size, v_rect.height);
+                        var v_miniRect = new Rect(v_rect.xMax - v_size - (15 * EditorGUI.indentLevel), v_rect.y, v_size, v_rect.height);
 
                         var v_oldGuiColor = GUI.color;
                         GUI.color = EditorGUIUtility.isProSkin ? new Color(0, 0.7f, 0) : new Color(0, 0.5f, 0);

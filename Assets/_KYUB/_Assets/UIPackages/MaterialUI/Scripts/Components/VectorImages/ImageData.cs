@@ -19,7 +19,7 @@ namespace MaterialUI
     public class ImageData
     {
         [SerializeField]
-        private ImageDataType m_ImageDataType = ImageDataType.Sprite;
+        private ImageDataType m_ImageDataType = ImageDataType.VectorImage;
         public ImageDataType imageDataType
         {
             get { return m_ImageDataType; }

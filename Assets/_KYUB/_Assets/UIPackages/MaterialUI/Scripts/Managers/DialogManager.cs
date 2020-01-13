@@ -2,6 +2,7 @@
 //  Please see license file for terms and conditions of use, and more information.
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MaterialUI
@@ -61,7 +62,9 @@ namespace MaterialUI
             {
                 if (instance.m_RectTransform == null && m_Instance.m_ParentCanvas != null)
                 {
-                    instance.m_RectTransform = m_Instance.m_ParentCanvas.transform as RectTransform;
+                    CanvasSafeArea safeArea = m_Instance.m_ParentCanvas.GetComponent<CanvasSafeArea>();
+
+                    instance.m_RectTransform = safeArea != null && safeArea.Content != null ? safeArea.Content : m_Instance.m_ParentCanvas.transform as RectTransform;
                 }
 
                 return instance.m_RectTransform;
@@ -347,7 +350,7 @@ namespace MaterialUI
         /// <param name="options">The strings to use for the list item labels.</param>
         /// <param name="onItemClick">Called when an option is selected.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public static DialogSimpleList ShowSimpleList(string[] options, Action<int> onItemClick)
+        public static DialogRadioList ShowSimpleList(string[] options, Action<int> onItemClick)
         {
             return ShowSimpleList(options, onItemClick, null, null);
         }
@@ -362,17 +365,17 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public static DialogSimpleList ShowSimpleList(string[] options, Action<int> onItemClick, string titleText, ImageData icon)
+        public static DialogRadioList ShowSimpleList(string[] options, Action<int> onItemClick, string titleText, ImageData icon)
         {
-            OptionDataList optionDataList = new OptionDataList();
+            List<OptionData> optionsData = new List<OptionData>();
 
             for (int i = 0; i < options.Length; i++)
             {
                 OptionData optionData = new OptionData(options[i], null);
-                optionDataList.options.Add(optionData);
+                optionsData.Add(optionData);
             }
 
-            return ShowSimpleList(optionDataList, onItemClick, titleText, icon);
+            return ShowSimpleList(optionsData.ToArray(), onItemClick, titleText, icon);
         }
 
         /// <summary>
@@ -383,9 +386,9 @@ namespace MaterialUI
         /// <param name="optionDataList">The data to use for the option list.</param>
         /// <param name="onItemClick">Called when an option is selected.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public static DialogSimpleList ShowSimpleList(OptionDataList optionDataList, Action<int> onItemClick)
+        public static DialogRadioList ShowSimpleList(OptionData[] options, Action<int> onItemClick)
         {
-            return ShowSimpleList(optionDataList, onItemClick, null, null);
+            return ShowSimpleList(options, onItemClick, null, null);
         }
 
         /// <summary>
@@ -398,25 +401,36 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public static DialogSimpleList ShowSimpleList(OptionDataList optionDataList, Action<int> onItemClick, string titleText, ImageData icon)
+        public static DialogRadioList ShowSimpleList(OptionData[] options, Action<int> onItemClick, string titleText, ImageData icon)
         {
-            DialogSimpleList dialog = CreateSimpleList();
-            dialog.Initialize(optionDataList, onItemClick, titleText, icon);
+            DialogRadioList dialog = CreateSimpleList();
+            dialog.Initialize(options, onItemClick, null, titleText, icon, null, null, -1, true);
             dialog.Show();
             return dialog;
+        }
+
+        public static void ShowSimpleListAsync(OptionData[] options, Action<int> onItemClick, string titleText, ImageData icon, Action onDismiss, System.Action<DialogRadioList> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        {
+            System.Action<DialogRadioList> initialize = (DialogRadioList dialog) =>
+            {
+                dialog.Initialize(options, onItemClick, null, titleText, icon, null, null, -1, true);
+                if (onCreateCallback != null)
+                    onCreateCallback(dialog);
+            };
+            ShowCustomDialogAsync<DialogRadioList>(PrefabManager.ResourcePrefabs.dialogSimpleList.Name, initialize, progressIndicator);
         }
 
         /// <summary>
         /// Creates a simple list dialog that can be modified or stored before showing.
         /// <para></para>
-        /// Before calling <see cref="DialogSimpleList.Show"/>, call <see cref="DialogSimpleList.Initialize(OptionDataList,Action{int},string,ImageData)"/>.
+        /// Before calling <see cref="DialogRadioList.Show"/>, call <see cref="DialogRadioList.Initialize(OptionDataList,Action{int},string,ImageData)"/>.
         /// <para></para>
         /// For a simpler solution with less customizability, use <see cref="ShowSimpleList(OptionDataList,Action{int},string,ImageData)"/>.
         /// </summary>
         /// <returns>The instance of the created dialog.</returns>
-        public static DialogSimpleList CreateSimpleList()
+        public static DialogRadioList CreateSimpleList()
         {
-            DialogSimpleList dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogSimpleList, instance.transform).GetComponent<DialogSimpleList>();
+            DialogRadioList dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogSimpleList, instance.transform).GetComponent<DialogRadioList>();
             CreateActivity(dialog, instance.m_ParentCanvas);
             //dialog.Initialize();
             return dialog;
@@ -435,7 +449,7 @@ namespace MaterialUI
         /// <param name="onAffirmativeButtonClicked">Called when the affirmative button is clicked.</param>
         /// <param name="affirmativeButtonText">The affirmative button text.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<bool[]> onAffirmativeButtonClicked, string affirmativeButtonText = "OK")
+        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText = "OK")
         {
             return ShowCheckboxList(options, onAffirmativeButtonClicked, affirmativeButtonText, null, null);
         }
@@ -451,9 +465,9 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<bool[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon)
+        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon)
         {
-            return ShowCheckboxList(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, null, null);
+            return ShowCheckboxList(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, null, null, null);
         }
 
         /// <summary>
@@ -469,12 +483,23 @@ namespace MaterialUI
         /// <param name="onDismissiveButtonClicked">Called when the dismissive button is clicked.</param>
         /// <param name="dismissiveButtonText">The dismissive button text. Make null for no dismissive button.</param>
         /// <returns>The instance of the initialized, shown dialog.</returns>
-        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<bool[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
+        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexes = null)
         {
             DialogCheckboxList dialog = CreateCheckboxList();
-            dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
+            dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexes);
             dialog.Show();
             return dialog;
+        }
+
+        public static void ShowCheckboxListAsync(OptionData[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexes = null, System.Action<DialogCheckboxList> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        {
+            System.Action<DialogCheckboxList> initialize = (DialogCheckboxList dialog) =>
+            {
+                dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexes);
+                if (onCreateCallback != null)
+                    onCreateCallback(dialog);
+            };
+            ShowCustomDialogAsync<DialogCheckboxList>(PrefabManager.ResourcePrefabs.dialogRadioList.Name, initialize, progressIndicator);
         }
 
         /// <summary>
@@ -579,6 +604,25 @@ namespace MaterialUI
             dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexStart);
             dialog.Show();
             return dialog;
+        }
+
+        public static DialogRadioList ShowRadioList(OptionData[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart = 0, bool allowSwitchOff = false)
+        {
+            DialogRadioList dialog = CreateRadioList();
+            dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexStart, allowSwitchOff);
+            dialog.Show();
+            return dialog;
+        }
+
+        public static void ShowRadioListAsync(OptionData[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff, System.Action<DialogRadioList> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        {
+            System.Action<DialogRadioList> initialize = (DialogRadioList dialog) =>
+            {
+                dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexStart, allowSwitchOff);
+                if (onCreateCallback != null)
+                    onCreateCallback(dialog);
+            };
+            ShowCustomDialogAsync<DialogRadioList>(PrefabManager.ResourcePrefabs.dialogRadioList.Name, initialize, progressIndicator);
         }
 
         /// <summary>
@@ -1010,7 +1054,13 @@ namespace MaterialUI
             if (parent == null)
                 parent = instance.m_ParentCanvas;
 
-            return CreateActivity(frame, parent.transform);
+            Transform parentTransform = null;
+            if (parent != null)
+            {
+                CanvasSafeArea safeArea = parent.GetComponent<CanvasSafeArea>();
+                parentTransform = safeArea != null && safeArea.Content != null ? safeArea.Content : parent.transform;
+            }
+            return CreateActivity(frame, parentTransform);
         }
 
         public static MaterialDialogActivity CreateActivity<TDialogFrame>(TDialogFrame frame, Transform parent) where TDialogFrame : MaterialFrame

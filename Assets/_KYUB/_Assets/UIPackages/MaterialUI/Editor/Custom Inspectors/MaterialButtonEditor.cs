@@ -34,6 +34,9 @@ namespace MaterialUI
         private SerializedProperty m_FitWidthToContent;
         private SerializedProperty m_FitHeightToContent;
 
+        private SerializedProperty onPress;
+        private SerializedProperty onClick;
+
         protected override void OnEnable()
         {
             OnBaseEnable();
@@ -57,6 +60,9 @@ namespace MaterialUI
 
             m_FitWidthToContent = serializedObject.FindProperty("m_FitWidthToContent");
             m_FitHeightToContent = serializedObject.FindProperty("m_FitHeightToContent");
+
+            onPress = serializedObject.FindProperty("onPress");
+            onClick = serializedObject.FindProperty("onClick");
         }
 
         protected override void OnDisable()
@@ -117,6 +123,10 @@ namespace MaterialUI
             DrawFoldoutExternalProperties(ExternalPropertiesSection);
 
             DrawFoldoutComponents(ComponentsSection);
+
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(onPress);
+            EditorGUILayout.PropertyField(onClick);
 
             DrawStyleGUIFolder();
 

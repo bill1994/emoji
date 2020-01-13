@@ -9,6 +9,8 @@ namespace MaterialUI
     [CustomEditor(typeof(MaterialSwitch))]
     class MaterialSwitchEditor : MaterialToggleBaseEditor
     {
+        private SerializedProperty m_Trail;
+        private SerializedProperty m_SlideDirection;
         private SerializedProperty m_SlideSwitch;
 
         private SerializedProperty m_SwitchImage;
@@ -27,7 +29,9 @@ namespace MaterialUI
         {
             base.OnEnable();
 
+            m_Trail = serializedObject.FindProperty("m_Trail");
             m_SlideSwitch = serializedObject.FindProperty("m_SlideSwitch");
+            m_SlideDirection = serializedObject.FindProperty("m_SlideDirection");
 
             m_SwitchImage = serializedObject.FindProperty("m_SwitchImage");
             m_BackImage = serializedObject.FindProperty("m_BackImage");
@@ -45,6 +49,7 @@ namespace MaterialUI
         protected override void InheritedFieldsSection()
         {
             LayoutStyle_PropertyField(m_SlideSwitch);
+            LayoutStyle_PropertyField(m_SlideDirection);
         }
 
         protected override void ColorsSection()
@@ -63,13 +68,14 @@ namespace MaterialUI
 
         protected override void ComponentsSection()
         {
+            base.ComponentsSection();
+
             EditorGUI.indentLevel++;
             LayoutStyle_PropertyField(m_SwitchImage);
             LayoutStyle_PropertyField(m_BackImage);
             LayoutStyle_PropertyField(m_ShadowImage);
+            LayoutStyle_PropertyField(m_Trail);
             EditorGUI.indentLevel--;
-
-            base.ComponentsSection();
         }
     }
 }

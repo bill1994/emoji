@@ -119,15 +119,11 @@ namespace MaterialUI
 
             m_OnScreenBeginTransition = serializedObject.FindProperty("m_OnScreenBeginTransition");
             m_OnScreenEndTransition = serializedObject.FindProperty("m_OnScreenEndTransition");
-
-            Selection.selectionChanged += () => m_ScreenView.TrackScreens();
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
             OnBaseDisable();
-
-            Selection.selectionChanged -= () => m_ScreenView.TrackScreens();
         }
 
         public override void OnInspectorGUI()

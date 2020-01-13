@@ -757,9 +757,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE916"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: date_range
@@ -1084,7 +1083,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 941283877}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -1168,8 +1166,8 @@ MonoBehaviour:
   m_Text: {fileID: 0}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 115, y: 16}
-  m_Size: {x: 145, y: 34}
+  m_ContentSize: {x: 114.178986, y: 16}
+  m_Size: {x: 144.17899, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -1736,7 +1734,6 @@ GameObject:
   - component: {fileID: 1217785375}
   - component: {fileID: 1217785374}
   - component: {fileID: 1217785372}
-  - component: {fileID: 1217785376}
   - component: {fileID: 1217785371}
   m_Layer: 5
   m_Name: Canvas
@@ -1754,23 +1751,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1217785370}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
+  m_Script: {fileID: 11500000, guid: e53aeec3e93c0424d9e290b4209ef433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 1217785374}
-  m_ScalerMode: 0
-  m_ScaleFactor: 1
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 360, y: 640}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 1
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 160
+  m_DefaultSpriteDPI: 160
   m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 0}
-  m_OnCanvasAreaChanged:
+  m_EditorForceDPI: 1
+  m_EditorForceDPIValue: 160
+  m_UseLegacyPhysicalSizeCalc: 0
+  m_SupportSafeArea: 1
+  onCanvasAreaChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &1217785372
@@ -1831,23 +1829,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1217785376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1217785370}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f0dcef36f7974cbe91bf74bdc9fd5f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_GutterColor: {r: 0.588, g: 0.706, b: 1, a: 0.5}
-  m_GutterWidth: 24
-  m_MarginWidth: 24
-  m_NumberOfColums: 12
-  m_FullScreenHeight: 0
 --- !u!1 &1352421010
 GameObject:
   m_ObjectHideFlags: 0
@@ -1918,9 +1899,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE192"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: access_time
@@ -2003,7 +1983,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1999353228}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -2087,8 +2066,8 @@ MonoBehaviour:
   m_Text: {fileID: 0}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 116, y: 16}
-  m_Size: {x: 146, y: 34}
+  m_ContentSize: {x: 114.178986, y: 16}
+  m_Size: {x: 144.17899, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -2225,7 +2204,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1745429620}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}

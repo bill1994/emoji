@@ -4,6 +4,7 @@
 using UnityEngine;
 using MaterialUI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Example14 : MonoBehaviour
 {
@@ -39,33 +40,33 @@ public class Example14 : MonoBehaviour
 
 	public void OnSimpleListBigVectorButtonClicked()
 	{
-		OptionDataList optionDataList = new OptionDataList();
-		for (int i = 0; i < m_BigStringList.Length; i++)
+        List<OptionData> options = new List<OptionData>();
+        for (int i = 0; i < m_BigStringList.Length; i++)
 		{
 			string itemValue = m_BigStringList[i];
 
 			OptionData optionData = new OptionData(itemValue, MaterialIconHelper.GetRandomIcon(), () => { Debug.Log("I am selected: " + itemValue); });
-			optionDataList.options.Add(optionData);
+            options.Add(optionData);
 		}
 
-		DialogManager.ShowSimpleList(optionDataList, (int selectedIndex) => {
+		DialogManager.ShowSimpleList(options.ToArray(), (int selectedIndex) => {
 			ToastManager.Show("Item #" + selectedIndex + " selected: " + m_BigStringList[selectedIndex]);
 		}, "Big Simple List - Vector", MaterialIconHelper.GetRandomIcon());
 	}
 
 	public void OnSimpleListBigSpriteButtonClicked()
 	{
-		OptionDataList optionDataList = new OptionDataList();
+		List<OptionData> options = new List<OptionData>();
 		for (int i = 0; i < m_IconSpriteArray.Length; i++)
 		{
 			string itemName = m_IconSpriteArray[i].name.Replace("icon_", "").Replace("_", " ");
 			itemName = itemName.Substring(0, 1).ToUpper() + itemName.Substring(1, itemName.Length - 1);
 
 			OptionData optionData = new OptionData(itemName, new ImageData(m_IconSpriteArray[i]), () => { Debug.Log("I am selected: " + itemName); });
-			optionDataList.options.Add(optionData);
+            options.Add(optionData);
 		}
 
-		DialogManager.ShowSimpleList(optionDataList, (int selectedIndex) => {
+		DialogManager.ShowSimpleList(options.ToArray(), (int selectedIndex) => {
 			ToastManager.Show("Item #" + selectedIndex + " selected: " + m_IconSpriteArray[selectedIndex].name);
 		}, "Big Simple List - Sprite", new ImageData(m_IconSpriteArray[Random.Range(0, m_IconSpriteArray.Length)]));
 	}
@@ -113,7 +114,7 @@ public class Example14 : MonoBehaviour
 		DialogManager.ShowCheckboxList(m_BigStringList, OnCheckboxValidateClicked, "OK", "Big Checkbox List", MaterialIconHelper.GetRandomIcon(), () => { ToastManager.Show("You clicked the cancel button"); }, "CANCEL");
 	}
 
-	private void OnCheckboxValidateClicked(bool[] resultArray)
+	private void OnCheckboxValidateClicked(int[] resultArray)
 	{
 		string result = "";
 		for (int i = 0; i < resultArray.Length; i++)

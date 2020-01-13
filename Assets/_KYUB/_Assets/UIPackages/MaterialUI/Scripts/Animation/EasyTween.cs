@@ -7,6 +7,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Linq;
+using UnityEngine.Events;
 
 namespace MaterialUI
 {
@@ -58,24 +59,31 @@ namespace MaterialUI
             private float m_Delay = 0;
             [SerializeField]
             private bool m_TweenOnStart = false;
-            [SerializeField]
-            private bool m_HasCallback = false;
-            [SerializeField]
-            private GameObject m_CallbackGameObject = null;
-            [SerializeField]
-            private Component m_CallbackComponent = null;
-            [SerializeField]
-            private string m_CallbackComponentName = null;
-            [SerializeField]
-            private MethodInfo m_CallbackMethodInfo = null;
-            [SerializeField]
-            private string m_CallbackName = null;
+            //[SerializeField]
+            //private bool m_HasCallback = false;
+            //[SerializeField]
+            //private GameObject m_CallbackGameObject = null;
+            //[SerializeField]
+            //private Component m_CallbackComponent = null;
+            //[SerializeField]
+            //private string m_CallbackComponentName = null;
+            //[SerializeField]
+            //private MethodInfo m_CallbackMethodInfo = null;
+            //[SerializeField]
+            //private string m_CallbackName = null;
             [SerializeField]
             private bool m_OptionsVisible = false;
             [SerializeField]
             private bool m_SubOptionsVisible = false;
             [SerializeField]
             private List<EasyTweenSubObject> m_SubTweens = null;
+
+            #endregion
+
+            #region Callbacks
+
+            public UnityEvent onStart = new UnityEvent();
+            public UnityEvent onFinish = new UnityEvent();
 
             #endregion
 
@@ -116,7 +124,7 @@ namespace MaterialUI
                 get { return m_TweenOnStart; }
                 set { m_TweenOnStart = value; }
             }
-            public bool hasCallback
+            /*public bool hasCallback
             {
                 get { return m_HasCallback; }
                 set { m_HasCallback = value; }
@@ -145,7 +153,7 @@ namespace MaterialUI
             {
                 get { return m_CallbackName; }
                 set { m_CallbackName = value; }
-            }
+            }*/
             public bool optionsVisible
             {
                 get { return m_OptionsVisible; }
@@ -171,8 +179,8 @@ namespace MaterialUI
                 tag = "New Tween";
                 tweenType = MaterialUI.Tween.TweenType.EaseOutQuint;
                 duration = 1f;
-                callbackComponentName = "--NONE--";
-                callbackName = "--NONE--";
+                //callbackComponentName = "--NONE--";
+                //callbackName = "--NONE--";
                 optionsVisible = true;
                 subOptionsVisible = true;
                 customCurve = new AnimationCurve(new[] { new Keyframe(0f, 0f), new Keyframe(1f, 1f) });
@@ -329,19 +337,21 @@ namespace MaterialUI
                 EasyTweenSubObject subObject = tweenObject.subTweens[i];
 
                 Action callbackAction = null;
-                Action tweenObjactCallback = null;
-                if (tweenObject.callbackName != "--NONE--" && tweenObject.hasCallback)
-                    tweenObjactCallback = (Action)Delegate.CreateDelegate(typeof(Action), tweenObject.callbackComponent, tweenObject.callbackName);
+                //Action tweenObjactCallback = null;
+                //if (tweenObject.callbackName != "--NONE--" && tweenObject.hasCallback)
+                //    tweenObjactCallback = (Action)Delegate.CreateDelegate(typeof(Action), tweenObject.callbackComponent, tweenObject.callbackName);
 
-                if (tweenObjactCallback != null || callback != null)
+                if (tweenObject.onFinish != null || callback != null)
                     callbackAction = () =>
                     {
-                        if (tweenObjactCallback != null)
-                            tweenObjactCallback();
-                        else if (callback != null)
+                        if (tweenObject.onFinish != null)
+                            tweenObject.onFinish.Invoke();
+                        if (callback != null)
                             callback();
                     };
 
+                if (tweenObject.onStart != null)
+                    tweenObject.onStart.Invoke();
 
                 switch (subObject.variableType)
                 {

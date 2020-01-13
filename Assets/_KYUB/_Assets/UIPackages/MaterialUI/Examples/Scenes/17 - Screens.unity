@@ -191,9 +191,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -242,7 +241,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 24, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &38527027
 MonoBehaviour:
@@ -277,9 +276,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE409"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: navigate_next
@@ -411,7 +409,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &70168204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -650,9 +648,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -1005,7 +1002,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -1}
-  m_SizeDelta: {x: 126, y: 126}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &305087225
 MonoBehaviour:
@@ -1203,9 +1200,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -1372,7 +1368,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 32}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 56, y: 56}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!225 &525822839
 CanvasGroup:
@@ -1470,8 +1466,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &525822843
 MonoBehaviour:
@@ -1563,7 +1557,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 29.5}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 199, y: 58}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &553387292
 MonoBehaviour:
@@ -1691,9 +1685,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -1751,6 +1744,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AutoTrackScreens: 1
   m_OnlyShowSelectedScreen: 1
+  m_Content: {fileID: 0}
   m_MaterialScreens:
   - {fileID: 1178569774}
   - {fileID: 70168204}
@@ -2044,9 +2038,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE88A"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: home
@@ -2284,8 +2277,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &942937750
 MonoBehaviour:
@@ -2380,7 +2371,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -1}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 126, y: 126}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &959024393
 MonoBehaviour:
@@ -2462,7 +2453,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -546, y: -607}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &986959600
 MonoBehaviour:
@@ -2636,7 +2627,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1178569774
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3033,7 +3024,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 32}
-  m_SizeDelta: {x: 56, y: 56}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!225 &1255516560
 CanvasGroup:
@@ -3131,8 +3122,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1255516564
 MonoBehaviour:
@@ -3431,9 +3420,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -3482,7 +3470,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 24, y: 24}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1779601384
 MonoBehaviour:
@@ -3517,9 +3505,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE409"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: navigate_next
@@ -3797,9 +3784,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 2090905007}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -3945,23 +3931,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 2090905006}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
+  m_Script: {fileID: 11500000, guid: e53aeec3e93c0424d9e290b4209ef433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 2090905011}
-  m_ScalerMode: 0
-  m_ScaleFactor: 1
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 360, y: 640}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 1
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 160
+  m_DefaultSpriteDPI: 160
   m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 0}
-  m_OnCanvasAreaChanged:
+  m_EditorForceDPI: 1
+  m_EditorForceDPIValue: 160
+  m_UseLegacyPhysicalSizeCalc: 0
+  m_SupportSafeArea: 1
+  onCanvasAreaChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!224 &2090905008

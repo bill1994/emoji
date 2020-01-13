@@ -27,7 +27,12 @@ namespace MaterialUI
 
         public Glyph glyph
         {
-            get { return m_Glyph; }
+            get
+            {
+                if (m_Glyph == null)
+                    m_Glyph = new Glyph();
+                return m_Glyph;
+            }
             set { m_Glyph = value; }
         }
         public Font font

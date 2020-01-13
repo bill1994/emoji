@@ -51,7 +51,12 @@ namespace MaterialUI
         public bool useFocusGroup
         {
             get { return m_UseFocusGroup; }
-            set { m_UseFocusGroup = value; }
+            set
+            {
+                if (m_UseFocusGroup == value)
+                    return;
+                m_UseFocusGroup = value;
+            }
         }
 
         public RectTransform rectTransform
@@ -73,20 +78,38 @@ namespace MaterialUI
 		public bool isModal
 		{
 			get { return m_IsModal; }
-			set { m_IsModal = value; }
-		}
+			set
+            {
+                if (m_IsModal == value)
+                    return;
+                m_IsModal = value;
+                ApplyPropertiesToActivity();
+            }
+        }
 
         public MaterialActivityBackground background
         {
             get { return m_Background; }
-            set { m_Background = value; }
+            set
+            {
+                if (m_Background == value)
+                    return;
+                m_Background = value;
+                ApplyPropertiesToActivity(true);
+            }
         }
 
 
         public bool hasBackground
         {
             get { return m_HasBackground; }
-            set { m_HasBackground = value; }
+            set
+            {
+                if (m_HasBackground == value)
+                    return;
+                m_HasBackground = value;
+                ApplyPropertiesToActivity();
+            }
         }
 
         public Color backgroundColor
@@ -97,19 +120,32 @@ namespace MaterialUI
                 if (m_BackgroundColor == value)
                     return;
                 m_BackgroundColor = value;
+                ApplyPropertiesToActivity();
             }
         }
 
 		public bool destroyOnHide
 		{
 			get { return m_DestroyOnHide; }
-			set { m_DestroyOnHide = value; }
+			set
+            {
+                if (m_DestroyOnHide == value)
+                    return;
+                m_DestroyOnHide = value;
+                ApplyPropertiesToActivity();
+            }
 		}
 
         public bool changeSibling
         {
             get { return m_ChangeSibling; }
-            set { m_ChangeSibling = value; }
+            set
+            {
+                if (m_ChangeSibling == value)
+                    return;
+                m_ChangeSibling = value;
+                ApplyPropertiesToActivity();
+            }
         }
 
         #endregion
@@ -154,35 +190,47 @@ namespace MaterialUI
 
         protected override void OnAttachedActivityChanged(MaterialActivity activity)
         {
+            ApplyPropertiesToActivity(true);
+        }
+
+        protected internal override void OnActivityBeginShow()
+        {
+            if (activity != null)
+                ValidateKeyTriggers(activity.focusGroup);
+
+            var materialAtivity = activity as MaterialDialogActivity;
+
+            ApplyPropertiesToActivity();
+            base.OnActivityBeginShow();
+        }
+
+        protected virtual void ApplyPropertiesToActivity(bool fullRecalc = false)
+        {
             var materialAtivity = activity as MaterialDialogActivity;
 
             if (materialAtivity != null)
             {
-                if (GetComponent<AbstractTweenBehaviour>() == null)
+                if (fullRecalc)
                 {
-                    var animator = this.GetAddComponent<EasyFrameAnimator>();
-                    animator.slideIn = true;
-                    animator.slideInDirection = ScreenView.SlideDirection.Down;
-                    animator.slideOut = true;
-                    animator.slideOutDirection = ScreenView.SlideDirection.Down;
+                    if (GetComponent<AbstractTweenBehaviour>() == null)
+                    {
+                        var animator = this.GetAddComponent<EasyFrameAnimator>();
+                        animator.slideIn = true;
+                        animator.slideInDirection = ScreenView.SlideDirection.Down;
+                        animator.slideOut = true;
+                        animator.slideOutDirection = ScreenView.SlideDirection.Down;
+                    }
                 }
                 materialAtivity.destroyOnHide = m_DestroyOnHide;
                 materialAtivity.isModal = m_IsModal;
                 materialAtivity.hasBackground = m_HasBackground;
                 materialAtivity.changeSibling = m_ChangeSibling;
-                materialAtivity.hasBackground = m_HasBackground;
-                materialAtivity.background = m_Background;
+                if(fullRecalc)
+                    materialAtivity.background = m_Background;
 
                 if (materialAtivity.background != null)
                     materialAtivity.background.backgroundColor = m_BackgroundColor;
             }
-        }
-
-        protected internal override void OnActivityShow()
-        {
-            if(activity != null)
-                ValidateKeyTriggers(activity.focusGroup);
-            base.OnActivityShow();
         }
 
         #endregion

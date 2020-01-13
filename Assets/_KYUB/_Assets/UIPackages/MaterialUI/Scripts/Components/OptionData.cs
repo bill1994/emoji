@@ -37,7 +37,10 @@ namespace MaterialUI
         /// </summary>
         public List<OptionData> options
 		{
-			get { return m_Options; }
+			get {
+                if (m_Options == null)
+                    m_Options = new List<OptionData>();
+                return m_Options; }
 			set { m_Options = value; }
 		}
     }
@@ -52,13 +55,18 @@ namespace MaterialUI
         /// The option's text.
         /// </summary>
         [SerializeField]
-        private string m_Text = null;
+        private string m_Text = string.Empty;
         /// <summary>
         /// The option's text.
         /// </summary>
         public string text
 		{
-			get { return m_Text; }
+			get
+            {
+                if (m_Text == null)
+                    m_Text = string.Empty;
+                return m_Text;
+            }
 			set { m_Text = value; }
 		}
 

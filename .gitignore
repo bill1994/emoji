@@ -69,3 +69,4 @@ UnityGenerated/
 /.vs/APALeiloesApp/v15/Server/sqlite3/storage.ide-wal
 /.vs
 /Logs/Packages-Update.log
+/Assets/_KYUB/KyubEngine.lib/Kyub.UnityEvents/package-lock.json

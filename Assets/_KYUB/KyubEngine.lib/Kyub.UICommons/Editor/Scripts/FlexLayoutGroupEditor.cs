@@ -11,7 +11,7 @@ using Kyub.UI;
 namespace KyubEditor.UI
 {
     [CustomEditor(typeof(FlexLayoutGroup), true)]
-    public class FlexLayoutGroupEditor : HorizontalOrVerticalLayoutGroupEditor
+    public class FlexLayoutGroupEditor : HorizontalOrVerticalLayoutGroupExEditor
     {
         SerializedProperty m_IsVertical = null;
         SerializedProperty m_SpacingBetween = null;

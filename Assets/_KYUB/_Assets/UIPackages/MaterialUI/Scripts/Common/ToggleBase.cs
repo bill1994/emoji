@@ -434,6 +434,9 @@ namespace MaterialUI
 
         protected override void Awake()
         {
+            if (!Application.isPlaying)
+                return;
+
             if (toggle != null)
                 RegisterEvents();
             base.Awake();
@@ -461,6 +464,9 @@ namespace MaterialUI
         protected bool _started = false;
         protected override void Start()
         {
+            if (!Application.isPlaying)
+                return;
+
             base.Start();
             _started = true;
 
@@ -471,7 +477,8 @@ namespace MaterialUI
 
         protected override void OnDisable()
         {
-            if (m_Group != null && Application.isPlaying)
+            //Only Unregister if self object disabled
+            if (m_Group != null && m_Group.gameObject.activeInHierarchy && Application.isPlaying)
                 m_Group.UnregisterToggle(this);
 
             base.OnDisable();
@@ -479,12 +486,19 @@ namespace MaterialUI
 
         protected override void OnDestroy()
         {
+            //Force Unregister OnDestroy
+            if (m_Group != null && Application.isPlaying)
+                m_Group.UnregisterToggle(this);
+
             UnregisterEvents();
             base.OnDestroy();
         }
 
         protected virtual void Update()
         {
+            if (!Application.isPlaying)
+                return;
+
             m_AnimDeltaTime = Time.realtimeSinceStartup - m_AnimStartTime;
 
             if (m_AnimState == 1)
@@ -897,7 +911,7 @@ namespace MaterialUI
             {
                 if (m_Toggle != null && m_Group != null && !m_Group.allowSwitchOff && m_Group.IsActiveAndEnabledInHierarchy())
                     m_Toggle.enabled = !isOn;
-                else
+                else if (m_Toggle != null)
                     m_Toggle.enabled = true;
             }
         }

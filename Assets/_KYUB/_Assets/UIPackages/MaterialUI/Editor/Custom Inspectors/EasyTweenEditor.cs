@@ -13,6 +13,8 @@ namespace MaterialUI
     [Serializable]
     public class EasyTweenEditor : Editor
     {
+        SerializedProperty m_Tweens = null;
+
         private EasyTween m_ScriptTarget;
         private string m_TempString;
         private int m_TempTweenIndex;
@@ -22,6 +24,7 @@ namespace MaterialUI
 
         void OnEnable()
         {
+            m_Tweens = serializedObject.FindProperty("m_Tweens");
             m_ScriptTarget = (EasyTween)target;
             EnforceListLengths();
         }
@@ -164,7 +167,7 @@ namespace MaterialUI
             return thisMenu;
         }
 
-        private GenericMenu MethodMenu(EasyTween.EasyTweenObject tweenObject)
+        /*private GenericMenu MethodMenu(EasyTween.EasyTweenObject tweenObject)
         {
             GenericMenu thisMenu = new GenericMenu();
             string[] componentStrings = FindComponentStrings(tweenObject.callbackGameObject);
@@ -180,16 +183,15 @@ namespace MaterialUI
             }
 
             return thisMenu;
-        }
+        }*/
 
         public override void OnInspectorGUI()
         {
             EnforceListLengths();
 
-			for (int i = 0; i < m_ScriptTarget.tweens.Count; i++)
+            for (int i = 0; i < m_ScriptTarget.tweens.Count; i++)
             {
 				EasyTween.EasyTweenObject tweenObject = m_ScriptTarget.tweens[i];
-
                 ConfigureTweenObject(ref tweenObject, i);
             }
         }
@@ -250,35 +252,21 @@ namespace MaterialUI
 					tweenObject.delay = EditorGUILayout.FloatField("Delay", tweenObject.delay);
 					
 					tweenObject.tweenOnStart = EditorGUILayout.Toggle("Tween on Start", tweenObject.tweenOnStart);
-					
-					tweenObject.hasCallback = EditorGUILayout.Toggle("Call method when done", tweenObject.hasCallback);
-					
-					using (new GUILayout.HorizontalScope())
-					{
-						if (tweenObject.hasCallback)
-						{
-							tweenObject.callbackGameObject =
-								(GameObject)EditorGUILayout.ObjectField("GameObject", tweenObject.callbackGameObject, typeof(GameObject), true);
-						}
-					}
-					
-					if (tweenObject.hasCallback && tweenObject.callbackGameObject != null)
-					{
-						using (new GUILayout.HorizontalScope())
-						{
-							if (tweenObject.hasCallback)
-							{
-								GUILayout.Label("Method");
-								if (GUILayout.Button(tweenObject.callbackComponentName + "/" + tweenObject.callbackName, GUI.skin.GetStyle("Popup")))
-								{
-									m_TempTweenIndex = tweenIndex;
-									MethodMenu(tweenObject).ShowAsContext();
-									return;
-								}
-							}
-						}
-					}
-					
+
+                    var tweenObjectProperty = m_Tweens.GetArrayElementAtIndex(tweenIndex);
+                    var onStart = tweenObjectProperty != null ? tweenObjectProperty.FindPropertyRelative("onStart") : null;
+                    var onFinish = tweenObjectProperty != null ? tweenObjectProperty.FindPropertyRelative("onFinish") : null;
+
+                    if (onFinish != null || onStart != null)
+                    {
+                        EditorGUILayout.Space();
+                        serializedObject.Update();
+                        if(onStart != null)
+                            EditorGUILayout.PropertyField(onStart);
+                        if(onFinish != null)
+                            EditorGUILayout.PropertyField(onFinish);
+                        serializedObject.ApplyModifiedProperties();
+                    }
 					EditorGUILayout.Space();
 					
 					if (tweenObject.targetGameObject)
@@ -498,23 +486,6 @@ namespace MaterialUI
             }
 
 			m_ScriptTarget.tweens[m_TempTweenIndex].subTweens[m_TempSubTweenIndex] = subObject;
-        }
-
-        public void MethodMenuCallback(object item)
-        {
-            string theString = (string)item;
-
-            string[] stringArray = theString.Split('/');
-
-			EasyTween.EasyTweenObject tweenObject = m_ScriptTarget.tweens[m_TempTweenIndex];
-
-            tweenObject.callbackComponent = tweenObject.callbackGameObject.GetComponent(stringArray[0]);
-            tweenObject.callbackComponentName = tweenObject.callbackComponent.GetType().Name;
-
-            tweenObject.callbackMethodInfo = tweenObject.callbackComponent.GetType().GetMethod(stringArray[1]);
-			tweenObject.callbackName = tweenObject.callbackMethodInfo.Name;
-
-			m_ScriptTarget.tweens[m_TempTweenIndex] = tweenObject;
         }
 
         private Vector4 ObjectToVector4(string valueType, object value)

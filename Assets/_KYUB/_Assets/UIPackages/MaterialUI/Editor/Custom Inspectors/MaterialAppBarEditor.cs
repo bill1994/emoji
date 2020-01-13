@@ -69,9 +69,9 @@ namespace MaterialUI
                 MaterialAppBar appBar = go.GetComponent<MaterialAppBar>();
                 return appBar == null ? null : appBar.panelGraphic;
             };
-            if (InspectorFields.GraphicColorMultiField("Title Text", getTitleTextFunc, m_TitleText.objectReferenceValue as Graphic) ||
-               InspectorFields.GraphicColorMultiField("Panel Graphic", getPanelGraphicFunc, m_PanelGraphic.objectReferenceValue as Graphic))
-                result = true;
+
+            result = InspectorFields.GraphicColorMultiField("Title Text", getTitleTextFunc, m_TitleText.objectReferenceValue as Graphic);
+            result = InspectorFields.GraphicColorMultiField("Panel Graphic", getPanelGraphicFunc, m_PanelGraphic.objectReferenceValue as Graphic) || result;
 
             return result;
         }

@@ -124,7 +124,7 @@ namespace MaterialUI
             /// <summary>
             /// Path to the simple list dialog prefab.
             /// </summary>
-            public const string dialogSimpleList = "Dialogs/DialogSimpleList";
+            public const string dialogSimpleList = "Dialogs/DialogRadioList";
             /// <summary>
             /// Path to the checkbox list dialog prefab.
             /// </summary>
@@ -236,6 +236,8 @@ namespace MaterialUI
                         ResourcesLoader.LoadAsync<GameObject>(nameWithPath, internalCallback);
                 }
             }
+            else
+                callback(nameWithPath, null);
         }
 
         /// <summary>

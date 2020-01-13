@@ -1,6 +1,7 @@
 ﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using Kyub.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,10 +14,10 @@ namespace MaterialUI
 
         [SerializeField]
 		private Graphic m_ItemText = null;
-		[SerializeField]
+        [SerializeField]
+        private Graphic m_ItemIcon = null;
+        [SerializeField]
 		private ToggleBase m_ItemCheckbox = null;
-        
-		private RectTransform m_RectTransform;
 
         #endregion
 
@@ -25,6 +26,11 @@ namespace MaterialUI
         public Graphic itemText
         {
             get { return m_ItemText; }
+        }
+
+        public Graphic itemIcon
+        {
+            get { return m_ItemIcon; }
         }
 
         public ToggleBase itemCheckbox
@@ -36,12 +42,29 @@ namespace MaterialUI
         {
             get
             {
-                if (m_RectTransform == null)
-                {
-                    m_RectTransform = transform as RectTransform;
-                }
+                return transform as RectTransform;
+            }
+        }
 
-                return m_RectTransform;
+        #endregion
+
+        #region Reload Functions
+
+        protected override void ApplyReload(ScrollDataView.ReloadEventArgs oldArgs, ScrollDataView.ReloadEventArgs newArgs)
+        {
+            BaseDialogList dialog = DataView != null? DataView.GetComponentInParent<BaseDialogList>() : null;
+            if (dialog != null)
+            {
+                OptionData option = Data as OptionData;
+                if (m_ItemText != null)
+                    m_ItemText.SetGraphicText(option != null ? option.text : "");
+                if (m_ItemIcon != null)
+                {
+                    m_ItemIcon.SetImage(option != null ? option.imageData : null);
+                    m_ItemIcon.gameObject.SetActive(m_ItemIcon.GetImageData() != null && m_ItemIcon.GetImageData().ContainsData(true));
+                }
+                if (m_ItemCheckbox != null)
+                    m_ItemCheckbox.isOn = dialog.IsDataIndexSelected(DataIndex);
             }
         }
 

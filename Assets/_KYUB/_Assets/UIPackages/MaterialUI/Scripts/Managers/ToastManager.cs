@@ -240,7 +240,7 @@ namespace MaterialUI
             Canvas canvas = null;
             if (canvasHierarchy != null)
             {
-                canvas = MaterialUIScaler.GetRootScaler(canvasHierarchy).canvas;
+                canvas = canvasHierarchy.GetRootCanvas();
                 if (canvas != null)
                 {
                     instance.m_ParentCanvas = canvas;
@@ -277,7 +277,7 @@ namespace MaterialUI
             Canvas canvas = null;
             if (canvasHierarchy != null)
             {
-                canvas = MaterialUIScaler.GetRootScaler(canvasHierarchy).canvas;
+                canvas = canvasHierarchy.GetRootCanvas();
                 if (canvas != null)
                 {
                     instance.m_ParentCanvas = canvas;

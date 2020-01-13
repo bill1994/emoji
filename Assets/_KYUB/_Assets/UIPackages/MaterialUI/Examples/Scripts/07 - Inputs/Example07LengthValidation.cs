@@ -5,16 +5,9 @@ using MaterialUI;
 using UnityEngine.UI;
 using UnityEngine;
 
-public class Example07LengthValidation : MonoBehaviour, ITextValidator
+public class Example07LengthValidation : BaseAutoFormatTextValidator, ITextValidator
 {
-	private MaterialInputField m_MaterialInputField;
-
-	public void Init(MaterialInputField materialInputField)
-	{
-		m_MaterialInputField = materialInputField;
-	}
-
-	public bool IsTextValid()
+	public override bool IsTextValid()
     {
 		if (m_MaterialInputField.text.Length <= 10)
         {

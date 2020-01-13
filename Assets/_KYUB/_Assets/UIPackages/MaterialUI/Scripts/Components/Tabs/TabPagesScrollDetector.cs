@@ -12,18 +12,25 @@ namespace MaterialUI
         [SerializeField] private TabView m_TabView = null;
         public TabView tabView
         {
-            get { return m_TabView; }
+            get
+            {
+                if (m_TabView == null)
+                    m_TabView = GetComponentInParent<TabView>();
+                return m_TabView;
+            }
             set { m_TabView = value; }
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            m_TabView.TabPageDrag();
+            if(tabView != null)
+                m_TabView.TabPageDrag();
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            m_TabView.TabPagePointerUp(eventData.delta.x);
+            if(tabView != null)
+                m_TabView.TabPagePointerUp(eventData.delta.x);
         }
     }
 }

@@ -3,187 +3,116 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace MaterialUI
 {
     [AddComponentMenu("MaterialUI/Dialogs/Checkbox List", 1)]
-    public class DialogCheckboxList : MaterialDialogCompat
+    public class DialogCheckboxList : BaseDialogList
     {
-        #region Helper Classes
-
-        public delegate void OptionSelectedEvent(int i);
-
-        #endregion
 
         #region Private Variables
 
-        [SerializeField]
-        private DialogTitleSection m_TitleSection = null;
-        [SerializeField]
-        private DialogButtonSection m_ButtonSection = null;
-        [SerializeField]
-        private GameObject m_OptionTemplate = null;
-
-        private List<DialogCheckboxOption> m_SelectionItems;
-        private bool[] m_SelectedIndexes;
-        private string[] m_OptionList;
+        private HashSet<int> m_SelectedIndexes = new HashSet<int>();
+        Action<int[]> _onAffirmativeButtonClicked = null;
 
         #endregion
 
         #region Callbacks
 
-        private Action<bool[]> m_OnAffirmativeButtonClicked;
-        public OptionSelectedEvent onOptionSelected;
+        public DialogClickableOption.IntUnityEvent onSelectedIndexChanged = new DialogClickableOption.IntUnityEvent();
 
         #endregion
 
         #region Public Properties
 
-        public DialogTitleSection titleSection
+        public HashSet<int> selectedIndexes
         {
-            get { return m_TitleSection; }
-            set { m_TitleSection = value; }
-        }
-
-        public DialogButtonSection buttonSection
-        {
-            get { return m_ButtonSection; }
-            set { m_ButtonSection = value; }
-        }
-
-        public List<DialogCheckboxOption> selectionItems
-        {
-            get { return m_SelectionItems; }
-        }
-
-        public bool[] selectedIndexes
-        {
-            get { return m_SelectedIndexes; }
-            set { m_SelectedIndexes = value; }
-        }
-
-        public string[] optionList
-        {
-            get { return m_OptionList; }
-            set { m_OptionList = value; }
-        }
-
-        public Action<bool[]> onAffirmativeButtonClicked
-        {
-            get { return m_OnAffirmativeButtonClicked; }
-            set { m_OnAffirmativeButtonClicked = value; }
-        }
-
-        #endregion
-
-        #region Unity Functions
-
-        protected override void OnEnable()
-		{
-            base.OnEnable();
-            OverscrollConfig scrollConfig = GetComponentInChildren<OverscrollConfig>();
-
-            if(scrollConfig != null)
+            get
             {
-                scrollConfig.Setup();
+                if (m_SelectedIndexes == null)
+                    m_SelectedIndexes = new HashSet<int>();
+                return m_SelectedIndexes;
             }
-		}
+            set
+            {
+                if (m_SelectedIndexes == value)
+                    return;
+                m_SelectedIndexes = value;
+                if (m_SelectedIndexes != null)
+                {
+                    foreach (var index in m_SelectedIndexes)
+                    {
+                        if (onSelectedIndexChanged != null)
+                            onSelectedIndexChanged.Invoke(index);
+                    }
+                }
+                if (m_ScrollDataView != null)
+                    m_ScrollDataView.FullReloadAll();
+            }
+        }
 
         #endregion
 
         #region Helper Functions
-
-        protected override void ValidateKeyTriggers(MaterialFocusGroup p_materialKeyFocus)
+        
+        public virtual void Initialize(string[] optionsStr, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexesStart)
         {
-            if (p_materialKeyFocus != null)
+            OptionData[] options = new OptionData[optionsStr != null ? optionsStr.Length : 0];
+            for (int i = 0; i < optionsStr.Length; i++)
             {
-                var v_affirmativeTrigger = new MaterialFocusGroup.KeyTriggerData();
-                v_affirmativeTrigger.Name = "Return KeyDown";
-                v_affirmativeTrigger.Key = KeyCode.Return;
-                v_affirmativeTrigger.TriggerType = MaterialFocusGroup.KeyTriggerData.KeyTriggerType.KeyDown;
-                MaterialActivity.AddEventListener(v_affirmativeTrigger.OnCallTrigger, AffirmativeButtonClicked);
-
-                var v_cancelTrigger = new MaterialFocusGroup.KeyTriggerData();
-                v_cancelTrigger.Name = "Escape KeyDown";
-                v_cancelTrigger.Key = KeyCode.Escape;
-                v_cancelTrigger.TriggerType = MaterialFocusGroup.KeyTriggerData.KeyTriggerType.KeyDown;
-                MaterialActivity.AddEventListener(v_cancelTrigger.OnCallTrigger, DismissiveButtonClicked);
-
-                p_materialKeyFocus.KeyTriggers = new System.Collections.Generic.List<MaterialFocusGroup.KeyTriggerData> { v_affirmativeTrigger, v_cancelTrigger };
+                options[i] = new OptionData(optionsStr[i], null);
             }
+            Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexesStart);
         }
 
-        public void Initialize(string[] options, Action<bool[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
+        public virtual void Initialize(OptionData[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexesStart)
         {
-            m_OptionList = options;
-            m_SelectionItems = new List<DialogCheckboxOption>();
-            m_SelectedIndexes = new bool[options.Length];
-
-            for (int i = 0; i < m_OptionList.Length; i++)
-            {
-                m_SelectionItems.Add(CreateSelectionItem(i));
-            }
-
-            Destroy(m_OptionTemplate);
-
-            m_TitleSection.SetTitle(titleText, icon);
-			m_ButtonSection.SetButtons(null, affirmativeButtonText, onDismissiveButtonClicked, dismissiveButtonText);
-            m_ButtonSection.SetupButtonLayout(rectTransform);
-
-			m_OnAffirmativeButtonClicked = onAffirmativeButtonClicked;
-
-            float availableHeight = DialogManager.rectTransform.rect.height;
-
-            LayoutGroup textAreaRectTransform = m_TitleSection.text.transform.parent.GetComponent<LayoutGroup>();
-
-            if (textAreaRectTransform.gameObject.activeSelf)
-            {
-                textAreaRectTransform.CalculateLayoutInputVertical();
-                availableHeight -= textAreaRectTransform.preferredHeight;
-            }
-
-            //Initialize();
+            _onAffirmativeButtonClicked = onAffirmativeButtonClicked;
+            BaseInitialize(options, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
+            selectedIndexes = selectedIndexesStart == null ? new HashSet<int>() : new HashSet<int>(selectedIndexesStart);
         }
 
-        private DialogCheckboxOption CreateSelectionItem(int i)
+        public override void AffirmativeButtonClicked()
         {
-            DialogCheckboxOption option = Instantiate(m_OptionTemplate).GetComponent<DialogCheckboxOption>();
-            option.rectTransform.SetParent(m_OptionTemplate.transform.parent);
-            option.rectTransform.localScale = Vector3.one;
-            option.rectTransform.localEulerAngles = Vector3.zero;
-            option.rectTransform.localPosition = new Vector3(option.rectTransform.localPosition.x, option.rectTransform.localPosition.y, 0f);
+            var canvasGroup = this.GetAddComponent<CanvasGroup>();
+            canvasGroup.blocksRaycasts = false;
 
-            Graphic text = option.itemText;
-
-            text.SetGraphicText(m_OptionList[i]);
-
-            option.index = i;
-            option.onClickAction += OnItemClick;
-
-            return option;
-        }
-
-        public void OnItemClick(int index)
-        {
-            Toggle toggle = m_SelectionItems[index].itemCheckbox.toggle;
-            toggle.isOn = !toggle.isOn;
-
-            m_SelectedIndexes[index] = toggle.isOn;
-        }
-
-        public void AffirmativeButtonClicked()
-        {
-			m_OnAffirmativeButtonClicked.InvokeIfNotNull(m_SelectedIndexes);
+            if (_onAffirmativeButtonClicked != null)
+                _onAffirmativeButtonClicked.InvokeIfNotNull(selectedIndexes.ToArray());
             Hide();
         }
 
-        public void DismissiveButtonClicked()
+        public override bool IsDataIndexSelected(int dataIndex)
         {
-            m_ButtonSection.OnDismissiveButtonClicked();
-            Hide();
-		}
+            return selectedIndexes.Contains(dataIndex);
+        }
+
+        #endregion
+
+        #region Receivers
+
+        protected override void HandleOnItemClicked(int dataIndex)
+        {
+            if (selectedIndexes.Contains(dataIndex))
+            {
+                selectedIndexes.Remove(dataIndex);
+                if (onSelectedIndexChanged != null)
+                    onSelectedIndexChanged.Invoke(dataIndex);
+                if (m_ScrollDataView)
+                    m_ScrollDataView.FullReloadAll();
+            }
+            else if (dataIndex >= 0 && dataIndex < options.Length && !selectedIndexes.Contains(dataIndex))
+            {
+                selectedIndexes.Add(dataIndex);
+                if (onSelectedIndexChanged != null)
+                    onSelectedIndexChanged.Invoke(dataIndex);
+                if (m_ScrollDataView)
+                    m_ScrollDataView.FullReloadAll();
+            }
+        }
 
         #endregion
     }

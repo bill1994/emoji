@@ -1,7 +1,9 @@
 ﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using Kyub.UI;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace MaterialUI
@@ -12,12 +14,11 @@ namespace MaterialUI
         #region Private Variables
 
         [SerializeField]
+        private Graphic m_ItemIcon = null;
+        [SerializeField]
         private Graphic m_ItemText = null;
         [SerializeField]
         private MaterialRipple m_ItemRipple = null;
-        private RectTransform m_RectTransform;
-
-        private Graphic m_ItemIcon;
 
         #endregion
 
@@ -45,12 +46,27 @@ namespace MaterialUI
         {
             get
             {
-                if (m_RectTransform == null)
-                {
-                    m_RectTransform = transform as RectTransform;
-                }
+                return transform as RectTransform;
+            }
+        }
 
-                return m_RectTransform;
+        #endregion
+
+        #region Reload Functions
+
+        protected override void ApplyReload(ScrollDataView.ReloadEventArgs oldArgs, ScrollDataView.ReloadEventArgs newArgs)
+        {
+            BaseDialogList dialog = DataView != null ? DataView.GetComponentInParent<BaseDialogList>() : null;
+            if (dialog != null)
+            {
+                OptionData option = Data as OptionData;
+                if (m_ItemText != null)
+                    m_ItemText.SetGraphicText(option != null ? option.text : "");
+                if (m_ItemIcon != null)
+                {
+                    m_ItemIcon.SetImage(option != null ? option.imageData : null);
+                    m_ItemIcon.gameObject.SetActive(m_ItemIcon.GetImageData() != null && m_ItemIcon.GetImageData().ContainsData(true));
+                }
             }
         }
 

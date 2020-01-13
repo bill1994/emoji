@@ -191,9 +191,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE254"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: mode_edit
@@ -534,8 +533,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &73617941
 MonoBehaviour:
@@ -962,8 +959,6 @@ MonoBehaviour:
   m_Size: {x: 40, y: 40}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &195626351
 MonoBehaviour:
@@ -1603,9 +1598,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE5C8"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: arrow_forward
@@ -1689,9 +1683,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -1875,9 +1868,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE254"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: mode_edit
@@ -2427,9 +2419,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE5C8"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: arrow_forward
@@ -2513,9 +2504,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE15E"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: reply
@@ -2771,8 +2761,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &730437404
 MonoBehaviour:
@@ -3035,7 +3023,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 886763232}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -3170,9 +3157,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -3256,9 +3242,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE254"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: mode_edit
@@ -3343,9 +3328,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -3441,9 +3425,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -3527,9 +3510,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE838"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: star
@@ -3826,8 +3808,6 @@ MonoBehaviour:
   m_Size: {x: 40, y: 40}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1055243402
 MonoBehaviour:
@@ -3992,8 +3972,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1075735002
 MonoBehaviour:
@@ -4108,9 +4086,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE15E"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: reply
@@ -4294,9 +4271,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE838"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: star
@@ -4461,9 +4437,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -4500,7 +4475,6 @@ GameObject:
   - component: {fileID: 1217785375}
   - component: {fileID: 1217785374}
   - component: {fileID: 1217785372}
-  - component: {fileID: 1217785376}
   - component: {fileID: 1217785371}
   m_Layer: 5
   m_Name: Canvas
@@ -4518,23 +4492,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1217785370}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
+  m_Script: {fileID: 11500000, guid: e53aeec3e93c0424d9e290b4209ef433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 1217785374}
-  m_ScalerMode: 0
-  m_ScaleFactor: 1
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 360, y: 640}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 1
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 160
+  m_DefaultSpriteDPI: 160
   m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 0}
-  m_OnCanvasAreaChanged:
+  m_EditorForceDPI: 1
+  m_EditorForceDPIValue: 160
+  m_UseLegacyPhysicalSizeCalc: 0
+  m_SupportSafeArea: 1
+  onCanvasAreaChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &1217785372
@@ -4595,23 +4570,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1217785376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1217785370}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f0dcef36f7974cbe91bf74bdc9fd5f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_GutterColor: {r: 0.588, g: 0.706, b: 1, a: 0.5}
-  m_GutterWidth: 24
-  m_MarginWidth: 24
-  m_NumberOfColums: 12
-  m_FullScreenHeight: 0
 --- !u!1 &1240669600
 GameObject:
   m_ObjectHideFlags: 0
@@ -4683,9 +4641,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -4831,8 +4788,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1246072534
 MonoBehaviour:
@@ -4958,7 +4913,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1283702577}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -5069,9 +5023,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -5417,8 +5370,6 @@ MonoBehaviour:
   m_Size: {x: 40, y: 40}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1371861172
 MonoBehaviour:
@@ -5620,9 +5571,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -5718,9 +5668,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -6113,7 +6062,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1515310013}
-  m_RootScaler: {fileID: 1217785371}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -6224,9 +6172,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -6485,9 +6432,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE5C8"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: arrow_forward
@@ -6571,9 +6517,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -6707,8 +6652,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1744435432
 MonoBehaviour:
@@ -6825,9 +6768,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -7025,9 +6967,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -7123,9 +7064,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE838"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: star
@@ -7381,8 +7321,6 @@ MonoBehaviour:
   m_Size: {x: 40, y: 40}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1863979599
 MonoBehaviour:
@@ -7647,9 +7585,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -7868,9 +7805,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -8016,8 +7952,6 @@ MonoBehaviour:
   m_Size: {x: 40, y: 40}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1992497604
 MonoBehaviour:
@@ -8133,9 +8067,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 40
+  m_ScaledSize: 32.125
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -8303,8 +8236,6 @@ MonoBehaviour:
   m_Size: {x: 40, y: 40}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1998204091
 MonoBehaviour:
@@ -8519,9 +8450,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE90A"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke_thin
@@ -8607,9 +8537,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 56
+  m_ScaledSize: 44.975002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
@@ -8705,9 +8634,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE15E"
   m_Size: 24
-  m_ScaledSize: 24
+  m_ScaledSize: 19.275002
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 1217785371}
   m_VectorImageData:
     m_Glyph:
       m_Name: reply
@@ -8863,8 +8791,6 @@ MonoBehaviour:
   m_Size: {x: 56, y: 56}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &2144815483
 MonoBehaviour:

@@ -15,9 +15,10 @@ namespace MaterialUI
 
         private SerializedProperty m_AnimationDuration;
 
-        private SerializedProperty m_BackgroundSizeMode;
+        private SerializedProperty m_BackgroundLayoutMode;
+        private SerializedProperty m_LineLayoutMode;
 
-        private SerializedProperty m_HintText;
+        //private SerializedProperty m_HintText;
         private SerializedProperty m_FloatingHint;
         private SerializedProperty m_FloatingHintFontSize;
 
@@ -29,11 +30,13 @@ namespace MaterialUI
         private SerializedProperty m_TextValidator;
         private SerializedProperty m_ValidateOnStart;
 
+        private SerializedProperty m_FitWidthToContent;
         private SerializedProperty m_ManualPreferredWidth;
         private SerializedProperty m_FitHeightToContent;
         private SerializedProperty m_ManualPreferredHeight;
         private SerializedProperty m_ManualSizeX;
         private SerializedProperty m_ManualSizeY;
+        private SerializedProperty m_ManualSize;
 
         private SerializedProperty m_LeftContentOffset;
         private SerializedProperty m_RightContentOffset;
@@ -75,6 +78,9 @@ namespace MaterialUI
         private SerializedProperty m_LeftContentGraphic;
         private SerializedProperty m_RightContentGraphic;
 
+        private SerializedProperty onValueChanged;
+        private SerializedProperty onEndEdit;
+
         protected override void OnEnable()
         {
             OnBaseEnable();
@@ -83,9 +89,10 @@ namespace MaterialUI
             m_Interactable = serializedObject.FindProperty("m_Interactable");
 
             m_AnimationDuration = serializedObject.FindProperty("m_AnimationDuration");
-            m_BackgroundSizeMode = serializedObject.FindProperty("m_BackgroundSizeMode");
+            m_BackgroundLayoutMode = serializedObject.FindProperty("m_BackgroundLayoutMode");
+            m_LineLayoutMode = serializedObject.FindProperty("m_LineLayoutMode");
 
-            m_HintText = serializedObject.FindProperty("m_HintText");
+            //m_HintText = serializedObject.FindProperty("m_HintText");
             m_FloatingHint = serializedObject.FindProperty("m_FloatingHint");
             m_FloatingHintFontSize = serializedObject.FindProperty("m_FloatingHintFontSize");
 
@@ -101,11 +108,13 @@ namespace MaterialUI
             m_TextValidator = serializedObject.FindProperty("m_TextValidator");
             m_ValidateOnStart = serializedObject.FindProperty("m_ValidateOnStart");
 
+            m_FitWidthToContent = serializedObject.FindProperty("m_FitWidthToContent");
             m_ManualPreferredWidth = serializedObject.FindProperty("m_ManualPreferredWidth");
             m_FitHeightToContent = serializedObject.FindProperty("m_FitHeightToContent");
             m_ManualPreferredHeight = serializedObject.FindProperty("m_ManualPreferredHeight");
             m_ManualSizeX = serializedObject.FindProperty("m_ManualSize.x");
             m_ManualSizeY = serializedObject.FindProperty("m_ManualSize.y");
+            m_ManualSize = serializedObject.FindProperty("m_ManualSize");
 
             m_LeftContentOffset = serializedObject.FindProperty("m_LeftContentOffset");
             m_RightContentOffset = serializedObject.FindProperty("m_RightContentOffset");
@@ -143,6 +152,15 @@ namespace MaterialUI
             m_RightContentGraphic = serializedObject.FindProperty("m_RightContentGraphic");
 
             m_Padding = serializedObject.FindProperty("m_Padding");
+
+            onValueChanged = serializedObject.FindProperty("onValueChanged");
+            onEndEdit = serializedObject.FindProperty("onEndEdit");
+
+            foreach (var target in targets)
+            {
+                if(target is MaterialInputField)
+                    (target as MaterialInputField).SetLayoutDirty();
+            }
         }
 
         protected override void OnDisable()
@@ -165,7 +183,45 @@ namespace MaterialUI
 
             if (m_HintTextTransform.objectReferenceValue != null)
             {
-                LayoutStyle_PropertyField(m_HintText);
+                string hintText = null;
+                string newHintText = null;
+                EditorGUI.BeginChangeCheck();
+                {
+                    var showMixed = false;
+                    foreach (var target in targets)
+                    {
+                        var input = target as MaterialInputField;
+                        if (input != null)
+                        {
+                            if (!showMixed && hintText != null && hintText != input.hintText)
+                            {
+                                showMixed = true;
+                                break;
+                            }
+                            hintText = input.hintText;
+                        }
+                    }
+                    if (hintText == null)
+                        hintText = "";
+                    var oldShowMixed = EditorGUI.showMixedValue;
+                    EditorGUI.showMixedValue = showMixed;
+                    newHintText = EditorGUILayout.TextField("Hint Text", hintText);
+                    EditorGUI.showMixedValue = oldShowMixed;
+                }
+                if (EditorGUI.EndChangeCheck())
+                {
+                    if (newHintText != hintText)
+                    {
+                        foreach (var target in targets)
+                        {
+                            var input = target as MaterialInputField;
+                            if (input != null)
+                            {
+                                input.hintText = newHintText;
+                            }
+                        }
+                    }
+                }
             }
 
             EditorGUILayout.Space();
@@ -173,7 +229,10 @@ namespace MaterialUI
             LayoutStyle_PropertyField(m_AnimationDuration);
             EditorGUILayout.Space();
 
-            LayoutStyle_PropertyField(m_BackgroundSizeMode);
+            LayoutStyle_PropertyField(m_BackgroundLayoutMode);
+            EditorGUILayout.Space();
+
+            LayoutStyle_PropertyField(m_LineLayoutMode);
             EditorGUILayout.Space();
 
             using (new GUILayout.HorizontalScope())
@@ -218,14 +277,19 @@ namespace MaterialUI
             }
 
             EditorGUILayout.Space();
-
-            using (new GUILayout.HorizontalScope())
+            LayoutStyle_PropertyField(m_FitWidthToContent);
+            if (!m_FitWidthToContent.boolValue)
             {
-                LayoutStyle_PropertyField(m_ManualPreferredWidth);
-                if (m_ManualPreferredWidth.boolValue)
+                EditorGUI.indentLevel++;
+                using (new GUILayout.HorizontalScope())
                 {
-                    LayoutStyle_PropertyField(m_ManualSizeX, new GUIContent(""));
+                    LayoutStyle_PropertyField(m_ManualPreferredWidth);
+                    if (m_ManualPreferredWidth.boolValue)
+                    {
+                        LayoutStyle_PropertyField(m_ManualSizeX, m_ManualSize, new GUIContent(""), false);
+                    }
                 }
+                EditorGUI.indentLevel--;
             }
 
             LayoutStyle_PropertyField(m_FitHeightToContent);
@@ -237,7 +301,7 @@ namespace MaterialUI
                     LayoutStyle_PropertyField(m_ManualPreferredHeight);
                     if (m_ManualPreferredHeight.boolValue)
                     {
-                        LayoutStyle_PropertyField(m_ManualSizeY, new GUIContent(""));
+                        LayoutStyle_PropertyField(m_ManualSizeY, m_ManualSize, new GUIContent(""), false);
                     }
                 }
                 EditorGUI.indentLevel--;
@@ -262,11 +326,14 @@ namespace MaterialUI
             DrawFoldoutColors(ColorsSection);
             DrawFoldoutComponents(ComponentsSection);
 
+            EditorGUILayout.Space();
+
+            EditorGUILayout.PropertyField(onValueChanged);
+            EditorGUILayout.PropertyField(onEndEdit);
+
             DrawStyleGUIFolder();
 
             serializedObject.ApplyModifiedProperties();
-
-            (target as MaterialInputField).OnTextChanged();
         }
 
         private void ColorsSection()

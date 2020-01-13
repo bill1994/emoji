@@ -186,7 +186,7 @@ namespace MaterialUI
                 }
 
                 IVectorImage vectorImage = graphic as IVectorImage;
-                if (vectorImage != null)
+                if (graphic != null && vectorImage != null)
                 {
                     VectorImageField(label, vectorImage, disableIfMultipleObjectsSelected);
                     return true;
@@ -453,6 +453,9 @@ namespace MaterialUI
         static Dictionary<VectorImageData, GUIStyle> s_iconStyles = new Dictionary<VectorImageData, GUIStyle>();
         public static bool VectorImageDataField(string label, VectorImageData targetData, Object objectToUndo, Action onIconPickAction = null, bool disableIfMultipleObjectsSelected = true)
         {
+            if (targetData == null)
+                return false;
+
             using (new DisabledScope(TooManySelected(!disableIfMultipleObjectsSelected)))
             {
                 string code = targetData.glyph.unicode;

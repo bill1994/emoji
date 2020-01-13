@@ -24,13 +24,20 @@ namespace MaterialUI
     [AddComponentMenu("MaterialUI/Material Input Field", 100)]
     public class MaterialInputField : StyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, ISelectHandler, IDeselectHandler
     {
-        public enum BackgroundSizeMode
+        public enum BackgroundLayoutMode
         {
             TextOnly,
             TextAndHint,
             TextAndCounter,
             All,
             Manual
+        }
+
+        public enum LineLayoutMode
+        {
+            Default,
+            IgnoreContent,
+            IgnoreContentAndPadding
         }
 
         public enum ColorSelectionState
@@ -43,10 +50,12 @@ namespace MaterialUI
 
         #region Private Varibles
 
-        [SerializeField, SerializeStyleProperty]
-        BackgroundSizeMode m_BackgroundSizeMode = BackgroundSizeMode.TextOnly;
-        [SerializeField]
-        private string m_HintText = null;
+        [SerializeField, SerializeStyleProperty, UnityEngine.Serialization.FormerlySerializedAs("m_BackgroundSizeMode")]
+        BackgroundLayoutMode m_BackgroundLayoutMode = BackgroundLayoutMode.TextOnly;
+        [SerializeField, SerializeStyleProperty, UnityEngine.Serialization.FormerlySerializedAs("m_LineSizeMode")]
+        LineLayoutMode m_LineLayoutMode = LineLayoutMode.Default;
+        //[SerializeField]
+        //private string m_HintText = null;
         [SerializeField, SerializeStyleProperty]
         private bool m_FloatingHint = true;
         [SerializeField]
@@ -61,6 +70,8 @@ namespace MaterialUI
         private int m_CharacterLimit = 0;
         [SerializeField, SerializeStyleProperty]
         private int m_FloatingHintFontSize = 12;
+        [SerializeField, SerializeStyleProperty]
+        private bool m_FitWidthToContent = false;
         [SerializeField, SerializeStyleProperty]
         private bool m_FitHeightToContent = true;
         [SerializeField, SerializeStyleProperty]
@@ -77,8 +88,6 @@ namespace MaterialUI
         private GameObject m_TextValidator = null;
         [SerializeField]
         private RectTransform m_RectTransform = null;
-        [SerializeField]
-        private Selectable m_InputField = null;
         [SerializeField]
         private RectTransform m_InputTextTransform = null;
         [SerializeField]
@@ -165,6 +174,9 @@ namespace MaterialUI
         [SerializeField, SerializeStyleProperty]
         private RectOffset m_Padding = new RectOffset();
 
+        [System.NonSerialized]
+        private Selectable m_InputField = null;
+
         private RectTransform m_CaretTransform;
         private CanvasGroup m_CanvasGroup;
         private static Sprite m_LineDisabledSprite;
@@ -202,14 +214,18 @@ namespace MaterialUI
         private Vector2 m_LastRectSize;
         private Vector2 m_LayoutSize;
 
-#if UNITY_EDITOR
-        private string m_LastHintText;
-#endif
+//#if UNITY_EDITOR
+//        private string m_LastHintText;
+//#endif
         #endregion
 
         #region InputField Callbacks
 
-        public UnityEvent<string> onValueChanged
+        //Events when inputfield is null and text is not null
+        public InputField.OnChangeEvent onValueChanged = new InputField.OnChangeEvent();
+        public InputField.OnChangeEvent onEndEdit = new InputField.OnChangeEvent();
+
+        /*public UnityEvent<string> onValueChanged
         {
             get
             {
@@ -217,7 +233,15 @@ namespace MaterialUI
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.onValueChanged as UnityEvent<string> : (tmpInputField != null ? tmpInputField.onValueChanged as UnityEvent<string> : (promptInputField != null ? promptInputField.onValueChanged as UnityEvent<string> : null));
+                var eventObj = unityInputField != null ? unityInputField.onValueChanged as UnityEvent<string> : (tmpInputField != null ? tmpInputField.onValueChanged as UnityEvent<string> : (promptInputField != null ? promptInputField.onValueChanged as UnityEvent<string> : null));
+                if (eventObj == null)
+                {
+                    if (_onValueChanged == null)
+                        _onValueChanged = new InputField.OnChangeEvent();
+                    eventObj = _onValueChanged;
+                }
+
+                return eventObj;
             }
         }
 
@@ -229,19 +253,91 @@ namespace MaterialUI
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.onEndEdit as UnityEvent<string> : (tmpInputField != null ? tmpInputField.onEndEdit as UnityEvent<string> : (promptInputField != null ? promptInputField.onEndEdit as UnityEvent<string> : null));
+                var eventObj = unityInputField != null ? unityInputField.onEndEdit as UnityEvent<string> : (tmpInputField != null ? tmpInputField.onEndEdit as UnityEvent<string> : (promptInputField != null ? promptInputField.onEndEdit as UnityEvent<string> : null));
+                if (eventObj == null)
+                {
+                    if(_onEndEdit == null)
+                        _onEndEdit = new InputField.OnChangeEvent();
+                    eventObj = _onEndEdit;
+                }
+
+                return eventObj;
             }
-        }
+        }*/
 
         #endregion
 
         #region Public Properties
 
+        public BackgroundLayoutMode backgroundLayoutMode
+        {
+            get
+            {
+                return m_BackgroundLayoutMode;
+            }
+            set
+            {
+                if (m_BackgroundLayoutMode == value)
+                    return;
+                m_BackgroundLayoutMode = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public LineLayoutMode lineLayoutMode
+        {
+            get
+            {
+                return m_LineLayoutMode;
+            }
+            set
+            {
+                if (m_LineLayoutMode == value)
+                    return;
+                m_LineLayoutMode = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public bool isPassword
+        {
+            get
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.inputType == InputField.InputType.Password : (tmpInputField != null ? tmpInputField.inputType == TMP_InputField.InputType.Password : (promptInputField != null ? promptInputField.inputType == InputField.InputType.Password : false));
+            }
+            set
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                {
+                    unityInputField.inputType = value ? InputField.InputType.Password : (unityInputField.inputType != InputField.InputType.Password ? unityInputField.inputType : InputField.InputType.Standard);
+                    ForceUpdateAll();
+                }
+                else if (tmpInputField != null)
+                {
+                    tmpInputField.inputType = value ? TMP_InputField.InputType.Password : (tmpInputField.inputType != TMP_InputField.InputType.Password ? tmpInputField.inputType : TMP_InputField.InputType.Standard);
+                    ForceUpdateAll();
+                }
+                else if (promptInputField != null)
+                {
+                    promptInputField.inputType = value ? InputField.InputType.Password : (promptInputField.inputType != InputField.InputType.Password ? promptInputField.inputType : InputField.InputType.Standard);
+                    ForceUpdateAll();
+                }
+            }
+        }
+
         public UnityEngine.UI.InputField.ContentType contentType
         {
             get
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -249,16 +345,25 @@ namespace MaterialUI
             }
             set
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
+                {
                     unityInputField.contentType = value;
+                    ForceUpdateAll();
+                }
                 else if (tmpInputField != null)
+                {
                     tmpInputField.contentType = (TMP_InputField.ContentType)((int)value);
+                    ForceUpdateAll();
+                }
                 else if (promptInputField != null)
+                {
                     promptInputField.contentType = value;
+                    ForceUpdateAll();
+                }
             }
         }
 
@@ -267,20 +372,25 @@ namespace MaterialUI
         {
             get
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
 
                 return unityInputField != null ? unityInputField.selectionColor : (tmpInputField != null ? tmpInputField.selectionColor : Color.clear);
             }
             set
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
 
                 if (unityInputField != null)
                     unityInputField.selectionColor = value;
                 else if (tmpInputField != null)
                     tmpInputField.selectionColor = value;
+
+#if UNITY_EDITOR
+                if(m_InputField != null)
+                    UnityEditor.EditorUtility.SetDirty(m_InputField);
+#endif
             }
         }
 
@@ -289,15 +399,15 @@ namespace MaterialUI
         {
             get
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null && unityInputField.textComponent != null ? unityInputField.textComponent.fontSize : (tmpInputField != null ? (int)tmpInputField.pointSize : (promptInputField != null ? (int)promptInputField.fontSize : 0));
+                return unityInputField != null && unityInputField.textComponent != null ? unityInputField.textComponent.fontSize : (tmpInputField != null ? (int)tmpInputField.pointSize : (promptInputField != null ? (int)promptInputField.fontSize : (m_InputText != null? (int)m_InputText.GetGraphicFontSize() : 0)));
             }
             set
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -307,6 +417,8 @@ namespace MaterialUI
                     tmpInputField.pointSize = value;
                 else if (promptInputField != null)
                     promptInputField.fontSize = value;
+                else if (m_InputText != null)
+                    m_InputText.SetGraphicFontSize(value);
             }
         }
 
@@ -315,15 +427,16 @@ namespace MaterialUI
         {
             get
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null && unityInputField.textComponent != null ? (UnityEngine.Object)unityInputField.textComponent.font : (tmpInputField != null ? tmpInputField.fontAsset : (promptInputField != null ? promptInputField.fontAsset : null));
+                return unityInputField != null && unityInputField.textComponent != null ? (UnityEngine.Object)unityInputField.textComponent.font : (tmpInputField != null ? tmpInputField.fontAsset : (promptInputField != null ? promptInputField.fontAsset : 
+                    (m_InputText is TMP_Text? (m_InputText as TMP_Text).font : (m_InputText is Text? (UnityEngine.Object)(m_InputText as Text).font : null))));
             }
             set
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -333,6 +446,10 @@ namespace MaterialUI
                     tmpInputField.fontAsset = value as TMP_FontAsset;
                 else if (promptInputField != null)
                     promptInputField.fontAsset = value;
+                else if (m_InputText is TMP_Text)
+                    (m_InputText as TMP_Text).font = value as TMP_FontAsset;
+                else if (m_InputText is Text)
+                    (m_InputText as Text).font = value as Font;
             }
         }
 
@@ -341,7 +458,7 @@ namespace MaterialUI
         {
             get
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -349,7 +466,7 @@ namespace MaterialUI
             }
             set
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -366,7 +483,7 @@ namespace MaterialUI
         {
             get
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -378,15 +495,24 @@ namespace MaterialUI
         {
             get
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.text : (tmpInputField != null ? tmpInputField.text : (promptInputField != null ? promptInputField.text : ""));
+                System.Func<string> getGraphicText = () => {
+                    var graphicText = m_InputText != null ? m_InputText.GetGraphicText() : "";
+                    if (!string.IsNullOrEmpty(graphicText))
+                        graphicText = graphicText.EndsWith("\u200B") ? graphicText.Substring(0, graphicText.Length - 1) : graphicText;
+                    else
+                        graphicText = "";
+
+                    return graphicText;
+                };
+                return unityInputField != null ? unityInputField.text : (tmpInputField != null ? tmpInputField.text : (promptInputField != null ? promptInputField.text : getGraphicText()));
             }
             set
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -396,6 +522,8 @@ namespace MaterialUI
                     tmpInputField.text = value;
                 else if (promptInputField != null)
                     promptInputField.text = value;
+                else if (m_InputText != null)
+                    m_InputText.SetGraphicText(value);
             }
         }
 
@@ -403,7 +531,7 @@ namespace MaterialUI
         {
             get
             {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -426,15 +554,16 @@ namespace MaterialUI
 
         public string hintText
         {
-            get { return m_HintText; }
+            get { return hintTextObject != null? hintTextObject.GetGraphicText() : ""; }
             set
             {
-                m_HintText = value;
-                hintTextObject.SetGraphicText(value);
+                //m_HintText = value;
+                if(hintTextObject != null)
+                    hintTextObject.SetGraphicText(value);
 
-#if UNITY_EDITOR
-                m_LastHintText = value;
-#endif
+//#if UNITY_EDITOR
+//                m_LastHintText = value;
+//#endif
             }
         }
 
@@ -498,7 +627,7 @@ namespace MaterialUI
         public int characterLimit
         {
             get {
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -523,7 +652,7 @@ namespace MaterialUI
                 if (m_CharacterLimit == value)
                     return;
 
-                var unityInputField = m_InputField as InputField;
+                var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
@@ -549,6 +678,16 @@ namespace MaterialUI
             set
             {
                 m_FloatingHintFontSize = value;
+                SetLayoutDirty();
+            }
+        }
+
+        public bool fitWidthToContent
+        {
+            get { return m_FitWidthToContent; }
+            set
+            {
+                m_FitWidthToContent = value;
                 SetLayoutDirty();
             }
         }
@@ -615,6 +754,28 @@ namespace MaterialUI
             }
         }
 
+        public int caretPosition
+        {
+            get
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+
+                return unityInputField != null? unityInputField.caretPosition : (tmpInputField != null? tmpInputField.caretPosition : 0);
+
+            }
+            set
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+
+                if (unityInputField != null)
+                    unityInputField.caretPosition = value;
+                else if (tmpInputField != null)
+                    tmpInputField.caretPosition = value;
+            }
+        }
+
         public Selectable inputField
         {
             get
@@ -635,7 +796,7 @@ namespace MaterialUI
             {
                 if (m_InputTextTransform == null)
                 {
-                    if (m_InputField != null)
+                    if (inputField != null)
                     {
                         var unityInputField = m_InputField as InputField;
                         var tmpInputField = m_InputField as TMP_InputField;
@@ -654,6 +815,9 @@ namespace MaterialUI
                             m_InputTextTransform = promptInputField.textComponent.GetComponent<RectTransform>();
                         }
                     }
+                    else if (m_InputText != null)
+                        m_InputTextTransform = m_InputText.GetComponent<RectTransform>();
+
                 }
 
                 return m_InputTextTransform;
@@ -752,7 +916,7 @@ namespace MaterialUI
                     if (inputTextTransform != null)
                     {
                         m_InputText = inputTextTransform.GetComponentInChildren<Graphic>();
-                        if (m_InputField != null)
+                        if (inputField != null)
                         {
                             var tmpInputField = m_InputField as TMP_InputField;
                             if (tmpInputField != null && tmpInputField.textComponent != m_InputText)
@@ -1098,6 +1262,9 @@ namespace MaterialUI
             get { return m_CustomTextValidator; }
             set
             {
+                if (m_CustomTextValidator != null)
+                    m_CustomTextValidator.Dispose();
+
                 m_CustomTextValidator = value;
 
                 if (m_CustomTextValidator != null)
@@ -1107,13 +1274,28 @@ namespace MaterialUI
             }
         }
 
+        public RectOffset padding
+        {
+            get
+            {
+                return m_Padding;
+            }
+            set
+            {
+                if (m_Padding == value)
+                    return;
+                m_Padding = value;
+                SetLayoutDirty();
+            }
+        }
+
         #endregion
 
         #region Unity Functions
 
         protected override void Awake()
         {
-            if (inputField != null)
+            if(inputField != null || inputText != null)
                 RegisterEvents();
             base.Awake();
         }
@@ -1121,23 +1303,27 @@ namespace MaterialUI
         protected override void OnEnable()
         {
             base.OnEnable();
-            OnTextChanged();
-            CheckHintText();
-            SetLayoutDirty();
+            if (started)
+            {
+                OnTextChangedInternal(text);
+                //CheckHintText();
+                SetLayoutDirty();
+            }
         }
 
+        protected bool started = false;
         protected override void Start()
         {
+            started = true;
+            base.Start();
             RefreshVisualStyles();
-            OnTextChanged();
-            CheckHintText();
+            OnTextChangedInternal(text);
             SetLayoutDirty();
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            CheckHintText();
             SetLayoutDirty();
         }
 
@@ -1151,14 +1337,15 @@ namespace MaterialUI
         {
             base.OnRectTransformDimensionsChange();
             SetLayoutDirty();
+            if (m_HasBeenSelected)
+                AnimateActiveLineSelect(true);
         }
 
         protected override void OnDidApplyAnimationProperties()
         {
             base.OnDidApplyAnimationProperties();
             RefreshVisualStyles();
-            OnTextChanged();
-            CheckHintText();
+            OnTextChangedInternal(text);
             SetLayoutDirty();
         }
 
@@ -1166,24 +1353,18 @@ namespace MaterialUI
         protected override void OnValidateDelayed()
         {
             base.OnValidateDelayed();
-            OnTextChanged();
-            SetLayoutDirty();
-
-            if (hintTextObject)
+            if (!Application.isPlaying)
             {
-                if (m_HintText != hintTextObject.GetGraphicText())
-                {
-                    if (m_LastHintText != hintText)
-                    {
-                        hintTextObject.SetGraphicText(m_HintText);
-                        m_LastHintText = m_HintText;
-                    }
-                }
+                OnTextChangedInternal(text);
+                SetLayoutDirty();
             }
 
-            canvasGroup.alpha = inputField.interactable ? 1 : 0.5f;
-            canvasGroup.interactable = inputField.interactable;
-            canvasGroup.blocksRaycasts = inputField.interactable;
+            if (inputField != null)
+            {
+                canvasGroup.alpha = inputField == null || inputField.interactable ? 1 : 0.5f;
+                canvasGroup.interactable = inputField.interactable;
+                canvasGroup.blocksRaycasts = inputField.interactable;
+            }
         }
 #endif
 
@@ -1207,7 +1388,7 @@ namespace MaterialUI
 
                 if (changed)
                     RefreshVisualStyles();
-                CheckHintText();
+                //CheckHintText();
 
                 if (m_AnimateHintText)
                 {
@@ -1229,6 +1410,7 @@ namespace MaterialUI
 
         public void OnDeselect(BaseEventData eventData)
         {
+            m_HasBeenSelected = false;
             m_LastFocussedState = false;
             AnimateActiveLineDeselect();
             AnimateHintTextDeselect();
@@ -1241,14 +1423,140 @@ namespace MaterialUI
 
         protected virtual void HandleOnTextChanged(string value)
         {
-            OnTextChanged();
+            OnTextChangedInternal(value, false);
+        }
+
+
+        protected virtual void HandleOnGraphicTextChanged()
+        {
+            OnTextChangedInternal(text, true);
+        }
+
+        protected virtual void HandleOnGraphicEndEdit()
+        {
+            OnEndEditInternal(text);
+        }
+
+        protected virtual void HandleOnEndEdit(string value)
+        {
+            OnEndEditInternal(value);
+        }
+
+        protected virtual void OnEndEditInternal(string value)
+        {
+            if (onEndEdit != null)
+                onEndEdit.Invoke(value);
+        }
+
+        protected virtual void OnTextChangedInternal(string value)
+        {
+            var unityInputField = m_InputField as InputField;
+            var tmpInputField = m_InputField as TMP_InputField;
+            var promptInputField = m_InputField as InputPromptField;
+
+            OnTextChangedInternal(value, unityInputField == null && tmpInputField == null && promptInputField == null && m_InputText != null);
+        }
+
+        protected virtual void OnTextChangedInternal(string value, bool canFixText)
+        {
+            if (onValueChanged != null)
+                onValueChanged.Invoke(value);
+
+            //Prevent Empty Text (fix Layout Bug)
+            if (canFixText && string.IsNullOrEmpty(value))
+            {
+                UnregisterEvents();
+                m_InputText.SetGraphicText("\u200B");
+                RegisterEvents();
+            }
+
+            SetLayoutDirty();
+            UpdateCounter();
+            ValidateText();
+            if (!m_FloatingHint)
+                SetHintLayoutToFloatingValue();
         }
 
         #endregion
 
         #region Other Functions
 
-        public void RegisterEvents()
+        public void SetTextWithoutNotify(string text)
+        {
+            text = string.IsNullOrEmpty(text) ? string.Empty : text;
+            var unityInputField = m_InputField as InputField;
+            var tmpInputField = m_InputField as TMP_InputField;
+            var promptInputField = m_InputField as InputPromptField;
+
+            if (unityInputField != null)
+                unityInputField.SetTextWithoutNotify(text);
+            else if (tmpInputField != null)
+                tmpInputField.SetTextWithoutNotify(text);
+            else if (promptInputField != null)
+                promptInputField.SetTextWithoutNotify(text);
+        }
+
+        public virtual void ForceUpdateAll()
+        {
+            SetLayoutDirty();
+            ForceLabelUpdate();
+            if (inputField != null)
+            {
+                var method = inputField.GetType().GetMethod("RecreateKeyboard", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                if (method != null)
+                {
+                    var parameters = method.GetParameters();
+                    if (parameters == null || parameters.Length == 0)
+                        method.Invoke(inputField, null);
+                }
+            }
+        }
+
+        public virtual void ForceLabelUpdate()
+        {
+            var unityInputField = inputField as InputField;
+            var tmpInputField = m_InputField as TMP_InputField;
+            var promptInputField = m_InputField as InputPromptField;
+
+            if (unityInputField != null)
+                unityInputField.ForceLabelUpdate();
+            else if (tmpInputField != null)
+                tmpInputField.ForceLabelUpdate();
+            else if (promptInputField != null)
+                promptInputField.ForceLabelUpdate();
+        }
+
+        public virtual void ActivateInputField()
+        {
+            if (inputField != null)
+            {
+                var method = inputField.GetType().GetMethod("ActivateInputField", System.Reflection.BindingFlags.Instance| System.Reflection.BindingFlags.Public);
+                if (method != null)
+                {
+                    var parameters = method.GetParameters();
+                    if (parameters == null || parameters.Length == 0)
+                        method.Invoke(inputField, null);
+                }
+            }
+        }
+
+        public virtual void DeactivateInputField()
+        {
+            if (inputField != null)
+            {
+                var method = inputField.GetType().GetMethod("DeactivateInputField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                if (method != null)
+                {
+                    var parameters = method.GetParameters();
+                    if (parameters == null || parameters.Length == 0)
+                        method.Invoke(inputField, null);
+                    else if (inputField is TMP_InputField)
+                        (inputField as TMP_InputField).DeactivateInputField();
+                }
+            }
+        }
+
+        protected virtual void RegisterEvents()
         {
             UnregisterEvents();
 
@@ -1258,13 +1566,24 @@ namespace MaterialUI
 
             if (unityInputField != null)
                 unityInputField.onValueChanged.AddListener(HandleOnTextChanged);
-            if (tmpInputField != null)
+            else if (tmpInputField != null)
                 tmpInputField.onValueChanged.AddListener(HandleOnTextChanged);
-            if (promptInputField != null)
+            else if (promptInputField != null)
                 promptInputField.onValueChanged.AddListener(HandleOnTextChanged);
+            else if (m_InputText != null)
+                m_InputText.RegisterDirtyVerticesCallback(HandleOnGraphicTextChanged);
+
+            if (unityInputField != null)
+                unityInputField.onEndEdit.AddListener(HandleOnEndEdit);
+            else if (tmpInputField != null)
+                tmpInputField.onEndEdit.AddListener(HandleOnEndEdit);
+            else if (promptInputField != null)
+                promptInputField.onEndEdit.AddListener(HandleOnEndEdit);
+            else if (m_InputText != null)
+                m_InputText.RegisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
         }
 
-        public void UnregisterEvents()
+        protected virtual void UnregisterEvents()
         {
             var unityInputField = m_InputField as InputField;
             var tmpInputField = m_InputField as TMP_InputField;
@@ -1272,10 +1591,21 @@ namespace MaterialUI
 
             if (unityInputField != null)
                 unityInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
-            if (tmpInputField != null)
+            else if (tmpInputField != null)
                 tmpInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
-            if (promptInputField != null)
+            else if (promptInputField != null)
                 promptInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
+            else if (m_InputText != null)
+                m_InputText.UnregisterDirtyVerticesCallback(HandleOnGraphicTextChanged);
+
+            if (unityInputField != null)
+                unityInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
+            else if (tmpInputField != null)
+                tmpInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
+            else if (promptInputField != null)
+                promptInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
+            else if (m_InputText != null)
+                m_InputText.UnregisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
         }
 
         public void ClearText()
@@ -1284,59 +1614,47 @@ namespace MaterialUI
             var tmpInputField = m_InputField as TMP_InputField;
             var promptInputField = m_InputField as InputPromptField;
 
+            bool requireCallback = true;
             if (unityInputField != null)
                 unityInputField.text = "";
-            if (tmpInputField != null)
+            else if (tmpInputField != null)
                 tmpInputField.text = "";
-            if (promptInputField != null)
+            else if (promptInputField != null)
                 promptInputField.text = "";
-
-            OnTextChanged();
-            SetLayoutDirty();
-        }
-
-        public void OnTextChanged()
-        {
-            SetLayoutDirty();
-            UpdateCounter();
-            ValidateText();
-            if (!m_FloatingHint)
-                SetHintLayoutToFloatingValue();
-        }
-
-        private void CheckHintText()
-        {
-            if (hintTextObject == null) return;
-
-            if (m_HintText != hintTextObject.GetGraphicText())
+            else if (m_InputText != null)
             {
-                m_HintText = hintTextObject.GetGraphicText();
-
-#if UNITY_EDITOR
-                m_LastHintText = m_HintText;
-#endif
+                requireCallback = false;
+                m_InputText.SetGraphicText("");
             }
+
+            if(requireCallback)
+                OnTextChangedInternal("", false);
+            SetLayoutDirty();
         }
 
         private void ValidateText()
         {
+            ITextValidator validator = m_TextValidator != null? m_TextValidator.GetComponent<ITextValidator>() : null;
+
+            if (m_CustomTextValidator != null)
+            {
+                if (validator != null && validator != customTextValidator)
+                    validator.Dispose();
+                validator = customTextValidator;
+            }
+
+            if (validator != null && !m_HasValidation)
+                validator.Dispose();
+
             if (validationText == null) return;
 
             if (!m_ValidateOnStart && !m_HasBeenSelected) return;
 
             m_ValidationText.color = IsSelected() ? m_ValidationActiveColor : m_ValidationInactiveColor;
 
-            ITextValidator validator = null;
-            if (m_TextValidator != null && m_TextValidator.GetComponent<ITextValidator>() != null)
+            if (m_TextValidator != null && validator != null)
             {
-                validator = m_TextValidator.GetComponent<ITextValidator>();
                 validator.Init(this);
-            }
-
-            if (m_CustomTextValidator != null)
-            {
-                validator = customTextValidator;
-                m_HasValidation = true;
             }
 
             if (validationCanvasGroup != null)
@@ -1369,7 +1687,6 @@ namespace MaterialUI
                                 validationCanvasGroup.alpha, 1f,
                                 m_AnimationDuration / 2,
                                 tweenType: Tween.TweenType.Linear);
-                            return;
                         }
                     }
                     else
@@ -1389,7 +1706,6 @@ namespace MaterialUI
                                 },
                                 false,
                                 Tween.TweenType.Linear);
-                            return;
                         }
                     }
                 }
@@ -1399,7 +1715,9 @@ namespace MaterialUI
                     validationCanvasGroup.interactable = false;
                     validationCanvasGroup.blocksRaycasts = false;
                 }
-            } 
+            }
+            if (m_HasValidation && m_ValidationText != null && string.IsNullOrEmpty(m_ValidationText.GetGraphicText()))
+                m_ValidationText.SetGraphicText("\u200B");
         }
 
         private void UpdateCounter()
@@ -1596,31 +1914,16 @@ namespace MaterialUI
                    m_CurrentSelectionState == ColorSelectionState.EnabledSelected;
         }
 
-        private float GetTextHeight()
+        private float GetTextPreferredHeight()
         {
-            /*string layoutText = text;
-
-            if (!multiLine)
-            {
-                generationSize = new Vector2(float.MaxValue, float.MaxValue);
-                layoutText = layoutText.Replace("\n", "");
-            }
-            else
-            {
-                generationSize = new Vector2(inputText.rectTransform.rect.width, float.MaxValue);
-            }
-
-            TextGenerator textGenerator = inputText.GetGraphicTextGeneratorForLayout();
-            TextGenerationSettings textGenerationSettings = inputText.GetGraphicGenerationSettings(generationSize);
-
-            float fontAssetSize = inputText.GetGraphicFontAssetFontSize();
-            float fontScale = fontAssetSize == 0? ((float)inputText.GetGraphicFontSize() / fontAssetSize) : 1.0f; //inputText.font.fontSize > 0 && !inputText.font.dynamic? ((float)inputText.GetGraphicFontSize() / inputText.GetGraphicFontAssetFontSize()) : 1.0f;
-
-            textGenerationSettings.scaleFactor = 1f;
-            if (inputText.font.dynamic)
-                textGenerationSettings.fontSize = inputText.fontSize;*/
-
             return m_InputText != null && !HasIgnoreLayout(m_InputText) ? LayoutUtility.GetPreferredHeight(m_InputText.rectTransform) :  0; // textGenerator.GetPreferredHeight(layoutText, textGenerationSettings) * fontScale;
+        }
+
+        private float GetTextPreferredWidth()
+        {
+            var hintWidth = m_HintTextObject != null && !HasIgnoreLayout(m_HintTextObject) ? LayoutUtility.GetPreferredWidth(m_HintTextObject.rectTransform) : 0;
+            var textWidth = m_InputText != null && !HasIgnoreLayout(m_InputText) ? LayoutUtility.GetPreferredWidth(m_InputText.rectTransform) : 0;
+            return Mathf.Max(textWidth, hintWidth);
         }
 
         private float GetSmallHintTextHeight()
@@ -1720,9 +2023,16 @@ namespace MaterialUI
                 m_ActiveLineTransform.anchoredPosition = new Vector2(Mathf.Clamp(m_ActiveLineTransform.anchoredPosition.x, -lineLength / 2, lineLength / 2), 0);
                 activeLineCanvasGroup.alpha = 1;
 
-                m_ActiveLinePosTweener = TweenManager.TweenFloat(f => m_ActiveLineTransform.anchoredPosition = new Vector2(f, m_ActiveLineTransform.anchoredPosition.y), m_ActiveLineTransform.anchoredPosition.x, 0f, m_AnimationDuration);
-
-                m_ActiveLineSizeTweener = TweenManager.TweenFloat(f => m_ActiveLineTransform.sizeDelta = new Vector2(f, m_ActiveLineTransform.sizeDelta.y), m_ActiveLineTransform.sizeDelta.x, m_LineTransform.GetProperSize().x, m_AnimationDuration);
+                m_ActiveLinePosTweener = TweenManager.TweenFloat(f =>
+                {
+                    if(m_ActiveLineTransform != null)
+                        m_ActiveLineTransform.anchoredPosition = new Vector2(f, m_ActiveLineTransform.anchoredPosition.y);
+                }, m_ActiveLineTransform.anchoredPosition.x, 0f, m_AnimationDuration);
+                m_ActiveLineSizeTweener = TweenManager.TweenFloat(f => 
+                {
+                    if(m_ActiveLineTransform != null)
+                        m_ActiveLineTransform.sizeDelta = new Vector2(f, m_ActiveLineTransform.sizeDelta.y);
+                }, m_ActiveLineTransform.sizeDelta.x, m_LineTransform.GetProperSize().x, m_AnimationDuration);
             }
         }
 
@@ -1759,7 +2069,7 @@ namespace MaterialUI
 
         protected virtual bool IsCounterInsideOutline()
         {
-            var isInsideOutline = m_BackgroundSizeMode != BackgroundSizeMode.TextOnly && m_BackgroundSizeMode == BackgroundSizeMode.TextAndHint;
+            var isInsideOutline = m_BackgroundLayoutMode != BackgroundLayoutMode.TextOnly && m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndCounter;
             if (isInsideOutline)
             {
                 //check if background or outline is valid
@@ -1771,7 +2081,7 @@ namespace MaterialUI
 
         protected virtual bool IsHintInsideOutline()
         {
-            var isInsideOutline = m_FloatingHint && m_BackgroundSizeMode != BackgroundSizeMode.TextOnly && m_BackgroundSizeMode == BackgroundSizeMode.TextAndCounter;
+            var isInsideOutline = m_FloatingHint && m_BackgroundLayoutMode != BackgroundLayoutMode.TextOnly && m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndHint;
             if (isInsideOutline)
             {
                 //check if background or outline is valid
@@ -1795,30 +2105,36 @@ namespace MaterialUI
                 var hintTopPosition = isInsideOutline ? m_Padding.top : 4;
                 m_HintTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_BottomSectionHeight);
                 m_HintTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, -Tween.Linear(m_TopSectionHeight, hintTopPosition, hintTextFloatingValue, 1));
-                hintTextObject.SetGraphicFontSize(Mathf.RoundToInt(Tween.Linear(inputText.GetGraphicFontSize(), m_FloatingHintFontSize, hintTextFloatingValue, 1)));
+                if(hintTextObject != null)
+                    hintTextObject.SetGraphicFontSize(Mathf.RoundToInt(Tween.Linear(fontSize, m_FloatingHintFontSize, hintTextFloatingValue, 1)));
 
-                float realFontSize = Tween.Linear(inputText.GetGraphicFontSize(), m_FloatingHintFontSize, hintTextFloatingValue, 1);
+                float realFontSize = Tween.Linear(fontSize, m_FloatingHintFontSize, hintTextFloatingValue, 1);
 
-                float hintFontSize = hintTextObject.GetGraphicFontSize();
+                float hintFontSize = hintTextObject != null? hintTextObject.GetGraphicFontSize() : 0;
                 float scaleFactor = hintFontSize == 0? 0 : realFontSize / hintFontSize;
 
                 m_HintTextTransform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                hintTextCanvasGroup.alpha = 1;
+                if(hintTextCanvasGroup != null)
+                    hintTextCanvasGroup.alpha = 1;
             }
             else
             {
                 //m_HintTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_BottomSectionHeight);
                 //m_HintTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, -m_TopSectionHeight);
-                hintTextObject.SetGraphicFontSize(inputText.GetGraphicFontSize());
+                if (hintTextObject != null)
+                    hintTextObject.SetGraphicFontSize(fontSize);
                 m_HintTextTransform.localScale = Vector3.one;
 
-                m_HintTextTransform.pivot = inputTextTransform.pivot;
-                m_HintTextTransform.anchorMin = inputTextTransform.anchorMin;
-                m_HintTextTransform.anchorMax = inputTextTransform.anchorMax;
-                m_HintTextTransform.anchoredPosition = inputTextTransform.anchoredPosition;
-                m_HintTextTransform.sizeDelta = inputTextTransform.sizeDelta;
-
-                hintTextCanvasGroup.alpha = m_InputField != null && text.Length > 0 ? 0 : 1;
+                if (inputTextTransform != null)
+                {
+                    m_HintTextTransform.pivot = inputTextTransform.pivot;
+                    m_HintTextTransform.anchorMin = inputTextTransform.anchorMin;
+                    m_HintTextTransform.anchorMax = inputTextTransform.anchorMax;
+                    m_HintTextTransform.anchoredPosition = inputTextTransform.anchoredPosition;
+                    m_HintTextTransform.sizeDelta = inputTextTransform.sizeDelta;
+                }
+                if(hintTextCanvasGroup != null)
+                    hintTextCanvasGroup.alpha = inputField != null && text.Length > 0 ? 0 : 1;
             }
         }
 
@@ -1828,22 +2144,22 @@ namespace MaterialUI
             {
                 Vector2 offsetMin = Vector2.zero;
                 Vector2 offsetMax = Vector2.zero;
-                if (m_BackgroundSizeMode == BackgroundSizeMode.TextOnly)
+                if (m_BackgroundLayoutMode == BackgroundLayoutMode.TextOnly)
                 {
                     offsetMin = new Vector2(0, (m_BottomSectionHeight - m_Padding.bottom));
                     offsetMax = new Vector2(0, -(m_TopSectionHeight - m_Padding.top));
                 }
-                else if (m_BackgroundSizeMode == BackgroundSizeMode.TextAndCounter)
+                else if (m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndCounter)
                 {
                     offsetMin = new Vector2(0, 0);
                     offsetMax = new Vector2(0, -(m_TopSectionHeight - m_Padding.top));
                 }
-                else if (m_BackgroundSizeMode == BackgroundSizeMode.TextAndHint)
+                else if (m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndHint)
                 {
                     offsetMin = new Vector2(0, (m_BottomSectionHeight - m_Padding.bottom));
                     offsetMax = new Vector2(0, 0);
                 }
-                else if (m_BackgroundSizeMode == BackgroundSizeMode.All)
+                else if (m_BackgroundLayoutMode == BackgroundLayoutMode.All)
                 {
                     offsetMin = Vector2.zero;
                     offsetMax = Vector2.zero;
@@ -1874,7 +2190,7 @@ namespace MaterialUI
                 if (m_ValidationTextTransform != null || m_CounterTextTransform != null)
                 {
                     var counterIsInsideBG = IsCounterInsideOutline();
-                    var defaultOffset = 0;
+                    var defaultOffset = 0;//(m_LineLayoutMode == LineLayoutMode.IgnoreContentAndPadding ? 0 : m_Padding.bottom);
                     if (m_ValidationTextTransform != null && validationText != null && !HasIgnoreLayout(m_ValidationTextTransform))
                     {
                         m_ValidationTextTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, counterIsInsideBG ? m_Padding.bottom : defaultOffset, m_ValidationText != null ? LayoutUtility.GetPreferredHeight(m_ValidationText.rectTransform) : 0);
@@ -1890,14 +2206,14 @@ namespace MaterialUI
             {
                 if (m_ValidationTextTransform != null && !HasIgnoreLayout(m_ValidationTextTransform))
                 {
-                    m_ValidationTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_ValidationTextTransform.offsetMin.y);
-                    m_ValidationTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, m_ValidationTextTransform.offsetMax.y);
+                    m_ValidationTextTransform.offsetMin = new Vector2(m_LineLayoutMode == LineLayoutMode.Default ? m_LeftSectionWidth : m_Padding.left, m_ValidationTextTransform.offsetMin.y);
+                    m_ValidationTextTransform.offsetMax = new Vector2(m_LineLayoutMode == LineLayoutMode.Default ? -m_RightSectionWidth : -m_Padding.right, m_ValidationTextTransform.offsetMax.y);
                 }
 
                 if (m_CounterTextTransform != null && !HasIgnoreLayout(m_CounterTextTransform))
                 {
-                    m_CounterTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_CounterTextTransform.offsetMin.y);
-                    m_CounterTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, m_CounterTextTransform.offsetMax.y);
+                    m_CounterTextTransform.offsetMin = new Vector2(m_LineLayoutMode == LineLayoutMode.Default ? m_LeftSectionWidth : m_Padding.left, m_CounterTextTransform.offsetMin.y);
+                    m_CounterTextTransform.offsetMax = new Vector2(m_LineLayoutMode == LineLayoutMode.Default ? -m_RightSectionWidth :-m_Padding.right, m_CounterTextTransform.offsetMax.y);
                 }
             }
         }
@@ -1911,23 +2227,6 @@ namespace MaterialUI
             }
             return false;
         }
-
-        /*protected float GetPreferredHeight(Component p_component)
-        {
-            if (p_component != null)
-            {
-                var v_layout = p_component.GetComponent<LayoutElement>();
-                if(v_layout != null && v_layout.preferredHeight >= 0)
-                    return v_layout.preferredHeight;
-                else
-                {
-                    ILayoutElement v_layoutElement = p_component as ILayoutElement;
-                    if (v_layoutElement != null)
-                        return v_layoutElement.preferredHeight;
-                }
-            }
-            return 0;
-        }*/
 
         #endregion
 
@@ -1954,8 +2253,8 @@ namespace MaterialUI
 
             if (m_LineTransform != null && !HasIgnoreLayout(m_LineTransform))
             {
-                m_LineTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_LineTransform.offsetMin.y);
-                m_LineTransform.offsetMax = new Vector2(-m_RightSectionWidth, m_LineTransform.offsetMax.y);
+                m_LineTransform.offsetMin = new Vector2(m_LineLayoutMode == LineLayoutMode.Default ? m_LeftSectionWidth : (m_LineLayoutMode == LineLayoutMode.IgnoreContent ? m_Padding.left : 0), m_LineTransform.offsetMin.y);
+                m_LineTransform.offsetMax = new Vector2(m_LineLayoutMode == LineLayoutMode.Default ? -m_RightSectionWidth : (m_LineLayoutMode == LineLayoutMode.IgnoreContent ? -m_Padding.right : 0), m_LineTransform.offsetMax.y);
             }
 
             /*if (caretTransform != null)
@@ -2003,10 +2302,10 @@ namespace MaterialUI
 
                 m_RightContentTransform.anchoredPosition = new Vector2(m_RightContentOffset.x - m_Padding.right, (inputTextTransform.offsetMax.y - (m_InputText.GetGraphicFontSize() / 2) - 2) + m_RightContentOffset.y /*+ (m_Padding.bottom)*/);
             }
-
+            
             if (m_LineTransform != null && !HasIgnoreLayout(m_LineTransform))
             {
-                m_LineTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, m_BottomSectionHeight, 1);
+                m_LineTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, m_BottomSectionHeight - m_Padding.bottom, 1);
             }
 
             if (inputField is InputField)
@@ -2032,8 +2331,6 @@ namespace MaterialUI
 
         public void CalculateLayoutInputHorizontal()
         {
-            m_LayoutSize.x = m_ManualPreferredWidth ? m_ManualSize.x : -1;
-
             m_LeftSectionWidth = 0;
             m_RightSectionWidth = 0;
 
@@ -2056,6 +2353,17 @@ namespace MaterialUI
             }
 
             SumPaddingHorizontal();
+
+            if (m_FitWidthToContent)
+            {
+                m_LayoutSize.x = GetTextPreferredWidth();
+                m_LayoutSize.x += m_LeftSectionWidth;
+                m_LayoutSize.x += m_RightSectionWidth;
+            }
+            else
+            {
+                m_LayoutSize.x = m_ManualPreferredWidth ? m_ManualSize.x : -1;
+            }
         }
 
         public void CalculateLayoutInputVertical()
@@ -2094,7 +2402,7 @@ namespace MaterialUI
 
             if (m_FitHeightToContent)
             {
-                m_LayoutSize.y = GetTextHeight() + 4;
+                m_LayoutSize.y = GetTextPreferredHeight() + 4;
                 m_LayoutSize.y += m_TopSectionHeight;
                 m_LayoutSize.y += m_BottomSectionHeight;
             }

@@ -17,7 +17,7 @@ namespace MaterialUI
 #if UNITY_EDITOR
     [InitializeOnLoad]
 #endif
-    //[ExecuteInEditMode]
+    [ExecuteInEditMode]
     [AddComponentMenu("MaterialUI/Screen View", 100)]
     public class ScreenView : UIBehaviour
     {
@@ -63,7 +63,8 @@ namespace MaterialUI
 
         private GameObject m_OldSelectionObjects;
 #endif
-
+        [SerializeField]
+        Transform m_Content = null;
         [SerializeField]
         private List<MaterialScreen> m_MaterialScreens = new List<MaterialScreen>();
         [SerializeField]
@@ -183,6 +184,12 @@ namespace MaterialUI
             set { m_ScreensDirty = value; }
         }
 #endif
+
+        public Transform content
+        {
+            get { return m_Content == null && this != null? this.transform : m_Content; }
+            set { m_Content = value; }
+        }
 
         public List<MaterialScreen> materialScreen
         {
@@ -493,18 +500,6 @@ namespace MaterialUI
             set { m_TransitionType = value; }
         }
 
-        public Canvas canvas
-        {
-            get { return m_Canvas; }
-            set { m_Canvas = value; }
-        }
-
-        public GraphicRaycaster graphicRaycaster
-        {
-            get { return m_GraphicRaycaster; }
-            set { m_GraphicRaycaster = value; }
-        }
-
         public OnScreenTransitionUnityEvent onScreenEndTransition
         {
             get { return m_OnScreenEndTransition; }
@@ -523,20 +518,14 @@ namespace MaterialUI
 
         protected override void OnEnable()
         {
-            RemoveInvalidScreens();
             base.OnEnable();
+            if (Application.isPlaying)
+            {
+                RemoveInvalidScreens();
+            }
 #if UNITY_EDITOR
-            m_GraphicRaycaster = GetComponent<GraphicRaycaster>();
-            if (m_GraphicRaycaster != null)
-            {
-                DestroyImmediate(m_GraphicRaycaster);
-            }
-
-            m_Canvas = GetComponent<Canvas>();
-            if (m_Canvas != null)
-            {
-                DestroyImmediate(m_Canvas);
-            }
+            Selection.selectionChanged -= OnValidate;
+            Selection.selectionChanged += OnValidate;
 #endif
         }
 
@@ -568,6 +557,7 @@ namespace MaterialUI
         {
             base.OnDisable();
 #if UNITY_EDITOR
+            Selection.selectionChanged -= OnValidate;
             CancelInvoke();
 #endif
         }
@@ -585,9 +575,16 @@ namespace MaterialUI
 
         #region ScreenStack Functions
 
-        public virtual bool PushToScreenStack(int screenIndex)
+        public virtual MaterialScreen PushToScreenStack(string screenName)
         {
-            return PushToScreenStack(m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null);
+            var materialScreen = GetScreenWithName(screenName);
+            return PushToScreenStack(materialScreen)? materialScreen : null;
+        }
+
+        public virtual MaterialScreen PushToScreenStack(int screenIndex)
+        {
+            var materialScreen = m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null;
+            return PushToScreenStack(materialScreen)? materialScreen : null;
         }
 
         public virtual bool PushToScreenStack(MaterialScreen screen)
@@ -887,15 +884,6 @@ namespace MaterialUI
             //    m_ScreensTransitioning = 0;
 
                 m_OnScreenEndTransition.InvokeIfNotNull(screenIndex);
-
-                if (m_GraphicRaycaster != null)
-                {
-                    Destroy(m_GraphicRaycaster);
-                }
-                if (m_Canvas != null)
-                {
-                    Destroy(m_Canvas);
-                }
             //}
         }
 
@@ -916,7 +904,7 @@ namespace MaterialUI
 
                 for (int i = 0; i < tempMaterialScreens.Length; i++)
                 {
-                    if (tempMaterialScreens[i].transform.parent == transform)
+                    if (tempMaterialScreens[i].transform.parent == content)
                     {
                         ownedTempScreens.Add(tempMaterialScreens[i]);
                     }

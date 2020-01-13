@@ -14,22 +14,22 @@ namespace MaterialUI
     {
         #region Fields
 
-        string[] _excludingProperties = new string[] { "m_Script", "m_extraStyleProperties", "m_styleGroup", "m_styleDataName", "m_supportStyleGroup", "m_disabledFieldStyles" };
+        protected string[] _excludingProperties = new string[] { "m_Script", "m_extraStyleProperties", "m_styleGroup", "m_styleDataName", "m_supportStyleGroup", "m_disabledFieldStyles" };
 
-        string[] _allValidStyleBehaviours = null;
-        StyleSheetAsset _cachedAsset = null;
+        protected string[] _allValidStyleBehaviours = null;
+        protected StyleSheetAsset _cachedAsset = null;
 
-        SerializedProperty m_script = null;
-        SerializedProperty m_styleGroup = null;
-        SerializedProperty m_supportStyleGroup = null;
-        SerializedProperty m_styleDataName = null;
-        ReorderableList m_extraStylePropertiesList = null;
+        protected SerializedProperty m_script = null;
+        protected SerializedProperty m_styleGroup = null;
+        protected SerializedProperty m_supportStyleGroup = null;
+        protected SerializedProperty m_styleDataName = null;
+        protected ReorderableList m_extraStylePropertiesList = null;
 
-        bool _cachedStyleControledByStyleGroup = false;
+        protected bool _cachedStyleControledByStyleGroup = false;
 
 
-        bool m_ShowStyles = true;
-        private string m_StylesPrefKey;
+        protected bool m_ShowStyles = true;
+        protected private string m_StylesPrefKey;
 
         #endregion
 
@@ -481,6 +481,14 @@ namespace MaterialUI
 
         protected void LayoutStyle_PropertyField(SerializedProperty p_property, GUIContent p_content, bool p_includeChildren, params GUILayoutOption[] options)
         {
+            LayoutStyle_PropertyField(p_property, p_property, p_content, p_includeChildren, options);
+        }
+
+        protected void LayoutStyle_PropertyField(SerializedProperty p_property, SerializedProperty p_mssProperty, GUIContent p_content, bool p_includeChildren, params GUILayoutOption[] options)
+        {
+            if (p_mssProperty == null)
+                p_mssProperty = p_property;
+
             //Cache Style
             if (s_miniLabelStyle == null)
             {
@@ -491,22 +499,22 @@ namespace MaterialUI
             var v_oldShowMixedValue = EditorGUI.showMixedValue;
             var v_oldColor = GUI.color;
 
-            var v_styleMetaType = MaterialUI.Reflection.StyleMetaType.GetOrCreateStyleMetaType(p_property.serializedObject.targetObject.GetType());
+            var v_styleMetaType = MaterialUI.Reflection.StyleMetaType.GetOrCreateStyleMetaType(p_mssProperty.serializedObject.targetObject.GetType());
             using (new EditorGUILayout.HorizontalScope())
             {
-                var v_target = p_property.serializedObject.targetObject as BaseStyleElement;
-                var v_isMSS = v_styleMetaType.DeclaredMembers.ContainsKey(p_property.name) || v_styleMetaType.GetMembers().ContainsKey(p_property.name);
+                var v_target = p_mssProperty.serializedObject.targetObject as BaseStyleElement;
+                var v_isMSS = v_styleMetaType.DeclaredMembers.ContainsKey(p_mssProperty.name) || v_styleMetaType.GetMembers().ContainsKey(p_mssProperty.name);
 
                 //Find if this property has MSS enabled (or with mixed value)
                 var v_styleControledByStyleGroup = StyleControledByStyleGroup();
-                var v_mssEnabled = v_isMSS && v_target.GetFieldStyleActive(p_property.name);
+                var v_mssEnabled = v_isMSS && v_target.GetFieldStyleActive(p_mssProperty.name);
                 var v_showMixedValue = false;
                 if (v_isMSS)
                 {
                     for (int i = 1; i < targets.Length; i++)
                     {
                         var baseStyleTarget = targets[i] as BaseStyleElement;
-                        if (v_mssEnabled != baseStyleTarget.GetFieldStyleActive(p_property.name))
+                        if (v_mssEnabled != baseStyleTarget.GetFieldStyleActive(p_mssProperty.name))
                         {
                             v_showMixedValue = true;
                             v_mssEnabled = true;
@@ -516,7 +524,7 @@ namespace MaterialUI
                 }
                 
                 //Draw Original Field
-                GUI.enabled = !v_styleControledByStyleGroup || p_property.propertyType == SerializedPropertyType.ObjectReference || !v_mssEnabled;
+                GUI.enabled = !v_styleControledByStyleGroup || p_mssProperty.propertyType == SerializedPropertyType.ObjectReference || !v_mssEnabled;
                 EditorGUILayout.PropertyField(p_property, p_content, p_includeChildren, options);
 
                 GUI.enabled = v_oldGui;
@@ -533,7 +541,7 @@ namespace MaterialUI
                         for (int i = 0; i < targets.Length; i++)
                         {
                             var baseStyleTarget = targets[i] as BaseStyleElement;
-                            baseStyleTarget.SetFieldStyleActive(p_property.name, v_mssEnabled);
+                            baseStyleTarget.SetFieldStyleActive(p_mssProperty.name, v_mssEnabled);
                         }
                     }
                     GUI.color = v_oldColor;

@@ -1,121 +1,125 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
-
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEditor;
+using UnityEditorInternal;
+using static MaterialUI.MaterialDropdown;
+using static MaterialUI.AssetAdressEditor;
 
 namespace MaterialUI
 {
-    [CustomEditor(typeof(MaterialDropdown))]
-	public class MaterialDropdownEditor : MaterialBaseEditor
+    [CustomPropertyDrawer(typeof(DialogRadioAddress), true)]
+    public class DialogRadioAddressDrawer : GenericAssetAddressDrawer<DialogRadioList>
     {
-        private SerializedProperty m_VerticalPivotType;
-        private SerializedProperty m_HorizontalPivotType;
-        private SerializedProperty m_ExpandStartType;
-        private SerializedProperty m_IgnoreInputAfterShowTimer;
-        private SerializedProperty m_MaxHeight;
-        private SerializedProperty m_CapitalizeButtonText;
-		private SerializedProperty m_CurrentlySelected;
-		private SerializedProperty m_HighlightCurrentlySelected;
-		private SerializedProperty m_UpdateHeader;
-        private SerializedProperty m_AnimationDuration;
-        private SerializedProperty m_MinDistanceFromEdge;
-        private SerializedProperty m_PanelColor;
-        private SerializedProperty m_ItemTextColor;
-        private SerializedProperty m_ItemIconColor;
-        private SerializedProperty m_ItemRippleData;
-        private SerializedProperty m_BaseTransform;
-        private SerializedProperty m_BaseSelectable;
-        private SerializedProperty m_ButtonTextContent;
-        private SerializedProperty m_ButtonImageContent;
-        private SerializedProperty m_DropdownPanelTemplate;
-        private SerializedProperty m_OnItemSelected;
+    }
 
-		private SerializedProperty m_OptionDataList;
+    [CustomEditor(typeof(MaterialDropdown))]
+    public class MaterialDropdownEditor : BaseStyleElementEditor
+    {
+        private SerializedProperty m_SpinnerMode;
+        private SerializedProperty m_DropdownExpandPivot;
+        private SerializedProperty m_DropdownFramePivot;
+        private SerializedProperty m_DropdownFramePreferredSize;
+        private SerializedProperty m_CustomFramePrefabAddress;
+        private SerializedProperty m_AlwaysDisplayHintOption;
 
-        void OnEnable()
+        private SerializedProperty m_TextComponent;
+        private SerializedProperty m_IconComponent;
+
+        private SerializedProperty m_HintTextComponent;
+        private SerializedProperty m_HintIconComponent;
+
+        private SerializedProperty m_AllowSwitchOff;
+        private SerializedProperty m_SelectedIndex;
+
+        private SerializedProperty OnCancelCallback;
+        private SerializedProperty OnItemSelected;
+
+        SerializedProperty m_OptionDataList = null;
+        SerializedProperty m_HintOption = null;
+
+        protected override void OnEnable()
         {
-			OnBaseEnable();
+            OnBaseEnable();
+            m_OptionDataList = serializedObject.FindProperty("m_OptionDataList");
+            m_HintOption = serializedObject.FindProperty("m_HintOption");
 
-            m_VerticalPivotType = serializedObject.FindProperty("m_VerticalPivotType");
-            m_HorizontalPivotType = serializedObject.FindProperty("m_HorizontalPivotType");
-            m_ExpandStartType = serializedObject.FindProperty("m_ExpandStartType");
-            m_IgnoreInputAfterShowTimer = serializedObject.FindProperty("m_IgnoreInputAfterShowTimer");
-            m_MaxHeight = serializedObject.FindProperty("m_MaxHeight");
-            m_CapitalizeButtonText = serializedObject.FindProperty("m_CapitalizeButtonText");
-			m_CurrentlySelected = serializedObject.FindProperty("m_CurrentlySelected");
-			m_HighlightCurrentlySelected = serializedObject.FindProperty("m_HighlightCurrentlySelected");
-			m_UpdateHeader = serializedObject.FindProperty("m_UpdateHeader");
-            m_AnimationDuration = serializedObject.FindProperty("m_AnimationDuration");
-            m_MinDistanceFromEdge = serializedObject.FindProperty("m_MinDistanceFromEdge");
-            m_PanelColor = serializedObject.FindProperty("m_PanelColor");
-            m_ItemTextColor = serializedObject.FindProperty("m_ItemTextColor");
-            m_ItemIconColor = serializedObject.FindProperty("m_ItemIconColor");
-            m_ItemRippleData = serializedObject.FindProperty("m_ItemRippleData");
-            m_BaseTransform = serializedObject.FindProperty("m_BaseTransform");
-            m_BaseSelectable = serializedObject.FindProperty("m_BaseSelectable");
-            m_ButtonTextContent = serializedObject.FindProperty("m_ButtonTextContent");
-            m_ButtonImageContent = serializedObject.FindProperty("m_ButtonImageContent");
+            m_SpinnerMode = serializedObject.FindProperty("m_SpinnerMode");
+            m_DropdownExpandPivot = serializedObject.FindProperty("m_DropdownExpandPivot");
+            m_DropdownFramePivot = serializedObject.FindProperty("m_DropdownFramePivot");
+            m_DropdownFramePreferredSize = serializedObject.FindProperty("m_DropdownFramePreferredSize");
+            m_CustomFramePrefabAddress = serializedObject.FindProperty("m_CustomFramePrefabAddress");
+            m_AlwaysDisplayHintOption = serializedObject.FindProperty("m_AlwaysDisplayHintOption");
 
-            m_DropdownPanelTemplate = serializedObject.FindProperty("m_DropdownPanelTemplate");
-            m_OnItemSelected = serializedObject.FindProperty("m_OnItemSelected");
+            m_TextComponent = serializedObject.FindProperty("m_TextComponent");
+            m_IconComponent = serializedObject.FindProperty("m_IconComponent");
 
-			m_OptionDataList = serializedObject.FindProperty("m_OptionDataList");
-		}
+            m_HintTextComponent = serializedObject.FindProperty("m_HintTextComponent");
+            m_HintIconComponent = serializedObject.FindProperty("m_HintIconComponent");
 
-		void OnDisable()
-		{
-			OnBaseDisable();
-		}
+            m_SelectedIndex = serializedObject.FindProperty("m_SelectedIndex");
+            m_AllowSwitchOff = serializedObject.FindProperty("m_AllowSwitchOff");
+
+            OnCancelCallback = serializedObject.FindProperty("OnCancelCallback");
+            OnItemSelected = serializedObject.FindProperty("OnItemSelected");
+        }
+
+        protected override void OnDisable()
+        {
+            OnBaseDisable();
+        }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_VerticalPivotType);
-            EditorGUILayout.PropertyField(m_HorizontalPivotType);
-            EditorGUILayout.PropertyField(m_ExpandStartType);
-            EditorGUILayout.PropertyField(m_IgnoreInputAfterShowTimer);
-            EditorGUILayout.PropertyField(m_MaxHeight);
-            EditorGUILayout.PropertyField(m_CapitalizeButtonText);
-            EditorGUILayout.IntSlider(m_CurrentlySelected, -1, m_OptionDataList.FindPropertyRelative("m_Options").arraySize - 1);
-            EditorGUILayout.PropertyField(m_HighlightCurrentlySelected);
-			EditorGUILayout.PropertyField(m_UpdateHeader);
-            EditorGUILayout.PropertyField(m_AnimationDuration);
-            EditorGUILayout.PropertyField(m_MinDistanceFromEdge);
-            EditorGUILayout.PropertyField(m_ItemRippleData, true);
-
-            DrawFoldoutColors(ColorsSection);
-			DrawFoldoutComponents(ComponentsSection);
+            LayoutStyle_PropertyField(m_AllowSwitchOff);
+            EditorGUILayout.IntSlider(m_SelectedIndex, -1, m_OptionDataList.FindPropertyRelative("m_Options").arraySize - 1);
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_CustomFramePrefabAddress, new GUIContent("Custom Address"));
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_SpinnerMode);
+            if (m_SpinnerMode.enumValueIndex != 1)
+            {
+                EditorGUI.indentLevel++;
+                LayoutStyle_PropertyField(m_DropdownExpandPivot);
+                LayoutStyle_PropertyField(m_DropdownFramePivot);
+                LayoutStyle_PropertyField(m_DropdownFramePreferredSize);
+                EditorGUI.indentLevel--;
+            }
+            EditorGUILayout.Space();
+            DrawFoldoutComponents(ComponentsSection);
 
             EditorGUILayout.Space();
-
-            EditorGUILayout.PropertyField(m_DropdownPanelTemplate, true);
+            OptionsSection();
 
             EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(OnItemSelected);
+            EditorGUILayout.PropertyField(OnCancelCallback);
 
-            EditorGUILayout.PropertyField(m_OptionDataList);
-            EditorGUILayout.PropertyField(m_OnItemSelected);
+            EditorGUILayout.Space();
+            DrawStyleGUIFolder();
 
             serializedObject.ApplyModifiedProperties();
         }
 
-		private void ColorsSection()
-		{
-			EditorGUI.indentLevel++;
-			EditorGUILayout.PropertyField(m_PanelColor);
-			EditorGUILayout.PropertyField(m_ItemTextColor);
-			EditorGUILayout.PropertyField(m_ItemIconColor);
-			EditorGUI.indentLevel--;
-		}
+        private void OptionsSection()
+        {
+            m_HintOption.FindPropertyRelative("m_ImageData.m_ImageDataType").enumValueIndex = m_OptionDataList.FindPropertyRelative("m_ImageType").enumValueIndex;
+            EditorGUILayout.PropertyField(m_HintOption);
+            EditorGUILayout.PropertyField(m_AlwaysDisplayHintOption);
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_OptionDataList);
+        }
 
-		private void ComponentsSection()
-		{
-			EditorGUI.indentLevel++;
-			EditorGUILayout.PropertyField(m_BaseTransform);
-			EditorGUILayout.PropertyField(m_BaseSelectable);
-			EditorGUILayout.PropertyField(m_ButtonTextContent);
-			EditorGUILayout.PropertyField(m_ButtonImageContent);
-			EditorGUI.indentLevel--;
-		}
+        private void ComponentsSection()
+        {
+            EditorGUI.indentLevel++;
+            LayoutStyle_PropertyField(m_TextComponent);
+            LayoutStyle_PropertyField(m_IconComponent);
+            LayoutStyle_PropertyField(m_HintTextComponent);
+            LayoutStyle_PropertyField(m_HintIconComponent);
+            EditorGUI.indentLevel--;
+        }
     }
 }

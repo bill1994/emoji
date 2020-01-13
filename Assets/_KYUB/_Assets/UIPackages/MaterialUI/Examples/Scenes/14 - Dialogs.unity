@@ -824,7 +824,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1619260293}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -911,12 +910,10 @@ MonoBehaviour:
   m_Text: {fileID: 1720728746}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 22.116041, y: 15.972696}
-  m_Size: {x: 52.116043, y: 33.972694}
+  m_ContentSize: {x: 22.41245, y: 16.18677}
+  m_Size: {x: 52.412453, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &105906976
 MonoBehaviour:
@@ -1578,7 +1575,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 376533621}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -1665,12 +1661,10 @@ MonoBehaviour:
   m_Text: {fileID: 1015380047}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 62.662113, y: 15.972696}
-  m_Size: {x: 92.66211, y: 33.972694}
+  m_ContentSize: {x: 63.501945, y: 16.18677}
+  m_Size: {x: 93.501945, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &194133410
 MonoBehaviour:
@@ -2005,7 +1999,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 259896148}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -3333,7 +3326,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 914711510}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -3420,12 +3412,10 @@ MonoBehaviour:
   m_Text: {fileID: 0}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 33.17406, y: 15.972696}
-  m_Size: {x: 63.17406, y: 33.972694}
+  m_ContentSize: {x: 33.618675, y: 16.18677}
+  m_Size: {x: 63.618675, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &513261647
 MonoBehaviour:
@@ -3813,7 +3803,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 514682486}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -3900,12 +3889,10 @@ MonoBehaviour:
   m_Text: {fileID: 965374474}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 45.46075, y: 15.972696}
-  m_Size: {x: 75.460754, y: 33.972694}
+  m_ContentSize: {x: 46.070038, y: 16.18677}
+  m_Size: {x: 76.07004, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &532282639
 MonoBehaviour:
@@ -4140,7 +4127,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 537986861}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -4486,7 +4472,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 871358730}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -4573,12 +4558,10 @@ MonoBehaviour:
   m_Text: {fileID: 788639644}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 109.35153, y: 15.972696}
-  m_Size: {x: 139.35153, y: 33.972694}
+  m_ContentSize: {x: 110.817116, y: 16.18677}
+  m_Size: {x: 140.81711, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &640579075
 MonoBehaviour:
@@ -5266,7 +5249,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1264239298}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -5353,12 +5335,10 @@ MonoBehaviour:
   m_Text: {fileID: 557337543}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 65.11945, y: 15.972696}
-  m_Size: {x: 95.11945, y: 33.972694}
+  m_ContentSize: {x: 65.99222, y: 16.18677}
+  m_Size: {x: 95.99222, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &757304199
 MonoBehaviour:
@@ -5760,7 +5740,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 2089640398}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -5847,12 +5826,10 @@ MonoBehaviour:
   m_Text: {fileID: 714973518}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 97.06484, y: 15.972696}
-  m_Size: {x: 127.06484, y: 33.972694}
+  m_ContentSize: {x: 98.36575, y: 16.18677}
+  m_Size: {x: 128.36575, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &806687198
 MonoBehaviour:
@@ -6386,7 +6363,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1969103815}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -6473,12 +6449,10 @@ MonoBehaviour:
   m_Text: {fileID: 1332413619}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 47.918087, y: 15.972696}
-  m_Size: {x: 77.91809, y: 33.972694}
+  m_ContentSize: {x: 48.56031, y: 16.18677}
+  m_Size: {x: 78.56031, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &927531413
 MonoBehaviour:
@@ -6900,7 +6874,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1517012055}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -6987,12 +6960,10 @@ MonoBehaviour:
   m_Text: {fileID: 472360254}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 44.232082, y: 15.972696}
-  m_Size: {x: 74.232086, y: 33.972694}
+  m_ContentSize: {x: 44.8249, y: 16.18677}
+  m_Size: {x: 74.824905, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &998941981
 MonoBehaviour:
@@ -7294,7 +7265,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 2056242106}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -7381,12 +7351,10 @@ MonoBehaviour:
   m_Text: {fileID: 1569077857}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 44.232082, y: 15.972696}
-  m_Size: {x: 74.232086, y: 33.972694}
+  m_ContentSize: {x: 44.8249, y: 16.18677}
+  m_Size: {x: 74.824905, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1042164451
 MonoBehaviour:
@@ -7511,7 +7479,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1897795925}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -7598,12 +7565,10 @@ MonoBehaviour:
   m_Text: {fileID: 1981041510}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 44.232082, y: 15.972696}
-  m_Size: {x: 74.232086, y: 33.972694}
+  m_ContentSize: {x: 44.8249, y: 16.18677}
+  m_Size: {x: 74.824905, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1045507538
 MonoBehaviour:
@@ -8226,10 +8191,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1217785375}
   - component: {fileID: 1217785374}
-  - component: {fileID: 1217785373}
   - component: {fileID: 1217785372}
-  - component: {fileID: 1217785376}
-  - component: {fileID: 1217785377}
+  - component: {fileID: 1217785371}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -8237,6 +8200,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1217785371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1217785370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e53aeec3e93c0424d9e290b4209ef433, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 360, y: 640}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 1
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 160
+  m_DefaultSpriteDPI: 160
+  m_DynamicPixelsPerUnit: 1
+  m_EditorForceDPI: 1
+  m_EditorForceDPIValue: 160
+  m_UseLegacyPhysicalSizeCalc: 0
+  m_SupportSafeArea: 1
+  onCanvasAreaChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1217785372
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8254,28 +8246,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &1217785373
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1217785370}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_UiScaleMode: 1
-  m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1280, y: 720}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 1
-  m_PhysicalUnit: 3
-  m_FallbackScreenDPI: 96
-  m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 1
 --- !u!223 &1217785374
 Canvas:
   m_ObjectHideFlags: 0
@@ -8317,51 +8287,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1217785376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1217785370}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f0dcef36f7974cbe91bf74bdc9fd5f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_GutterColor: {r: 0.588, g: 0.706, b: 1, a: 0.5}
-  m_GutterWidth: 24
-  m_MarginWidth: 24
-  m_NumberOfColums: 12
-  m_FullScreenHeight: 0
---- !u!114 &1217785377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1217785370}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a1f2d41dc65ae74e8565d47c23b2eaa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Canvas: {fileID: 1217785374}
-  m_ScalerMode: 2
-  m_ScaleFactor: 0.8138889
-  m_EditorForceDpi: 1
-  m_EditorForceDpiValue: 160
-  m_ReferencePixelsPerUnit: 100
-  m_DynamicPixelsPerUnit: 1
-  m_BaseDpi: 160
-  m_FallbackDpi: 160
-  m_ScaleModifier: 1
-  m_ScaleSnapLevel: 8
-  m_TargetScaler: {fileID: 0}
-  m_TargetCanvasScaler: {fileID: 1217785373}
-  m_OnCanvasAreaChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1233440491
 GameObject:
   m_ObjectHideFlags: 0
@@ -9531,7 +9456,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 2099132782}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -9618,12 +9542,10 @@ MonoBehaviour:
   m_Text: {fileID: 1303384268}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 72.49146, y: 15.972696}
-  m_Size: {x: 102.49146, y: 33.972694}
+  m_ContentSize: {x: 73.463036, y: 16.18677}
+  m_Size: {x: 103.463036, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1475929477
 MonoBehaviour:
@@ -10760,7 +10682,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1706340099}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -11442,7 +11363,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1853608083}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -11551,7 +11471,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1445640518}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -11638,12 +11557,10 @@ MonoBehaviour:
   m_Text: {fileID: 486442492}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 77.40614, y: 15.972696}
-  m_Size: {x: 107.40614, y: 33.972694}
+  m_ContentSize: {x: 78.44358, y: 16.18677}
+  m_Size: {x: 108.44358, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &1870050611
 MonoBehaviour:
@@ -12738,7 +12655,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1993097886}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -12924,7 +12840,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 658895758}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -13011,12 +12926,10 @@ MonoBehaviour:
   m_Text: {fileID: 430365505}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 22.116041, y: 15.972696}
-  m_Size: {x: 52.116043, y: 33.972694}
+  m_ContentSize: {x: 22.41245, y: 16.18677}
+  m_Size: {x: 52.412453, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &2011812204
 MonoBehaviour:
@@ -13141,7 +13054,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 1849500293}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
@@ -13228,12 +13140,10 @@ MonoBehaviour:
   m_Text: {fileID: 0}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 33.17406, y: 15.972696}
-  m_Size: {x: 63.17406, y: 33.972694}
+  m_ContentSize: {x: 33.618675, y: 16.18677}
+  m_Size: {x: 63.618675, y: 34.186768}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
-  m_IsCircularButton: 0
-  m_IsRaisedButton: 0
   m_ResetRippleOnDisable: 1
 --- !u!114 &2050190272
 MonoBehaviour:
@@ -13963,7 +13873,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TargetImage: {fileID: 2136253688}
-  m_RootScaler: {fileID: 1217785377}
   m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}

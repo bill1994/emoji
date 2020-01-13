@@ -133,9 +133,15 @@ namespace MaterialUI
                 if (GUI.Button(new Rect(rect.width + 16, rect.y, 18, rect.height), IconDecoder.Decode(@"\ue14c"), fontStyle))
                 {
                     IOptionDataListContainer optionDataListContainer = itemData.serializedObject.targetObject as IOptionDataListContainer;
-                    VectorImageData data = optionDataListContainer.optionDataList.options[index].imageData.vectorImageData;
-                    data.vectorFont = null;
-                    data.glyph = null;
+                    if (optionDataListContainer != null && optionDataListContainer.optionDataList.options[index].imageData != null)
+                    {
+                        VectorImageData data = optionDataListContainer.optionDataList.options[index].imageData.vectorImageData;
+                        if (data != null)
+                        {
+                            data.vectorFont = null;
+                            data.glyph = null;
+                        }
+                    }
                     EditorUtility.SetDirty(itemData.serializedObject.targetObject);
                 }
             }

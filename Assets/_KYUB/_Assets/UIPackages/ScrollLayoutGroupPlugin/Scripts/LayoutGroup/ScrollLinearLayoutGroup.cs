@@ -15,6 +15,12 @@ namespace Kyub.UI
 
         protected override void RecalculateLayout()
         {
+            if (IsFullRecalcRequired())
+            {
+                var anotherAxis = IsVertical() ? 0 : 1;
+                _layoutSize[anotherAxis] = -1;
+            }
+
             if (Content != null)
             {
                 UpdateContentPivotAndAnchor();
@@ -87,6 +93,7 @@ namespace Kyub.UI
                     v_rectTransform.pivot = Content.pivot;
                     if (IsVertical())
                     {
+                        _layoutSize.x = Mathf.Max(_layoutSize.x, LayoutUtility.GetPreferredWidth(v_rectTransform));
                         if (Mathf.Abs(GetLocalHeight(v_rectTransform) - v_itemSize) > SIZE_ERROR)
                             SetLocalHeight(v_rectTransform, v_itemSize);
 
@@ -99,6 +106,7 @@ namespace Kyub.UI
                     }
                     else
                     {
+                        _layoutSize.y = Mathf.Max(_layoutSize.y, LayoutUtility.GetPreferredHeight(v_rectTransform));
                         if (Mathf.Abs(GetLocalWidth(v_rectTransform) - v_itemSize) > SIZE_ERROR)
                             SetLocalWidth(v_rectTransform, v_itemSize);
 
@@ -145,6 +153,41 @@ namespace Kyub.UI
                 }
             }
             return v_position;
+        }
+
+        #endregion
+
+        #region Layout Elements Function
+
+        public override void CalculateLayoutInputHorizontal()
+        {
+            var isVertical = IsVertical();
+            if(isVertical && !IsFullRecalcRequired())
+                CalculateAnotherAxisPreferredSize(isVertical);
+            else
+                _layoutSize = new Vector2(GetLocalWidth(Content), _layoutSize.y);
+        }
+
+        public override void CalculateLayoutInputVertical()
+        {
+            var isVertical = IsVertical();
+            if (!isVertical && !IsFullRecalcRequired())
+                CalculateAnotherAxisPreferredSize(isVertical);
+            else
+                _layoutSize = new Vector2(_layoutSize.x, GetLocalHeight(Content));
+        }
+
+        protected virtual float CalculateAnotherAxisPreferredSize(bool isVertical)
+        {
+            var anotherAxis = isVertical ? 0 : 1;
+            List<GameObject> visibleElements = new List<GameObject>();
+            for (int i = _cachedMinMaxIndex.x; i <= _cachedMinMaxIndex.y; i++)
+            {
+                var elementRectTransform = i >= 0 && m_elements.Count > i && m_elements[i] != null ? m_elements[i].transform as RectTransform : null;
+                if (elementRectTransform != null)
+                    _layoutSize[anotherAxis] = Mathf.Max(_layoutSize[anotherAxis], LayoutUtility.GetPreferredSize(elementRectTransform, anotherAxis));
+            }
+            return _layoutSize[anotherAxis];
         }
 
         #endregion

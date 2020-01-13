@@ -12,36 +12,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd39871cd9193d5488a3f9287d711f14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_VerticalPivotType: 2
-  m_HorizontalPivotType: 0
-  m_ExpandStartType: 3
-  m_IgnoreInputAfterShowTimer: 0.3
-  m_MaxHeight: 200
-  m_CapitalizeButtonText: 1
-  m_HighlightCurrentlySelected: 1
-  m_UpdateHeader: 1
-  m_AnimationDuration: 0.3
-  m_MinDistanceFromEdge: 16
-  m_PanelColor: {r: 1, g: 1, b: 1, a: 1}
-  m_ItemRippleData:
-    AutoSize: 1
-    SizePercent: 100
-    ManualSize: 0
-    SizeMode: 0
-    Speed: 8
-    Color: {r: 0, g: 0, b: 0, a: 1}
-    StartAlpha: 0.3
-    EndAlpha: 0.1
-    MoveTowardCenter: 1
-    RippleParent: {fileID: 0}
-    PlaceRippleBehind: 0
-  m_ItemTextColor: {r: 0, g: 0, b: 0, a: 0.8745098}
-  m_ItemIconColor: {r: 0, g: 0, b: 0, a: 0.5411765}
-  m_BaseTransform: {fileID: 250431956444461114}
-  m_BaseSelectable: {fileID: 250431956469075218}
-  m_ButtonTextContent: {fileID: 250431956469033668}
-  m_ButtonImageContent: {fileID: 0}
-  m_CurrentlySelected: -1
+  m_supportStyleGroup: 1
+  m_styleDataName: 
+  m_styleGroup: {fileID: 0}
+  m_disabledFieldStyles: []
+  m_extraStyleProperties: []
+  m_SpinnerMode: 0
+  m_DropdownExpandPivot: {x: 0.5, y: 1}
+  m_DropdownFramePivot: {x: 0.5, y: 1}
+  m_DropdownFramePreferredSize: {x: -1, y: -1}
+  OnCancelCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  m_HintTextComponent: {fileID: 0}
+  m_HintIconComponent: {fileID: 0}
+  m_TextComponent: {fileID: 250431956469033668}
+  m_IconComponent: {fileID: 0}
+  m_AllowSwitchOff: 1
+  m_SelectedIndex: -1
+  m_CustomFramePrefabAddress:
+    m_name: 
+    m_asset: {fileID: 0}
+    m_assetPath: 
+    m_keepLoaded: 0
+  m_HintOption:
+    m_Text: 
+    m_ImageData:
+      m_ImageDataType: 1
+      m_Sprite: {fileID: 0}
+      m_VectorImageData:
+        m_Glyph:
+          m_Name: 
+          m_Unicode: 
+        m_Font: {fileID: 0}
   m_OptionDataList:
     m_ImageType: 1
     m_Options:
@@ -72,8 +75,7 @@ MonoBehaviour:
             m_Name: airplanemode_active
             m_Unicode: \ue195
           m_Font: {fileID: 12800000, guid: a0a40789b9baa45a68c6d593e02f648a, type: 3}
-  m_DropdownPanelTemplate: {fileID: 0}
-  m_OnItemSelected:
+  OnItemSelected:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1001 &250431956457622374
@@ -89,7 +91,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11411874, guid: 7c17b414a46217042be858aa29bedc48, type: 3}
       propertyPath: m_text
-      value: DROPDOWN
+      value: "\u200B"
       objectReference: {fileID: 0}
     - target: {fileID: 11411874, guid: 7c17b414a46217042be858aa29bedc48, type: 3}
       propertyPath: m_fontColor32.rgba
@@ -182,6 +184,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff,
         type: 2}
+    - target: {fileID: 11454068, guid: 7c17b414a46217042be858aa29bedc48, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 11495778, guid: 7c17b414a46217042be858aa29bedc48, type: 3}
       propertyPath: m_RootScaler
       value: 
@@ -334,24 +340,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 250431956457622374}
   m_PrefabAsset: {fileID: 0}
---- !u!224 &250431956444461114 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 22491996, guid: 7c17b414a46217042be858aa29bedc48,
-    type: 3}
-  m_PrefabInstance: {fileID: 250431956457622374}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &250431956469075218 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 11454068, guid: 7c17b414a46217042be858aa29bedc48,
-    type: 3}
-  m_PrefabInstance: {fileID: 250431956457622374}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 250431956457745646}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &250431956469033668 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 11411874, guid: 7c17b414a46217042be858aa29bedc48,

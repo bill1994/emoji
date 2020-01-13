@@ -468,7 +468,7 @@ namespace MaterialUI
                 if (gameObject != null)
                 {
                     _CanvasGroup = gameObject.GetAddComponent<CanvasGroup>();
-                    _CanvasGroup.blocksRaycasts = true;
+                    //_CanvasGroup.blocksRaycasts = true;
                     _CanvasGroup.interactable = true;
                     //m_CanvasGroup.ignoreParentGroups = true;
                 }
@@ -598,16 +598,29 @@ namespace MaterialUI
 
         #region Public Functions
 
+        public virtual void Clear()
+        {
+            m_FadeIn = false;
+            m_ScaleIn = false;
+            m_SlideIn = false;
+            m_RippleIn = false;
+
+            m_FadeOut = false;
+            m_ScaleOut = false;
+            m_SlideOut = false;
+            m_RippleOut = false;
+        }
+
         public virtual void TransitionIn()
         {
             //CheckValues();
 
-            //InterruptAnimation();
+            InterruptAnimation(false);
 
             if (canvasGroup != null)
             {
                 canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
+                //canvasGroup.blocksRaycasts = true;
             }
 
             if (gameObject != null)
@@ -677,7 +690,7 @@ namespace MaterialUI
                     }*/
                 }
 
-                var localRectPosition = rectTransform.localPosition;
+                var localRectPosition = rectTransform.anchoredPosition3D;
                 switch (slideInDirection)
                 {
                     case ScreenView.SlideDirection.Left:
@@ -707,10 +720,10 @@ namespace MaterialUI
         {
             //CheckValues();
 
-            //InterruptAnimation();
+            InterruptAnimation(false);
 
             canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
+            //canvasGroup.blocksRaycasts = false;
 
             _TempScreenPos = rectTransform.position;
 
@@ -778,7 +791,7 @@ namespace MaterialUI
                     }*/
                 }
 
-                var localRectPosition = rectTransform.localPosition;
+                var localRectPosition = rectTransform.anchoredPosition3D;
                 switch (slideOutDirection)
                 {
                     case ScreenView.SlideDirection.Left:
@@ -928,7 +941,7 @@ namespace MaterialUI
             return rectTransform.GetPositionRegardlessOfPivot();
         }
 
-        protected internal int InterruptAnimation()
+        protected internal int InterruptAnimation(bool callEvent = true)
         {
             int v_processedTransition = _IsTransitioning;
             if (_IsTransitioning == 1)
@@ -958,7 +971,8 @@ namespace MaterialUI
                 {
                     rectTransform.position = _TempScreenPos;
                 }
-                HandleOnShow();
+                if(callEvent)
+                    HandleOnShow();
             }
             else if (_IsTransitioning == 2)
             {
@@ -987,10 +1001,11 @@ namespace MaterialUI
                 {
                     rectTransform.position = _TempScreenPos;
                 }
-                HandleOnHide();
+                if(callEvent)
+                    HandleOnHide();
             }
 
-            if (_IsTransitioning > 0)
+            if (_IsTransitioning > 0 && callEvent)
             {
                 _IsTransitioning = 0;
                 enabled = false;

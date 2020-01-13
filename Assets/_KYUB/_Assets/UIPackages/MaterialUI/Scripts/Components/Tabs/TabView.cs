@@ -10,13 +10,14 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace MaterialUI
 {
 #if UNITY_EDITOR
     [InitializeOnLoad]
 #endif
-    //[ExecuteInEditMode]
+    [ExecuteInEditMode]
     [AddComponentMenu("MaterialUI/TabView", 100)]
     public class TabView : UIBehaviour
     {
@@ -33,7 +34,8 @@ namespace MaterialUI
 
         private bool m_PagesDirty;
 #endif
-
+        [SerializeField]
+        bool m_AnimateTabs = true;
         [SerializeField]
         bool m_ForceSameTabSize = true;
         [Space]
@@ -71,6 +73,8 @@ namespace MaterialUI
         private Vector2 m_PageSize;
         //private bool m_AlreadyInitialized;
 
+        protected Canvas _RootCanvas;
+
         #endregion
 
         #region Public Properties
@@ -95,14 +99,27 @@ namespace MaterialUI
 
         public TabPage[] pages
         {
-            get { return m_Pages; }
+            get
+            {
+                if (m_Pages == null)
+                    m_Pages = new TabPage[0];
+                return m_Pages;
+            }
             set { m_Pages = value; }
         }
 
         public int currentPage
         {
             get { return m_CurrentPage; }
-            set { m_CurrentPage = value; }
+            set
+            {
+                if (m_CurrentPage == value)
+                    return;
+                if(Application.isPlaying)
+                    SetPage(value);
+                else
+                    m_CurrentPage = value;
+            }
         }
 
         public TabItem tabItemTemplate
@@ -203,27 +220,48 @@ namespace MaterialUI
             }
         }
 
+        public bool animateTabs
+        {
+            get
+            {
+                return m_AnimateTabs;
+            }
+
+            set
+            {
+                m_AnimateTabs = value;
+            }
+        }
+
+        public Canvas rootCanvas
+        {
+            get
+            {
+                if (_RootCanvas == null)
+                {
+                    _RootCanvas = transform.GetRootCanvas();
+                }
+                return _RootCanvas;
+            }
+        }
+
         #endregion
 
         #region Unity Functions
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            _initializeTabsAndPagesCoroutine = null;
-#if UNITY_EDITOR
-            CancelInvoke();
-#endif
-        }
 
         protected override void OnEnable()
         {
             base.OnEnable();
             if (_started && Application.isPlaying)
                 InitializeTabsAndPagesDelayed();
+
+#if UNITY_EDITOR
+            Selection.selectionChanged -= OnValidate;
+            Selection.selectionChanged += OnValidate;
+#endif
         }
 
-        bool _started = false;
+        protected bool _started = false;
         protected override void Start()
         {
             if (Application.isPlaying)
@@ -231,13 +269,30 @@ namespace MaterialUI
                 _started = true;
                 InitializeTabsAndPagesDelayed();
 
-                MaterialUIScaler.GetRootScaler(rectTransform).onCanvasAreaChanged.AddListener((scaleChanged, orientationChanged) =>
-                {
-                    if (Application.isPlaying)
-                    {
-                        InitializeTabsAndPagesDelayed();
-                    }
-                });
+                var scaler = rootCanvas != null? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
+                if (scaler != null)
+                    scaler.onCanvasAreaChanged.AddListener(OnCanvasAreaChanged);
+            }
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            if (Application.isPlaying)
+            {
+                _initializeTabsAndPagesCoroutine = null;
+            }
+#if UNITY_EDITOR
+            Selection.selectionChanged -= OnValidate;
+            CancelInvoke();
+#endif
+        }
+
+        protected virtual void OnCanvasAreaChanged(bool scaleChanged, bool orientationChanged)
+        {
+            if (Application.isPlaying)
+            {
+                InitializeTabsAndPagesDelayed();
             }
         }
 
@@ -247,6 +302,17 @@ namespace MaterialUI
             if (Application.isPlaying)
             {
                 InitializeTabsAndPagesDelayed();
+            }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (Application.isPlaying)
+            {
+                var scaler = rootCanvas != null ? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
+                if (scaler != null)
+                    scaler.onCanvasAreaChanged.RemoveListener(OnCanvasAreaChanged);
             }
         }
 
@@ -265,6 +331,9 @@ namespace MaterialUI
 
         public void InitializeTabs()
         {
+            if (m_TabsContainer == null)
+                return;
+
             //Initialize TabContainer
             float barWidth = rectTransform.GetProperSize().x;
 
@@ -293,6 +362,9 @@ namespace MaterialUI
 
         protected void InitializeIndicator()
         {
+            if (m_Indicator == null)
+                return;
+
             m_Indicator.anchorMin = new Vector2(0, 0);
             m_Indicator.anchorMax = new Vector2(0, 0);
             m_Indicator.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_ForceSameTabSize ? m_TabWidth : m_Tabs[m_CurrentPage].rectTransform.GetProperSize().x);
@@ -502,7 +574,7 @@ namespace MaterialUI
 
         public void SetPage(int index)
         {
-            SetPage(index, true);
+            SetPage(index, animateTabs);
         }
 
         public void SetPage(int index, bool animate)
@@ -512,6 +584,9 @@ namespace MaterialUI
             TweenIndicator(index, animate);
             TweenTabsContainer(index, animate);
             TweenPagesContainer(index, animate);
+
+            if (m_Tabs == null)
+                m_Tabs = new TabItem[0];
 
             for (int i = 0; i < m_Tabs.Length; i++)
             {
@@ -546,6 +621,12 @@ namespace MaterialUI
 
         private void TweenPagesContainer(int index, bool animate = true)
         {
+            if (m_PagesContainer == null)
+                return;
+
+            if (m_Pages == null)
+                m_Pages = new TabPage[0];
+
             for (int i = 0; i < m_Pages.Length; i++)
             {
                 int smaller = Mathf.Min(m_CurrentPage, index);
@@ -585,6 +666,9 @@ namespace MaterialUI
 
         private void TweenTabsContainer(int index, bool animate = true)
         {
+            if (m_TabsContainer == null)
+                return;
+
             var v_useSameSizeCalculation = m_ForceSameTabSize || m_Tabs.Length <= index || index < 0 || m_Tabs[index] == null;
 
             float targetPosition = 0;
@@ -616,6 +700,9 @@ namespace MaterialUI
 
         private void TweenIndicator(int targetTab, bool animate = true)
         {
+            if (m_Indicator == null)
+                return;
+
             float targetPosition = m_ForceSameTabSize || m_Tabs.Length <= targetTab || targetTab < 0  || m_Tabs[targetTab] == null? 
                 targetTab * m_TabWidth : 
                 m_Tabs[targetTab].rectTransform.anchoredPosition.x - (m_Tabs[targetTab].rectTransform.GetProperSize().x/2);
@@ -654,17 +741,17 @@ namespace MaterialUI
 
                 if (Mathf.Abs(delta) < 1)
                 {
-                    SetPage(NearestPage());
+                    SetPage(NearestPage(), true);
                 }
                 else
                 {
                     if (delta < 0)
                     {
-                        SetPage(NearestPage(1));
+                        SetPage(NearestPage(1), true);
                     }
                     else
                     {
-                        SetPage(NearestPage(-1));
+                        SetPage(NearestPage(-1), true);
                     }
                 }
             }
@@ -705,14 +792,17 @@ namespace MaterialUI
 
                 TweenManager.EndTween(m_IndicatorTweener);
 
-                float normalizedPagesContainerPosition = -m_PagesContainer.anchoredPosition.x / (m_PageSize.x * m_Pages.Length);
-                if (m_ForceSameTabSize)
+                if (m_Indicator != null)
                 {
-                    m_Indicator.anchoredPosition = new Vector2((m_TabWidth * m_Tabs.Length) * normalizedPagesContainerPosition, 0);
-                }
-                else
-                {
-                    m_Indicator.anchoredPosition = new Vector2(rectTransform.GetProperSize().x * normalizedPagesContainerPosition, 0);
+                    float normalizedPagesContainerPosition = -m_PagesContainer.anchoredPosition.x / (m_PageSize.x * m_Pages.Length);
+                    if (m_ForceSameTabSize)
+                    {
+                        m_Indicator.anchoredPosition = new Vector2((m_TabWidth * m_Tabs.Length) * normalizedPagesContainerPosition, 0);
+                    }
+                    else
+                    {
+                        m_Indicator.anchoredPosition = new Vector2(rectTransform.GetProperSize().x * normalizedPagesContainerPosition, 0);
+                    }
                 }
             }
         }
@@ -758,19 +848,25 @@ namespace MaterialUI
 
                 List<TabPage> ownedTempPages = new List<TabPage>();
 
+                var trackedPagesDirty = false;
                 for (int i = 0; i < tempPages.Length; i++)
                 {
                     if (tempPages[i].transform.parent.parent.parent == transform)
                     {
+                        trackedPagesDirty = trackedPagesDirty || !m_Pages.Contains(tempPages[i]);
                         ownedTempPages.Add(tempPages[i]);
                     }
                 }
 
-                m_Pages = new TabPage[ownedTempPages.Count];
-
-                for (int i = 0; i < ownedTempPages.Count; i++)
+                if (trackedPagesDirty || m_Pages.Length != ownedTempPages.Count)
                 {
-                    m_Pages[i] = ownedTempPages[i];
+                    m_Pages = new TabPage[ownedTempPages.Count];
+
+                    for (int i = 0; i < ownedTempPages.Count; i++)
+                    {
+                        m_Pages[i] = ownedTempPages[i];
+                    }
+                    EditorUtility.SetDirty(this);
                 }
             }
 

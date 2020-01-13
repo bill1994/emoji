@@ -8,25 +8,25 @@ using System.Linq;
 namespace MaterialUI
 {
     [RequireComponent(typeof(RectTransform))]
-    public class MaterialDialogActivity : MaterialActivity
+    public sealed class MaterialDialogActivity : MaterialActivity
     {
         #region Private Variables
 
         [SerializeField]
-        protected MaterialFrame m_Frame = null;
+        MaterialFrame m_Frame = null;
         [Space]
         [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_AutoCreateBackground")]
-        protected bool m_HasBackground = true;
+        bool m_HasBackground = true;
         [SerializeField]
-        protected MaterialActivityBackground m_Background = null;
+        MaterialActivityBackground m_Background = null;
         [SerializeField]
-        protected bool m_IsModal;
+        bool m_IsModal;
 
         #endregion
 
         #region Public Properties
 
-        public virtual MaterialFrame frame
+        public MaterialFrame frame
         {
             get
             {
@@ -84,12 +84,12 @@ namespace MaterialUI
         #region Public Functions
 
         //Replace internal frame
-        public virtual MaterialFrame SetFrame(MaterialFrame frame, bool inflate)
+        public MaterialFrame SetFrame(MaterialFrame frame, bool inflate)
         {
             if (frame == null)
                 return null;
 
-            var localPosition = frame.transform.localPosition;
+            var anchoredPosition = frame.transform is RectTransform? (frame.transform as RectTransform).anchoredPosition3D : frame.transform.localPosition;
             var localScale = frame.transform.localScale;
             var localRotation = frame.transform.localRotation;
 
@@ -98,12 +98,12 @@ namespace MaterialUI
                 frame = GameObject.Instantiate(frame);
 
             //Delete Default Frame
-            if (m_Frame != null)
+            if (m_Frame != null && m_Frame != frame)
                 GameObject.Destroy(m_Frame.gameObject);
 
             //MaterialDialogActivity does not support activities in same object as the frame added
             var frameActivity = frame.GetComponent<MaterialActivity>();
-            if(frameActivity != null)
+            if (frameActivity != null)
                 Component.DestroyImmediate(frameActivity);
 
             frame.transform.SetParent(this.transform);
@@ -115,7 +115,10 @@ namespace MaterialUI
                 Inflate(frame.transform as RectTransform, false);
             else
             {
-                frame.transform.localPosition = localPosition;
+                if (frame.transform is RectTransform)
+                    (frame.transform as RectTransform).anchoredPosition3D = anchoredPosition;
+                else
+                    frame.transform.localPosition = anchoredPosition;
                 frame.transform.localScale = localScale;
                 frame.transform.localRotation = localRotation;
             }
@@ -126,7 +129,7 @@ namespace MaterialUI
         }
 
         //Set in pre-created frame a content as a child
-        public virtual RectTransform SetFrameContent(RectTransform frameContent)
+        public RectTransform SetFrameContent(RectTransform frameContent)
         {
             if (frameContent == null)
                 return null;
@@ -159,13 +162,6 @@ namespace MaterialUI
             return frameContent;
         }
 
-        /*public override void Build(Transform parent)
-        {
-            //CreateBackground();
-
-            base.Build(parent);
-        }*/
-
         public void ShowModal()
         {
             m_IsModal = true;
@@ -187,6 +183,7 @@ namespace MaterialUI
                 if (this == null)
                     return;
 
+                canvasGroup.blocksRaycasts = true;
                 HandleOnShowAnimationOver();
             };
 
@@ -194,7 +191,8 @@ namespace MaterialUI
                 m_Background.AnimateShowBackground(null);
             if (m_Frame != null)
                 ShowFrame(onShow);
-            canvasGroup.blocksRaycasts = true;
+            else
+                onShow();
         }
 
         public override void Hide()
@@ -204,22 +202,23 @@ namespace MaterialUI
                 if (this == null)
                     return;
 
+                canvasGroup.blocksRaycasts = false;
                 HandleOnHideAnimationOver();
-
             };
 
             if (m_Background != null)
                 m_Background.AnimateHideBackground(null);
             if (m_Frame != null)
                 HideFrame(onHide);
-            canvasGroup.blocksRaycasts = false;
+            else
+                onHide();
         }
 
         #endregion
 
         #region Receivers
 
-        protected virtual void HandleOnBackgroundClick()
+        void HandleOnBackgroundClick()
         {
             if (!m_IsModal)
             {
@@ -227,12 +226,12 @@ namespace MaterialUI
             }
         }
 
-        protected virtual void HandleOnShowAnimationOver()
+        void HandleOnShowAnimationOver()
         {
             OnShowAnimationOver.InvokeIfNotNull();
         }
 
-        protected virtual void HandleOnHideAnimationOver()
+        void HandleOnHideAnimationOver()
         {
             OnHideAnimationOver.InvokeIfNotNull();
 
@@ -250,13 +249,16 @@ namespace MaterialUI
 
         #region Internal Frame Functions
 
-        protected virtual void ShowFrame(System.Action callback)
+        void ShowFrame(System.Action callback)
         {
+            if (m_Frame != null)
+                m_Frame.OnActivityBeginShow();
+
             System.Action showAction = () =>
             {
                 callback.InvokeIfNotNull();
                 if (m_Frame != null)
-                    m_Frame.OnActivityShow();
+                    m_Frame.OnActivityEndShow();
             };
 
             if (m_Frame)
@@ -273,13 +275,16 @@ namespace MaterialUI
 
         }
 
-        protected virtual void HideFrame(System.Action callback)
+        void HideFrame(System.Action callback)
         {
+            if (m_Frame != null)
+                m_Frame.OnActivityBeginHide();
+
             System.Action hideAction = () =>
             {
                 callback.InvokeIfNotNull();
                 if (m_Frame != null)
-                    m_Frame.OnActivityHide();
+                    m_Frame.OnActivityEndHide();
             };
 
             var tweener = frame != null ? frame.GetComponent<AbstractTweenBehaviour>() : null;
@@ -297,7 +302,7 @@ namespace MaterialUI
 
         #region Internal Background Functions
 
-        protected virtual void CreateBackground()
+        void CreateBackground()
         {
             if (this == null)
                 return;
@@ -321,24 +326,33 @@ namespace MaterialUI
                     frameAnimator.fadeOut = true;
                 }
                 //Object from another scene or this is not hierarchy child (template object?)
-                else if (m_Background.gameObject.scene != this.gameObject.scene || 
-                    (m_Background.transform.parent != this.transform && m_Background.transform != this.transform))
+                else if (m_Background.gameObject.scene != this.gameObject.scene ||
+                  (m_Background.transform.parent != this.transform && m_Background.transform != this.transform))
                 {
                     var oldBackground = m_Background;
                     UnregisterBackgroundEvents();
-                    m_Background = GameObject.Instantiate(m_Background);
+                    m_Background = GameObject.Instantiate(m_Background, this.rectTransform);
+                    Inflate(m_Background.transform as RectTransform, true);
                     m_Background.transform.SetAsFirstSibling();
+                    m_Background.transition = Selectable.Transition.None;
                     oldBackground.gameObject.SetActive(false);
+
+                    if (m_Background.tweener == null)
+                    {
+                        var frameAnimator = m_Background.gameObject.GetAddComponent<EasyFrameAnimator>();
+                        frameAnimator.fadeIn = true;
+                        frameAnimator.fadeOut = true;
+                    }
                 }
             }
 
             ApplyBackgroundVisibility();
         }
 
-        protected virtual void ApplyBackgroundVisibility()
+        void ApplyBackgroundVisibility()
         {
             if (m_Background != null && m_Background.gameObject.scene == this.gameObject.scene &&
-                (m_Background.transform.parent == this.transform || m_Background.transform == this.transform))
+              (m_Background.transform.parent == this.transform || m_Background.transform == this.transform))
             {
                 //Same as Activity
                 if (m_Background.transform == this.transform)
@@ -361,7 +375,7 @@ namespace MaterialUI
             }
         }
 
-        protected virtual void RegisterBackgroundEvents()
+        void RegisterBackgroundEvents()
         {
             UnregisterBackgroundEvents();
 
@@ -369,7 +383,7 @@ namespace MaterialUI
                 m_Background.onBackgroundClick.AddListener(HandleOnBackgroundClick);
         }
 
-        protected virtual void UnregisterBackgroundEvents()
+        void UnregisterBackgroundEvents()
         {
             if (m_Background != null && m_Background.onBackgroundClick != null)
                 m_Background.onBackgroundClick.RemoveListener(HandleOnBackgroundClick);

@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 namespace MaterialUI
 {
@@ -20,7 +21,7 @@ namespace MaterialUI
     [RequireComponent(typeof(RectTransform))]
     [RequireComponent(typeof(CanvasGroup))]
     [AddComponentMenu("MaterialUI/Material Button", 100)]
-    public class MaterialButton : StyleElement<MaterialButton.ButtonStyleProperty>, ILayoutGroup, ILayoutElement, ILayoutSelfController
+    public class MaterialButton : StyleElement<MaterialButton.ButtonStyleProperty>, ILayoutGroup, ILayoutElement, ILayoutSelfController, IPointerDownHandler, IPointerClickHandler
     {
         #region Consts
 
@@ -82,14 +83,6 @@ namespace MaterialUI
         #endregion
 
         #region Properties
-
-        public Button.ButtonClickedEvent OnClick
-        {
-            get
-            {
-                return buttonObject != null ? buttonObject.onClick : null;
-            }
-        }
 
         public RectTransform rectTransform
         {
@@ -272,6 +265,13 @@ namespace MaterialUI
 
         #endregion
 
+        #region Callbacks
+
+        public UnityEvent onClick = new UnityEvent();
+        public UnityEvent onPress = new UnityEvent();
+
+        #endregion
+
         #region ExternalProperties
 
         [SerializeStyleProperty]
@@ -427,6 +427,22 @@ namespace MaterialUI
             SetLayoutDirty();
         }
 #endif
+
+        #endregion
+
+        #region Unity Input Functions
+
+        public virtual void OnPointerDown(PointerEventData pointerEventData)
+        {
+            if (onPress != null)
+                onPress.Invoke();
+        }
+
+        public virtual void OnPointerClick(PointerEventData pointerEventData)
+        {
+            if (onClick != null)
+                onClick.Invoke();
+        }
 
         #endregion
 

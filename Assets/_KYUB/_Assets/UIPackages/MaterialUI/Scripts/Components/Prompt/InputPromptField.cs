@@ -215,7 +215,7 @@ namespace MaterialUI
             {
                 if (m_TextComponent is Text)
                     return (m_TextComponent as Text).fontSize;
-                if (m_TextComponent is Text)
+                if (m_TextComponent is TMP_Text)
                     return (m_TextComponent as TMP_Text).fontSize;
                 return 0;
             }
@@ -236,7 +236,7 @@ namespace MaterialUI
             get
             {   if (m_TextComponent is Text)
                     return (m_TextComponent as Text).font;
-                if (m_TextComponent is Text)
+                if (m_TextComponent is TMP_Text)
                     return (m_TextComponent as TMP_Text).font;
                 return null;
             }
@@ -358,6 +358,33 @@ namespace MaterialUI
         public virtual void OnSubmit(BaseEventData eventData)
         {
             OpenPromptDialog();
+        }
+
+        #endregion
+
+        #region Helper Functions
+
+        public void ForceLabelUpdate()
+        {
+            UpdateLabel();
+        }
+
+        public void ActivateInputField()
+        {
+            if(!isFocused)
+                OpenPromptDialog();
+        }
+
+        public void DeactivateInputField()
+        {
+            if (isFocused)
+                _dialogPrompt.Hide();
+        }
+
+        public void SetTextWithoutNotify(string text)
+        {
+            m_Text = string.IsNullOrEmpty(text)? string.Empty : text;
+            UpdateLabel();
         }
 
         #endregion

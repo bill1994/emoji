@@ -1,30 +1,24 @@
 ﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using Kyub.UI;
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace MaterialUI
 {
     [AddComponentMenu("MaterialUI/Dialogs/Clickable Option", 100)]
-    public class DialogClickableOption : MonoBehaviour, IPointerClickHandler, ISubmitHandler
+    public class DialogClickableOption : ScrollDataViewElement, IPointerClickHandler, ISubmitHandler
     {
+        [System.Serializable]
+        public class IntUnityEvent : UnityEvent<int> { }
+
         #region Callbacks
 
-        private Action<int> m_OnClickAction;
-        public Action<int> onClickAction
-        {
-            get { return m_OnClickAction; }
-            set { m_OnClickAction = value; }
-        }
-
-		private int m_Index = -1;
-        public int index
-        {
-            get { return m_Index; }
-            set { m_Index = value; }
-        }
+        public IntUnityEvent onItemClicked = new IntUnityEvent();
+        public IntUnityEvent onAfterItemClicked = new IntUnityEvent();
 
         #endregion
 
@@ -32,17 +26,28 @@ namespace MaterialUI
 
         public virtual void OnPointerClick(PointerEventData eventData)
         {
-            if (m_OnClickAction != null)
-            {
-                m_OnClickAction.Invoke(m_Index);
-            }
+            HandleOnItemClicked();
         }
 
         public virtual void OnSubmit(BaseEventData eventData)
         {
-            if (m_OnClickAction != null)
+            HandleOnItemClicked();
+        }
+
+        #endregion
+
+        #region Receivers Functions
+
+        protected virtual void HandleOnItemClicked()
+        {
+            var dataIndex = DataIndex;
+            if (onItemClicked != null)
             {
-                m_OnClickAction.Invoke(m_Index);
+                onItemClicked.Invoke(dataIndex);
+            }
+            if (onAfterItemClicked != null)
+            {
+                onAfterItemClicked.Invoke(dataIndex);
             }
         }
 

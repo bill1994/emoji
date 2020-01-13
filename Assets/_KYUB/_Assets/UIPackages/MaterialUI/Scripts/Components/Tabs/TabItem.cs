@@ -17,6 +17,8 @@ namespace MaterialUI
         protected bool m_ChangeIconColor = false;
         [SerializeField, SerializeStyleProperty]
         protected Graphic m_ItemIcon = null;
+        [SerializeField, SerializeStyleProperty]
+        protected Graphic m_ItemIndex = null;
         [SerializeField]
         protected TabView m_TabView = null;
 
@@ -87,7 +89,12 @@ namespace MaterialUI
         public int id
         {
             get { return m_Id; }
-            set { m_Id = value; }
+            set
+            {
+                m_Id = value;
+                if (m_ItemIndex != null)
+                    m_ItemIndex.SetGraphicText((m_Id + 1).ToString());
+            }
         }
         
         public RectTransform rectTransform
@@ -341,7 +348,7 @@ namespace MaterialUI
         {
             base.AnimOff();
 
-            if(m_ChangeIconColor)
+            if(m_ChangeIconColor && m_ItemIcon != null)
                 m_ItemIcon.color = Tween.QuintOut(m_CurrentColor, m_OffColor, m_AnimDeltaTime, m_AnimationDuration);
         }
 
@@ -349,7 +356,7 @@ namespace MaterialUI
         {
             base.AnimOffComplete();
 
-            if (m_ChangeIconColor)
+            if (m_ChangeIconColor && m_ItemIcon != null)
                 m_ItemIcon.color = m_OffColor;
         }
 

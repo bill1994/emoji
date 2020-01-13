@@ -39,7 +39,7 @@ namespace Kyub.UI
         [SerializeField]
         protected Vector2 m_cellSize = new Vector2(100f, 100f);
         [SerializeField]
-        protected int m_defaultConstraintCount = 2; //Used to defined amouont of rows or collums
+        protected int m_defaultConstraintCount = 2; //Used to defined amount of rows or collums
         [SerializeField]
         protected float m_constraintSpacing = 0;
 
@@ -517,7 +517,7 @@ namespace Kyub.UI
         protected virtual int GetCurrentConstraintCount()
         {
             int v_currentConstraintCount = m_defaultConstraintCount;
-            //Is case of being flexible layout we must calculate the constraint
+            //In case of being flexible layout we must calculate the constraint
             if (m_constraintType == GridConstraintTypeEnum.Flexible)
             {
                 v_currentConstraintCount = (int)(IsVertical() ?
@@ -556,6 +556,52 @@ namespace Kyub.UI
             return v_alignOffset;
         }
 
-        #endregion     
+        #endregion
+
+        #region Layout Elements Function
+
+        public override void CalculateLayoutInputHorizontal()
+        {
+            var isVertical = IsVertical();
+            if (isVertical)
+            {
+                if (!IsFullRecalcRequired())
+                    CalculateAnotherAxisPreferredSize(isVertical);
+                else
+                    _layoutSize = new Vector2(_cachedConstraintSize, _layoutSize.y);
+            }
+            else
+                _layoutSize = new Vector2(GetLocalWidth(Content), _layoutSize.y);
+        }
+
+        public override void CalculateLayoutInputVertical()
+        {
+            var isVertical = IsVertical();
+            if (!isVertical)
+            {
+                if(!IsFullRecalcRequired())
+                    CalculateAnotherAxisPreferredSize(isVertical);
+                else
+                    _layoutSize = new Vector2(_layoutSize.x, _cachedConstraintSize);
+            }
+            else
+                _layoutSize = new Vector2(_layoutSize.x, GetLocalHeight(Content));
+        }
+
+        protected virtual float CalculateAnotherAxisPreferredSize(bool isVertical)
+        {
+            _cachedConstraintCount = GetCurrentConstraintCount();
+            _cachedConstraintSize = GetCurrentConstraintSize();
+            _cachedConstraintCellSize = GetCurrentConstraintCellSize();
+
+            var anotherAxis = isVertical ? 0 : 1;
+            _layoutSize[anotherAxis] = _cachedConstraintSize;
+
+            return _layoutSize[anotherAxis];
+        }
+
+        #endregion
+
+        
     }
 }

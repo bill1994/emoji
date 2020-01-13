@@ -3,11 +3,15 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
+using UnityEngine.Events;
 
 namespace MaterialUI
 {
     public class CanvasSafeArea : UnityEngine.EventSystems.UIBehaviour
     {
+        [System.Serializable]
+        public class RectUnityEvent : UnityEvent<Rect> { }
+
         #region Private Variables
 
         [SerializeField] RectTransform m_Content = null;
@@ -29,6 +33,12 @@ namespace MaterialUI
 #if UNITY_EDITOR
         Image _simulatorSpriteContent = null;
 #endif
+
+        #endregion
+
+        #region Callbacks
+
+        public RectUnityEvent OnApplySafeArea = new RectUnityEvent();
 
         #endregion
 
@@ -143,7 +153,9 @@ namespace MaterialUI
         protected override void OnValidate()
         {
             if (Application.isPlaying && this.isActiveAndEnabled)
-                Refresh();
+            {
+                Invoke("Refresh", 0);
+            }
         }
 #endif
 
@@ -175,12 +187,34 @@ namespace MaterialUI
 
             if (safeArea != _LastSafeArea || force)
             {
-                ApplySafeArea(safeArea);
                 Theme.ApplyStatusBarTheme();
+                safeArea = GetSafeArea(); //useful when Theme change safe area size (when statusbar is hidden, for example)
+                ApplySafeArea(safeArea);
             }
         }
 
-        protected virtual Rect GetSafeArea()
+        public Rect GetConformSafeArea()
+        {
+            var safeArea = GetSafeArea();
+
+            // Ignore x-axis?
+            if (!m_ConformX)
+            {
+                safeArea.x = 0;
+                safeArea.width = Screen.width;
+            }
+
+            // Ignore y-axis?
+            if (!m_ConformY)
+            {
+                safeArea.y = 0;
+                safeArea.height = Screen.height;
+            }
+
+            return safeArea;
+        }
+
+        public virtual Rect GetSafeArea()
         {
             Rect nsa = new Rect(0, 0, Screen.width, Screen.height);
             if (!IsRootSafeArea())
@@ -198,7 +232,7 @@ namespace MaterialUI
                     safeArea = new Rect(Screen.width * nsa.x, Screen.height * nsa.y, Screen.width * nsa.width, Screen.height * nsa.height);
 #endif
                 }
-                else if (IsStatusBarActive() && Screen.safeArea == nsa)
+                else if (IsStatusBarActiveWithLayoutStable() && Screen.safeArea == nsa)
                 {
                     //This is the size of statusbar in IOS without notch
                     safeArea.height = Mathf.Max(0, safeArea.height - GetStatusBarHeight());
@@ -242,6 +276,9 @@ namespace MaterialUI
 #endif
 
             Kyub.Performance.SustainedPerformanceManager.Invalidate();
+
+            if (OnApplySafeArea != null)
+                OnApplySafeArea.Invoke(r);
             //Debug.LogFormat("New safe area applied to {0}: x={1}, y={2}, w={3}, h={4} on full extents w={5}, h={6}", name, r.x, r.y, r.width, r.height, Screen.width, Screen.height);
         }
 
@@ -310,12 +347,15 @@ namespace MaterialUI
         static extern float _GetStatusBarHeight();
 #endif
 
-        public static bool IsStatusBarActive()
+        public static bool IsStatusBarActiveWithLayoutStable()
         {
 #if UNITY_IPHONE && !UNITY_EDITOR
 		    return _IsIOSStatusBarActive();
 #else
-            return false;
+            var activity = AndroidThemeNativeUtils.GetActivity();
+            var window = AndroidThemeNativeUtils.GetWindow(activity);
+
+            return !Screen.fullScreen && AndroidThemeNativeUtils.IsStatusBarActive(window) && AndroidThemeNativeUtils.IsViewBehindBars(window);
 #endif
         }
 
@@ -323,11 +363,14 @@ namespace MaterialUI
         {
 #if UNITY_IPHONE && !UNITY_EDITOR
 		    return _GetStatusBarHeight();
+#elif UNITY_ANDROID && UNITY_2019_1_OR_NEWER && !UNITY_EDITOR
+            var activity = AndroidThemeNativeUtils.GetActivity();
+            return AndroidThemeNativeUtils.GetStatusBarHeight(activity);
 #else
             return 0;
 #endif
         }
 
-        #endregion
+#endregion
     }
 }

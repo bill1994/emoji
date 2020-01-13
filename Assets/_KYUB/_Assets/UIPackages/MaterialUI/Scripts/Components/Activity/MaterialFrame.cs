@@ -10,11 +10,19 @@ namespace MaterialUI
     {
         #region Public Functions
 
-        protected internal virtual void OnActivityShow()
+        protected internal virtual void OnActivityBeginShow()
         {
         }
 
-        protected internal virtual void OnActivityHide()
+        protected internal virtual void OnActivityEndShow()
+        {
+        }
+
+        protected internal virtual void OnActivityBeginHide()
+        {
+        }
+
+        protected internal virtual void OnActivityEndHide()
         {
         }
 

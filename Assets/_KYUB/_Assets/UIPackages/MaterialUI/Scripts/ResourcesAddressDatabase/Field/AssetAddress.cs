@@ -40,6 +40,38 @@ namespace MaterialUI
         }
     }
 
+    public class ComponentPrefabAddress<T> : GenericAssetAddress<T> where T : Component, new()
+    {
+        public static explicit operator ComponentPrefabAddress<T>(string s)
+        {
+            return new ComponentPrefabAddress<T>() { AssetPath = s };
+        }
+
+        public static explicit operator PrefabAddress(ComponentPrefabAddress<T> address)
+        {
+            if (address == null)
+                return null;
+
+            if (address.IsResources())
+            {
+                return new PrefabAddress()
+                {
+                    AssetPath = address.AssetPath,
+                    KeepLoaded = address.KeepLoaded
+                };
+            }
+            else
+            {
+                return new PrefabAddress()
+                {
+                    Asset = address.Asset != null? address.Asset.gameObject : null,
+                    KeepLoaded = address.KeepLoaded
+                };
+            }
+           
+        }
+    }
+
     [System.Serializable]
     public abstract class GenericAssetAddress<T> : IAssetAddress, ISerializationCallbackReceiver where T : Object
     {
@@ -274,6 +306,7 @@ namespace MaterialUI
 
         const string RESOURCES_PATH = "Resources/";
         const string EDITOR_PATH = "Editor/";
+        const string PACKAGES_PATH = "Packages/";
         protected internal virtual bool EditorValidateAssetPath()
         {
             if (m_asset != null || !string.IsNullOrEmpty(m_assetPath))
@@ -285,8 +318,8 @@ namespace MaterialUI
                 if (m_asset != null)
                 {
                     var v_assetPath = UnityEditor.AssetDatabase.GetAssetPath(m_asset);
-                    //Try find Resources Path (if resources is not inside Editor Path)
-                    if (v_assetPath.Contains(RESOURCES_PATH) && !v_assetPath.Contains(EDITOR_PATH))
+                    //Try find Resources Path (if resources is not inside Editor Path or not inside Package Path)
+                    if (v_assetPath.Contains(RESOURCES_PATH) && !v_assetPath.Contains(EDITOR_PATH) && !v_assetPath.StartsWith(PACKAGES_PATH))
                     {
                         var v_paths = v_assetPath.Split(new string[] { RESOURCES_PATH }, System.StringSplitOptions.None);
                         if (v_paths.Length > 1)
