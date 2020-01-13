@@ -12,7 +12,7 @@ namespace Kyub.UI
     public abstract class HorizontalOrVerticalLayoutGroupEx : HorizontalOrVerticalLayoutGroup
     {
         [SerializeField]
-        bool m_ReverseOrder = true;
+        bool m_ReverseOrder = false;
 
         public override void CalculateLayoutInputHorizontal()
         {
