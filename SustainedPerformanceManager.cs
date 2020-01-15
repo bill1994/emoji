@@ -23,13 +23,31 @@ namespace Kyub.Performance
 
         #region Public Static Properties
 
-        public new SustainedPerformanceManager Instance
+        public new static SustainedPerformanceManager Instance
         {
             get
             {
                 if (s_instance == null)
                     s_instance = GetInstanceFastSearch();
                 return s_instance;
+            }
+        }
+
+        protected static RenderTexture s_simulatedFrameBuffer = null;
+        protected internal static RenderTexture SimulatedFrameBuffer
+        {
+            get
+            {
+                if (s_lowPerformanceCamera == null || !s_lowPerformanceCamera.IsViewActive())
+                    return null;
+
+                var v_userSimulatedFrameBuffer = s_canGenerateLowPerformanceCamera && UseSimulatedFrameBuffer;
+                if ((v_userSimulatedFrameBuffer && s_simulatedFrameBuffer == null) || (!v_userSimulatedFrameBuffer && s_simulatedFrameBuffer != null))
+                {
+                    CheckBufferTexture(ref s_simulatedFrameBuffer, v_userSimulatedFrameBuffer);
+                }
+
+                return s_simulatedFrameBuffer;
             }
         }
 
@@ -57,7 +75,7 @@ namespace Kyub.Performance
             return v_renderBuffer;
         }
 
-        public static bool SimulateKeepFrameBuffer
+        public static bool UseSimulatedFrameBuffer
         {
             get
             {
@@ -69,7 +87,7 @@ namespace Kyub.Performance
 
                 //Metal Require Simulate FrameBuffer
                 return (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal) ||
-                    (s_instance != null && s_instance.m_simulateKeepFrameBuffer);
+                    (s_instance != null && s_instance.m_forceSimulateFrameBuffer);
             }
         }
 
@@ -161,7 +179,7 @@ namespace Kyub.Performance
         [SerializeField, Tooltip("This property will try to add a SustainedRenderView on each Camera/Canvas in Scene")]
         bool m_autoConfigureRenderViews = true;
         [SerializeField, Tooltip("This property try simulate FrameBuffer (keep last frame between frames). \nSome platforms dicard frameBuffer every cycle so we can activate this property to simulate frameBuffer state")]
-        bool m_simulateKeepFrameBuffer = false;
+        bool m_forceSimulateFrameBuffer = false;
         [Space]
         [Tooltip("* RenderBufferMode.Delayed will wait one cycle to draw to a RenderTexture after invalidation (it optimizes the app if invalidate will be called every cycle)\n" +
                  "* RenderBufferModeEnum.Immediate will draw at same cycle of invalidation to a RenderTexture")]
@@ -280,6 +298,23 @@ namespace Kyub.Performance
             }
         }
 
+        public bool ForceSimulateFrameBuffer
+        {
+            get
+            {
+                return m_forceSimulateFrameBuffer;
+            }
+
+            set
+            {
+                if (m_forceSimulateFrameBuffer == value)
+                    return;
+                m_forceSimulateFrameBuffer = value;
+                CheckBufferTextures();
+                Invalidate();
+            }
+        }
+
         public RenderBufferModeEnum RenderBufferMode
         {
             get
@@ -325,6 +360,7 @@ namespace Kyub.Performance
                 _bufferIsDirty = true;
                 SetHighPerformance(false);
                 ReleaseRenderBuffers();
+                ConfigureLowPerformanceCamera();
             }
         }
 
@@ -353,8 +389,10 @@ namespace Kyub.Performance
 
                 TryCheckDynamicElements();
                 //We must check if screen size changed
-                if (!_bufferIsDirty)
-                    _bufferIsDirty = CheckBufferTextures();
+                //if (!_bufferIsDirty)
+                //{
+                //    _bufferIsDirty = CheckBufferTextures();
+                //}
                 TryApplyPerformanceUpdate();
             }
         }
@@ -374,7 +412,6 @@ namespace Kyub.Performance
         {
             m_performanceFpsRange = new Vector2(Mathf.RoundToInt(m_performanceFpsRange.x), Mathf.RoundToInt(m_performanceFpsRange.y));
             MarkToSetHighPerformance(true);
-            UpdateLowPerformanceCameraActiveStatus();
         }
 #endif
 
@@ -382,7 +419,7 @@ namespace Kyub.Performance
 
         #region Internal Helper Functions
 
-        protected virtual void RegisterEvents()
+        protected internal virtual void RegisterEvents()
         {
             UnregisterEvents();
             if (CanvasRebuildRegistry.instance != null)
@@ -391,7 +428,7 @@ namespace Kyub.Performance
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneWasLoaded;
         }
 
-        protected virtual void UnregisterEvents()
+        protected internal virtual void UnregisterEvents()
         {
             if (CanvasRebuildRegistry.instance != null)
                 CanvasRebuildRegistry.OnWillPerformRebuild -= HandleOnWillPerformRebuild;
@@ -614,16 +651,16 @@ namespace Kyub.Performance
 
             s_isWaitingRenderBuffer = false;
 
-            //UpdateLowPerformanceCameraActiveStatus();
-
             if (OnAfterDrawBuffer != null)
                 OnAfterDrawBuffer(new Dictionary<int, RenderTexture>(s_renderBufferDict));
+
+            UpdateLowPerformanceCameraActiveStatus();
         }
 
         protected IList<SustainedCameraView> PrepareCameraViewsToDrawInBuffer(int p_invalidCullingMask)
         {
             //prepare all cameras draw into RenderBuffer changing the render texture target based in index
-            var v_cameraViews = SustainedCameraView.FindCameraViewsThatUseBuffer();
+            var v_cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
 
             var v_invalidCameraViews = new List<SustainedCameraView>();
             foreach (var v_cameraView in v_cameraViews)
@@ -641,33 +678,18 @@ namespace Kyub.Performance
         }
         protected void UpdateLowPerformanceCameraActiveStatus()
         {
-            var canUseLowPerformanceCamera = Application.isPlaying && (Application.isEditor || SimulateKeepFrameBuffer);
-            if (canUseLowPerformanceCamera)
+            if (s_canGenerateLowPerformanceCamera && Application.isPlaying)
             {
-                var v_hasAnyCameraRendering = HasAnyCameraRenderingToScreen();
+                var v_activateLowPerformance = !HasAnyCameraRenderingToScreen();
 
-                if (!v_hasAnyCameraRendering &&
-                    (s_lowPerformanceCamera == null || !s_lowPerformanceCamera.gameObject.activeSelf))
-                {
-                    if (s_lowPerformanceCamera == null)
-                        ConfigureLowPerformanceCamera();
+                if (s_lowPerformanceCamera == null && v_activateLowPerformance)
+                    ConfigureLowPerformanceCamera();
 
-                    if (s_lowPerformanceCamera != null)
-                        s_lowPerformanceCamera.gameObject.SetActive(true);
-                }
-                else if (v_hasAnyCameraRendering &&
-                    (s_lowPerformanceCamera != null && s_lowPerformanceCamera.gameObject.activeSelf))
-                {
-                    s_lowPerformanceCamera.gameObject.SetActive(false);
-                }
+                if (s_lowPerformanceCamera != null)
+                    s_lowPerformanceCamera.SetViewActive(v_activateLowPerformance);
             }
             else if (s_lowPerformanceCamera != null)
-            {
-                if (Application.isPlaying)
-                    GameObject.Destroy(s_lowPerformanceCamera.gameObject);
-                else
-                    GameObject.DestroyImmediate(s_lowPerformanceCamera.gameObject);
-            }
+                ConfigureLowPerformanceCamera();
         }
 
         protected bool HasAnyCameraRenderingToScreen()
@@ -897,19 +919,21 @@ namespace Kyub.Performance
 
         protected virtual void ConfigureLowPerformanceCamera()
         {
-            if (!s_canGenerateLowPerformanceCamera)
-                return;
-
-            var canUseLowPerformanceCamera = Application.isPlaying && (Application.isEditor || SimulateKeepFrameBuffer);
-            if (canUseLowPerformanceCamera)
+            if (s_canGenerateLowPerformanceCamera && Application.isPlaying)
             {
                 if (s_lowPerformanceCamera == null)
                 {
                     var _lowPerformanceGameObject = new GameObject("LowPerformance - Camera");
-                    _lowPerformanceGameObject.AddComponent<Camera>();
                     //Simulate KeepFrameBuffer (useful in Metal) using LowPerformanceCameraView
                     s_lowPerformanceCamera = _lowPerformanceGameObject.AddComponent<LowPerformanceCameraView>();
                 }
+            }
+            else if (s_lowPerformanceCamera != null)
+            {
+                if (Application.isPlaying)
+                    GameObject.Destroy(s_lowPerformanceCamera.gameObject);
+                else
+                    GameObject.DestroyImmediate(s_lowPerformanceCamera.gameObject);
             }
         }
 
@@ -946,10 +970,11 @@ namespace Kyub.Performance
 
         protected static bool CheckBufferTextures()
         {
+            var allCameras = Camera.allCameras;
             var v_sucess = false;
             //Fill all Used indexes of render buffer in scene
             HashSet<int> v_validBufferIndexes = new HashSet<int>();
-            var v_sceneViews = SustainedCameraView.FindCameraViewsThatUseBuffer();
+            var v_sceneViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
             foreach (var v_renderViews in v_sceneViews)
             {
                 var v_cameraView = v_renderViews as SustainedCameraView;
@@ -972,43 +997,54 @@ namespace Kyub.Performance
                 if (!v_validBufferIndexes.Contains(v_bufferIndex))
                 {
                     s_renderBufferDict.Remove(v_bufferIndex);
-                    ReleaseRenderBuffer(ref v_renderBuffer);
+                    ReleaseRenderBuffer(ref v_renderBuffer, allCameras);
                 }
                 //Update Render Buffer Texture
                 else
                 {
-                    v_sucess = CheckBufferTexture(ref v_renderBuffer) || v_sucess;
+                    v_sucess = CheckBufferTexture(ref v_renderBuffer, allCameras) || v_sucess;
                     s_renderBufferDict[v_bufferIndex] = v_renderBuffer;
                 }
             }
+
+            //Check Simulated FrameBuffer Texture
+            v_sucess = CheckBufferTexture(ref s_simulatedFrameBuffer, s_canGenerateLowPerformanceCamera && UseSimulatedFrameBuffer, allCameras) || v_sucess;
 
             return v_sucess;
         }
 
         protected static bool ReleaseRenderBuffers()
         {
+            var allCameras = Camera.allCameras;
             var v_sucess = false;
             var v_bufferIndexes = new HashSet<int>(s_renderBufferDict.Keys);
             foreach (var v_bufferIndex in v_bufferIndexes)
             {
                 var v_renderBuffer = s_renderBufferDict[v_bufferIndex];
-                v_sucess = ReleaseRenderBuffer(ref v_renderBuffer) || v_sucess;
+                v_sucess = ReleaseRenderBuffer(ref v_renderBuffer, allCameras) || v_sucess;
             }
             s_renderBufferDict.Clear();
+
+            v_sucess = ReleaseRenderBuffer(ref s_simulatedFrameBuffer, allCameras) || v_sucess;
 
             return v_sucess;
         }
 
-        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer)
+        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer, Camera[] p_cameras = null)
+        {
+            return CheckBufferTexture(ref p_renderBuffer, s_useRenderBuffer, p_cameras);
+        }
+
+        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer, bool p_isActive, Camera[] p_cameras = null)
         {
             if (Application.isPlaying)
             {
-                if (s_useRenderBuffer)
+                if (p_isActive)
                 {
                     if (p_renderBuffer == null || !p_renderBuffer.IsCreated() ||
                         p_renderBuffer.width != Screen.width || p_renderBuffer.height != Screen.height)
                     {
-                        ReleaseRenderBuffer(ref p_renderBuffer);
+                        ReleaseRenderBuffer(ref p_renderBuffer, p_cameras);
 
                         //s_renderBuffer = RenderTexture.GetTemporary(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
                         p_renderBuffer = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
@@ -1022,20 +1058,20 @@ namespace Kyub.Performance
                     }
                 }
                 else
-                    ReleaseRenderBuffer(ref p_renderBuffer);
+                    ReleaseRenderBuffer(ref p_renderBuffer, p_cameras);
             }
             return false;
         }
 
-        protected static bool ReleaseRenderBuffer(ref RenderTexture p_renderBuffer)
+        protected static bool ReleaseRenderBuffer(ref RenderTexture p_renderBuffer, Camera[] p_cameras = null)
         {
             if (p_renderBuffer != null)
             {
                 if (p_renderBuffer == RenderTexture.active)
-                    RenderTexture.active = p_renderBuffer;
-
-                var v_cameras = Resources.FindObjectsOfTypeAll<Camera>();
-                foreach (var v_camera in v_cameras)
+                    RenderTexture.active = null;
+                if (p_cameras == null)
+                    p_cameras = Camera.allCameras;//Resources.FindObjectsOfTypeAll<Camera>();
+                foreach (var v_camera in p_cameras)
                 {
                     if (v_camera != null && v_camera.scene.IsValid() && v_camera.activeTexture == p_renderBuffer || v_camera.targetTexture == p_renderBuffer)
                     {

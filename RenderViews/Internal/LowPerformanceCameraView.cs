@@ -3,14 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace Kyub.Performance
 {
+    [RequireComponent(typeof(Camera))]
     public sealed class LowPerformanceCameraView : MonoBehaviour
     {
         #region Private Variables
 
-        Texture2D _renderBuffer = null;
+        bool _isViewActive = false;
 
         #endregion
 
@@ -21,7 +23,7 @@ namespace Kyub.Performance
         {
             get
             {
-                if (this != null && _cachedCamera == null)
+                if (this != null && _cachedCamera == null && Application.isPlaying)
                 {
                     ConfigureCamera();
                 }
@@ -33,104 +35,117 @@ namespace Kyub.Performance
 
         #region Unity Functions
 
-        void OnEnable()
+        private void Awake()
         {
-            InitRenderBufferDelayed();
-        }
-
-        void Start()
-        {
-            if (Application.isPlaying && Camera == null)
+            if (_cachedCamera == null)
             {
-                ClearRenderBuffer();
-                Debug.Log("[FakeFrameBufferView] Must contain a camera to work, removing component to prevent instabilities (sender: " + name + ")");
-                Component.Destroy(this);
-                return;
+                _cachedCamera = GetComponent<Camera>();
+                if (_cachedCamera == null)
+                    _cachedCamera = this.gameObject.AddComponent<Camera>();
             }
         }
 
-        void OnDisable()
+        private void OnEnable()
         {
-            ClearRenderBuffer();
-        }
-
-        void OnDestroy()
-        {
-            ClearRenderBuffer();
+            if (IsViewActive())
+                UpdateFrameBuffer();
         }
 
         void OnPostRender()
         {
-            if (_renderBuffer != null)
+            if (Application.isPlaying && _isViewActive)
             {
-                if (SustainedPerformanceManager.SimulateKeepFrameBuffer)
-                    Graphics.Blit(_renderBuffer, null as RenderTexture);
-                else
-                    ClearRenderBuffer();
+                var buffer = SustainedPerformanceManager.SimulatedFrameBuffer;
+                if (buffer != null)
+                    Graphics.Blit(buffer, null as RenderTexture);
             }
         }
 
         #endregion
 
-        #region Buffer Helper Functions
+        #region Helper Functions
 
-        internal void ClearRenderBuffer()
+        public bool IsViewActive()
         {
-            if (_initRenderBufferCoroutine != null)
-            {
-                StopCoroutine(_initRenderBufferCoroutine);
-                _initRenderBufferCoroutine = null;
-            }
-            if (_renderBuffer != null)
-            {
-                if (Application.isPlaying)
-                    Texture2D.Destroy(_renderBuffer);
-                else
-                    Texture2D.DestroyImmediate(_renderBuffer);
-            }
-            _renderBuffer = null;
+            return this.gameObject.activeSelf && _isViewActive;
         }
 
-        Coroutine _initRenderBufferCoroutine = null;
-        void InitRenderBufferDelayed()
+        public void SetViewActive(bool active)
         {
-            if (enabled && gameObject.activeInHierarchy)
-            {
-                if (SustainedPerformanceManager.SimulateKeepFrameBuffer)
-                    Camera.enabled = false;
-                if (_initRenderBufferCoroutine == null)
-                    _initRenderBufferCoroutine = StartCoroutine(InitRenderBufferOnEndFrameRoutine());
-            }
-            else
-                InitRenderBuffer();
-        }
-
-        void InitRenderBuffer()
-        {
-            if (SustainedPerformanceManager.SimulateKeepFrameBuffer)
-                Camera.enabled = false;
-            ClearRenderBuffer();
             if (Application.isPlaying)
             {
-                if (SustainedPerformanceManager.SimulateKeepFrameBuffer)
-                {
-                    //Take Screenshot and Save it
-                    var width = Screen.width;
-                    var height = Screen.height;
-                    _renderBuffer = new Texture2D(width, height, TextureFormat.RGB24, false);
+                gameObject.SetActive(active || Application.isEditor);
+                _isViewActive = active;
 
-                    _renderBuffer.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-                    _renderBuffer.Apply();
-                }
-                ConfigureCamera();
+                if (active)
+                    UpdateFrameBuffer();
+                else if(Application.isEditor)
+                    ConfigureCamera();
             }
-            Camera.enabled = true;
         }
 
-        IEnumerator InitRenderBufferOnEndFrameRoutine()
+        internal void UpdateFrameBuffer()
         {
-            yield return new WaitForEndOfFrame();
-            InitRenderBuffer();
+            ConfigureCamera();
+            if (_cachedCamera != null)
+            {
+                //Prevent invalidate after draw camera
+                var instance = SustainedPerformanceManager.Instance;
+                if(instance != null && instance.enabled && instance.gameObject.activeInHierarchy)
+                    instance.UnregisterEvents();
+
+                var frameBuffer = SustainedPerformanceManager.SimulatedFrameBuffer;
+                if (frameBuffer != null)
+                {
+                    var cameraViewsToDrawOnScreen = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(false);
+
+                    Camera lastCamera = null;
+                    for (int i = 0; i < cameraViewsToDrawOnScreen.Count; i++)
+                    {
+                        var camera = cameraViewsToDrawOnScreen[i].Camera;
+                        if (i == cameraViewsToDrawOnScreen.Count - 1)
+                            lastCamera = camera;
+                        else
+                        {
+                            camera.targetTexture = frameBuffer;
+                            camera.Render();
+                            camera.targetTexture = null;
+                        }
+                    }
+                    if (lastCamera == null)
+                        lastCamera = this.Camera;
+
+                    //Set all canvas to last camera
+                    var canvasViewsToDraw = SustainedCanvasView.FindAllActiveCanvasViewOverlay();
+                    foreach (var canvasView in canvasViewsToDraw)
+                    {
+                        var canvasGroup = canvasView.GetComponent<CanvasGroup>();
+                        if (canvasGroup != null)
+                            canvasGroup.alpha = canvasView._cachedAlphaValue;
+                        canvasView.Canvas.worldCamera = lastCamera;
+                        canvasView.Canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                    }
+
+                    //Render Last Camera
+                    lastCamera.targetTexture = frameBuffer;
+                    lastCamera.Render();
+                    lastCamera.targetTexture = null;
+
+                    //Revert Canvas
+                    foreach (var canvasView in canvasViewsToDraw)
+                    {
+                        var canvasGroup = canvasView.GetComponent<CanvasGroup>();
+                        if (canvasGroup != null)
+                            canvasGroup.alpha = canvasView.IsViewActive() ? canvasView._cachedAlphaValue : 0;
+                        canvasView.Canvas.worldCamera = null;
+                        canvasView.Canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                    }
+                }
+
+                //Register events again in Sustained Performance Manager
+                if (instance != null && instance.enabled && instance.gameObject.activeInHierarchy)
+                    instance.RegisterEvents();
+            }
         }
 
         internal void ConfigureCamera()
@@ -142,37 +157,23 @@ namespace Kyub.Performance
                     _cachedCamera = GetComponent<Camera>();
                     if (_cachedCamera == null)
                         _cachedCamera = gameObject.AddComponent<Camera>();
-
-                    if (Application.isEditor)
-                        gameObject.hideFlags = HideFlags.NotEditable; //s_lowPerformanceCamera.gameObject.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.NotEditable;
-                    _cachedCamera.backgroundColor = Color.clear;
-                    _cachedCamera.clearStencilAfterLightingPass = false;
-                    _cachedCamera.allowHDR = false;
-                    _cachedCamera.allowMSAA = false;
-                    _cachedCamera.allowDynamicResolution = false;
-                    _cachedCamera.cullingMask = 0;
-                    _cachedCamera.orthographic = true;
-                    _cachedCamera.farClipPlane = 0.1f;
-                    _cachedCamera.nearClipPlane = 0;
-                    _cachedCamera.enabled = enabled;
-                    _cachedCamera.depth = -999999;
                 }
-                _cachedCamera.clearFlags = SustainedPerformanceManager.SimulateKeepFrameBuffer ? CameraClearFlags.SolidColor : CameraClearFlags.Nothing;
+
+                if (Application.isEditor)
+                    gameObject.hideFlags = HideFlags.NotEditable; //s_lowPerformanceCamera.gameObject.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.NotEditable;
+                _cachedCamera.backgroundColor = Color.blue;
+                _cachedCamera.clearStencilAfterLightingPass = false;
+                _cachedCamera.allowHDR = false;
+                _cachedCamera.allowMSAA = false;
+                _cachedCamera.allowDynamicResolution = false;
+                _cachedCamera.cullingMask = 0;
+                _cachedCamera.orthographic = true;
+                _cachedCamera.farClipPlane = 0.1f;
+                _cachedCamera.nearClipPlane = 0;
+                _cachedCamera.enabled = true;
+                _cachedCamera.depth = -999999;
+                _cachedCamera.clearFlags = SustainedPerformanceManager.UseSimulatedFrameBuffer && _isViewActive ? CameraClearFlags.SolidColor : CameraClearFlags.Nothing;
             }
-        }
-
-        #endregion
-
-        #region Receivers
-
-        private void HandleOnAfterSetPerformance()
-        {
-            InitRenderBufferDelayed();
-        }
-
-        private void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> obj)
-        {
-            InitRenderBuffer();
         }
 
         #endregion

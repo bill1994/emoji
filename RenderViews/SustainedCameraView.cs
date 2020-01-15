@@ -150,13 +150,17 @@ namespace Kyub.Performance
                 TryInitRenderBuffer();
 
             var v_camera = Camera;
-            if (v_camera != null && v_camera.enabled != p_active)
+            if (v_camera != null)
             {
-                //Special RenderBuffer Mode (we can't disable camera in this cycle when SustainedPerformanceManager.UseRenderBufferInHighPerformance == false)
-                //var v_canChangeCameraState = !m_useRenderBuffer || p_active || !SustainedPerformanceManager.IsWaitingRenderBuffer;
-                //if(v_canChangeCameraState)
-                v_camera.enabled = p_active;
+                if (v_camera.enabled != p_active)
+                {
+                    //Special RenderBuffer Mode (we can't disable camera in this cycle when SustainedPerformanceManager.UseRenderBufferInHighPerformance == false)
+                    //var v_canChangeCameraState = !m_useRenderBuffer || p_active || !SustainedPerformanceManager.IsWaitingRenderBuffer;
+                    //if(v_canChangeCameraState)
+                    v_camera.enabled = p_active;
+                }
             }
+            
             _isViewActive = p_active;
         }
 
@@ -187,8 +191,6 @@ namespace Kyub.Performance
                             v_bufferCamera.targetTexture = v_renderTexture;
                     }
                 }
-                else
-                    ClearRenderBuffer();
             }
         }
 
@@ -255,20 +257,20 @@ namespace Kyub.Performance
 
         #region Static Helper Functions
 
-        public static IList<SustainedCameraView> FindCameraViewsThatUseBuffer()
+        public static IList<SustainedCameraView> FindAllActiveCameraViewsWithRenderBufferState(bool p_useRenderBuffer)
         {
             List<SustainedCameraView> v_activeCameraViews = new List<SustainedCameraView>();
             foreach (var v_view in s_sceneRenderViews)
             {
                 var v_sustainedCameraView = v_view as SustainedCameraView;
-                if (v_sustainedCameraView != null && 
-                    v_sustainedCameraView.enabled && v_sustainedCameraView.gameObject.activeInHierarchy && 
-                    v_sustainedCameraView.m_useRenderBuffer && v_sustainedCameraView.Camera != null)
+                if (v_sustainedCameraView != null &&
+                    v_sustainedCameraView.enabled && v_sustainedCameraView.gameObject.activeInHierarchy &&
+                    v_sustainedCameraView.m_useRenderBuffer == p_useRenderBuffer && v_sustainedCameraView.Camera != null)
                     v_activeCameraViews.Add(v_sustainedCameraView);
             }
 
             //Sort cameras by depth
-            if(v_activeCameraViews.Count > 1)
+            if (v_activeCameraViews.Count > 1)
                 v_activeCameraViews.Sort((a, b) => a.Camera.depth.CompareTo(b.Camera.depth));
 
             return v_activeCameraViews;
