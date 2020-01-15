@@ -93,10 +93,9 @@ namespace Kyub.Performance
 
         #region Constructors
 
+        Canvas.WillRenderCanvases OnBasePerformUpdate = null;
         protected CanvasRebuildRegistry(CanvasUpdateRegistry p_baseInstanceTemplate) : base()
         {
-            Canvas.WillRenderCanvases v_baseDelegate = null;
-
             //Unregister base PerformUpdate
             if (p_baseInstanceTemplate != null)
             {
@@ -116,7 +115,7 @@ namespace Kyub.Performance
                             //Save base delegate to force invoke after PerformRefresh
                             if (v_delegate.Target == this)
                             {
-                                v_baseDelegate = (Canvas.WillRenderCanvases)v_delegate;
+                                OnBasePerformUpdate = (Canvas.WillRenderCanvases)v_delegate;
                             }
                         }
                     }
@@ -153,9 +152,8 @@ namespace Kyub.Performance
             }
 
             //Register new PerformUpdate
+            Canvas.willRenderCanvases -= this.OnBeforePerformUpdate;
             Canvas.willRenderCanvases += this.OnBeforePerformUpdate;
-            if (v_baseDelegate != null)
-                Canvas.willRenderCanvases += v_baseDelegate;
         }
 
         #endregion
@@ -233,6 +231,9 @@ namespace Kyub.Performance
                 if (OnWillPerformRebuild != null)
                     OnWillPerformRebuild.Invoke();
             }
+
+            if (OnBasePerformUpdate != null)
+                OnBasePerformUpdate.Invoke();
         }
 
         #endregion
