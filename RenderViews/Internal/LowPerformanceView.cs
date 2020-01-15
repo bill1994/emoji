@@ -89,6 +89,8 @@ namespace Kyub.Performance
                     else
                         SetFrameBufferDirty();
                 }
+                else
+                    _bufferIsDirty = false;
                 //SetFrameBufferDirty();
                 else if (Application.isEditor)
                     Configure();
