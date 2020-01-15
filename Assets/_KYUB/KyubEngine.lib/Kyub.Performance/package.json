@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.performance",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "displayName": "Kyub Performance",
   "description": "This package allows unity to disable Canvas to cutoff drawcalls in runtime. Useful to optimize performance in Default UI Apps",
   "unity": "2019.1",
