@@ -13,6 +13,7 @@ namespace Kyub.Performance
     {
         #region Static Events
 
+        public static event Action OnBeforeSetPerformance; //Before Process Performances (Useful to know if LowPerformanceView will be activated)
         public static event Action<bool> OnSetHighPerformance;
         public static event Action OnSetLowPerformance;
         public static event Action<int> OnAfterWaitingToPrepareRenderBuffer; //Only in Delayed RenderBuffer Mode
@@ -22,6 +23,15 @@ namespace Kyub.Performance
         #endregion
 
         #region Public Static Properties
+
+        static bool s_isEndOfFrame = false;
+        public static bool IsEndOfFrame
+        {
+            get
+            {
+                return s_isEndOfFrame;
+            }
+        }
 
         public new static SustainedPerformanceManager Instance
         {
@@ -323,13 +333,14 @@ namespace Kyub.Performance
         {
             if (s_instance == this)
             {
+                s_isEndOfFrame = false;
                 s_canGenerateLowPerformanceView = true;
                 MarkDynamicElementsDirty();
                 TryAutoCreateRenderViews();
 
                 RegisterEvents();
                 _bufferIsDirty = true;
-                SetHighPerformance();
+                SetHighPerformanceDelayed();
             }
         }
 
@@ -338,10 +349,12 @@ namespace Kyub.Performance
             UnregisterEvents();
             if (s_instance == this)
             {
+                s_isEndOfFrame = false;
                 s_canGenerateLowPerformanceView = false;
                 s_useRenderBuffer = false;
                 _bufferIsDirty = true;
-                SetHighPerformance(false);
+                CancelSetLowPerformance();
+                SetHighPerformanceImmediate();
                 ReleaseRenderBuffers();
                 ConfigureLowPerformanceView();
             }
@@ -354,13 +367,14 @@ namespace Kyub.Performance
             TryAutoCreateRenderViews();
 
             _bufferIsDirty = true;
-            SetHighPerformance();
+            SetHighPerformanceDelayed();
         }
 
         protected virtual void Update()
         {
             if (s_instance == this)
             {
+                s_isEndOfFrame = false;
 #if UNITY_EDITOR
                 if (Application.isPlaying)
                 {
@@ -425,9 +439,6 @@ namespace Kyub.Performance
 
         private void HandleOnWillPerformRebuild()
         {
-            if (s_lowPerformanceView != null && s_lowPerformanceView.IsViewActive())
-                return;
-
             if (_ignoreNextLayoutRebuild)
             {
                 ClearPendentInvalidTransforms();
@@ -443,7 +454,7 @@ namespace Kyub.Performance
 
         protected virtual void OnPerformanceUpdate()
         {
-            SetHighPerformance();
+            SetHighPerformanceDelayed();
         }
 
         #endregion
@@ -468,53 +479,46 @@ namespace Kyub.Performance
         }
 
         Coroutine _routineSetLowPerformance = null;
-        protected virtual void CancelSetLowPerformanceTick()
+        protected virtual void CancelSetLowPerformance()
         {
-            _currentDisableHighPerformanceTime = 0;
+            _lowPerformanceWaitTime = 0;
             if (_routineSetLowPerformance != null)
                 StopCoroutine(_routineSetLowPerformance);
         }
 
-        protected virtual void InitSetLowPerformanceTick(float p_time)
+        protected virtual void SetLowPerformanceDelayed(float p_waitTime = 0)
         {
-            if (p_time > 0)
+            CancelSetHighPerformance();
+            if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
             {
-                if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
+                if (_lowPerformanceWaitTime <= 0)
                 {
-                    if (_currentDisableHighPerformanceTime <= 0)
-                    {
-                        CancelSetLowPerformanceTick();
-                        _routineSetLowPerformance = StartCoroutine(SetLowPerformanceRoutine(p_time));
-                    }
-                    else
-                        _currentDisableHighPerformanceTime = p_time;
+                    CancelSetLowPerformance();
+                    _routineSetLowPerformance = StartCoroutine(SetLowPerformanceInEndOfFrameRoutine(p_waitTime));
                 }
+                else
+                    _lowPerformanceWaitTime = p_waitTime;
             }
         }
 
-        float _currentDisableHighPerformanceTime = 0;
-        protected virtual IEnumerator SetLowPerformanceRoutine(float p_time)
-        {
-            if (p_time > 0)
-            {
-                _currentDisableHighPerformanceTime = p_time;
-                yield return null;
-
-                while (_currentDisableHighPerformanceTime > 0)
-                {
-                    _currentDisableHighPerformanceTime -= Time.unscaledDeltaTime;
-                    yield return null;
-                }
-                SetLowPerformance();
-            }
-            else
-                SetLowPerformance();
-        }
-
+        float _lowPerformanceWaitTime = 0;
         bool _ignoreNextLayoutRebuild = false;
-        protected virtual void SetLowPerformance()
+        protected virtual IEnumerator SetLowPerformanceInEndOfFrameRoutine(float p_waitTime)
         {
+            _lowPerformanceWaitTime = p_waitTime;
+            while (_lowPerformanceWaitTime > 0)
+            {
+                _lowPerformanceWaitTime -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            yield return new WaitForEndOfFrame(); //Wait until finish draw this cycle
+            s_isEndOfFrame = true;
+
             _isHighPerformance = false;
+
+            CallOnBeforeSetPerformance();
+
             if (m_canControlFps)
             {
                 QualitySettings.vSyncCount = 0;
@@ -531,12 +535,73 @@ namespace Kyub.Performance
             _ignoreNextLayoutRebuild = true;
 
             CallOnAfterSetPerformance();
+
+            _routineSetLowPerformance = null;
+        }
+
+        protected virtual void CancelSetHighPerformance()
+        {
+            _highPerformanceAutoDisable = false;
+            _highPerformanceWaitTime = 0;
+            if (_routineSetHighPerformance != null)
+                StopCoroutine(_routineSetHighPerformance);
+        }
+
+        protected virtual void SetHighPerformanceImmediate(bool p_autoDisable = true)
+        {
+            CancelSetLowPerformance();
+            CancelSetHighPerformance();
+            var routine = SetHighPerformanceInEndOfFrameRoutine(p_autoDisable, 0, true);
+            while (routine.MoveNext()) { };
+        }
+
+        bool _highPerformanceAutoDisable = false;
+        float _highPerformanceWaitTime = 0;
+        Coroutine _routineSetHighPerformance = null;
+        protected virtual void SetHighPerformanceDelayed(bool p_autoDisable = true, float p_waitTime = 0)
+        {
+            CancelSetLowPerformance();
+            if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
+            {
+                if (_highPerformanceWaitTime <= 0)
+                {
+                    CancelSetHighPerformance();
+                    _routineSetHighPerformance = StartCoroutine(SetHighPerformanceInEndOfFrameRoutine(p_autoDisable));
+                }
+                else
+                {
+                    _highPerformanceWaitTime = p_waitTime;
+                    _highPerformanceAutoDisable = p_autoDisable || _highPerformanceAutoDisable;
+                }
+            }
+            else
+            {
+                CancelSetHighPerformance();
+                _performanceIsDirty = true;
+            }
         }
 
         Coroutine _routineAfterDrawBuffer = null;
-        protected virtual void SetHighPerformance(bool p_autoDisable = true)
+        protected virtual IEnumerator SetHighPerformanceInEndOfFrameRoutine(bool p_autoDisable = true, float p_waitTime = 0, bool skipEndOfFrame = false)
         {
+            _highPerformanceAutoDisable = p_autoDisable;
+            _highPerformanceWaitTime = p_waitTime;
+            while (_highPerformanceWaitTime > 0)
+            {
+                _highPerformanceWaitTime -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            if (skipEndOfFrame)
+            {
+                yield return new WaitForEndOfFrame(); //Wait until finish draw this cycle
+                s_isEndOfFrame = true;
+            }
+
             _isHighPerformance = true;
+
+            CallOnBeforeSetPerformance();
+
             if (m_canControlFps)
             {
                 QualitySettings.vSyncCount = 0;
@@ -566,8 +631,12 @@ namespace Kyub.Performance
 
             CallOnAfterSetPerformance();
 
-            if (p_autoDisable)
-                InitSetLowPerformanceTick(m_autoDisableHighPerformanceTime);
+            _routineSetHighPerformance = null;
+
+            if (_highPerformanceAutoDisable)
+                SetLowPerformanceDelayed(m_autoDisableHighPerformanceTime);
+            else
+                CancelSetLowPerformance();  
         }
 
         protected virtual void CancelOnAfterDrawBuffer()
@@ -591,6 +660,13 @@ namespace Kyub.Performance
             s_pendentInvalidRectTransforms.Clear();
             s_invalidCullingMask = _defaultInvalidCullingMask;
         }
+
+        protected virtual void CallOnBeforeSetPerformance()
+        {
+            if (OnBeforeSetPerformance != null)
+                OnBeforeSetPerformance.Invoke();
+        }
+
 
         protected virtual void CallOnAfterSetPerformance()
         {
@@ -617,6 +693,7 @@ namespace Kyub.Performance
                     OnAfterWaitingToPrepareRenderBuffer(p_invalidCullingMask);
 
                 yield return new WaitForEndOfFrame();
+                s_isEndOfFrame = true;
 
                 //Reset camera RenderTextures
                 foreach (var v_cameraView in v_cameraViews)
@@ -633,6 +710,7 @@ namespace Kyub.Performance
                 if (QualitySettings.antiAliasing > 1)
                     PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
                 yield return new WaitForEndOfFrame();
+                s_isEndOfFrame = true;
             }
 
             s_isWaitingRenderBuffer = false;
@@ -807,7 +885,7 @@ namespace Kyub.Performance
         {
             var v_instance = GetInstanceFastSearch();
             if (v_instance != null && v_instance._isHighPerformance)
-                v_instance.InitSetLowPerformanceTick(0.1f);
+                v_instance.SetLowPerformanceDelayed(0.1f);
         }
 
         public static bool IsHighPerformanceActive()
@@ -840,7 +918,7 @@ namespace Kyub.Performance
                 if (v_bufferIsDirty != v_instance._bufferIsDirty)
                 {
                     v_instance._bufferIsDirty = v_bufferIsDirty;
-                    v_instance.CancelSetLowPerformanceTick();
+                    v_instance.CancelSetLowPerformance();
                     v_instance._isHighPerformance = false;
                 }
                 //Invalidate all Cavas
@@ -850,7 +928,7 @@ namespace Kyub.Performance
                 if (!v_instance._isHighPerformance || !v_instance.m_safeRefreshMode)
                     v_instance._performanceIsDirty = true;
                 else
-                    v_instance.InitSetLowPerformanceTick(v_instance.m_autoDisableHighPerformanceTime);
+                    v_instance.SetLowPerformanceDelayed(v_instance.m_autoDisableHighPerformanceTime);
             }
         }
 
@@ -941,7 +1019,7 @@ namespace Kyub.Performance
                 var v_allCanvas = Resources.FindObjectsOfTypeAll<Canvas>();
                 foreach (var v_canvas in v_allCanvas)
                 {
-                    if (v_canvas != null && (s_lowPerformanceView == null || v_canvas != s_lowPerformanceView.Canvas) &&
+                    if (v_canvas != null &&
                         (v_canvas.transform.parent == null || v_canvas.transform.parent.GetComponentInParent<Canvas>() == null)
                         && v_canvas.gameObject.scene.IsValid())
 
