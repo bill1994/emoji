@@ -124,8 +124,8 @@ namespace Kyub.Performance
 
         #region Rendering Helper Functions
 
-        protected float _cachedAlphaValue = 1;
-        protected CanvasGroup ConfigureLowPerformanceCanvasGroup()
+        protected internal float _cachedAlphaValue = 1;
+        internal CanvasGroup ConfigureLowPerformanceCanvasGroup()
         {
             var v_canvasGroup = GetComponent<CanvasGroup>();
             if (v_canvasGroup == null)
@@ -348,7 +348,7 @@ namespace Kyub.Performance
             }
         }
 
-        protected static SustainedCanvasView FindSustainedCanvasParent(ISustainedElement p_element)
+        public static SustainedCanvasView FindSustainedCanvasParent(ISustainedElement p_element)
         {
             SustainedCanvasView v_canvasView = null;
             if (!p_element.IsDestroyed())
@@ -367,6 +367,25 @@ namespace Kyub.Performance
                 }
             }
             return v_canvasView;
+        }
+
+        public static IList<SustainedCanvasView> FindAllActiveCanvasViewOverlay()
+        {
+            List<SustainedCanvasView> v_activeCanvasViews = new List<SustainedCanvasView>();
+            foreach (var v_view in s_sceneRenderViews)
+            {
+                var v_sustainedCanvasView = v_view as SustainedCanvasView;
+                if (v_sustainedCanvasView != null &&
+                    v_sustainedCanvasView.enabled && v_sustainedCanvasView.gameObject.activeInHierarchy &&
+                    v_sustainedCanvasView.Canvas != null && v_sustainedCanvasView.Canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                    v_activeCanvasViews.Add(v_sustainedCanvasView);
+            }
+
+            //Sort cameras by depth
+            if (v_activeCanvasViews.Count > 1)
+                v_activeCanvasViews.Sort((a, b) => a.Canvas.renderOrder.CompareTo(b.Canvas.renderOrder));
+
+            return v_activeCanvasViews;
         }
 
         #endregion
