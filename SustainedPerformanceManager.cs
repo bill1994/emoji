@@ -33,24 +33,6 @@ namespace Kyub.Performance
             }
         }
 
-        protected static RenderTexture s_simulatedFrameBuffer = null;
-        protected internal static RenderTexture SimulatedFrameBuffer
-        {
-            get
-            {
-                if (s_lowPerformanceCamera == null || !s_lowPerformanceCamera.IsViewActive())
-                    return null;
-
-                var v_userSimulatedFrameBuffer = s_canGenerateLowPerformanceCamera && UseSimulatedFrameBuffer;
-                if ((v_userSimulatedFrameBuffer && s_simulatedFrameBuffer == null) || (!v_userSimulatedFrameBuffer && s_simulatedFrameBuffer != null))
-                {
-                    CheckBufferTexture(ref s_simulatedFrameBuffer, v_userSimulatedFrameBuffer);
-                }
-
-                return s_simulatedFrameBuffer;
-            }
-        }
-
         protected static Dictionary<int, RenderTexture> s_renderBufferDict = new Dictionary<int, RenderTexture>();
         public static RenderTexture GetRenderBuffer(int p_bufferIndex)
         {
@@ -1008,9 +990,6 @@ namespace Kyub.Performance
                 }
             }
 
-            //Check Simulated FrameBuffer Texture
-            v_sucess = CheckBufferTexture(ref s_simulatedFrameBuffer, s_canGenerateLowPerformanceCamera && UseSimulatedFrameBuffer, allCameras) || v_sucess;
-
             return v_sucess;
         }
 
@@ -1025,8 +1004,6 @@ namespace Kyub.Performance
                 v_sucess = ReleaseRenderBuffer(ref v_renderBuffer, allCameras) || v_sucess;
             }
             s_renderBufferDict.Clear();
-
-            v_sucess = ReleaseRenderBuffer(ref s_simulatedFrameBuffer, allCameras) || v_sucess;
 
             return v_sucess;
         }

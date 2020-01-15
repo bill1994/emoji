@@ -300,8 +300,7 @@ namespace Kyub.Performance
             {
                 if (v_renderBuffer != texture)
                 {
-                    texture = SustainedPerformanceManager.GetRenderBuffer(m_renderBufferIndex);
-                    texture = texture;
+                    texture = v_renderBuffer;
                     RecalculateRectUV(m_uvBasedOnScreenRect);
                 }
             }

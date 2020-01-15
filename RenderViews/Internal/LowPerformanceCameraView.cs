@@ -14,6 +14,8 @@ namespace Kyub.Performance
 
         bool _isViewActive = false;
 
+        Texture2D _frameBuffer = null;
+
         #endregion
 
         #region Public Properties
@@ -51,13 +53,17 @@ namespace Kyub.Performance
                 UpdateFrameBuffer();
         }
 
+        private void OnDisable()
+        {
+            ClearFrameBuffer();
+        }
+
         void OnPostRender()
         {
             if (Application.isPlaying && _isViewActive)
             {
-                var buffer = SustainedPerformanceManager.SimulatedFrameBuffer;
-                if (buffer != null)
-                    Graphics.Blit(buffer, null as RenderTexture);
+                if (_frameBuffer != null)
+                    Graphics.Blit(_frameBuffer, null as RenderTexture);
             }
         }
 
@@ -79,73 +85,97 @@ namespace Kyub.Performance
 
                 if (active)
                     UpdateFrameBuffer();
-                else if(Application.isEditor)
+                else if (Application.isEditor)
+                {
+                    ClearFrameBuffer();
                     ConfigureCamera();
+                }
             }
         }
 
         internal void UpdateFrameBuffer()
         {
             ConfigureCamera();
-            if (_cachedCamera != null)
+
+            if (_cachedCamera != null && SustainedPerformanceManager.UseSimulatedFrameBuffer)
             {
+                var frameBufferRT = RenderTexture.GetTemporary(Screen.width, Screen.height);
+
                 //Prevent invalidate after draw camera
                 var instance = SustainedPerformanceManager.Instance;
-                if(instance != null && instance.enabled && instance.gameObject.activeInHierarchy)
+                if (instance != null && instance.enabled && instance.gameObject.activeInHierarchy)
                     instance.UnregisterEvents();
 
-                var frameBuffer = SustainedPerformanceManager.SimulatedFrameBuffer;
-                if (frameBuffer != null)
+                var cameraViewsToDrawOnScreen = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(false);
+
+                Camera lastCamera = null;
+                for (int i = 0; i < cameraViewsToDrawOnScreen.Count; i++)
                 {
-                    var cameraViewsToDrawOnScreen = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(false);
-
-                    Camera lastCamera = null;
-                    for (int i = 0; i < cameraViewsToDrawOnScreen.Count; i++)
+                    var camera = cameraViewsToDrawOnScreen[i].Camera;
+                    if (i == cameraViewsToDrawOnScreen.Count - 1)
+                        lastCamera = camera;
+                    else
                     {
-                        var camera = cameraViewsToDrawOnScreen[i].Camera;
-                        if (i == cameraViewsToDrawOnScreen.Count - 1)
-                            lastCamera = camera;
-                        else
-                        {
-                            camera.targetTexture = frameBuffer;
-                            camera.Render();
-                            camera.targetTexture = null;
-                        }
-                    }
-                    if (lastCamera == null)
-                        lastCamera = this.Camera;
-
-                    //Set all canvas to last camera
-                    var canvasViewsToDraw = SustainedCanvasView.FindAllActiveCanvasViewOverlay();
-                    foreach (var canvasView in canvasViewsToDraw)
-                    {
-                        var canvasGroup = canvasView.GetComponent<CanvasGroup>();
-                        if (canvasGroup != null)
-                            canvasGroup.alpha = canvasView._cachedAlphaValue;
-                        canvasView.Canvas.worldCamera = lastCamera;
-                        canvasView.Canvas.renderMode = RenderMode.ScreenSpaceCamera;
-                    }
-
-                    //Render Last Camera
-                    lastCamera.targetTexture = frameBuffer;
-                    lastCamera.Render();
-                    lastCamera.targetTexture = null;
-
-                    //Revert Canvas
-                    foreach (var canvasView in canvasViewsToDraw)
-                    {
-                        var canvasGroup = canvasView.GetComponent<CanvasGroup>();
-                        if (canvasGroup != null)
-                            canvasGroup.alpha = canvasView.IsViewActive() ? canvasView._cachedAlphaValue : 0;
-                        canvasView.Canvas.worldCamera = null;
-                        canvasView.Canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                        camera.targetTexture = frameBufferRT;
+                        camera.Render();
+                        camera.targetTexture = null;
                     }
                 }
+                if (lastCamera == null)
+                    lastCamera = this.Camera;
+
+                //Set all canvas to last camera
+                var canvasViewsToDraw = SustainedCanvasView.FindAllActiveCanvasViewOverlay();
+                foreach (var canvasView in canvasViewsToDraw)
+                {
+                    var canvasGroup = canvasView.GetComponent<CanvasGroup>();
+                    if (canvasGroup != null)
+                        canvasGroup.alpha = canvasView._cachedAlphaValue;
+                    canvasView.Canvas.worldCamera = lastCamera;
+                    canvasView.Canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                }
+
+                //Render Last Camera
+                lastCamera.targetTexture = frameBufferRT;
+                lastCamera.Render();
+                lastCamera.targetTexture = null;
+
+                //Revert Canvas
+                foreach (var canvasView in canvasViewsToDraw)
+                {
+                    var canvasGroup = canvasView.GetComponent<CanvasGroup>();
+                    if (canvasGroup != null)
+                        canvasGroup.alpha = canvasView.IsViewActive() ? canvasView._cachedAlphaValue : 0;
+                    canvasView.Canvas.worldCamera = null;
+                    canvasView.Canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                }
+
+                //Copy Render texture to a texture
+                var oldRT = RenderTexture.active;
+                RenderTexture.active = frameBufferRT;
+                //Only recreate texture if size changed
+                if (_frameBuffer == null || _frameBuffer.width != frameBufferRT.width || _frameBuffer.height != frameBufferRT.height)
+                {
+                    ClearFrameBuffer();
+                    _frameBuffer = new Texture2D(frameBufferRT.width, frameBufferRT.height, TextureFormat.RGB24, false);
+                }
+                _frameBuffer.ReadPixels(new Rect(0, 0, frameBufferRT.width, frameBufferRT.height), 0, 0);
+                _frameBuffer.Apply();
+                RenderTexture.active = oldRT;
+                
+                //Destroy temporary render texture
+                RenderTexture.ReleaseTemporary(frameBufferRT);
 
                 //Register events again in Sustained Performance Manager
                 if (instance != null && instance.enabled && instance.gameObject.activeInHierarchy)
                     instance.RegisterEvents();
             }
+        }
+
+        internal void ClearFrameBuffer()
+        {
+            if (_frameBuffer != null)
+                Texture2D.Destroy(_frameBuffer);
         }
 
         internal void ConfigureCamera()
