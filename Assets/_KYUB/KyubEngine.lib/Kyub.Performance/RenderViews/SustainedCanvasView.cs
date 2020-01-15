@@ -369,7 +369,7 @@ namespace Kyub.Performance
             return v_canvasView;
         }
 
-        public static IList<SustainedCanvasView> FindAllActiveCanvasViewOverlay()
+        public static IList<SustainedCanvasView> FindAllActiveCanvasView()
         {
             List<SustainedCanvasView> v_activeCanvasViews = new List<SustainedCanvasView>();
             foreach (var v_view in s_sceneRenderViews)
@@ -377,7 +377,7 @@ namespace Kyub.Performance
                 var v_sustainedCanvasView = v_view as SustainedCanvasView;
                 if (v_sustainedCanvasView != null &&
                     v_sustainedCanvasView.enabled && v_sustainedCanvasView.gameObject.activeInHierarchy &&
-                    v_sustainedCanvasView.Canvas != null && v_sustainedCanvasView.Canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                    v_sustainedCanvasView.Canvas != null)
                     v_activeCanvasViews.Add(v_sustainedCanvasView);
             }
 
