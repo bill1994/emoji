@@ -81,13 +81,14 @@ namespace Kyub.Performance
             {
 #if UNITY_EDITOR && UNITY_IOS
                 return true;
-#endif
+#else
                 if (s_instance == null)
                     s_instance = GetInstanceFastSearch();
 
                 //Metal Require Simulate FrameBuffer
                 return (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal) ||
                     (s_instance != null && s_instance.m_forceSimulateFrameBuffer);
+#endif
             }
         }
 
