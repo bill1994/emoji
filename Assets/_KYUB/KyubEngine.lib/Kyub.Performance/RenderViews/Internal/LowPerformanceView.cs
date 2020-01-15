@@ -90,10 +90,11 @@ namespace Kyub.Performance
                         SetFrameBufferDirty();
                 }
                 else
+                {
                     _bufferIsDirty = false;
-                //SetFrameBufferDirty();
-                else if (Application.isEditor)
-                    Configure();
+                    if (Application.isEditor)
+                        Configure();
+                }
             }
         }
 
