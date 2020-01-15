@@ -53,7 +53,7 @@ namespace Kyub.Performance
                 UpdateFrameBuffer();
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             ClearFrameBuffer();
         }
@@ -87,7 +87,6 @@ namespace Kyub.Performance
                     UpdateFrameBuffer();
                 else if (Application.isEditor)
                 {
-                    ClearFrameBuffer();
                     ConfigureCamera();
                 }
             }
