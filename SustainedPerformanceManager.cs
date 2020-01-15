@@ -187,8 +187,8 @@ namespace Kyub.Performance
         bool _bufferIsDirty = false;
         bool _isHighPerformance = true;
 
-        protected internal static LowPerformanceCameraView s_lowPerformanceCamera = null;
-        protected static bool s_canGenerateLowPerformanceCamera = false;
+        protected internal static LowPerformanceView s_lowPerformanceView = null;
+        protected static bool s_canGenerateLowPerformanceView = false;
         protected static Vector2Int s_lastScreenSize = Vector2Int.zero;
 
         #endregion
@@ -323,7 +323,7 @@ namespace Kyub.Performance
         {
             if (s_instance == this)
             {
-                s_canGenerateLowPerformanceCamera = true;
+                s_canGenerateLowPerformanceView = true;
                 MarkDynamicElementsDirty();
                 TryAutoCreateRenderViews();
 
@@ -338,12 +338,12 @@ namespace Kyub.Performance
             UnregisterEvents();
             if (s_instance == this)
             {
-                s_canGenerateLowPerformanceCamera = false;
+                s_canGenerateLowPerformanceView = false;
                 s_useRenderBuffer = false;
                 _bufferIsDirty = true;
                 SetHighPerformance(false);
                 ReleaseRenderBuffers();
-                ConfigureLowPerformanceCamera();
+                ConfigureLowPerformanceView();
             }
         }
 
@@ -425,6 +425,9 @@ namespace Kyub.Performance
 
         private void HandleOnWillPerformRebuild()
         {
+            if (s_lowPerformanceView != null && s_lowPerformanceView.IsViewActive())
+                return;
+
             if (_ignoreNextLayoutRebuild)
             {
                 ClearPendentInvalidTransforms();
@@ -594,7 +597,7 @@ namespace Kyub.Performance
             if (OnAfterSetPerformance != null)
                 OnAfterSetPerformance.Invoke();
 
-            UpdateLowPerformanceCameraActiveStatus();
+            UpdateLowPerformanceViewActiveStatus();
         }
 
         protected IEnumerator OnAfterDrawBufferRoutine(int p_invalidCullingMask)
@@ -637,7 +640,7 @@ namespace Kyub.Performance
             if (OnAfterDrawBuffer != null)
                 OnAfterDrawBuffer(new Dictionary<int, RenderTexture>(s_renderBufferDict));
 
-            UpdateLowPerformanceCameraActiveStatus();
+            UpdateLowPerformanceViewActiveStatus();
         }
 
         protected IList<SustainedCameraView> PrepareCameraViewsToDrawInBuffer(int p_invalidCullingMask)
@@ -659,20 +662,20 @@ namespace Kyub.Performance
             }
             return v_invalidCameraViews;
         }
-        protected void UpdateLowPerformanceCameraActiveStatus()
+        protected void UpdateLowPerformanceViewActiveStatus()
         {
-            if (s_canGenerateLowPerformanceCamera && Application.isPlaying)
+            if (s_canGenerateLowPerformanceView && Application.isPlaying)
             {
                 var v_activateLowPerformance = !HasAnyCameraRenderingToScreen();
 
-                if (s_lowPerformanceCamera == null && v_activateLowPerformance)
-                    ConfigureLowPerformanceCamera();
+                if (s_lowPerformanceView == null && v_activateLowPerformance)
+                    ConfigureLowPerformanceView();
 
-                if (s_lowPerformanceCamera != null)
-                    s_lowPerformanceCamera.SetViewActive(v_activateLowPerformance);
+                if (s_lowPerformanceView != null)
+                    s_lowPerformanceView.SetViewActive(v_activateLowPerformance);
             }
-            else if (s_lowPerformanceCamera != null)
-                ConfigureLowPerformanceCamera();
+            else if (s_lowPerformanceView != null)
+                ConfigureLowPerformanceView();
         }
 
         protected bool HasAnyCameraRenderingToScreen()
@@ -687,7 +690,7 @@ namespace Kyub.Performance
                 p_allCameras = Camera.allCameras;
             foreach (var v_camera in p_allCameras)
             {
-                if (v_camera != null && (s_lowPerformanceCamera == null || v_camera != s_lowPerformanceCamera.Camera) && v_camera.enabled && v_camera.targetTexture == null)
+                if (v_camera != null && (s_lowPerformanceView == null || v_camera != s_lowPerformanceView.Camera) && v_camera.enabled && v_camera.targetTexture == null)
                     return true;
             }
             return false;
@@ -900,23 +903,24 @@ namespace Kyub.Performance
 
         #region RenderView Important Functions
 
-        protected virtual void ConfigureLowPerformanceCamera()
+        protected virtual void ConfigureLowPerformanceView()
         {
-            if (s_canGenerateLowPerformanceCamera && Application.isPlaying)
+            if (s_canGenerateLowPerformanceView && Application.isPlaying)
             {
-                if (s_lowPerformanceCamera == null)
+                if (s_lowPerformanceView == null)
                 {
-                    var _lowPerformanceGameObject = new GameObject("LowPerformance - Camera");
+                    var _lowPerformanceGameObject = new GameObject("LowPerformanceView");
+                    _lowPerformanceGameObject.gameObject.SetActive(false);
                     //Simulate KeepFrameBuffer (useful in Metal) using LowPerformanceCameraView
-                    s_lowPerformanceCamera = _lowPerformanceGameObject.AddComponent<LowPerformanceCameraView>();
+                    s_lowPerformanceView = _lowPerformanceGameObject.AddComponent<LowPerformanceView>();
                 }
             }
-            else if (s_lowPerformanceCamera != null)
+            else if (s_lowPerformanceView != null)
             {
                 if (Application.isPlaying)
-                    GameObject.Destroy(s_lowPerformanceCamera.gameObject);
+                    GameObject.Destroy(s_lowPerformanceView.gameObject);
                 else
-                    GameObject.DestroyImmediate(s_lowPerformanceCamera.gameObject);
+                    GameObject.DestroyImmediate(s_lowPerformanceView.gameObject);
             }
         }
 
@@ -927,7 +931,7 @@ namespace Kyub.Performance
                 var v_allCameras = Resources.FindObjectsOfTypeAll<Camera>();
                 foreach (var v_camera in v_allCameras)
                 {
-                    if (v_camera != null && (s_lowPerformanceCamera == null || v_camera != s_lowPerformanceCamera.Camera) && v_camera.gameObject.scene.IsValid())
+                    if (v_camera != null && (s_lowPerformanceView == null || v_camera != s_lowPerformanceView.Camera) && v_camera.gameObject.scene.IsValid())
                     {
                         if (v_camera.GetComponent<SustainedRenderView>() == null) //Yeah, we must check for base class
                             v_camera.gameObject.AddComponent<SustainedCameraView>();
@@ -937,7 +941,7 @@ namespace Kyub.Performance
                 var v_allCanvas = Resources.FindObjectsOfTypeAll<Canvas>();
                 foreach (var v_canvas in v_allCanvas)
                 {
-                    if (v_canvas != null &&
+                    if (v_canvas != null && (s_lowPerformanceView == null || v_canvas != s_lowPerformanceView.Canvas) &&
                         (v_canvas.transform.parent == null || v_canvas.transform.parent.GetComponentInParent<Canvas>() == null)
                         && v_canvas.gameObject.scene.IsValid())
 
