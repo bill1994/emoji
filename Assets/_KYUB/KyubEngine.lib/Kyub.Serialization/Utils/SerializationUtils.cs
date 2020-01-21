@@ -414,6 +414,7 @@ namespace Kyub
             if (p_serializer == null)
                 p_serializer = DefaultSerializer;
 
+#if !UNITY_WEBGL || UNITY_EDITOR
             if (System.Threading.Monitor.TryEnter(p_serializer, 0))
             {
                 return p_serializer;
@@ -425,12 +426,17 @@ namespace Kyub
 
                 return v_threadSerializer;
             }
+#else
+            return p_serializer;
+#endif
         }
 
         protected static void UnlockSerializer(Serializer p_serializer)
         {
-            if(p_serializer != null)
+#if !UNITY_WEBGL || UNITY_EDITOR
+            if (p_serializer != null)
                 System.Threading.Monitor.Exit(p_serializer);
+#endif
         }
 
         #endregion
