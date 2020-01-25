@@ -158,11 +158,6 @@ namespace Kyub.Serialization {
                     continue;
                 }
 
-                MethodInfo canSerializeInContextMethodInfo = null;
-                var serializeMemberAttr = PortableReflection.GetAttribute<SerializePropertyAttribute>(member);
-                if(serializeMemberAttr != null)
-                    canSerializeInContextMethodInfo = serializeMemberAttr.CanSerializeInContextMethodInfo(reflectedType);
-
                 /*else
                 {
                     //We must check if CanIgnoreMethodInfo is Defined in Ignore Attribute
@@ -195,14 +190,24 @@ namespace Kyub.Serialization {
                 }*/
 
                 if (property != null) {
-                    if (CanSerializeProperty(property, members, requireOptOut)) {
-                        properties.Add(new MetaProperty(property, canSerializeInContextMethodInfo));
+                    if (CanSerializeProperty(property, members, requireOptOut))
+                    {
+                        var serializePropertyAttr = PortableReflection.GetAttribute<SerializePropertyAttribute>(property);
+                        properties.Add(new MetaProperty(property, 
+                            serializePropertyAttr != null ? 
+                            serializePropertyAttr.FindSerializeInContextMethodInfo(reflectedType) : 
+                            null));
                     }
                 }
                 else if (field != null) {
                     //We can serialize public field if is default
-                    if (CanSerializeField(field, requireOptOut || (!requireOptIn && !requireOptOut))) {
-                        properties.Add(new MetaProperty(field, canSerializeInContextMethodInfo));
+                    if (CanSerializeField(field, requireOptOut || (!requireOptIn && !requireOptOut)))
+                    {
+                        var serializeFieldAttr = PortableReflection.GetAttribute<SerializePropertyAttribute>(field);
+                        properties.Add(new MetaProperty(field, 
+                            serializeFieldAttr != null ?
+                            serializeFieldAttr.FindSerializeInContextMethodInfo(reflectedType) :
+                            null));
                     }
                 }
             }
