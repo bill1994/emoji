@@ -52,7 +52,7 @@ namespace Kyub.Serialization {
             FallbackNames = new ReadOnlyCollection<string>(list);
         }
 
-        public MethodInfo FindSerializeInContextMethodInfo(Type contextType)
+        public MethodInfo GetCanSerializeInContextMethodInfo(Type contextType)
         {
             if (contextType != null && !string.IsNullOrEmpty(ValidatorFuncName))
             {

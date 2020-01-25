@@ -195,7 +195,7 @@ namespace Kyub.Serialization {
                         var serializePropertyAttr = PortableReflection.GetAttribute<SerializePropertyAttribute>(property);
                         properties.Add(new MetaProperty(property, 
                             serializePropertyAttr != null ? 
-                            serializePropertyAttr.FindSerializeInContextMethodInfo(reflectedType) : 
+                            serializePropertyAttr.GetCanSerializeInContextMethodInfo(reflectedType) : 
                             null));
                     }
                 }
@@ -206,7 +206,7 @@ namespace Kyub.Serialization {
                         var serializeFieldAttr = PortableReflection.GetAttribute<SerializePropertyAttribute>(field);
                         properties.Add(new MetaProperty(field, 
                             serializeFieldAttr != null ?
-                            serializeFieldAttr.FindSerializeInContextMethodInfo(reflectedType) :
+                            serializeFieldAttr.GetCanSerializeInContextMethodInfo(reflectedType) :
                             null));
                     }
                 }
