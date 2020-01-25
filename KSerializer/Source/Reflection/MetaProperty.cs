@@ -7,15 +7,17 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using UnityEngine;
 
 namespace Kyub.Serialization.Internal {
     /// <summary>
     /// A property or field on a MetaType.
     /// </summary>
     public class MetaProperty {
-        public MetaProperty(FieldInfo field) {
+        public MetaProperty(FieldInfo field, MethodInfo canSerializeInContextMethodInfo) {
             if (field != null)
             {
+                _canSerializeInContextMethodInfo = canSerializeInContextMethodInfo;
                 _memberInfo = field;
                 StorageType = field.FieldType;
                 JsonName = GetJsonName(field);
@@ -27,9 +29,10 @@ namespace Kyub.Serialization.Internal {
             }
         }
 
-        public MetaProperty(PropertyInfo property) {
+        public MetaProperty(PropertyInfo property, MethodInfo canSerializeInContextMethodInfo) {
             if (property != null)
             {
+                _canSerializeInContextMethodInfo = canSerializeInContextMethodInfo;
                 _memberInfo = property;
                 StorageType = property.PropertyType;
                 JsonName = GetJsonName(property);
@@ -44,7 +47,13 @@ namespace Kyub.Serialization.Internal {
         /// <summary>
         /// Internal handle to the reflected member.
         /// </summary>
-        private MemberInfo _memberInfo;
+        private MemberInfo _memberInfo = null;
+
+        /// <summary>
+        /// Internal handle to the reflected member.
+        /// </summary>
+        private MethodInfo _canSerializeInContextMethodInfo = null;
+
 
         /// <summary>
         /// The type of value that is stored inside of the property. For example, for an int field,
@@ -102,6 +111,23 @@ namespace Kyub.Serialization.Internal {
         public bool IsPublic {
             get;
             private set;
+        }
+
+        public bool CanSerializeInContext(object context)
+        {
+            try
+            {
+                if (_canSerializeInContextMethodInfo != null && context != null)
+                {
+                    var returnValue = _canSerializeInContextMethodInfo.Invoke(context, null);
+                    if (returnValue is bool)
+                        return (bool)returnValue;
+                }
+            }
+            catch (Exception e){
+                Debug.LogWarning("[MetaProperty] Invalid CanSerializeInContext MethodInfo or Target.\n" + e.Message);
+            }
+            return true;
         }
 
         public bool HasAttribute(System.Type p_type)

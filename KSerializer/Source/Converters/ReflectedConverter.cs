@@ -24,7 +24,7 @@ namespace Kyub.Serialization.Internal {
 
             for (int i = 0; i < metaType.Properties.Length; ++i) {
                 MetaProperty property = metaType.Properties[i];
-                if (property.CanRead == false) continue;
+                if (!property.CanRead || !property.CanSerializeInContext(instance)) continue;
 
                 Data serializedData;
 
