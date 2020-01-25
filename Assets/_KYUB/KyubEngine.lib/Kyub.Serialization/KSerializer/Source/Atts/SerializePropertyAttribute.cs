@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace Kyub.Serialization {
+
     /// <summary>
     /// Explicitly mark a property to be serialized. This can also be used to give the name that the
     /// property should use during serialization.
@@ -19,6 +21,11 @@ namespace Kyub.Serialization {
         /// Other names that can be used while deserializing
         /// </summary>
         public ReadOnlyCollection<string> FallbackNames { get; private set; }
+
+        /// <summary>
+        /// Method to check if CanSerialize in Context
+        /// </summary>
+        public string ValidatorFuncName { get; set; }
 
         public SerializePropertyAttribute()
             : this(string.Empty) {
@@ -43,6 +50,18 @@ namespace Kyub.Serialization {
             }
 
             FallbackNames = new ReadOnlyCollection<string>(list);
+        }
+
+        public MethodInfo CanSerializeInContextMethodInfo(Type contextType)
+        {
+            if (contextType != null && !string.IsNullOrEmpty(ValidatorFuncName))
+            {
+                var methodInfo = contextType.GetMethod(ValidatorFuncName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[0], null);
+                if (methodInfo != null && methodInfo.ReturnType == typeof(bool))
+                    return methodInfo;
+            }
+
+            return null;
         }
     }
 }

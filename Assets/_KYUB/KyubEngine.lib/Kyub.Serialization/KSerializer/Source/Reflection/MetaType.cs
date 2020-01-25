@@ -139,7 +139,6 @@ namespace Kyub.Serialization {
 
         private void CollectProperties(List<MetaProperty> properties, Type reflectedType)
         {
-
             // do we require a [SerializeField] or [Property] attribute?
             bool requireOptIn = _configUsed.MemberSerialization == MemberSerialization.OptIn;
             bool requireOptOut = _configUsed.MemberSerialization == MemberSerialization.OptOut;
@@ -152,10 +151,29 @@ namespace Kyub.Serialization {
 
             MemberInfo[] members = reflectedType.GetDeclaredMembers();
             foreach (var member in members) {
+
                 // We don't serialize members annotated with any of the ignore serialize attributes
-                if (_configUsed.IgnoreSerializeAttributes.Any(t => PortableReflection.HasAttribute(member, t))) {
+                if (_configUsed.IgnoreSerializeAttributes.Any(t => PortableReflection.HasAttribute(member, t)))
+                {
                     continue;
                 }
+
+                MethodInfo canSerializeInContextMethodInfo = null;
+                var serializeMemberAttr = PortableReflection.GetAttribute<SerializePropertyAttribute>(member);
+                if(serializeMemberAttr != null)
+                    canSerializeInContextMethodInfo = serializeMemberAttr.CanSerializeInContextMethodInfo(reflectedType);
+
+                /*else
+                {
+                    //We must check if CanIgnoreMethodInfo is Defined in Ignore Attribute
+                    var memberIgnoreAttr = PortableReflection.GetAttribute<IgnoreAttribute>(member);
+                    if (memberIgnoreAttr != null)
+                    {
+                        canIgnoreMethodInfo = memberIgnoreAttr.GetCanIgnoreMethodInfo(reflectedType);
+                        if (canIgnoreMethodInfo == null)
+                            return true;
+                    }
+                }*/
 
                 PropertyInfo property = member as PropertyInfo;
                 FieldInfo field = member as FieldInfo;
@@ -170,21 +188,21 @@ namespace Kyub.Serialization {
 
                 // If an opt-out annotation is required, then skip the property *only if* it has one of
                 // the not serialize attributes
-                if (requireOptOut &&
+                /*if (requireOptOut &&
                     _configUsed.IgnoreSerializeAttributes.Any(t => PortableReflection.HasAttribute(member, t))) {
 
                     continue;
-                }
+                }*/
 
                 if (property != null) {
                     if (CanSerializeProperty(property, members, requireOptOut)) {
-                        properties.Add(new MetaProperty(property));
+                        properties.Add(new MetaProperty(property, canSerializeInContextMethodInfo));
                     }
                 }
                 else if (field != null) {
                     //We can serialize public field if is default
                     if (CanSerializeField(field, requireOptOut || (!requireOptIn && !requireOptOut))) {
-                        properties.Add(new MetaProperty(field));
+                        properties.Add(new MetaProperty(field, canSerializeInContextMethodInfo));
                     }
                 }
             }
