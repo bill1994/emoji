@@ -333,6 +333,21 @@ namespace Kyub
             FromJsonOverwrite(p_json, p_target, v_serializer);
         }
 
+        public static void FromJsonOverwrite<T>(string p_json, ref T p_target, Serializer p_serializer = null)
+        {
+            p_target = FromJson<T>(p_json, p_serializer);
+        }
+
+        public static void FromJsonOverwrite<T>(string p_json, ref T p_target, Config p_config)
+        {
+            p_target = FromJson<T>(p_json, p_config);
+        }
+
+        public static void FromJsonOverwrite<T>(string p_json, ref T p_target, JSONPolymorphicMode p_mode)
+        {
+            p_target = FromJson<T>(p_json, p_mode);
+        }
+
         #endregion
 
         #region Internal Functions
