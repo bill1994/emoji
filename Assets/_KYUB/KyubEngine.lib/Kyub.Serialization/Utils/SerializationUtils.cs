@@ -335,17 +335,26 @@ namespace Kyub
 
         public static void FromJsonOverwrite<T>(string p_json, ref T p_target, Serializer p_serializer = null)
         {
-            p_target = FromJson<T>(p_json, p_serializer);
+            if (!typeof(T).IsValueType && p_target != null)
+                FromJsonOverwrite(p_json, p_target, p_serializer);
+            else
+                p_target = FromJson<T>(p_json, p_serializer);
         }
 
         public static void FromJsonOverwrite<T>(string p_json, ref T p_target, Config p_config)
         {
-            p_target = FromJson<T>(p_json, p_config);
+            if (!typeof(T).IsValueType && p_target != null)
+                FromJsonOverwrite(p_json, p_target, p_config);
+            else
+                p_target = FromJson<T>(p_json, p_config);
         }
 
         public static void FromJsonOverwrite<T>(string p_json, ref T p_target, JSONPolymorphicMode p_mode)
         {
-            p_target = FromJson<T>(p_json, p_mode);
+            if (!typeof(T).IsValueType && p_target != null)
+                FromJsonOverwrite(p_json, p_target, p_mode);
+            else
+                p_target = FromJson<T>(p_json, p_mode);
         }
 
         #endregion
