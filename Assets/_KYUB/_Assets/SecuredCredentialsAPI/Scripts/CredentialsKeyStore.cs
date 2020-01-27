@@ -133,6 +133,9 @@ namespace Kyub.Credentials
             if (s_instance == null)
                 Load_Internal();
 
+            if (string.IsNullOrEmpty(p_key))
+                return false;
+
             return s_instance.SetInstanceString(p_key.ToLower(), p_value);
         }
 
