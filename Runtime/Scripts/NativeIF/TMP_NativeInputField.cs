@@ -392,13 +392,13 @@ namespace Kyub.UI
                 {
                     TouchScreenKeyboard.hideInput = shouldHideMobileInput;
                 }
-#if UNITY_2018_3_OR_NEWER
-                    m_SoftKeyboard = inputType == InputType.Password ?
+#if TMP_2_0_0_OR_NEWER
+                m_SoftKeyboard = inputType == InputType.Password ?
 #else
                 m_Keyboard = inputType == InputType.Password ?
 #endif
                     TouchScreenKeyboard.Open(m_Text, keyboardType, false, multiLine, true) :
-                TouchScreenKeyboard.Open(m_Text, keyboardType, inputType == InputType.AutoCorrect, multiLine);
+                    TouchScreenKeyboard.Open(m_Text, keyboardType, inputType == InputType.AutoCorrect, multiLine);
             }
             else if (IsNativeKeyboardSupported())
             {
@@ -431,7 +431,7 @@ namespace Kyub.UI
                 m_SetCaretVisibleInfo.Invoke(this, null);
         }
 
-#if UNITY_2019_2_OR_NEWER
+#if TMP_2_0_1_OR_NEWER
         public void DeactivateInputField()
         {
             base.DeactivateInputField();
