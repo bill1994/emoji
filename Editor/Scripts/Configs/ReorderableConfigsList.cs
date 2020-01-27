@@ -18,9 +18,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEditor;
 using UnityEngine;
-using Format = KyubEditor.ScreenShooter.Configs.ScreenshotConfig.Format;
+using Format = KyubEditor.Screenshot.Configs.ScreenshotConfig.Format;
 
-namespace KyubEditor.ScreenShooter.Configs
+namespace KyubEditor.Screenshot.Configs
 {
     public static class ReorderableConfigsList
     {

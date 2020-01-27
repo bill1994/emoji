@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b023249ec8aa50142ad62b315bc5f090, type: 3}
   m_Name: ScreenShooterSettings
   m_EditorClassIdentifier: 
-  Camera: {fileID: 0}
+  Cameras: []
   ScreenshotConfigs:
   - Name: iPhone 6.5-Inch Portrait
     Width: 1242
@@ -30,6 +30,6 @@ MonoBehaviour:
     Width: 1440
     Height: 2560
     Type: 0
-  Tag: 05_
+  Tag: 01_
   AppendTimestamp: 0
   SaveFolder: Screenshots

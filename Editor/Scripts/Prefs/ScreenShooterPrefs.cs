@@ -18,15 +18,63 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace KyubEditor.ScreenShooter
+namespace KyubEditor.Screenshot
 {
     public class ScreenShooterPrefs
     {
-        private const string HOME_FOLDER_PREF_KEY = "KyubEditor.ScreenShooter.HomeFolder.";
-        private const string HOME_FOLDER_DEFAULT = "Assets/_KYUB/_Assets/EditorScreenshotAPI";
-        private const string HOME_FOLDER_HINT = "Change this setting to the new location of the \"ScreenShooter\" folder if you move it around in your project.";
+        private const string HOME_FOLDER_PREF_KEY = "KyubEditor.Screenshot.HomeFolder.";
+        private const string HOME_FOLDER = "Assets/EditorScreenShooter";
+        private const string HOME_FOLDER_HINT = "Change this setting to the new location of the \"EditorScreenshotAPI\" folder if you move it around in your project.";
 
-        public static EditorPrefsString HomeFolder = new EditorPrefsString(HOME_FOLDER_PREF_KEY + ProjectName, "Folder Location", HOME_FOLDER_DEFAULT);
+        private static EditorPrefsString _homeFolder = null;
+        public static EditorPrefsString HomeFolder
+        {
+            get
+            {
+                if (_homeFolder == null)
+                {
+                    var mainPath = ScriptsFolder;
+                    if (mainPath.Contains("Packages"))
+                        mainPath = HOME_FOLDER;
+                    _homeFolder = new EditorPrefsString(HOME_FOLDER_PREF_KEY + ProjectName, "Folder Location", mainPath);
+                }
+                return _homeFolder;
+            }
+        }
+
+        private static string _scriptsFolder = null;
+        public static string ScriptsFolder
+        {
+            get
+            {
+                if (_scriptsFolder == null)
+                    _scriptsFolder = GetMainScriptsFolderPath();
+                return _scriptsFolder;
+            }
+        }
+
+        public static string GetMainScriptsFolderPath()
+        {
+            var packagePath = "Packages/com.kyub.editorscreenshot";
+            //Try discover if script is inside Package or in AssetFolder
+            var fullPackagePath = System.IO.Path.GetFullPath(packagePath).Replace("\\", "/");
+            if (!System.IO.Directory.Exists(fullPackagePath))
+                fullPackagePath = "";
+
+            string[] files = System.IO.Directory.GetFiles(string.IsNullOrEmpty(fullPackagePath) ? Application.dataPath : fullPackagePath, "ScreenShooterPrefs.cs", System.IO.SearchOption.AllDirectories);
+
+            var folderPath = files.Length > 0 ? files[0].Replace("\\", "/") : "";
+            if (!string.IsNullOrEmpty(folderPath))
+            {
+                folderPath = folderPath.Split(new string[] { "/EditorScreenshotAPI/" }, System.StringSplitOptions.None)[0] + "/EditorScreenshotAPI/";
+                if (string.IsNullOrEmpty(fullPackagePath))
+                    folderPath = folderPath.Replace(Application.dataPath, "Assets");
+                else
+                    folderPath = folderPath.Replace(fullPackagePath, packagePath); //Support new Package Manager file system
+            }
+
+            return folderPath;
+        }
 
         //---------------------------------------------------------------------
         // Messages

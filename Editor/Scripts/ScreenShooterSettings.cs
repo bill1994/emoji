@@ -16,17 +16,17 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using KyubEditor.ScreenShooter.Configs;
-using KyubEditor.ScreenShooter.Utils;
+using KyubEditor.Screenshot.Configs;
+using KyubEditor.Screenshot.Utils;
 
-namespace KyubEditor.ScreenShooter
+namespace KyubEditor.Screenshot
 {
     public class ScreenShooterSettings : ScriptableObject
     {
         private const string RELATIVE_PATH = "Editor/Data/ScreenShooterSettings.asset";
 
-        public Camera Camera;
-        public List<ScreenshotConfig> ScreenshotConfigs;
+        public List<Camera> Cameras = new List<Camera>();
+        public List<ScreenshotConfig> ScreenshotConfigs = new List<ScreenshotConfig>();
         public string Tag;
         public bool AppendTimestamp;
         public string SaveFolder;

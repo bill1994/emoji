@@ -15,33 +15,38 @@
 #if UNITY_EDITOR
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using KyubEditor.ScreenShooter.Configs;
+using KyubEditor.Screenshot.Configs;
 using UnityEngine;
 
-namespace KyubEditor.ScreenShooter.Utils
+namespace KyubEditor.Screenshot.Utils
 {
     public static class ScreenshotUtil
     {
         public static void TakeScreenshot(ScreenShooterSettings settings, ScreenshotConfig config)
         {
             var suffix = settings.AppendTimestamp ? "." + DateTime.Now.ToString("yyyyMMddHHmmssfff") : "";
-            TakeScreenshot(settings.Camera, settings.SaveFolder, settings.Tag, suffix, config);
+            TakeScreenshot(settings.Cameras, settings.SaveFolder, settings.Tag, suffix, config);
         }
 
-        public static void TakeScreenshot(Camera camera, string folderName, string prefix, string suffix, ScreenshotConfig screenshotConfig)
+        public static void TakeScreenshot(IList<Camera> cameras, string folderName, string prefix, string suffix, ScreenshotConfig screenshotConfig)
         {
             Texture2D scrTexture = null;
             scrTexture = new Texture2D(screenshotConfig.Width, screenshotConfig.Height, TextureFormat.RGB24, false);
 
-            if (camera != null)
+            if (cameras != null && cameras.Count > 0)
             {
                 //scrTexture = new Texture2D(screenshotConfig.Width, screenshotConfig.Height, TextureFormat.RGB24, false);
                 var scrRenderTexture = new RenderTexture(scrTexture.width, scrTexture.height, 24);
-                var camRenderTexture = camera.targetTexture;
-                camera.targetTexture = scrRenderTexture;
-                camera.Render();
-                camera.targetTexture = camRenderTexture;
+
+                foreach (var camera in cameras)
+                {
+                    var camRenderTexture = camera.targetTexture;
+                    camera.targetTexture = scrRenderTexture;
+                    camera.Render();
+                    camera.targetTexture = camRenderTexture;
+                }
 
                 RenderTexture.active = scrRenderTexture;
                 scrTexture.ReadPixels(new Rect(0, 0, scrTexture.width, scrTexture.height), 0, 0);

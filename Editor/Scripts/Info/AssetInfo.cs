@@ -14,7 +14,7 @@
 
 #if UNITY_EDITOR
 
-namespace KyubEditor.ScreenShooter
+namespace KyubEditor.Screenshot
 {
     public class AssetInfo
     {

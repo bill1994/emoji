@@ -16,7 +16,7 @@
 
 using System;
 
-namespace KyubEditor.ScreenShooter.Configs
+namespace KyubEditor.Screenshot.Configs
 {
     [Serializable]
     public class ScreenshotConfig
