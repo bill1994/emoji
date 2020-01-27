@@ -60,11 +60,16 @@ namespace MaterialUI
         {
             get
             {
-                if (instance.m_RectTransform == null && m_Instance.m_ParentCanvas != null)
+                if (instance != null && m_Instance.m_RectTransform == null)
                 {
-                    CanvasSafeArea safeArea = m_Instance.m_ParentCanvas.GetComponent<CanvasSafeArea>();
+                    if (m_Instance.m_ParentCanvas == null)
+                        m_Instance.InitDialogSystem();
 
-                    instance.m_RectTransform = safeArea != null && safeArea.Content != null ? safeArea.Content : m_Instance.m_ParentCanvas.transform as RectTransform;
+                    if (m_Instance.m_ParentCanvas != null)
+                    {
+                        CanvasSafeArea safeArea = m_Instance.m_ParentCanvas.GetComponent<CanvasSafeArea>();
+                        instance.m_RectTransform = safeArea != null && safeArea.Content != null ? safeArea.Content : m_Instance.m_ParentCanvas.transform as RectTransform;
+                    }
                 }
 
                 return instance.m_RectTransform;
@@ -131,6 +136,16 @@ namespace MaterialUI
         #endregion
 
         #region Alert
+
+        public static void ShowAlertAsync(string bodyText, string titleText, ImageData icon, System.Action<DialogAlert> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        {
+            ShowAlertAsync(bodyText, null, "OK", titleText, icon, onCreateCallback, progressIndicator);
+        }
+
+        public static void ShowAlertAsync(string bodyText, Action onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, System.Action<DialogAlert> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        {
+            ShowAlertAsync(bodyText, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, null, null, onCreateCallback, progressIndicator);
+        }
 
         public static void ShowAlertAsync(string bodyText, Action onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, System.Action<DialogAlert> onCreateCallback = null, ProgressIndicator progressIndicator = null)
         {

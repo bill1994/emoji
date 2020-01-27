@@ -249,6 +249,7 @@ namespace MaterialUI
         {
             base.OnDisable();
             ClearOverScrolls();
+            CancelInvoke();
         }
 
         public virtual void OnBeginDrag(PointerEventData eventData)
@@ -297,16 +298,7 @@ namespace MaterialUI
 
             if (_Started && Application.isPlaying)
             {
-                if (IsScrollHorizontalEnabled())
-                {
-                    CreateOverscroll(0);
-                    CreateOverscroll(1);
-                }
-                if (IsScrollVerticalEnabled())
-                {
-                    CreateOverscroll(2);
-                    CreateOverscroll(3);
-                }
+                Invoke("UpdateOverScroll", 0);
             }
         }
 
@@ -640,6 +632,11 @@ namespace MaterialUI
             _ScrollPosition = ClampVector2(_ScrollRect.normalizedPosition);
             _LastScrollPosition = ClampVector2(_ScrollRect.normalizedPosition);
 
+            UpdateOverScroll();
+        }
+
+        public void UpdateOverScroll()
+        {
             if (IsScrollHorizontalEnabled())
             {
                 CreateOverscroll(0);

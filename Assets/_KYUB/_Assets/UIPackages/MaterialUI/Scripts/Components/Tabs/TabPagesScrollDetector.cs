@@ -9,13 +9,13 @@ namespace MaterialUI
     [AddComponentMenu("MaterialUI/Tab Pages Scroll Detector", 100)]
     public class TabPagesScrollDetector : MonoBehaviour, IDragHandler, IEndDragHandler
     {
-        [SerializeField] private TabView m_TabView = null;
-        public TabView tabView
+        [SerializeField] private BaseTabView m_TabView = null;
+        public BaseTabView tabView
         {
             get
             {
                 if (m_TabView == null)
-                    m_TabView = GetComponentInParent<TabView>();
+                    m_TabView = GetComponentInParent<BaseTabView>();
                 return m_TabView;
             }
             set { m_TabView = value; }

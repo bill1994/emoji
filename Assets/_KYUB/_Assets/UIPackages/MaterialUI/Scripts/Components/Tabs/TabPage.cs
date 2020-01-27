@@ -62,13 +62,27 @@ namespace MaterialUI
         public string tabName
         {
             get { return m_TabName; }
-            set { m_TabName = value; }
+            set
+            {
+                if (m_TabName == value)
+                    return;
+                m_TabName = value;
+                if (Application.isPlaying)
+                    tabView.InitializeTabsAndPagesDelayed();
+            }
         }
 
         public ImageData tabIcon
         {
             get { return m_TabIcon; }
-            set { m_TabIcon = value; }
+            set
+            {
+                if (m_TabIcon == value)
+                    return;
+                m_TabIcon = value;
+                if (Application.isPlaying)
+                    tabView.InitializeTabsAndPagesDelayed();
+            }
         }
 
         private CanvasGroup canvasGroup

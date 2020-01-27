@@ -54,8 +54,6 @@ namespace MaterialUI
         protected ImageData m_ToggleOnIcon = null;
         [SerializeField]
         protected ImageData m_ToggleOffIcon = null;
-        [SerializeField]
-        protected CanvasGroup m_CanvasGroup = null;
 
         [SerializeField]
         protected bool m_Interactable = true;
@@ -74,6 +72,7 @@ namespace MaterialUI
         protected bool m_LastToggleState = false;
         //#endif
 
+        protected CanvasGroup m_CanvasGroup = null;
         protected MaterialRipple m_MaterialRipple;
         protected Toggle m_Toggle;
         protected Color m_CurrentColor;
@@ -356,7 +355,7 @@ namespace MaterialUI
             {
                 if (m_Graphic == null) return;
 
-                m_Graphic.SetImage(value);
+                m_Graphic.SetImageData(value);
 
                 if (m_ToggleGraphic)
                 {
@@ -374,7 +373,7 @@ namespace MaterialUI
             {
                 if (m_CanvasGroup == null)
                 {
-                    m_CanvasGroup = gameObject.GetAddComponent<CanvasGroup>();
+                    m_CanvasGroup = gameObject.GetComponent<CanvasGroup>();
                 }
 
                 return m_CanvasGroup;
@@ -704,7 +703,7 @@ namespace MaterialUI
 
             if (m_Graphic is Image || m_Graphic is IVectorImage)
             {
-                m_Graphic.SetImage(m_Toggle.isOn ? m_ToggleOnIcon : m_ToggleOffIcon);
+                m_Graphic.SetImageData(m_Toggle.isOn ? m_ToggleOnIcon : m_ToggleOffIcon);
             }
             else
             {
@@ -802,19 +801,25 @@ namespace MaterialUI
                 }
             }
 
-            canvasGroup.blocksRaycasts = true;
-            canvasGroup.interactable = true;
+            if (canvasGroup != null)
+            {
+                canvasGroup.blocksRaycasts = true;
+                canvasGroup.interactable = true;
+            }
         }
 
         protected virtual void ApplyInteractableOff()
         {
             RefreshVisualStyles(false);
 
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.interactable = false;
+            if (canvasGroup != null)
+            {
+                canvasGroup.blocksRaycasts = false;
+                canvasGroup.interactable = false;
+            }
 
 #if UNITY_EDITOR
-            OnValidateDelayed();
+            OnValidate();
 #endif
         }
 
@@ -884,7 +889,7 @@ namespace MaterialUI
             }
         }
 
-        protected virtual void ApplyCanvasGroupChanged()
+        public virtual bool IsInteractable()
         {
             bool interactable = m_Interactable;
             if (interactable)
@@ -899,10 +904,19 @@ namespace MaterialUI
                         break;
                 }
             }
+            return interactable;
+        }
 
-            canvasGroup.blocksRaycasts = m_Interactable;
-            canvasGroup.interactable = m_Interactable;
-            canvasGroup.alpha = interactable ? 1f : 0.5f;
+        protected virtual void ApplyCanvasGroupChanged()
+        {
+            bool interactable = IsInteractable();
+
+            if (canvasGroup != null)
+            {
+                canvasGroup.blocksRaycasts = m_Interactable;
+                canvasGroup.interactable = m_Interactable;
+                canvasGroup.alpha = interactable ? 1f : 0.5f;
+            }
         }
 
         protected internal virtual void ApplyGroupAllowSwitchOff()

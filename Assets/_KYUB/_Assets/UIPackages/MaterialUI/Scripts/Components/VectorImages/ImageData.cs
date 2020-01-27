@@ -42,6 +42,21 @@ namespace MaterialUI
             set { m_VectorImageData = value; }
         }
 
+        [SerializeField]
+        private string m_ImgUrl = "";
+        public string imgUrl
+        {
+            get { return m_ImgUrl; }
+            set { m_ImgUrl = value; }
+        }
+
+        public ImageData(string imgUrl, Sprite defaultSprite)
+        {
+            m_ImgUrl = imgUrl;
+            m_Sprite = defaultSprite;
+            m_ImageDataType = ImageDataType.Sprite;
+        }
+
         public ImageData(Sprite sprite)
         {
             m_Sprite = sprite;
@@ -60,7 +75,7 @@ namespace MaterialUI
             {
                 if (m_ImageDataType == ImageDataType.Sprite)
                 {
-                    return m_Sprite != null;
+                    return !string.IsNullOrEmpty(m_ImgUrl) || m_Sprite != null;
                 }
                 else
                 {
@@ -69,7 +84,7 @@ namespace MaterialUI
             }
             else
             {
-                return m_Sprite != null || (m_VectorImageData != null && m_VectorImageData.ContainsData());
+                return m_Sprite != null || (m_VectorImageData != null && m_VectorImageData.ContainsData()) || !string.IsNullOrEmpty(m_ImgUrl);
             }
         }
 

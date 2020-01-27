@@ -31,8 +31,13 @@ namespace MaterialUI
                 var folderPath = files.Length > 0 ? files[0].Replace("\\", "/") : "";
                 if (!string.IsNullOrEmpty(folderPath))
                 {
-                    folderPath = folderPath.Split(new string[] { "/MaterialUI/" }, System.StringSplitOptions.None)[0] + "/MaterialUI/Prefabs/";
-                    if(string.IsNullOrEmpty(fullPackagePath))
+                    var keyFolderPath = "/MaterialUI/";
+                    if (folderPath.Contains(keyFolderPath))
+                        folderPath = folderPath.Split(new string[] { keyFolderPath }, System.StringSplitOptions.None)[0] + keyFolderPath + "Prefabs/";
+                    else
+                        folderPath = packagePath + "Prefabs/";
+
+                    if (string.IsNullOrEmpty(fullPackagePath))
                         folderPath = folderPath.Replace(Application.dataPath, "Assets");
                     else
                         folderPath = folderPath.Replace(fullPackagePath, packagePath); //Support new Package Manager file system

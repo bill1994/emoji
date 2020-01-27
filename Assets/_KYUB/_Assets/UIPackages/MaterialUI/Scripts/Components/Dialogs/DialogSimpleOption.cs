@@ -64,7 +64,7 @@ namespace MaterialUI
                     m_ItemText.SetGraphicText(option != null ? option.text : "");
                 if (m_ItemIcon != null)
                 {
-                    m_ItemIcon.SetImage(option != null ? option.imageData : null);
+                    m_ItemIcon.SetImageData(option != null ? option.imageData : null);
                     m_ItemIcon.gameObject.SetActive(m_ItemIcon.GetImageData() != null && m_ItemIcon.GetImageData().ContainsData(true));
                 }
             }

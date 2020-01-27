@@ -351,11 +351,13 @@ namespace MaterialUI
         {
 #if UNITY_IPHONE && !UNITY_EDITOR
 		    return _IsIOSStatusBarActive();
-#else
+#elif UNITY_ANDROID && !UNITY_EDITOR
             var activity = AndroidThemeNativeUtils.GetActivity();
             var window = AndroidThemeNativeUtils.GetWindow(activity);
 
             return !Screen.fullScreen && AndroidThemeNativeUtils.IsStatusBarActive(window) && AndroidThemeNativeUtils.IsViewBehindBars(window);
+#else
+            return false;
 #endif
         }
 

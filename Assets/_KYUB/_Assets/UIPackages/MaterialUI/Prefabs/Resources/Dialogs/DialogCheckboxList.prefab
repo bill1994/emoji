@@ -228,7 +228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -247,7 +247,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 47.6875
+  m_ScaledSize: 45.5
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
@@ -398,7 +398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.25882354, g: 0.25882354, b: 0.25882354, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1047,7 +1047,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_disableNonVisibleElements: 1
   m_autoPickElements: 1
-  m_extraVisibleElements: {x: 1, y: 0}
+  m_extraVisibleElements: {x: 0, y: 0}
   m_elements:
   - {fileID: 179608}
   m_startingSibling: 0
@@ -1303,7 +1303,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11475384}
   m_HandleRect: {fileID: 22405912}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1706,6 +1706,7 @@ MonoBehaviour:
         m_Name: 
         m_Unicode: 
       m_Font: {fileID: 0}
+    m_ImgUrl: 
   m_ToggleOffIcon:
     m_ImageDataType: 0
     m_Sprite: {fileID: 0}
@@ -1714,7 +1715,7 @@ MonoBehaviour:
         m_Name: 
         m_Unicode: 
       m_Font: {fileID: 0}
-  m_CanvasGroup: {fileID: 22502788}
+    m_ImgUrl: 
   m_Interactable: 1
   m_AutoRegisterInParentGroup: 1
   m_Group: {fileID: 0}
@@ -1917,7 +1918,7 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 28.612501
+  m_ScaledSize: 27.300001
   m_SizeMode: 0
   m_VectorImageData:
     m_Glyph:
@@ -2248,6 +2249,7 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+  m_ReverseOrder: 0
   m_IsVertical: 0
 --- !u!1 &184322
 GameObject:
@@ -2366,7 +2368,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11475990}
   m_MaterialRipple: {fileID: 11400572}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22554008}
   m_Icon: {fileID: 0}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 11495412}
@@ -2619,7 +2620,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.25882354, g: 0.25882354, b: 0.25882354, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2713,7 +2714,7 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 28.612501
+  m_ScaledSize: 27.300001
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
@@ -3161,7 +3162,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11490770}
   m_MaterialRipple: {fileID: 11410988}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22502544}
   m_Icon: {fileID: 0}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 11424356}
@@ -3464,7 +3464,7 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 28.612501
+  m_ScaledSize: 27.300001
   m_SizeMode: 0
   m_VectorImageData:
     m_Glyph:
@@ -3726,4 +3726,5 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+  m_ReverseOrder: 0
   m_IsVertical: 0

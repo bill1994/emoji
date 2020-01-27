@@ -14,6 +14,7 @@
 
 #if UNITY_EDITOR
 
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -30,25 +31,25 @@ namespace KyubEditor.Screenshot.Utils
         // Public
         //---------------------------------------------------------------------
 
+        static Dictionary<string, Object> packageAssetInstancesCache = new Dictionary<string, Object>();
         public static T LoadFromAsset<T>(string relativePath) where T : UnityEngine.Object
         {
-            var assetPath = Path.Combine(ScreenShooterPrefs.HomeFolder, relativePath);
             T asset = null;
-            if (!File.Exists(System.IO.Path.GetFullPath(assetPath)) && ScreenShooterPrefs.HomeFolder != ScreenShooterPrefs.ScriptsFolder)
+
+            var assetPath = Path.Combine(ScreenShooterPrefs.HomeFolder, relativePath).Replace("\\", "/");
+            var fullAssetPath = System.IO.Path.GetFullPath(assetPath);
+            
+            if (!File.Exists(fullAssetPath))
             {
-                var packagePath = Path.Combine(ScreenShooterPrefs.ScriptsFolder, relativePath);
-                var packageAsset = AssetDatabase.LoadAssetAtPath<T>(packagePath);
-
-                if (packageAsset != null && typeof(ScriptableObject).IsAssignableFrom(typeof(T)))
-                {
-                    Directory.CreateDirectory(System.IO.Path.GetFullPath(assetPath));
-                    AssetDatabase.CreateAsset(Object.Instantiate(packageAsset), assetPath);
-                    AssetDatabase.Refresh();
-                }
+                var packagePath = Path.Combine(ScreenShooterPrefs.ScriptsFolder, relativePath).Replace("\\", "/");
+                var fullPackagePath = System.IO.Path.GetFullPath(packagePath);
+                if (File.Exists(fullPackagePath))
+                    asset = AssetDatabase.LoadAssetAtPath<T>(packagePath);
             }
+            else
+                asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
 
-            asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
-            if (!asset)
+            if (asset == null)
                 Debug.LogError(string.Format(LOAD_ASSET_ERROR_MSG, assetPath));
             return asset;
         }

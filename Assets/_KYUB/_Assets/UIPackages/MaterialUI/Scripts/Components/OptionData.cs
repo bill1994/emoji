@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MaterialUI
 {
@@ -87,15 +88,7 @@ namespace MaterialUI
         /// <summary>
         /// Called when the option is selected.
         /// </summary>
-        private Action m_OnOptionSelected;
-        /// <summary>
-        /// Called when the option is selected.
-        /// </summary>
-        public Action onOptionSelected
-		{
-			get { return m_OnOptionSelected; }
-			set { m_OnOptionSelected = value; }
-		}
+        public UnityEvent onOptionSelected = new UnityEvent();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionData"/> class.
@@ -108,11 +101,22 @@ namespace MaterialUI
         /// <param name="text">The text.</param>
         /// <param name="imageData">The image data.</param>
         /// <param name="onOptionSelected">Called when the option is selected.</param>
-        public OptionData(string text, ImageData imageData, Action onOptionSelected = null)
+
+        //Action _OnOptionSelected = null;
+        public OptionData(string text, ImageData imageData, Action onOptionSelectedAction = null)
         {
             m_Text = text;
             m_ImageData = imageData;
-			m_OnOptionSelected = onOptionSelected;
+            if (onOptionSelectedAction != null)
+            {
+                if (this.onOptionSelected == null)
+                    this.onOptionSelected = new UnityEvent();
+                this.onOptionSelected.AddListener(() =>
+                {
+                    if (onOptionSelectedAction != null)
+                        onOptionSelectedAction();
+                });
+            }
         }
     }
 }

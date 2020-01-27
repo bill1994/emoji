@@ -79,13 +79,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_IgnoreLayout: 1
+  m_IgnoreLayout: 0
   m_MinWidth: -1
-  m_MinHeight: -1
+  m_MinHeight: 56
   m_PreferredWidth: -1
-  m_PreferredHeight: -1
-  m_FlexibleWidth: -1
-  m_FlexibleHeight: -1
+  m_PreferredHeight: 56
+  m_FlexibleWidth: 1
+  m_FlexibleHeight: 0
   m_LayoutPriority: 1
 --- !u!1 &100380
 GameObject:
@@ -810,7 +810,7 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 56
-  m_ScaledSize: 61.99375
+  m_ScaledSize: 54.7625
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
@@ -970,7 +970,7 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 28.612501
+  m_ScaledSize: 25.275002
   m_SizeMode: 0
   m_VectorImageData:
     m_Glyph:
@@ -1322,7 +1322,7 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 56
-  m_ScaledSize: 45.303127
+  m_ScaledSize: 40.01875
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
@@ -1392,6 +1392,7 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+  m_ReverseOrder: 0
   m_IsVertical: 0
 --- !u!1 &2716643875466169818
 GameObject:
@@ -1549,6 +1550,7 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+  m_ReverseOrder: 0
   m_IsVertical: 0
 --- !u!1 &4619907902446267026
 GameObject:
@@ -1651,6 +1653,7 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+  m_ReverseOrder: 0
   m_IsVertical: 0
 --- !u!1 &5392861671822616087
 GameObject:
@@ -1805,7 +1808,7 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 28.612501
+  m_ScaledSize: 25.275002
   m_SizeMode: 0
   m_VectorImageData:
     m_Glyph:

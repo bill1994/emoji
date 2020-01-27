@@ -205,8 +205,14 @@ namespace MaterialUI
 
         public virtual ToggleBase GetCurrentSelectedToggle(bool ensureValidToggle)
         {
-            var toggle = selectedIndexInternal >=0 && selectedIndexInternal < _Toggles.Count? _Toggles[selectedIndexInternal] : null;
+            if (_Toggles == null || _Toggles.Count == 0)
+            {
+                if (ensureValidToggle)
+                    SetSelectedIndexInternal(-1);
+                return null;
+            }
 
+            var toggle = selectedIndexInternal >=0 && selectedIndexInternal < _Toggles.Count? _Toggles[selectedIndexInternal] : null;
             //Valid Toggle
             if (!ensureValidToggle || (toggle != null && toggle.isOn))
             {

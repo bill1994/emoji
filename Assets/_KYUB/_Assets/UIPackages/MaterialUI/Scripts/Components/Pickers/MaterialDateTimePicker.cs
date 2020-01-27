@@ -45,6 +45,19 @@ namespace MaterialUI
         [SerializeField, SerializeStyleProperty]
         protected Color m_DialogColor = MaterialColor.teal500;
 
+        [Space]
+        [SerializeField, Tooltip("Will always apply hint text or will only show hint when date is invalid?")]
+        protected bool m_AlwaysDisplayHintText = false;
+        [SerializeField]
+        protected string m_HintText = "";
+
+        [Space]
+        [SerializeField, SerializeStyleProperty]
+        protected Graphic m_HintTextComponent = null;
+        [SerializeField, SerializeStyleProperty, UnityEngine.Serialization.FormerlySerializedAs("m_ButtonTextContent")]
+        protected Graphic m_TextComponent = null;
+        [SerializeField, SerializeStyleProperty, UnityEngine.Serialization.FormerlySerializedAs("m_ButtonImageContent")]
+
         #endregion
 
         #region Callback
@@ -57,11 +70,36 @@ namespace MaterialUI
 
         #region Public Properties
 
+        public string hintText
+        {
+            get
+            {
+                if (m_HintText == null)
+                    m_HintText = "";
+                return m_HintText;
+            }
+            set
+            {
+                if (m_HintText == value)
+                    return;
+                m_HintText = value;
+                UpdateLabelState();
+            }
+        }
+
+        public virtual Graphic hintTextComponent
+        {
+            get
+            {
+                return m_HintTextComponent;
+            }
+        }
+
         public virtual Graphic textComponent
         {
             get
             {
-                return button != null ? button.text : null;
+                return m_TextComponent;
             }
         }
 
@@ -196,7 +234,8 @@ namespace MaterialUI
         protected override void OnValidate()
         {
             base.OnValidate();
-            if(Application.isPlaying)
+            UpdateLabelState();
+            if (Application.isPlaying)
                 HandleOnChangeDateTime(m_CurrentFormattedDate);
         }
 
@@ -355,16 +394,17 @@ namespace MaterialUI
         {
             bool isValidData = IsValidDate(m_CurrentFormattedDate, m_DateFormat, GetCultureInfo());
             if (textComponent != null)
-            {
-                //bool textActive = m_HintTextComponent == null || isValidData;
-                textComponent.SetGraphicText(isValidData? m_CurrentFormattedDate : "");
-                //m_TextComponent.enabled = textActive;
-            }
-            /*if (m_HintTextComponent != null)
-            {
-                bool hintActive = m_TextComponent != null && !isValidData;
-                m_HintTextComponent.enabled = hintActive;
-            }*/
+                textComponent.SetGraphicText(isValidData ? m_CurrentFormattedDate : "\u200B");
+
+            //Apply Hint Text
+            var hintTextStr = !isValidData || m_AlwaysDisplayHintText ? this.hintText : null;
+            if (hintTextComponent != null && (textComponent != hintTextComponent || (!isValidData && hintTextStr != null)))
+                hintTextComponent.SetGraphicText(!string.IsNullOrEmpty(hintTextStr) ? hintTextStr : "\u200B");
+
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
         }
 
         public System.Globalization.CultureInfo GetCultureInfo()

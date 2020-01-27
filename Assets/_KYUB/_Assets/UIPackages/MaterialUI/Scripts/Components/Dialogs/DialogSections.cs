@@ -72,14 +72,14 @@ namespace MaterialUI
 					if (icon.imageDataType == ImageDataType.VectorImage)
 					{
                         if(m_VectorImageData != null)
-						    m_VectorImageData.SetImage(icon.vectorImageData);
+						    m_VectorImageData.SetImageData(icon.vectorImageData);
                         if(m_Sprite != null)
 						    m_Sprite.gameObject.SetActive(false);
 					}
 					else
 					{
                         if (m_Sprite != null)
-                            m_Sprite.SetImage(icon);
+                            m_Sprite.SetImageData(icon);
                         if (m_VectorImageData != null)
                             m_VectorImageData.gameObject.SetActive(false);
 					}

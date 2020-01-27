@@ -1,6 +1,7 @@
 //  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using System;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -28,6 +29,7 @@ namespace MaterialUI
             m_ReorderableList = new ReorderableList(property.serializedObject, array);
             m_ReorderableList.drawElementCallback = DrawOptionData;
             m_ReorderableList.drawHeaderCallback = DrawHeader;
+            m_ReorderableList.elementHeightCallback += ElementHeightCallback;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -46,14 +48,33 @@ namespace MaterialUI
             GUI.Label(rect, "Options");
         }
 
+        private float ElementHeightCallback(int index)
+        {
+            SerializedProperty itemData = m_ReorderableList.serializedProperty.GetArrayElementAtIndex(index);
+            SerializedProperty itemImageType = itemData.FindPropertyRelative("m_ImageData.m_ImageDataType");
+            SerializedProperty onSelectEvent = itemData.FindPropertyRelative("onOptionSelected");
+
+            var size = itemData.isExpanded ? (m_ImageTypeHeight + EditorGUI.GetPropertyHeight(onSelectEvent) + 6) : m_ImageTypeHeight;
+            if (m_ImageType.enumValueIndex == 0)
+            {
+                return size + (itemData.isExpanded ? m_ImageTypeHeight + 7 : 0);
+            }
+            else
+            {
+                return size;
+            }
+        }
+
         private void DrawOptionData(Rect rect, int index, bool isActive, bool isFocused)
         {
             SerializedProperty itemData = m_ReorderableList.serializedProperty.GetArrayElementAtIndex(index);
             SerializedProperty itemText = itemData.FindPropertyRelative("m_Text");
+            SerializedProperty onSelectEvent = itemData.FindPropertyRelative("onOptionSelected");
 
             SerializedProperty itemSprite = itemData.FindPropertyRelative("m_ImageData.m_Sprite");
+            SerializedProperty imgUrl = itemData.FindPropertyRelative("m_ImageData.m_ImgUrl");
 
-			SerializedProperty itemCode = itemData.FindPropertyRelative("m_ImageData.m_VectorImageData.m_Glyph.m_Unicode");
+            SerializedProperty itemCode = itemData.FindPropertyRelative("m_ImageData.m_VectorImageData.m_Glyph.m_Unicode");
             SerializedProperty itemName = itemData.FindPropertyRelative("m_ImageData.m_VectorImageData.m_Glyph.m_Name");
             GUIStyle iconStyle = null;
             if (iconStyle == null)
@@ -67,13 +88,13 @@ namespace MaterialUI
 
             SerializedProperty itemImageType = itemData.FindPropertyRelative("m_ImageData.m_ImageDataType");
 
-            RectOffset offset = new RectOffset(0, 0, -1, -3);
+            RectOffset offset = new RectOffset(-5, 0, -1, -3);
             rect = offset.Add(rect);
             rect.height = EditorGUIUtility.singleLineHeight;
 
-            float offsetH = 0;
+            float offsetH = 2;
 
-            EditorGUI.LabelField(new Rect(rect.x, rect.y, 16, rect.height), index.ToString());
+            EditorGUI.LabelField(new Rect(rect.x + offsetH, rect.y, 16, rect.height), index.ToString());
             offsetH += 16;
 
 			EditorGUI.LabelField(new Rect(rect.x + offsetH, rect.y, 35, rect.height), "Text", EditorStyles.boldLabel);
@@ -87,9 +108,11 @@ namespace MaterialUI
 
             itemImageType.enumValueIndex = m_ImageType.enumValueIndex;
 
+            
             if (m_ImageType.enumValueIndex == 0)
             {
-                EditorGUI.PropertyField(new Rect(rect.x + offsetH, rect.y, rect.width - offsetH, rect.height), itemSprite, GUIContent.none);
+                var itemSpriteRect = new Rect(rect.x + offsetH, rect.y, rect.width - offsetH, rect.height);
+                EditorGUI.PropertyField(itemSpriteRect, itemSprite, GUIContent.none);
             }
             else
             {
@@ -144,6 +167,24 @@ namespace MaterialUI
                     }
                     EditorUtility.SetDirty(itemData.serializedObject.targetObject);
                 }
+            }
+
+            EditorGUI.PropertyField(rect, itemData, new GUIContent(string.Empty), false);
+            //itemData.isExpanded = EditorGUI.Foldout(rect, itemData.isExpanded, string.Empty);
+            if (itemData.isExpanded)
+            {
+                var drawUrl = m_ImageType.enumValueIndex == 0;
+                rect.y += EditorGUIUtility.singleLineHeight + 3;
+                if (drawUrl)
+                {
+                    var itemSpriteRect = new Rect(rect.x + offsetH, rect.y, rect.width - offsetH, rect.height);
+
+                    EditorGUI.LabelField(new Rect(itemSpriteRect.x - 32, rect.y, 32, rect.height), "Url", EditorStyles.boldLabel);
+                    EditorGUI.PropertyField(itemSpriteRect, imgUrl, GUIContent.none);
+
+                    rect.y += EditorGUIUtility.singleLineHeight + 7;
+                }
+                EditorGUI.PropertyField(rect, onSelectEvent);
             }
         }
 

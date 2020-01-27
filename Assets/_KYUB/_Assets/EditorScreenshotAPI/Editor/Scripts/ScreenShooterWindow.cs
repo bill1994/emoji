@@ -27,7 +27,6 @@ namespace KyubEditor.Screenshot
 {    
     public class ScreenShooterWindow : EditorWindow
     {
-        private static ScreenShooterSettings _settings;
         private UnityEditorInternal.ReorderableList _list;
 
         private UnityEditorInternal.ReorderableList _camerasList;
@@ -75,12 +74,10 @@ namespace KyubEditor.Screenshot
             // Reset button style, bcz it can be initialized only on GUI section
             _buttonStyle = null;
 
-            _settings = ScreenShooterSettings.Load();
-
             // Init reorderable list if required
-            _list = _list ?? ReorderableConfigsList.Create(_settings.ScreenshotConfigs, MenuItemHandler);
+            _list = _list ?? ReorderableConfigsList.Create(ScreenShooterSettings.Instance.ScreenshotConfigs, MenuItemHandler);
 
-            _camerasList = new UnityEditorInternal.ReorderableList(_settings.Cameras, typeof(Camera), true, false, true, true);
+            _camerasList = new UnityEditorInternal.ReorderableList(ScreenShooterSettings.Instance.Cameras, typeof(Camera), true, false, true, true);
             _camerasList.headerHeight = 0;
             _camerasList.drawElementCallback += (Rect rect, int index, bool isActive, bool isFocused) =>
             {
@@ -94,14 +91,18 @@ namespace KyubEditor.Screenshot
             GUI.changed = false;
             GUI.enabled = !_isMakingScreenshotsNow;
 
-            Undo.RecordObject(_settings, "ScreenShooter settings");
+            Undo.RecordObject(ScreenShooterSettings.Instance, "ScreenShooter settings");
 
             OnGUICameraInput();            
             OnGUIScreenshotConfigs();
             OnGUISaveFolderInput();
             OnGUITakeButton();
 
-            if (GUI.changed) EditorUtility.SetDirty(_settings);
+            if (GUI.changed)
+            {
+                EditorUtility.SetDirty(ScreenShooterSettings.Instance);
+                ScreenShooterSettings.Instance.ApplyModificationPropertiesToJson();
+            }
         }
 
         //---------------------------------------------------------------------
@@ -119,7 +120,7 @@ namespace KyubEditor.Screenshot
 
             //if (_settings.Camera == null) _settings.Camera = Camera.main;
             _camerasList.DoLayoutList();
-            if (_settings.Cameras == null || _settings.Cameras.Count == 0)
+            if (ScreenShooterSettings.Instance.Cameras == null || ScreenShooterSettings.Instance.Cameras.Count == 0)
             {
                 EditorGUILayout.HelpBox("No cameras selected, Game View buffer will be used instead", MessageType.Info);
             }
@@ -136,10 +137,10 @@ namespace KyubEditor.Screenshot
             _list.DoLayoutList();
             EditorGUILayout.Space();
 
-            _settings.Tag = EditorGUILayout.TextField("Tag", _settings.Tag);
+            ScreenShooterSettings.Instance.Tag = EditorGUILayout.TextField("Tag", ScreenShooterSettings.Instance.Tag);
             EditorGUILayout.Space();
 
-            _settings.AppendTimestamp = EditorGUILayout.Toggle("Timestamp", _settings.AppendTimestamp);
+            ScreenShooterSettings.Instance.AppendTimestamp = EditorGUILayout.Toggle("Timestamp", ScreenShooterSettings.Instance.AppendTimestamp);
             EditorGUILayout.Space();
         }
 
@@ -150,27 +151,27 @@ namespace KyubEditor.Screenshot
             GUILayout.Label("Save To", EditorStyles.boldLabel);
             EditorGUILayout.EndHorizontal();
 
-            _settings.SaveFolder = EditorGUILayout.TextField(_settings.SaveFolder);
+            ScreenShooterSettings.Instance.SaveFolder = EditorGUILayout.TextField(ScreenShooterSettings.Instance.SaveFolder);
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
 
-            GUI.enabled &= Directory.Exists(_settings.SaveFolder);
+            GUI.enabled &= Directory.Exists(ScreenShooterSettings.Instance.SaveFolder);
             if (GUILayout.Button("Show", GUILayout.ExpandWidth(false)))
             {
-                Application.OpenURL("file://" + Path.GetFullPath(_settings.SaveFolder));
+                Application.OpenURL("file://" + Path.GetFullPath(ScreenShooterSettings.Instance.SaveFolder));
             }
             GUI.enabled = !_isMakingScreenshotsNow;
 
             if (GUILayout.Button("Browse", GUILayout.ExpandWidth(false)))
             {
-                _settings.SaveFolder = EditorUtility.SaveFolderPanel("Save screenshots to:", _settings.SaveFolder, string.Empty);
+                ScreenShooterSettings.Instance.SaveFolder = EditorUtility.SaveFolderPanel("Save screenshots to:", ScreenShooterSettings.Instance.SaveFolder, string.Empty);
                 GUI.FocusControl("Browse");
             }
 
             EditorGUILayout.EndHorizontal();
 
-            if (string.IsNullOrEmpty(_settings.SaveFolder) || _settings.SaveFolder.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+            if (string.IsNullOrEmpty(ScreenShooterSettings.Instance.SaveFolder) || ScreenShooterSettings.Instance.SaveFolder.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
             {
                 EditorGUILayout.HelpBox("Folder path is empty or contains invalid characters.", MessageType.Error);
                 _hasErrors = true;
@@ -220,10 +221,10 @@ namespace KyubEditor.Screenshot
                 EditorApplication.isPaused = false;
                 Time.timeScale = 0.001f;
 
-                var configsCount = _settings.ScreenshotConfigs.Count;
+                var configsCount = ScreenShooterSettings.Instance.ScreenshotConfigs.Count;
                 for (var i = 0; i < configsCount; i++)
                 {
-                    var data = _settings.ScreenshotConfigs[i];
+                    var data = ScreenShooterSettings.Instance.ScreenshotConfigs[i];
 
                     // Show progress
                     var info = (i + 1) + " / " + configsCount + " - " + data.Name;
@@ -249,7 +250,7 @@ namespace KyubEditor.Screenshot
 
                     yield return new WaitForEndOfFrame();
 
-                    ScreenshotUtil.TakeScreenshot(_settings, data);
+                    ScreenshotUtil.TakeScreenshot(ScreenShooterSettings.Instance, data);
 
                     yield return new WaitForSecondsRealtime(1f);
 
@@ -272,7 +273,7 @@ namespace KyubEditor.Screenshot
         
         private void MenuItemHandler(object target)
         {
-            _settings.ScreenshotConfigs.Add(target as ScreenshotConfig);
+            ScreenShooterSettings.Instance.ScreenshotConfigs.Add(target as ScreenshotConfig);
         }
     }
 }

@@ -112,8 +112,8 @@ namespace MaterialUI
                 }
                 else
                 {
-                    if (m_MaterialInputField.onEndEdit != null)
-                        m_MaterialInputField.onEndEdit.RemoveListener(HandleonValueChanged);
+                    if (m_MaterialInputField.onValueChanged != null)
+                        m_MaterialInputField.onValueChanged.RemoveListener(HandleonValueChanged);
                 }
             }
         }
@@ -629,14 +629,16 @@ namespace MaterialUI
                         //Replace character of original text to the mask char text
                         maskChars[i] = sh;
                         j++;
+                        continue;
                     }
-                    //Amount of special chars invalid
-                    else
-                    {
-                        var subConvertedText = i ==0? string.Empty : new string(maskChars, 0, i);
-                        caretPosition = Mathf.Clamp(caretPosition, 0, subConvertedText.Length);
-                        return subConvertedText;
-                    }
+                }
+
+                //Amount of special chars invalid
+                if (j >= textChars.Count)
+                {
+                    var subConvertedText = i <= 0 ? string.Empty : new string(maskChars, 0, i);
+                    caretPosition = Mathf.Clamp(caretPosition, 0, subConvertedText.Length);
+                    return subConvertedText;
                 }
             }
 

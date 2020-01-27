@@ -19,7 +19,7 @@ namespace MaterialUI
     [ExecuteInEditMode]
     [RequireComponent(typeof(Button))]
     [RequireComponent(typeof(RectTransform))]
-    [RequireComponent(typeof(CanvasGroup))]
+    //[RequireComponent(typeof(CanvasGroup))]
     [AddComponentMenu("MaterialUI/Material Button", 100)]
     public class MaterialButton : StyleElement<MaterialButton.ButtonStyleProperty>, ILayoutGroup, ILayoutElement, ILayoutSelfController, IPointerDownHandler, IPointerClickHandler
     {
@@ -42,13 +42,11 @@ namespace MaterialUI
         private MaterialRipple m_MaterialRipple = null;
         [SerializeField]
         private MaterialShadow m_MaterialShadow = null;
-        [SerializeField]
-        private CanvasGroup m_CanvasGroup = null;
 
         [SerializeField]
         private Graphic m_Icon = null;
 
-        [SerializeField, SerializeStyleProperty]
+        [SerializeField]
         private CanvasGroup m_ShadowsCanvasGroup;
         [SerializeField, SerializeStyleProperty]
         private Graphic m_BackgroundImage;
@@ -78,6 +76,7 @@ namespace MaterialUI
         private Vector2 m_LastPosition;
 #endif
 
+        private CanvasGroup m_CanvasGroup = null;
         private DrivenRectTransformTracker m_Tracker = new DrivenRectTransformTracker();
 
         #endregion
@@ -112,7 +111,7 @@ namespace MaterialUI
             {
                 if (m_ButtonObject == null)
                 {
-                    m_ButtonObject = gameObject.GetAddComponent<Button>();
+                    m_ButtonObject = gameObject.GetComponent<Button>();
                 }
                 return m_ButtonObject;
             }
@@ -174,7 +173,7 @@ namespace MaterialUI
             {
                 if (m_CanvasGroup == null)
                 {
-                    m_CanvasGroup = gameObject.GetAddComponent<CanvasGroup>();
+                    m_CanvasGroup = gameObject.GetComponent<CanvasGroup>();
                 }
                 return m_CanvasGroup;
             }
@@ -193,12 +192,6 @@ namespace MaterialUI
             {
                 m_Interactable = value;
                 m_ButtonObject.interactable = m_Interactable;
-                canvasGroup.alpha = m_Interactable ? 1f : 0.5f;
-                canvasGroup.blocksRaycasts = m_Interactable;
-                if (shadowsCanvasGroup)
-                {
-                    shadowsCanvasGroup.alpha = m_Interactable ? 1f : 0f;
-                }
                 ApplyCanvasGroupChanged();
             }
         }
@@ -323,7 +316,7 @@ namespace MaterialUI
             set
             {
                 if(m_Icon != null)
-                    m_Icon.SetImage(value);
+                    m_Icon.SetImageData(value);
             }
         }
 
@@ -333,7 +326,7 @@ namespace MaterialUI
             set
             {
                 if(m_Icon != null)
-                    m_Icon.SetImage(value);
+                    m_Icon.SetImageData(value);
             }
         }
 
@@ -343,7 +336,7 @@ namespace MaterialUI
             set
             {
                 if(m_BackgroundImage != null)
-                    m_BackgroundImage.SetImage(value);
+                    m_BackgroundImage.SetImageData(value);
             }
         }
 
@@ -353,7 +346,7 @@ namespace MaterialUI
             set
             {
                 if(m_BackgroundImage != null)
-                    m_BackgroundImage.SetImage(value);
+                    m_BackgroundImage.SetImageData(value);
             }
         }
 
@@ -421,7 +414,7 @@ namespace MaterialUI
             }
             if (m_CanvasGroup == null)
             {
-                m_CanvasGroup = gameObject.GetAddComponent<CanvasGroup>();
+                m_CanvasGroup = gameObject.GetComponent<CanvasGroup>();
             }
 
             SetLayoutDirty();
@@ -656,7 +649,7 @@ namespace MaterialUI
             m_Tracker.Clear();
         }
 
-        protected virtual void ApplyCanvasGroupChanged()
+        public virtual bool IsInteractable()
         {
             bool interactable = m_Interactable;
             if (interactable)
@@ -671,7 +664,18 @@ namespace MaterialUI
                         break;
                 }
             }
-            canvasGroup.alpha = interactable ? 1f : 0.5f;
+            return interactable;
+        }
+
+        protected virtual void ApplyCanvasGroupChanged()
+        {
+            bool interactable = buttonObject.IsInteractable() && m_Interactable;
+
+            if (canvasGroup != null)
+            {
+                canvasGroup.blocksRaycasts = m_Interactable;
+                canvasGroup.alpha = interactable ? 1f : 0.5f;
+            }
             if (shadowsCanvasGroup)
                 shadowsCanvasGroup.alpha = interactable ? 1f : 0f;
         }

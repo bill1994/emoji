@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_ANDROID
+
+using UnityEngine;
 
 namespace MaterialUI
 {
@@ -11,7 +13,7 @@ namespace MaterialUI
 
         public const int SYSTEM_UI_FLAG_LIGHT_STATUS_BAR = 8192;
         public const int SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 16;
-        
+
         public const int SYSTEM_UI_FLAG_VISIBLE = 0;
         public const int SYSTEM_UI_FLAG_LOW_PROFILE = 1;
         public const int SYSTEM_UI_FLAG_HIDE_NAVIGATION = 2;
@@ -38,63 +40,43 @@ namespace MaterialUI
 
         public static AndroidJavaObject GetActivity()
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return null;
 
             AndroidJavaObject activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
             return activity;
-#else
-            return null;
-#endif
         }
 
         public static AndroidJavaObject GetApplicationContext(AndroidJavaObject activity)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return null;
 
             return activity.Call<AndroidJavaObject>("getApplicationContext");
-#else
-            return null;
-#endif
         }
 
         public static AndroidJavaObject GetWindow(AndroidJavaObject activity)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return null;
 
             return activity.Call<AndroidJavaObject>("getWindow");
-#else
-            return null;
-#endif
         }
 
         public static AndroidJavaObject GetPackageManager(AndroidJavaObject activity)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return null;
 
             return activity.Call<AndroidJavaObject>("getPackageManager");
-#else
-            return null;
-#endif
         }
 
         public static AndroidJavaObject GetDecorView(AndroidJavaObject window)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return null;
 
             return window.Call<AndroidJavaObject>("getDecorView");
-#else
-            return null;
-#endif
         }
 
         #endregion
@@ -103,38 +85,26 @@ namespace MaterialUI
 
         public static AndroidJavaObject GetResources(AndroidJavaObject applicationContext)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return null;
 
             return applicationContext.Call<AndroidJavaObject>("getResources");
-#else
-            return null;
-#endif
         }
 
         public static AndroidJavaObject GetDisplayMetrics(AndroidJavaObject resources)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return null;
 
             return resources.Call<AndroidJavaObject>("getDisplayMetrics");
-#else
-            return null;
-#endif
         }
 
         public static float GetScreenDensity(AndroidJavaObject displayMetrics)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return 1;
 
             return displayMetrics.Get<float>("density");
-#else
-            return 1;
-#endif
         }
 
         #endregion
@@ -143,32 +113,23 @@ namespace MaterialUI
 
         public static string GetPackageName(AndroidJavaObject activity)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || activity == null)
                 return null;
 
             string packageName = activity.Call<string>("getPackageName");
             return packageName;
-#else
-            return null;
-#endif
         }
 
         public static AndroidJavaObject GetApplicationIcon(AndroidJavaObject packageManager, string packageName)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || packageManager == null)
                 return null;
 
             return packageManager.Call<AndroidJavaObject>("getApplicationIcon", packageName).Call<AndroidJavaObject>("getBitmap");
-#else
-            return null;
-#endif
         }
 
         public static void SetTaskDescriptionIcon(AndroidJavaObject activity, Color iconColor)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || activity == null)
                 return;
 
@@ -178,7 +139,6 @@ namespace MaterialUI
             var icon = GetApplicationIcon(packageManager, packageName);
             AndroidJavaObject taskDescription = new AndroidJavaObject("android.app.ActivityManager$TaskDescription", label, icon, ToAndroidARGB(iconColor));
             activity.Call("setTaskDescription", taskDescription);
-#endif
         }
 
         #endregion
@@ -187,48 +147,38 @@ namespace MaterialUI
 
         public static void ClearSystemUiVisibilityFlags(AndroidJavaObject decorView, int flags)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || decorView == null)
                 return;
 
             var currentFlags = GetSystemUiVisibilityFlags(decorView);
             currentFlags &= ~flags;
             SetSystemUiVisibilityFlags(decorView, currentFlags);
-#endif
         }
 
         public static void AddSystemUiVisibilityFlags(AndroidJavaObject decorView, int flags)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || decorView == null)
                 return;
 
             var currentFlags = GetSystemUiVisibilityFlags(decorView);
             currentFlags |= flags;
             SetSystemUiVisibilityFlags(decorView, currentFlags);
-#endif
         }
 
         public static void SetSystemUiVisibilityFlags(AndroidJavaObject decorView, int flags)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || decorView == null)
                 return;
 
             decorView.Call("setSystemUiVisibility", flags);
-#endif
         }
 
         public static int GetSystemUiVisibilityFlags(AndroidJavaObject decorView)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || decorView == null)
                 return -1;
 
             return decorView.Call<int>("getSystemUiVisibility");
-#else
-            return -1;
-#endif
         }
 
         #endregion
@@ -237,47 +187,35 @@ namespace MaterialUI
 
         public static int GetWindowFlagConstValue(string flagName)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return -1;
 
             AndroidJavaClass layoutParamsClass = new AndroidJavaClass("android.view.WindowManager$LayoutParams");
             return layoutParamsClass.GetStatic<int>(flagName);
-#else
-            return -1;
-#endif
         }
 
         protected static int GetWindowFlags(AndroidJavaObject window)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || window == null)
                 return -1;
 
             return window.Call<AndroidJavaObject>("getAttributes").Get<int>("flags");
-#else
-            return -1;
-#endif
         }
 
         protected static void AddWindowFlags(AndroidJavaObject window, int flags)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || window == null)
                 return;
 
             window.Call("addFlags", flags);
-#endif
         }
 
         protected static void ClearWindowFlags(AndroidJavaObject window, int flags)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || window == null)
                 return;
 
             window.Call("clearFlags", flags);
-#endif
         }
 
         #endregion
@@ -286,7 +224,6 @@ namespace MaterialUI
 
         public static void RunOnUIThread(AndroidJavaObject activity, System.Action action)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || activity == null)
                 return;
 
@@ -295,7 +232,6 @@ namespace MaterialUI
                 if (action != null)
                     action.Invoke();
             }));
-#endif
         }
 
         #endregion
@@ -304,7 +240,6 @@ namespace MaterialUI
 
         static bool IsStatusBarVisible_Internal(AndroidJavaObject decorView)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || decorView == null)
                 return false;
 
@@ -312,14 +247,10 @@ namespace MaterialUI
             var rectangle = new AndroidJavaObject("android.graphics.Rect");
             int statusBarHeight = rectangle.Get<int>("top");
             return statusBarHeight != 0;
-#else
-            return false;
-#endif
         }
 
         public static bool IsStatusBarActive(AndroidJavaObject window)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || window == null)
                 return false;
 
@@ -337,14 +268,10 @@ namespace MaterialUI
             //}
 
             return false;
-#else
-            return false;
-#endif
         }
 
         public static bool IsNavigationBarActive(AndroidJavaObject window)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || window == null)
                 return false;
 
@@ -362,14 +289,10 @@ namespace MaterialUI
             }
 
             return false;
-#else
-            return false;
-#endif
         }
 
         public static bool IsViewBehindBars(AndroidJavaObject window)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || window == null)
                 return true;
 
@@ -379,14 +302,10 @@ namespace MaterialUI
             var decorViewFlags = GetSystemUiVisibilityFlags(decorView);
             return (decorViewFlags & SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN) == SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN || 
                 (windowFlags & FLAG_LAYOUT_NO_LIMITS) == FLAG_LAYOUT_NO_LIMITS;
-#else
-            return true;
-#endif
         }
 
         public static float GetNavigationBarHeight(AndroidJavaObject activity)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || activity == null)
                 return 0;
 
@@ -407,14 +326,10 @@ namespace MaterialUI
             }
 
             return height;
-#else
-            return 0;
-#endif
         }
 
         public static float GetStatusBarHeight(AndroidJavaObject activity)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || activity == null)
                 return 0;
 
@@ -436,14 +351,10 @@ namespace MaterialUI
             }
 
             return height;
-#else
-            return 0;
-#endif
         }
 
         public static Color GetNavigationBarColor(Color color)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return Color.clear;
 
@@ -455,14 +366,10 @@ namespace MaterialUI
             var intColor = GetWindow(activity).Call<int>("getNavigationBarColor");
 
             return FromAndroidARGB(intColor);
-#else
-            return Color.clear;
-#endif
         }
 
         public static Color GetStatusBarColor(Color color)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return Color.clear;
 
@@ -474,14 +381,10 @@ namespace MaterialUI
             var intColor = GetWindow(activity).Call<int>("getStatusBarColor");
 
             return FromAndroidARGB(intColor);
-#else
-            return Color.clear;
-#endif
         }
 
         public static void SetStatusBarColor(Color color, bool isWhiteIcons)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return;
 
@@ -514,12 +417,10 @@ namespace MaterialUI
                     SetTaskDescriptionIcon(activity, isWhiteIcons ? Color.white : Color.black);
                 }
             });
-#endif
         }
 
         public static void SetNavigationBarColor(Color color, bool isWhiteIcons)
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return;
 
@@ -546,12 +447,10 @@ namespace MaterialUI
                     AddSystemUiVisibilityFlags(decorView, SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
 
             });
-#endif
         }
 
         public static void SetStatusBarTranslucentActive(AndroidJavaObject window, bool isOn)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || window == null)
                 return;
 
@@ -567,12 +466,10 @@ namespace MaterialUI
                 ClearWindowFlags(window, FLAG_FULLSCREEN);
                 AddWindowFlags(window, FLAG_FORCE_NOT_FULLSCREEN);
             }
-#endif
         }
 
         protected static void SetNavigationBarTranslucentActive(AndroidJavaObject window, bool isOn)
         {
-#if UNITY_ANDROID
             if (Application.isEditor || window == null)
                 return;
 
@@ -587,24 +484,19 @@ namespace MaterialUI
                 ClearWindowFlags(window, FLAG_TRANSLUCENT_NAVIGATION);
                 ClearSystemUiVisibilityFlags(decorView, SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
             }
-#endif
         }
 
-#endregion
+        #endregion
 
-#region Other Functions
+        #region Other Functions
 
         public static int GetSdkVersion()
         {
-#if UNITY_ANDROID
             if (Application.isEditor)
                 return -1;
 
             int sdkInt = new AndroidJavaClass("android.os.Build$VERSION").GetStatic<int>("SDK_INT");
             return sdkInt;
-#else
-            return -1;
-#endif
         }
 
         public static int ToAndroidARGB(Color color)
@@ -628,6 +520,8 @@ namespace MaterialUI
             return color;
         }
 
-#endregion
+        #endregion
     }
 }
+
+#endif

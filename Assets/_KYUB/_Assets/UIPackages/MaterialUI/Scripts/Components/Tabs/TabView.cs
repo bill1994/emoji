@@ -19,7 +19,7 @@ namespace MaterialUI
 #endif
     [ExecuteInEditMode]
     [AddComponentMenu("MaterialUI/TabView", 100)]
-    public class TabView : UIBehaviour
+    public class TabView : BaseTabView
     {
         #region Private Variables
 
@@ -35,129 +35,35 @@ namespace MaterialUI
         private bool m_PagesDirty;
 #endif
         [SerializeField]
-        bool m_AnimateTabs = true;
-        [SerializeField]
         bool m_ForceSameTabSize = true;
         [Space]
         [SerializeField]
-        private RectTransform m_TabsContainer = null;
-        [SerializeField]
-        private TabPage[] m_Pages = null;
-        [SerializeField]
-        private int m_CurrentPage = 0;
-        [SerializeField]
-        private TabItem m_TabItemTemplate = null;
-        [SerializeField]
-        private RectTransform m_PagesContainer = null;
-        [SerializeField]
-        private RectTransform m_PagesRect = null;
-        [SerializeField]
-        private RectTransform m_Indicator = null;
-        [Space]
-        //[SerializeField]
-        //private bool m_LowerUnselectedTabAlpha = true;
-        [SerializeField]
-        private bool m_CanScrollBetweenTabs = true;
+        private List<TabPage> m_Pages = null;
 
-        private ScrollRect m_PagesScrollRect;
-        private float m_TabWidth;
-        private float m_TabPadding = 12;
-        private TabItem[] m_Tabs;
-        private RectTransform m_RectTransform;
+        protected float m_TabWidth;
+        protected float m_TabPadding = 12;
 
-        private int m_IndicatorSizeTweener;
-        private int m_IndicatorTweener;
-        private int m_TabsContainerTweener;
-        private int m_PagesContainerTweener;
-
-        private Vector2 m_PageSize;
-        //private bool m_AlreadyInitialized;
-
-        protected Canvas _RootCanvas;
+        protected bool? _cachedTabChildForceExpand = null;
+        protected float? _cachedTabSpacing = null;
+#if UNITY_EDITOR
+        protected bool? _lastForceSameTabSize = false;
+#endif
 
         #endregion
 
         #region Public Properties
 
-        /*public float shrinkTabsToFitThreshold
-        {
-            get { return m_ShrinkTabsToFitThreshold; }
-            set { m_ShrinkTabsToFitThreshold = value; }
-        }
-
-        public bool forceStretchTabsOnLanscape
-        {
-            get { return m_ForceStretchTabsOnLanscape; }
-            set { m_ForceStretchTabsOnLanscape = value; }
-        }*/
-
-        public RectTransform tabsContainer
-        {
-            get { return m_TabsContainer; }
-            set { m_TabsContainer = value; }
-        }
-
-        public TabPage[] pages
+        public override List<TabPage> pages
         {
             get
             {
                 if (m_Pages == null)
-                    m_Pages = new TabPage[0];
+                    m_Pages = new List<TabPage>();
                 return m_Pages;
             }
             set { m_Pages = value; }
         }
-
-        public int currentPage
-        {
-            get { return m_CurrentPage; }
-            set
-            {
-                if (m_CurrentPage == value)
-                    return;
-                if(Application.isPlaying)
-                    SetPage(value);
-                else
-                    m_CurrentPage = value;
-            }
-        }
-
-        public TabItem tabItemTemplate
-        {
-            get { return m_TabItemTemplate; }
-            set { m_TabItemTemplate = value; }
-        }
-
-        public RectTransform pagesContainer
-        {
-            get { return m_PagesContainer; }
-            set { m_PagesContainer = value; }
-        }
-
-        public RectTransform pagesRect
-        {
-            get { return m_PagesRect; }
-            set { m_PagesRect = value; }
-        }
-
-        public RectTransform indicator
-        {
-            get { return m_Indicator; }
-            set { m_Indicator = value; }
-        }
-
-        public ScrollRect pagesScrollRect
-        {
-            get
-            {
-                if (m_PagesScrollRect == null)
-                {
-                    m_PagesScrollRect = m_PagesRect.GetComponent<ScrollRect>();
-                }
-                return m_PagesScrollRect;
-            }
-        }
-
+        
         public float tabWidth
         {
             get { return m_TabWidth; }
@@ -168,45 +74,7 @@ namespace MaterialUI
             get { return m_TabPadding; }
             set { m_TabPadding = value; }
         }
-
-        public TabItem[] tabs
-        {
-            get { return m_Tabs; }
-        }
-
-        /*public bool lowerUnselectedTabAlpha
-        {
-            get { return m_LowerUnselectedTabAlpha; }
-            set { m_LowerUnselectedTabAlpha = value; }
-        }*/
-
-        public bool canScrollBetweenTabs
-        {
-            get { return m_CanScrollBetweenTabs; }
-            set
-            {
-                m_CanScrollBetweenTabs = value;
-                pagesScrollRect.enabled = value;
-                OverscrollConfig overscroll = pagesScrollRect.GetComponent<OverscrollConfig>();
-                if (overscroll != null)
-                {
-                    overscroll.enabled = value;
-                }
-            }
-        }
-
-        public RectTransform rectTransform
-        {
-            get
-            {
-                if (m_RectTransform == null)
-                {
-                    m_RectTransform = (RectTransform)transform;
-                }
-                return m_RectTransform;
-            }
-        }
-
+        
         public bool forceSameTabSize
         {
             get
@@ -216,112 +84,33 @@ namespace MaterialUI
 
             set
             {
+                if (m_ForceSameTabSize == value)
+                    return;
                 m_ForceSameTabSize = value;
+                if(Application.isPlaying && enabled && gameObject.activeInHierarchy)
+                    InitializeTabsAndPagesDelayed();
             }
         }
-
-        public bool animateTabs
-        {
-            get
-            {
-                return m_AnimateTabs;
-            }
-
-            set
-            {
-                m_AnimateTabs = value;
-            }
-        }
-
-        public Canvas rootCanvas
-        {
-            get
-            {
-                if (_RootCanvas == null)
-                {
-                    _RootCanvas = transform.GetRootCanvas();
-                }
-                return _RootCanvas;
-            }
-        }
-
+        
         #endregion
 
         #region Unity Functions
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            if (_started && Application.isPlaying)
-                InitializeTabsAndPagesDelayed();
-
-#if UNITY_EDITOR
-            Selection.selectionChanged -= OnValidate;
-            Selection.selectionChanged += OnValidate;
-#endif
-        }
-
-        protected bool _started = false;
-        protected override void Start()
-        {
-            if (Application.isPlaying)
-            {
-                _started = true;
-                InitializeTabsAndPagesDelayed();
-
-                var scaler = rootCanvas != null? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
-                if (scaler != null)
-                    scaler.onCanvasAreaChanged.AddListener(OnCanvasAreaChanged);
-            }
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            if (Application.isPlaying)
-            {
-                _initializeTabsAndPagesCoroutine = null;
-            }
-#if UNITY_EDITOR
-            Selection.selectionChanged -= OnValidate;
-            CancelInvoke();
-#endif
-        }
-
-        protected virtual void OnCanvasAreaChanged(bool scaleChanged, bool orientationChanged)
-        {
-            if (Application.isPlaying)
-            {
-                InitializeTabsAndPagesDelayed();
-            }
-        }
-
-        protected override void OnRectTransformDimensionsChange()
-        {
-            base.OnRectTransformDimensionsChange();
-            if (Application.isPlaying)
-            {
-                InitializeTabsAndPagesDelayed();
-            }
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            if (Application.isPlaying)
-            {
-                var scaler = rootCanvas != null ? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
-                if (scaler != null)
-                    scaler.onCanvasAreaChanged.RemoveListener(OnCanvasAreaChanged);
-            }
-        }
 
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
             base.OnValidate();
             if (enabled && gameObject.activeInHierarchy)
-                Invoke("TrackPages", 0.05f);
+            {
+                if (!Application.isPlaying)
+                    Invoke("TrackPages", 0);
+                else if (_lastForceSameTabSize == null || _lastForceSameTabSize != m_ForceSameTabSize)
+                {
+                    if(_lastForceSameTabSize != null)
+                        InitializeTabsAndPagesDelayed();
+                    _lastForceSameTabSize = m_ForceSameTabSize;
+                }
+            }
         }
 #endif
 
@@ -329,40 +118,55 @@ namespace MaterialUI
 
         #region Initialize Methods
 
-        public void InitializeTabs()
+        public override void InitializeTabs()
         {
-            if (m_TabsContainer == null)
+            if (this == null || m_TabsContainer == null || !Application.isPlaying)
                 return;
 
-            //Initialize TabContainer
-            float barWidth = rectTransform.GetProperSize().x;
-
-            m_TabsContainer.GetComponent<LayoutElement>().minWidth = barWidth;
-
             var contentSizeFitter = m_TabsContainer.GetComponent<ContentSizeFitter>();
-            if(contentSizeFitter != null)
+            if (contentSizeFitter != null)
                 contentSizeFitter.enabled = true;
 
-            if(m_ForceSameTabSize)
-                m_TabsContainer.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = true;
+            //Initialize TabContainer
+            var layoutGroup = m_TabsContainer.GetComponent<HorizontalOrVerticalLayoutGroup>();
+            if (layoutGroup != null)
+            {
+                if (_cachedTabChildForceExpand == null)
+                    _cachedTabChildForceExpand = layoutGroup.childForceExpandWidth;
+                if(_cachedTabSpacing == null)
+                    _cachedTabSpacing = layoutGroup.spacing;
+                layoutGroup.childForceExpandWidth = m_ForceSameTabSize? true : _cachedTabChildForceExpand.Value;
+                layoutGroup.spacing = m_ForceSameTabSize ? 0 : _cachedTabSpacing.Value;
+            }
+
             m_TabsContainer.anchorMin = Vector2.zero;
             m_TabsContainer.anchorMax = new Vector2(0, 1);
 
             SetupTabSize();
             InstantiateTabsFromTemplate();
-            InitializeIndicator();
+
+            float barWidth = m_ForceSameTabSize? (m_TabWidth * m_Pages.Count()) : 
+                ((m_TabWidth + (layoutGroup != null ? layoutGroup.spacing : 0)) * m_Pages.Count()) + layoutGroup.padding.horizontal;
+
+            var barParent = m_TabsContainer.parent as RectTransform;
+            //Setup Size
+            var tabContainerLayoutElement = m_TabsContainer.GetComponent<LayoutElement>();
+            if (tabContainerLayoutElement)
+                tabContainerLayoutElement.minWidth = barParent.GetProperSize().x;//Mathf.Max(barWidth, tabContainerLayoutElement.minWidth, barParent != null? barParent.GetProperSize().x : 0);
+            m_TabsContainer.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, barWidth);
 
             //Configure Overscroll
             OverscrollConfig overscrollConfig = m_TabsContainer.parent.GetComponent<OverscrollConfig>();
             if (overscrollConfig != null)
                 overscrollConfig.Setup();
 
-            //m_AlreadyInitialized = true;
+            //Fix Indicator size in next cycle
+            InitializeIndicatorDelayed();
         }
 
-        protected void InitializeIndicator()
+        protected override void InitializeIndicator()
         {
-            if (m_Indicator == null)
+            if (this == null || m_Indicator == null || !Application.isPlaying)
                 return;
 
             m_Indicator.anchorMin = new Vector2(0, 0);
@@ -372,26 +176,32 @@ namespace MaterialUI
             if (m_Indicator != null && m_Indicator.transform.parent == m_TabItemTemplate.transform.parent)
                 m_Indicator.transform.SetAsLastSibling();
 
-            TweenIndicator(m_CurrentPage, true);
+            TweenIndicator(m_CurrentPage, false);
         }
 
-        protected void SetupTabSize()
+        protected override void SetupTabSize()
         {
+            if (this == null || m_TabItemTemplate == null || !Application.isPlaying)
+            {
+                m_TabWidth = -1;
+                return;
+            }
+
             if (m_ForceSameTabSize)
             {
                 float barWidth = rectTransform.GetProperSize().x;
 
                 m_TabWidth = GetMaxTabTextWidth() + (2 * m_TabPadding);
-                float combinedWidth = m_TabWidth * m_Pages.Length;
+                float combinedWidth = m_TabWidth * m_Pages.Count;
                 m_TabItemTemplate.GetComponent<LayoutElement>().minWidth = 72;
 
                 var v_minDelta = 16f;
                 if (combinedWidth - barWidth < v_minDelta)
                 {
-                    m_TabWidth = barWidth / m_Pages.Length;
+                    m_TabWidth = barWidth / m_Pages.Count;
                 }
 
-                m_TabWidth = Mathf.Max(m_TabWidth, m_TabItemTemplate.GetComponent<LayoutElement>().minWidth);
+                m_TabWidth = Mathf.Max(m_TabWidth, LayoutUtility.GetPreferredWidth(m_TabItemTemplate.rectTransform), m_TabItemTemplate.GetComponent<LayoutElement>().minWidth);
             }
             else
             {
@@ -401,151 +211,11 @@ namespace MaterialUI
             m_TabItemTemplate.gameObject.SetActive(false);
         }
 
-        protected void InstantiateTabsFromTemplate()
-        {
-            var tabs = new List<TabItem>(m_Tabs != null ? m_Tabs : new TabItem[m_Pages.Length]);
-            m_Tabs = new TabItem[m_Pages.Length];
-
-            for (int i = 0; i < m_Pages.Length; i++)
-            {
-                TabItem tab = tabs.Count > i ? tabs[i] : null;
-                if (tab == null)
-                    tab = Instantiate(m_TabItemTemplate.gameObject).GetComponent<TabItem>();
-
-                tab.gameObject.SetActive(true);
-                tab.rectTransform.SetParent(m_TabItemTemplate.transform.parent);
-
-                tab.rectTransform.localScale = Vector3.one;
-                tab.rectTransform.localEulerAngles = Vector3.zero;
-                tab.rectTransform.localPosition = new Vector3(tab.rectTransform.localPosition.x, tab.rectTransform.localPosition.y, 0f);
-
-                tab.id = i;
-
-                if (!string.IsNullOrEmpty(m_Pages[i].tabName))
-                {
-                    tab.name = m_Pages[i].tabName;
-                    tab.labelText = tab.name;
-
-                    /*if (tab.graphic != null)
-                    {
-                        tab.graphic.SetGraphicText(tab.name);
-                    }*/
-                }
-                else
-                {
-                    tab.name = "Tab " + i;
-                    tab.labelText = "";
-                    /*if (tab.graphic != null)
-                    {
-                        tab.graphic.enabled = false;
-                    }*/
-                }
-
-                tab.SetupGraphic(m_Pages[i].tabIcon.imageDataType);
-
-                if (tab.itemIcon != null)
-                {
-                    if (m_Pages[i].tabIcon != null)
-                    {
-                        tab.itemIcon.SetImage(m_Pages[i].tabIcon);
-                    }
-                    else
-                    {
-                        tab.itemIcon.enabled = false;
-                    }
-                }
-
-                m_Tabs[i] = tab;
-            }
-
-            //Destroy extra tabs
-            for (int i = m_Pages.Length; i < tabs.Count; i++)
-            {
-                var tab = tabs[i];
-                if (tab != null)
-                {
-                    if (Application.isPlaying)
-                        GameObject.Destroy(tab.gameObject);
-                    else
-                        GameObject.DestroyImmediate(tab.gameObject);
-                }
-            }
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
-        }
-
-        public void InitializePages()
-        {
-            if (m_Pages.Length > 0)
-            {
-                for (int i = 0; i < m_Pages.Length; i++)
-                {
-                    m_Pages[i].gameObject.SetActive(true);
-                }
-            }
-
-            m_PageSize = m_PagesRect.GetProperSize();
-
-            for (int i = 0; i < m_Pages.Length; i++)
-            {
-                RectTransform page = m_Pages[i].rectTransform;
-
-                page.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, i * m_PageSize.x, m_PageSize.x);
-                page.anchorMin = Vector2.zero;
-                page.anchorMax = new Vector2(0, 1);
-                page.sizeDelta = new Vector2(page.sizeDelta.x, 0);
-            }
-
-            m_PagesContainer.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, 0, m_PageSize.x * m_Pages.Length);
-            m_PagesContainer.anchorMin = Vector2.zero;
-            m_PagesContainer.anchorMax = new Vector2(0, 1);
-            m_PagesContainer.sizeDelta = new Vector2(m_PagesContainer.sizeDelta.x, 0);
-
-            OverscrollConfig overscrollConfig = m_PagesRect.GetComponent<OverscrollConfig>();
-
-            if (overscrollConfig != null)
-            {
-                overscrollConfig.Setup();
-            }
-
-            SetPage(m_CurrentPage, false);
-        }
-
-        Coroutine _initializeTabsAndPagesCoroutine = null;
-        public void InitializeTabsAndPagesDelayed()
-        {
-            if (enabled && gameObject.activeInHierarchy)
-            {
-                if (_initializeTabsAndPagesCoroutine == null)
-                    _initializeTabsAndPagesCoroutine = StartCoroutine(InitializeTabsAndPagesRoutine());
-            }
-            else
-            {
-                if (_initializeTabsAndPagesCoroutine != null)
-                {
-                    StopCoroutine(_initializeTabsAndPagesCoroutine);
-                    _initializeTabsAndPagesCoroutine = null;
-                }
-
-                InitializeTabs();
-                InitializePages();
-            }
-        }
-
-        protected IEnumerator InitializeTabsAndPagesRoutine()
-        {
-            yield return null;
-            InitializeTabs();
-            yield return null;
-            InitializePages();
-
-            _initializeTabsAndPagesCoroutine = null;
-        }
-
         #endregion
 
         #region Helper Functions
 
-        private float GetMaxTabTextWidth()
+        protected virtual float GetMaxTabTextWidth()
         {
             float longestTextWidth = 0;
 
@@ -553,7 +223,7 @@ namespace MaterialUI
             {
                 var changed = false;
                 var originalText = m_TabItemTemplate.graphic.GetGraphicText();
-                for (int i = 0; i < m_Pages.Length; i++)
+                for (int i = 0; i < m_Pages.Count; i++)
                 {
                     ILayoutElement layoutElement = m_TabItemTemplate.graphic as ILayoutElement;
                     if (layoutElement != null)
@@ -572,99 +242,7 @@ namespace MaterialUI
             return longestTextWidth;
         }
 
-        public void SetPage(int index)
-        {
-            SetPage(index, animateTabs);
-        }
-
-        public void SetPage(int index, bool animate)
-        {
-            index = Mathf.Clamp(index, 0, m_Pages.Length - 1);
-
-            TweenIndicator(index, animate);
-            TweenTabsContainer(index, animate);
-            TweenPagesContainer(index, animate);
-
-            if (m_Tabs == null)
-                m_Tabs = new TabItem[0];
-
-            for (int i = 0; i < m_Tabs.Length; i++)
-            {
-                if (m_Tabs[i] != null)
-                {
-                    //Call Events
-                    m_Tabs[i].isOn = i == index;
-                    //Tween
-                    /*if (m_LowerUnselectedTabAlpha)
-                    {
-                        if (animate)
-                        {
-                            int i1 = i;
-                            TweenManager.TweenFloat(
-                                f =>
-                                {
-                                    if (m_Tabs[i1] != null)
-                                        m_Tabs[i1].canvasGroup.alpha = f;
-                                },
-                                () => m_Tabs[i1] != null ? m_Tabs[i1].canvasGroup.alpha : 0,
-                                () => m_Pages[i1] != null && m_Pages[i1].interactable ? (i1 == index ? 1f : 0.5f) : 0.15f,
-                                0.5f);
-                        }
-                        else
-                        {
-                            m_Tabs[i].canvasGroup.alpha = m_Pages[i].interactable ? (i == index ? 1f : 0.5f) : 0.15f;
-                        }
-                    }*/
-                }
-            }
-        }
-
-        private void TweenPagesContainer(int index, bool animate = true)
-        {
-            if (m_PagesContainer == null)
-                return;
-
-            if (m_Pages == null)
-                m_Pages = new TabPage[0];
-
-            for (int i = 0; i < m_Pages.Length; i++)
-            {
-                int smaller = Mathf.Min(m_CurrentPage, index);
-                int bigger = Mathf.Max(m_CurrentPage, index);
-
-                //if (i >= smaller - 1 && i <= bigger + 1)
-                if (i == smaller || i == bigger)
-                {
-                    m_Pages[i].gameObject.SetActive(true);
-                }
-                else
-                {
-                    m_Pages[i].DisableIfAllowed();
-                }
-            }
-
-            float targetPosition = -(index * m_PageSize.x);
-
-            targetPosition = Mathf.Clamp(targetPosition, -(m_Pages.Length * m_PageSize.x), 0);
-
-            TweenManager.EndTween(m_PagesContainerTweener);
-
-            m_CurrentPage = index;
-
-            if (animate)
-            {
-                m_PagesContainerTweener =
-                    TweenManager.TweenVector2(vector2 => m_PagesContainer.anchoredPosition = vector2,
-                        m_PagesContainer.anchoredPosition, new Vector2(targetPosition, 0), 0.5f, 0, OnPagesTweenEnd);
-            }
-            else
-            {
-                m_PagesContainer.anchoredPosition = new Vector2(targetPosition, 0);
-                OnPagesTweenEnd();
-            }
-        }
-
-        private void TweenTabsContainer(int index, bool animate = true)
+        protected override void TweenTabsContainer(int index, bool animate = true)
         {
             if (m_TabsContainer == null)
                 return;
@@ -698,7 +276,7 @@ namespace MaterialUI
             }
         }
 
-        private void TweenIndicator(int targetTab, bool animate = true)
+        protected override void TweenIndicator(int targetTab, bool animate = true)
         {
             if (m_Indicator == null)
                 return;
@@ -728,53 +306,7 @@ namespace MaterialUI
             }
         }
 
-        public void TabItemPointerDown(int id)
-        {
-            TweenManager.EndTween(m_TabsContainerTweener);
-        }
-
-        public void TabPagePointerUp(float delta)
-        {
-            if (m_CanScrollBetweenTabs)
-            {
-                pagesScrollRect.velocity = Vector2.zero;
-
-                if (Mathf.Abs(delta) < 1)
-                {
-                    SetPage(NearestPage(), true);
-                }
-                else
-                {
-                    if (delta < 0)
-                    {
-                        SetPage(NearestPage(1), true);
-                    }
-                    else
-                    {
-                        SetPage(NearestPage(-1), true);
-                    }
-                }
-            }
-        }
-
-        private int NearestPage(int direction = 0)
-        {
-            float currentPosition = -m_PagesContainer.anchoredPosition.x;
-
-            if (direction < 0)
-            {
-                return Mathf.FloorToInt(currentPosition / m_PageSize.x);
-            }
-
-            if (direction > 0)
-            {
-                return Mathf.CeilToInt(currentPosition / m_PageSize.x);
-            }
-
-            return Mathf.RoundToInt(currentPosition / m_PageSize.x);
-        }
-
-        public void TabPageDrag()
+        public override void TabPageDrag()
         {
             Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             if (m_CanScrollBetweenTabs)
@@ -794,7 +326,7 @@ namespace MaterialUI
 
                 if (m_Indicator != null)
                 {
-                    float normalizedPagesContainerPosition = -m_PagesContainer.anchoredPosition.x / (m_PageSize.x * m_Pages.Length);
+                    float normalizedPagesContainerPosition = -m_PagesContainer.anchoredPosition.x / (m_PageSize.x * m_Pages.Count);
                     if (m_ForceSameTabSize)
                     {
                         m_Indicator.anchoredPosition = new Vector2((m_TabWidth * m_Tabs.Length) * normalizedPagesContainerPosition, 0);
@@ -803,27 +335,6 @@ namespace MaterialUI
                     {
                         m_Indicator.anchoredPosition = new Vector2(rectTransform.GetProperSize().x * normalizedPagesContainerPosition, 0);
                     }
-                }
-            }
-        }
-
-        #endregion
-
-        #region Receivers
-
-        private void OnPagesTweenEnd()
-        {
-            for (int i = 0; i < m_Pages.Length; i++)
-            {
-                if (i == m_CurrentPage)
-                //if (i >= m_CurrentPage - 1 && i <= m_CurrentPage + 1)
-                {
-                    m_Pages[i].gameObject.SetActive(true);
-                    m_Pages[i].CallOnShow();
-                }
-                else
-                {
-                    m_Pages[i].DisableIfAllowed();
                 }
             }
         }
@@ -842,29 +353,29 @@ namespace MaterialUI
         {
             if (IsDestroyed() || Application.isPlaying) return;
 
-            if (m_AutoTrackPages && enabled && gameObject.activeInHierarchy)
+            if (m_PagesContainer != null && m_AutoTrackPages && enabled && gameObject.activeInHierarchy)
             {
-                TabPage[] tempPages = GetComponentsInChildren<TabPage>(true);
+                TabPage[] tempPages = m_PagesContainer.GetComponentsInChildren<TabPage>(true);
 
                 List<TabPage> ownedTempPages = new List<TabPage>();
 
                 var trackedPagesDirty = false;
                 for (int i = 0; i < tempPages.Length; i++)
                 {
-                    if (tempPages[i].transform.parent.parent.parent == transform)
+                    if (tempPages[i].transform.parent == m_PagesContainer.transform)
                     {
                         trackedPagesDirty = trackedPagesDirty || !m_Pages.Contains(tempPages[i]);
                         ownedTempPages.Add(tempPages[i]);
                     }
                 }
 
-                if (trackedPagesDirty || m_Pages.Length != ownedTempPages.Count)
+                if (trackedPagesDirty || m_Pages.Count != ownedTempPages.Count)
                 {
-                    m_Pages = new TabPage[ownedTempPages.Count];
+                    m_Pages = new List<TabPage>();
 
                     for (int i = 0; i < ownedTempPages.Count; i++)
                     {
-                        m_Pages[i] = ownedTempPages[i];
+                        m_Pages.Add(ownedTempPages[i]);
                     }
                     EditorUtility.SetDirty(this);
                 }
@@ -876,7 +387,7 @@ namespace MaterialUI
                 m_PagesDirty = true;
             }
 
-            if (m_Pages.Length > 0 && m_PagesDirty)
+            if (m_Pages.Count > 0 && m_PagesDirty)
             {
                 m_PagesDirty = false;
 
@@ -884,7 +395,7 @@ namespace MaterialUI
 
                 if (m_OnlyShowSelectedPage)
                 {
-                    for (int i = 0; i < m_Pages.Length; i++)
+                    for (int i = 0; i < m_Pages.Count; i++)
                     {
                         if (m_Pages[i] == null) continue;
 

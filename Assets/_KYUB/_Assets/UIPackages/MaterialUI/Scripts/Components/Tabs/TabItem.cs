@@ -20,7 +20,7 @@ namespace MaterialUI
         [SerializeField, SerializeStyleProperty]
         protected Graphic m_ItemIndex = null;
         [SerializeField]
-        protected TabView m_TabView = null;
+        protected BaseTabView m_TabView = null;
 
         private int m_Id;
 
@@ -73,7 +73,7 @@ namespace MaterialUI
             set { m_ItemIcon = value; }
         }
 
-        public TabView tabView
+        public BaseTabView tabView
         {
             get
             {

@@ -29,6 +29,7 @@ MonoBehaviour:
   m_TextComponent: {fileID: 250431956469033668}
   m_IconComponent: {fileID: 0}
   m_AllowSwitchOff: 1
+  m_AlwaysDisplayHintOption: 0
   m_SelectedIndex: -1
   m_CustomFramePrefabAddress:
     m_name: 
@@ -45,6 +46,7 @@ MonoBehaviour:
           m_Name: 
           m_Unicode: 
         m_Font: {fileID: 0}
+      m_ImgUrl: 
   m_OptionDataList:
     m_ImageType: 1
     m_Options:
@@ -57,6 +59,7 @@ MonoBehaviour:
             m_Name: directions_car
             m_Unicode: \ue531
           m_Font: {fileID: 12800000, guid: a0a40789b9baa45a68c6d593e02f648a, type: 3}
+        m_ImgUrl: 
     - m_Text: Item 2
       m_ImageData:
         m_ImageDataType: 1
@@ -66,6 +69,7 @@ MonoBehaviour:
             m_Name: directions_transit
             m_Unicode: \ue535
           m_Font: {fileID: 12800000, guid: a0a40789b9baa45a68c6d593e02f648a, type: 3}
+        m_ImgUrl: 
     - m_Text: Item 3
       m_ImageData:
         m_ImageDataType: 1
@@ -75,6 +79,7 @@ MonoBehaviour:
             m_Name: airplanemode_active
             m_Unicode: \ue195
           m_Font: {fileID: 12800000, guid: a0a40789b9baa45a68c6d593e02f648a, type: 3}
+        m_ImgUrl: 
   OnItemSelected:
     m_PersistentCalls:
       m_Calls: []

@@ -39,7 +39,7 @@ namespace MaterialUI
         protected Graphic m_IconComponent = null;
         [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_SupportEmptySelection")]
         protected bool m_AllowSwitchOff = true;
-        [SerializeField, Tooltip("Will always apply hint option to text and icon or will only show option when selectedIndex is -1")]
+        [SerializeField, Tooltip("Will always apply hint option to text/icon or will only show option when selectedIndex is -1?")]
         protected bool m_AlwaysDisplayHintOption = false;
         [Space]
         [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_CurrentlySelected")]
@@ -368,15 +368,20 @@ namespace MaterialUI
                 textComponent.SetGraphicText(option != null && !string.IsNullOrEmpty(option.text) ? option.text : "\u200B");
 
             if (iconComponent != null)
-                iconComponent.SetImage(option != null ? option.imageData : null);
+                iconComponent.SetImageData(option != null ? option.imageData : null);
 
-            //Apply Empty Option
+            //Apply Hint Option
             var hintOption = option == null || m_AlwaysDisplayHintOption ? m_HintOption : null;
             if (hintTextComponent != null && ((textComponent != hintTextComponent) || (hintOption != null && option == null)))
                 hintTextComponent.SetGraphicText(hintOption != null && !string.IsNullOrEmpty(hintOption.text)? hintOption.text : "\u200B");
 
             if (hintIconComponent != null && ((iconComponent != hintIconComponent) || (hintOption != null && option == null)))
-                hintIconComponent.SetImage(hintOption != null ? hintOption.imageData : null);
+                hintIconComponent.SetImageData(hintOption != null ? hintOption.imageData : null);
+
+#if UNITY_EDITOR
+            if(!Application.isPlaying)
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
         }
 
         #endregion

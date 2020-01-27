@@ -69,10 +69,12 @@ namespace MaterialUI
                     if (defaultFullScreen != isFullScreen)
                         Screen.fullScreen = isFullScreen;
                 }
+#if UNITY_ANDROID
                 if (m_changeStatusBarColor)
                     AndroidThemeNativeUtils.SetStatusBarColor(m_statusBarColor, m_useLightIconsOnStatusBar);
                 if (m_changeNavigationBarColor)
                     AndroidThemeNativeUtils.SetNavigationBarColor(m_navigationBarColor, m_useLightIconsOnNavigationBar);
+#endif
             }
         }
 

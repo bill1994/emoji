@@ -166,7 +166,7 @@ namespace MaterialUI
 
         public bool IsResources()
         {
-            return m_asset == null && !string.IsNullOrEmpty(m_assetPath);
+            return !string.IsNullOrEmpty(m_assetPath);
         }
 
         public bool IsEmpty()

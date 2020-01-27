@@ -125,7 +125,15 @@ namespace MaterialUI
             
             Build(parentTransform);*/
 
-            Build(parentCanvas != null? parentCanvas.transform : null);
+            //Set Transform
+            Transform parentTransform = null;
+            if (parentCanvas != null)
+            {
+                CanvasSafeArea safeArea = parentCanvas.GetComponent<CanvasSafeArea>();
+                parentTransform = safeArea != null && safeArea.Content != null ? safeArea.Content : parentCanvas.transform;
+            }
+
+            Build(parentTransform);
         }
 
         public virtual void Build(Transform parent)

@@ -1,6 +1,7 @@
 ﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using Kyub.UI;
 using System;
 using System.Linq;
 #if UNITY_EDITOR
@@ -115,7 +116,8 @@ namespace MaterialUI
                     ((Text)textGraphic).text = text;
 
 #if UNITY_EDITOR
-                UnityEditor.EditorUtility.SetDirty(textGraphic);
+                if (!Application.isPlaying)
+                    UnityEditor.EditorUtility.SetDirty(textGraphic);
 #endif
             }
         }
@@ -736,7 +738,7 @@ namespace MaterialUI
         /// </summary>
         /// <param name="graphic">The graphic to modify.</param>
         /// <param name="sprite">The sprite to set.</param>
-        public static void SetImage(this Graphic graphic, Sprite sprite)
+        public static void SetImageData(this Graphic graphic, Sprite sprite)
         {
             Image imageToSet = graphic as Image;
 
@@ -750,7 +752,7 @@ namespace MaterialUI
         /// </summary>
         /// <param name="graphic">The graphic to modify.</param>
         /// <param name="vectorImageData">The vector image data to set.</param>
-        public static void SetImage(this Graphic graphic, VectorImageData vectorImageData)
+        public static void SetImageData(this Graphic graphic, VectorImageData vectorImageData)
         {
             IVectorImage imageToSet = graphic as IVectorImage;
 
@@ -764,7 +766,7 @@ namespace MaterialUI
         /// </summary>
         /// <param name="graphic">The graphic to modify.</param>
         /// <param name="imageData">The image data to set.</param>
-        public static void SetImage(this Graphic graphic, ImageData imageData)
+        public static void SetImageData(this Graphic graphic, ImageData imageData)
         {
             IVectorImage vectorImage = graphic as IVectorImage;
 
@@ -784,7 +786,22 @@ namespace MaterialUI
                 if (imageData.imageDataType == ImageDataType.Sprite)
                     spriteImage.sprite = imageData.sprite;
                 else
-                    vectorImage.vectorImageData = null;
+                    spriteImage.sprite = null;
+            }
+
+            ExternalImage externalImage = graphic != null ? graphic.GetComponent<ExternalImage>() : null;
+            if (externalImage != null)
+            {
+                if (imageData.imageDataType == ImageDataType.Sprite)
+                {
+                    externalImage.Key = imageData.imgUrl;
+                    externalImage.DefaultSprite = imageData.sprite;
+                }
+                else
+                {
+                    externalImage.Key = "";
+                    externalImage.DefaultSprite = null;
+                }
             }
         }
 
@@ -831,7 +848,15 @@ namespace MaterialUI
         {
             Sprite sprite = graphic.GetSpriteImage();
 
-            if (sprite != null)
+            ExternalImage externalImage = graphic != null ? graphic.GetComponent<ExternalImage>() : null;
+            var key = externalImage != null ? externalImage.Key : null;
+            sprite = externalImage != null && externalImage.DefaultSprite != null ? externalImage.DefaultSprite : sprite;
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                return new ImageData(key, sprite);
+            }
+            else if (sprite != null)
             {
                 return new ImageData(sprite);
             }

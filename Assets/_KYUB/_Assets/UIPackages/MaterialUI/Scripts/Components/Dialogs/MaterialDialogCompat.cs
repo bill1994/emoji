@@ -170,6 +170,20 @@ namespace MaterialUI
 
         #region Public Functions
 
+        public override void Hide()
+        {
+            if (activity == null && m_LegacyActivityCompatibility)
+            {
+                //Create Activity in Main Canvas
+                if (this.transform.parent == null)
+                    activity = DialogManager.CreateActivity(this);
+                //Create Activity inside this parent
+                else
+                    activity = DialogManager.CreateActivity(this, this.transform.parent);
+            }
+            base.Hide();
+        }
+
         public override void Show()
         {
             if (activity == null && m_LegacyActivityCompatibility)

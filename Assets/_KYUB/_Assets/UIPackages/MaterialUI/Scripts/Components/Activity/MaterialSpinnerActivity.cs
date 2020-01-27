@@ -67,8 +67,25 @@ namespace MaterialUI
 
         #region Public Functions
 
-        //Replace internal frame
+        public MaterialFrame SetFrame(MaterialFrame frame, Vector3 frameOpenWorldPosition, Vector2 framePivot, Vector2 minSize, Vector2 preferredSize)
+        {
+            frame = SetFrame(frame);
+            if (frame != null)
+                RecalculatePosition(frameOpenWorldPosition, framePivot, minSize, preferredSize);
+
+            return frame;
+        }
+
         public MaterialFrame SetFrame(MaterialFrame frame, IBaseSpinner spinner)
+        {
+            frame = SetFrame(frame);
+            if (frame != null)
+                RecalculatePosition(spinner);
+
+            return frame;
+        }
+
+        public MaterialFrame SetFrame(MaterialFrame frame)
         {
             if (frame == null)
                 return null;
@@ -91,7 +108,6 @@ namespace MaterialUI
             if (frame is MaterialDialogFrame)
                 (frame as MaterialDialogFrame).activity = this;
 
-            RecalculatePosition(spinner);
             m_Frame.transform.SetAsLastSibling();
 
             return frame;
@@ -99,7 +115,15 @@ namespace MaterialUI
 
         public virtual void RecalculatePosition(IBaseSpinner spinner)
         {
-            var frameAnchoredPosition = spinner != null && !spinner.IsDestroyed() && spinner.rectTransform != null ? this.transform.InverseTransformPoint(spinner.rectTransform.TransformPoint(Rect.NormalizedToPoint(spinner.rectTransform.rect, spinner.dropdownExpandPivot))) : Vector3.zero;
+            var frameAnchoredPosition = spinner != null && !spinner.IsDestroyed() && spinner.rectTransform != null ? spinner.rectTransform.TransformPoint(Rect.NormalizedToPoint(spinner.rectTransform.rect, spinner.dropdownExpandPivot)) : Vector3.zero;
+            var spinnerMinSize = spinner.rectTransform != null ? spinner.rectTransform.GetProperSize() : Vector2.zero;
+            var spinnerPreferredSize = spinner.rectTransform != null ? spinner.dropdownFramePreferredSize : Vector2.zero;
+            RecalculatePosition(frameAnchoredPosition, spinner.dropdownFramePivot, spinnerMinSize, spinnerPreferredSize);
+        }
+
+        public virtual void RecalculatePosition(Vector3 frameOpenWorldPosition, Vector2 framePivot, Vector2 minSize, Vector2 preferredSize)
+        {
+            var frameAnchoredPosition = this.transform.InverseTransformPoint(frameOpenWorldPosition);
 
             var localScale = frame.transform.localScale;
             var localRotation = frame.transform.localRotation;
@@ -107,7 +131,7 @@ namespace MaterialUI
             var frameRectTransform = frame.transform as RectTransform;
             if (frameRectTransform != null)
             {
-                frameRectTransform.pivot = spinner.dropdownFramePivot;
+                frameRectTransform.pivot = framePivot;
                 frameRectTransform.anchorMin = new Vector2(0.5f, 0.5f);
                 frameRectTransform.anchorMax = new Vector2(0.5f, 0.5f);
             }
@@ -116,25 +140,18 @@ namespace MaterialUI
             frame.transform.localScale = localScale;
             frame.transform.localRotation = localRotation;
 
-            if (spinner != null && !spinner.IsDestroyed())
+            var frameLayoutElement = frame.GetAddComponent<LayoutElement>();
+            if (frameLayoutElement != null)
             {
-                var spinnerWidth = spinner.rectTransform != null ? spinner.rectTransform.GetProperSize().x : 0;
-                var spinnerHeight= spinner.rectTransform != null ? spinner.rectTransform.GetProperSize().y : 0;
-
-                var preferredHeight = spinner.dropdownFramePreferredSize.y < 0 ? spinner.rectTransform.GetProperSize().y : spinner.dropdownFramePreferredSize.y;
-                var layoutElement = frame.GetAddComponent<LayoutElement>();
-                if (layoutElement != null)
-                {
-                    layoutElement.minWidth = Mathf.Max(layoutElement.minWidth, spinnerWidth, spinner.dropdownFramePreferredSize.x);
-                    layoutElement.minHeight = Mathf.Max(layoutElement.minHeight, spinnerHeight, spinner.dropdownFramePreferredSize.y);
-                    layoutElement.preferredWidth = spinner.dropdownFramePreferredSize.x < 0 ? layoutElement.preferredWidth : spinner.dropdownFramePreferredSize.x;
-                    layoutElement.preferredHeight = spinner.dropdownFramePreferredSize.y < 0 ? layoutElement.preferredHeight : preferredHeight;
-                }
-                frameRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, spinnerWidth);
-                frameRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight);
-                
-                LayoutRebuilder.ForceRebuildLayoutImmediate(frameRectTransform);
+                frameLayoutElement.minWidth = Mathf.Max(frameLayoutElement.minWidth, minSize.x, preferredSize.x);
+                frameLayoutElement.minHeight = Mathf.Max(frameLayoutElement.minHeight, minSize.y, preferredSize.y);
+                frameLayoutElement.preferredWidth = preferredSize.x < 0 ? frameLayoutElement.preferredWidth : preferredSize.x;
+                frameLayoutElement.preferredHeight = preferredSize.y < 0 ? frameLayoutElement.preferredHeight : preferredSize.y;
             }
+            frameRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, preferredSize.x < 0 ? minSize.x : preferredSize.x);
+            frameRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredSize.y < 0 ? minSize.y : preferredSize.y);
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(frameRectTransform);
 
             m_Frame.transform.localPosition = GetValidLocalPositionInsideActivity(m_Frame);
         }

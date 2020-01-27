@@ -12,18 +12,18 @@ public class Example10 : MonoBehaviour
 
 	public void OnIconNameButtonClicked()
 	{
-		m_VectorImage.SetImage(MaterialIconHelper.GetIcon("volume_off"));
-		//m_VectorImage.SetImage(GetIconFromIconFont("FontAwesome", "gift"));
+		m_VectorImage.SetImageData(MaterialIconHelper.GetIcon("volume_off"));
+		//m_VectorImage.SetImageData(GetIconFromIconFont("FontAwesome", "gift"));
 	}
 
 	public void OnIconEnumButtonClicked()
 	{
-		m_VectorImage.SetImage(MaterialIconHelper.GetIcon(MaterialIconEnum.SHOPPING_CART));
+		m_VectorImage.SetImageData(MaterialIconHelper.GetIcon(MaterialIconEnum.SHOPPING_CART));
 	}
 
 	public void OnIconRandomButtonClicked()
 	{
-		m_VectorImage.SetImage(MaterialIconHelper.GetRandomIcon());
+		m_VectorImage.SetImageData(MaterialIconHelper.GetRandomIcon());
 	}
 
 	// If you want to get the icon from a icon font you downloaded:

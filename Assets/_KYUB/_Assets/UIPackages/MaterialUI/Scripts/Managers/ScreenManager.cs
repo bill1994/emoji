@@ -55,9 +55,16 @@ namespace MaterialUI
         {
             get
             {
-                if (instance.m_RectTransform == null)
+                if (instance != null && m_Instance.m_RectTransform == null)
                 {
-                    instance.m_RectTransform = instance.transform as RectTransform;
+                    if (m_Instance.m_ParentCanvas == null)
+                        m_Instance.InitScreenViewSystem();
+
+                    if (m_Instance.m_ParentCanvas != null)
+                    {
+                        CanvasSafeArea safeArea = m_Instance.m_ParentCanvas.GetComponent<CanvasSafeArea>();
+                        instance.m_RectTransform = safeArea != null && safeArea.Content != null ? safeArea.Content : m_Instance.m_ParentCanvas.transform as RectTransform;
+                    }
                 }
 
                 return instance.m_RectTransform;

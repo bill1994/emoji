@@ -11,12 +11,14 @@ namespace MaterialUI
     {
         private SerializedProperty m_ImageDataType;
         private SerializedProperty m_Sprite;
+        private SerializedProperty m_ImgUrl;
         private SerializedProperty m_VectorImageData;
 
         private void GetProperties(SerializedProperty property)
         {
             m_ImageDataType = property.FindPropertyRelative("m_ImageDataType");
             m_Sprite = property.FindPropertyRelative("m_Sprite");
+            m_ImgUrl = property.FindPropertyRelative("m_ImgUrl");
             m_VectorImageData = property.FindPropertyRelative("m_VectorImageData");
         }
 
@@ -28,28 +30,30 @@ namespace MaterialUI
             Rect pos = position;
             pos.height = EditorGUI.GetPropertyHeight(m_ImageDataType);
 
-            float labelWidth = GUI.skin.GetStyle("Label").CalcSize(label).x;
-
-            float i = EditorGUI.PrefixLabel(new Rect(pos.x, pos.y, labelWidth, pos.height), label).width;
-
-            pos.x -= i - 54;
-            pos.width += i - 55;
-
-			if (property.name.Equals("m_ToggleOnIcon") || property.name.Equals("m_ToggleOffIcon"))
-			{
-				pos.x += 33;
-				pos.width -= 33;
-			}
-			else if (property.name.Equals("m_TabIcon"))
-			{
-				pos.x -= 3;
-				pos.width += 3;
-			}
+            
+            var labelRect = new Rect(position.x, position.y, position.width, EditorGUI.GetPropertyHeight(m_ImageDataType));
+            pos = EditorGUI.PrefixLabel(labelRect, label);
+            pos.x -= (15 * EditorGUI.indentLevel);
+            pos.width += (15 * EditorGUI.indentLevel);
 
             if (m_ImageDataType.enumValueIndex == 0)
             {
                 pos.height = EditorGUI.GetPropertyHeight(m_Sprite);
+                
                 EditorGUI.PropertyField(pos, m_Sprite, GUIContent.none);
+
+                //property.isExpanded = EditorGUI.Foldout(new Rect(position.x - 4, position.y, position.width, pos.height), property.isExpanded, string.Empty);
+                EditorGUI.PropertyField(new Rect(position.x - 4, position.y, position.width, pos.height), property, new GUIContent(string.Empty), false);
+                if (property.isExpanded)
+                {
+                    pos.y += pos.height + 3;
+                    labelRect.y += EditorGUIUtility.singleLineHeight + 3;
+
+                    labelRect = EditorGUI.IndentedRect(labelRect);
+                    EditorGUI.LabelField(labelRect, "Url");
+                    EditorGUI.PropertyField(pos, m_ImgUrl, GUIContent.none);
+                }
+                pos.y += pos.height;
             }
 
             if (m_ImageDataType.enumValueIndex == 1)
@@ -127,6 +131,17 @@ namespace MaterialUI
             }
         }
 
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            if(m_ImageDataType == null)
+                GetProperties(property);
+
+            if (m_ImageDataType.enumValueIndex == 0 && property.isExpanded)
+                return (2 * base.GetPropertyHeight(property, label)) + 6;
+            else
+                return base.GetPropertyHeight(property, label);
+        }
+
         //public static void DrawWithoutPopup(SerializedProperty property)
         //{
         //    DrawWithoutPopup(property, new GUIContent(property.displayName));
@@ -145,7 +160,7 @@ namespace MaterialUI
 
         //    if (imageDataType.enumValueIndex == 1)
         //    {
-		//        SerializedProperty code = imageData.FindPropertyRelative("m_Glyph.m_Unicode");
+        //        SerializedProperty code = imageData.FindPropertyRelative("m_Glyph.m_Unicode");
         //        SerializedProperty name = imageData.FindPropertyRelative("m_Glyph.m_Name");
         //        SerializedProperty font = imageData.FindPropertyRelative("m_Font");
         //        GUIStyle iconStyle = new GUIStyle { font = (Font)font.objectReferenceValue };

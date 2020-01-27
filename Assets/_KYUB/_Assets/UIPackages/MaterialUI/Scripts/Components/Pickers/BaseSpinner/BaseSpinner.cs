@@ -19,6 +19,7 @@ namespace MaterialUI
         bool IsDestroyed();
     }
 
+    [DisallowMultipleComponent]
     public abstract class BaseSpinner<T> : StyleElement<MaterialStylePanel.PanelStyleProperty>, IBaseSpinner where T : StyleProperty, new()
     {
         #region Private Variables
@@ -226,7 +227,11 @@ namespace MaterialUI
                 return null;
 
             MaterialSpinnerActivity activity = new GameObject(frame.name + " (SpinnerActivity)").AddComponent<MaterialSpinnerActivity>();
-            activity.Build(DialogManager.rectTransform);
+            if (DialogManager.rectTransform != null)
+                activity.Build(DialogManager.rectTransform);
+            else
+                activity.Build(this.transform.GetRootCanvas());
+
             activity.SetFrame(frame, this);
 
             return activity;

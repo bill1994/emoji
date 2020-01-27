@@ -20,7 +20,7 @@ namespace MaterialUI
     [InitializeOnLoad]
 #endif
     [ExecuteInEditMode]
-    [RequireComponent(typeof(CanvasGroup))]
+    //[RequireComponent(typeof(CanvasGroup))]
     [AddComponentMenu("MaterialUI/Material Input Field", 100)]
     public class MaterialInputField : StyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, ISelectHandler, IDeselectHandler
     {
@@ -557,13 +557,15 @@ namespace MaterialUI
             get { return hintTextObject != null? hintTextObject.GetGraphicText() : ""; }
             set
             {
-                //m_HintText = value;
-                if(hintTextObject != null)
+                if (hintTextObject != null && !string.Equals(hintTextObject.GetGraphicText(), value))
+                {
                     hintTextObject.SetGraphicText(value);
 
-//#if UNITY_EDITOR
-//                m_LastHintText = value;
-//#endif
+#if UNITY_EDITOR
+                    if (!Application.isPlaying)
+                        UnityEditor.EditorUtility.SetDirty(this);
+#endif
+                }
             }
         }
 
@@ -772,7 +774,10 @@ namespace MaterialUI
                 if (unityInputField != null)
                     unityInputField.caretPosition = value;
                 else if (tmpInputField != null)
+                {
                     tmpInputField.caretPosition = value;
+                    tmpInputField.stringPosition = value;
+                }
             }
         }
 
@@ -1207,6 +1212,7 @@ namespace MaterialUI
             set
             {
                 m_Interactable = value;
+                ApplyCanvasGroupChanged();
                 RefreshVisualStyles();
                 inputField.interactable = value;
             }
@@ -1349,6 +1355,13 @@ namespace MaterialUI
             SetLayoutDirty();
         }
 
+        protected override void OnCanvasGroupChanged()
+        {
+            base.OnCanvasGroupChanged();
+            SetLayoutDirty();
+            ApplyCanvasGroupChanged();
+        }
+
 #if UNITY_EDITOR
         protected override void OnValidateDelayed()
         {
@@ -1359,9 +1372,9 @@ namespace MaterialUI
                 SetLayoutDirty();
             }
 
-            if (inputField != null)
+            if (inputField != null && canvasGroup != null)
             {
-                canvasGroup.alpha = inputField == null || inputField.interactable ? 1 : 0.5f;
+                //canvasGroup.alpha = inputField == null || inputField.interactable ? 1 : 0.5f;
                 canvasGroup.interactable = inputField.interactable;
                 canvasGroup.blocksRaycasts = inputField.interactable;
             }
@@ -1741,7 +1754,7 @@ namespace MaterialUI
             if (m_ValidationText != null)
                 m_ValidationText.gameObject.SetActive(m_HasValidation);
 
-            if (m_Interactable)
+            if (IsInteractable())
             {
                 m_CurrentSelectionState = isFocused ? ColorSelectionState.EnabledSelected : ColorSelectionState.EnabledDeselected;
 
@@ -1902,9 +1915,12 @@ namespace MaterialUI
                 if (m_ActiveLineTransform)
                     m_ActiveLineTransform.GetComponent<Graphic>().color = m_LineActiveColor;
 
-                canvasGroup.alpha = m_Interactable ? 1 : 0.5f;
-                canvasGroup.interactable = m_Interactable;
-                canvasGroup.blocksRaycasts = m_Interactable;
+                //canvasGroup.alpha = m_Interactable ? 1 : 0.5f;
+                if (canvasGroup != null)
+                {
+                    canvasGroup.interactable = m_Interactable;
+                    canvasGroup.blocksRaycasts = m_Interactable;
+                }
             }
         }
 
@@ -2455,6 +2471,35 @@ namespace MaterialUI
         #endregion
 
         #region BaseStyleElement Overrides
+
+        protected virtual void ApplyCanvasGroupChanged()
+        {
+            var isInteractable = IsInteractable();
+            if (canvasGroup != null)
+            {
+                canvasGroup.interactable = m_Interactable;
+                canvasGroup.blocksRaycasts = m_Interactable;
+                canvasGroup.alpha = isInteractable ? 1f : 0.5f;
+            }
+        }
+
+        public virtual bool IsInteractable()
+        {
+            bool interactable = m_Interactable;
+            if (interactable)
+            {
+                var allCanvas = GetComponentsInParent<CanvasGroup>();
+                for (int i = 0; i < allCanvas.Length; i++)
+                {
+                    var canvas = allCanvas[i];
+
+                    interactable = interactable && canvas.interactable;
+                    if (!interactable || canvas.ignoreParentGroups)
+                        break;
+                }
+            }
+            return interactable;
+        }
 
         public override void RefreshVisualStyles(bool p_canAnimate = true)
         {

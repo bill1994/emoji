@@ -79,13 +79,13 @@ namespace MaterialUI
 
             EditorGUILayout.PropertyField(m_OnlyShowSelectedPage);
 
-            TabPage[] pages = m_TabView.pages;
+            List<TabPage> pages = m_TabView.pages;
 
-            if (pages != null && pages.Length > 0)
+            if (pages != null && pages.Count > 0)
             {
-                string[] names = new string[pages.Length];
+                string[] names = new string[pages.Count];
 
-                for (int i = 0; i < pages.Length; i++)
+                for (int i = 0; i < pages.Count; i++)
                 {
                     var v_tabName = (i + 1) + " - " + (pages[i] != null ? pages[i].name : "");
                     names[i] = v_tabName;
