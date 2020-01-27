@@ -17,18 +17,20 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using KyubEditor.ScreenShooter.Configs;
-using KyubEditor.ScreenShooter.Utils;
+using KyubEditor.Screenshot.Configs;
+using KyubEditor.Screenshot.Utils;
 using UnityEditor;
 using UnityEngine;
-using GameViewSizeType = KyubEditor.ScreenShooter.Utils.GameViewUtil.GameViewSizeType;
+using GameViewSizeType = KyubEditor.Screenshot.Utils.GameViewUtil.GameViewSizeType;
 
-namespace KyubEditor.ScreenShooter
+namespace KyubEditor.Screenshot
 {    
     public class ScreenShooterWindow : EditorWindow
     {
         private static ScreenShooterSettings _settings;
         private UnityEditorInternal.ReorderableList _list;
+
+        private UnityEditorInternal.ReorderableList _camerasList;
 
         private static bool _isMakingScreenshotsNow;
         private bool _hasErrors;
@@ -77,6 +79,13 @@ namespace KyubEditor.ScreenShooter
 
             // Init reorderable list if required
             _list = _list ?? ReorderableConfigsList.Create(_settings.ScreenshotConfigs, MenuItemHandler);
+
+            _camerasList = new UnityEditorInternal.ReorderableList(_settings.Cameras, typeof(Camera), true, false, true, true);
+            _camerasList.headerHeight = 0;
+            _camerasList.drawElementCallback += (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                _camerasList.list[index] = EditorGUI.ObjectField(rect, _camerasList.list[index] as Camera, typeof(Camera), true);
+            };
         }
 
         protected void OnGUI()
@@ -109,10 +118,10 @@ namespace KyubEditor.ScreenShooter
             EditorGUILayout.EndHorizontal();
 
             //if (_settings.Camera == null) _settings.Camera = Camera.main;
-            _settings.Camera = (Camera)EditorGUILayout.ObjectField(_settings.Camera, typeof(Camera), true);
-            if (_settings.Camera == null)
+            _camerasList.DoLayoutList();
+            if (_settings.Cameras == null || _settings.Cameras.Count == 0)
             {
-                EditorGUILayout.HelpBox("Camera is not selected, Game View buffer will be used instead", MessageType.Info);
+                EditorGUILayout.HelpBox("No cameras selected, Game View buffer will be used instead", MessageType.Info);
             }
             EditorGUILayout.Space();
         }

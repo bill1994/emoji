@@ -18,7 +18,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace KyubEditor.ScreenShooter.Utils
+namespace KyubEditor.Screenshot.Utils
 {
     public static class EditorUtil
     {
@@ -33,8 +33,23 @@ namespace KyubEditor.ScreenShooter.Utils
         public static T LoadFromAsset<T>(string relativePath) where T : UnityEngine.Object
         {
             var assetPath = Path.Combine(ScreenShooterPrefs.HomeFolder, relativePath);
-            var asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
-            if (!asset) Debug.LogError(string.Format(LOAD_ASSET_ERROR_MSG, assetPath));
+            T asset = null;
+            if (!File.Exists(System.IO.Path.GetFullPath(assetPath)) && ScreenShooterPrefs.HomeFolder != ScreenShooterPrefs.ScriptsFolder)
+            {
+                var packagePath = Path.Combine(ScreenShooterPrefs.ScriptsFolder, relativePath);
+                var packageAsset = AssetDatabase.LoadAssetAtPath<T>(packagePath);
+
+                if (packageAsset != null && typeof(ScriptableObject).IsAssignableFrom(typeof(T)))
+                {
+                    Directory.CreateDirectory(System.IO.Path.GetFullPath(assetPath));
+                    AssetDatabase.CreateAsset(Object.Instantiate(packageAsset), assetPath);
+                    AssetDatabase.Refresh();
+                }
+            }
+
+            asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+            if (!asset)
+                Debug.LogError(string.Format(LOAD_ASSET_ERROR_MSG, assetPath));
             return asset;
         }
 

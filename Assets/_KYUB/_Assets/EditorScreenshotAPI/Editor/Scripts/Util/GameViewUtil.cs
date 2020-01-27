@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 
-namespace KyubEditor.ScreenShooter.Utils
+namespace KyubEditor.Screenshot.Utils
 {
     public static class GameViewUtil
     {

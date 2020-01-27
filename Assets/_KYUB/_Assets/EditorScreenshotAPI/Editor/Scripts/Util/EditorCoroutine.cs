@@ -17,7 +17,7 @@
 using System.Collections;
 using UnityEditor;
 
-namespace KyubEditor.ScreenShooter.Utils
+namespace KyubEditor.Screenshot.Utils
 {
     public class EditorCoroutine
     {

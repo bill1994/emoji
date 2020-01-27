@@ -14,7 +14,7 @@
 
  #if UNITY_EDITOR
 
-namespace KyubEditor.ScreenShooter.Configs
+namespace KyubEditor.Screenshot.Configs
 {
     public class PredefinedConfigs
     {
