@@ -23,11 +23,11 @@ namespace KyubEditor.Screenshot
     public class ScreenShooterPrefs
     {
         private const string HOME_FOLDER_PREF_KEY = "KyubEditor.Screenshot.HomeFolder.";
-        private const string HOME_FOLDER = "Assets/EditorScreenShooter";
+        private const string HOME_FOLDER = "Assets";
         private const string HOME_FOLDER_HINT = "Change this setting to the new location of the \"EditorScreenshotAPI\" folder if you move it around in your project.";
 
-        private static EditorPrefsString _homeFolder = null;
-        public static EditorPrefsString HomeFolder
+        private static string _homeFolder = null;
+        public static string HomeFolder
         {
             get
             {
@@ -36,7 +36,7 @@ namespace KyubEditor.Screenshot
                     var mainPath = ScriptsFolder;
                     if (mainPath.Contains("Packages"))
                         mainPath = HOME_FOLDER;
-                    _homeFolder = new EditorPrefsString(HOME_FOLDER_PREF_KEY + ProjectName, "Folder Location", mainPath);
+                    _homeFolder = mainPath;
                 }
                 return _homeFolder;
             }
@@ -66,7 +66,12 @@ namespace KyubEditor.Screenshot
             var folderPath = files.Length > 0 ? files[0].Replace("\\", "/") : "";
             if (!string.IsNullOrEmpty(folderPath))
             {
-                folderPath = folderPath.Split(new string[] { "/EditorScreenshotAPI/" }, System.StringSplitOptions.None)[0] + "/EditorScreenshotAPI/";
+                var keyFolderPath = "/EditorScreenshotAPI/";
+                if (folderPath.Contains(keyFolderPath))
+                    folderPath = folderPath.Split(new string[] { keyFolderPath }, System.StringSplitOptions.None)[0] + keyFolderPath;
+                else
+                    folderPath = fullPackagePath;
+
                 if (string.IsNullOrEmpty(fullPackagePath))
                     folderPath = folderPath.Replace(Application.dataPath, "Assets");
                 else
@@ -80,7 +85,7 @@ namespace KyubEditor.Screenshot
         // Messages
         //---------------------------------------------------------------------
 
-#if !UNITY_2018_3_OR_NEWER
+/*#if !UNITY_2018_3_OR_NEWER
         [PreferenceItem(AssetInfo.NAME)]
         public static void EditorPreferences()
         {
@@ -90,7 +95,7 @@ namespace KyubEditor.Screenshot
             GUILayout.FlexibleSpace();
             EditorGUILayout.LabelField("Version " + AssetInfo.VERSION, EditorStyles.centeredGreyMiniLabel);
         }
-#endif
+#endif*/
 
         //---------------------------------------------------------------------
         // Helpers
