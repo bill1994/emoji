@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
+using Kyub.Localization.UI;
+using TMPro.EditorUtilities;
 
-namespace TMPro.EditorUtilities
+namespace KyubEditor.Localization.UI
 {
     [CustomEditor(typeof(TMP_LocaleTextUGUI), true), CanEditMultipleObjects]
-#if UNITY_2019_2_OR_NEWER
+#if TMP_2_1_0_PREVIEW_1_OR_NEWER
     public class TMP_LocaleTextUGUIEditor : TMP_EditorPanelUI
 #else
     public class TMP_LocaleTextUGUIEditor : TMP_UiEditorPanel

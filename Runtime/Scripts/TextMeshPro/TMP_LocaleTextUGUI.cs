@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Kyub.Localization;
+using TMPro;
 
-namespace TMPro
+namespace Kyub.Localization.UI
 {
     public class TMP_LocaleTextUGUI : TextMeshProUGUI
     {
@@ -38,7 +39,7 @@ namespace TMPro
                 if (m_supportLocaleRichTextTags == value)
                     return;
                 m_supportLocaleRichTextTags = value;
-                if(m_isLocalized)
+                if (m_isLocalized)
                     SetVerticesDirty();
             }
         }
@@ -58,14 +59,14 @@ namespace TMPro
             }
         }
 
-#if UNITY_2018_3_OR_NEWER
+#if TMP_2_0_0_OR_NEWER
         protected System.Reflection.FieldInfo _isInputParsingRequired_Field = null;
 #endif
         protected internal bool IsInputParsingRequired_Internal
         {
             get
             {
-#if UNITY_2018_3_OR_NEWER
+#if TMP_2_0_0_OR_NEWER
                 if (_isInputParsingRequired_Field == null)
                     _isInputParsingRequired_Field = typeof(TMP_Text).GetField("m_isInputParsingRequired", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
@@ -79,7 +80,7 @@ namespace TMPro
             }
             protected set
             {
-#if UNITY_2018_3_OR_NEWER
+#if TMP_2_0_0_OR_NEWER
                 if (_isInputParsingRequired_Field == null)
                     _isInputParsingRequired_Field = typeof(TMP_Text).GetField("m_isInputParsingRequired", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
@@ -91,7 +92,7 @@ namespace TMPro
             }
         }
 
-#if UNITY_2018_3_OR_NEWER
+#if TMP_2_0_0_OR_NEWER
         protected enum TextInputSources { Text = 0, SetText = 1, SetCharArray = 2, String = 3 };
         protected System.Reflection.FieldInfo _inputSource_Field = null;
         protected System.Type _textInputSources_Type = null;
@@ -100,7 +101,7 @@ namespace TMPro
         {
             get
             {
-#if UNITY_2018_3_OR_NEWER
+#if TMP_2_0_0_OR_NEWER
                 if (_inputSource_Field == null)
                     _inputSource_Field = typeof(TMP_Text).GetField("m_inputSource", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
@@ -114,7 +115,7 @@ namespace TMPro
             }
             set
             {
-#if UNITY_2018_3_OR_NEWER
+#if TMP_2_0_0_OR_NEWER
 
                 if (_inputSource_Field == null)
                     _inputSource_Field = typeof(TMP_Text).GetField("m_inputSource", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
@@ -166,13 +167,13 @@ namespace TMPro
                 var v_parsedLocale = false;
                 var v_oldText = m_text;
 
-                if(IsInputParsingRequired_Internal)
-                    m_text = m_text != null? m_text.Replace("\n", "\\n").Replace("\r", "") : null;
+                if (IsInputParsingRequired_Internal)
+                    m_text = m_text != null ? m_text.Replace("\n", "\\n").Replace("\r", "") : null;
 
                 v_parsedLocale = !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized) ?
                     TryClearLocaleTags(m_text, out m_text) :
                     TryGetLocalizedText(m_text, out m_text);
-                    
+
 
                 _localeParsingRequired = false;
                 IsInputParsingRequired_Internal = false;
@@ -225,7 +226,7 @@ namespace TMPro
                 _lastLocalizedLanguage = LocaleManager.Instance.CurrentLanguage;
             }
             else
-                p_localizedValue = p_text != null? p_text : "";
+                p_localizedValue = p_text != null ? p_text : "";
 
             return v_sucess;
         }
@@ -264,10 +265,22 @@ namespace TMPro
 
         public override TMP_TextInfo GetTextInfo(string text)
         {
-            TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref text);
+            if (!Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized))
+                TryClearLocaleTags(text, out text);
+            else
+                TryGetLocalizedText(text, out text);
             return base.GetTextInfo(text);
         }
 
+#if TMP_2_1_0_PREVIEW_3_OR_NEWER
+        protected override Vector2 CalculatePreferredValues(float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing, bool isWordWrappingEnabled)
+        {
+            if (_localeParsingRequired)
+                ParseInputTextAndLocalizeTags();
+
+            return base.CalculatePreferredValues(defaultFontSize, marginSize, ignoreTextAutoSizing, isWordWrappingEnabled);
+        }
+#else
         protected override Vector2 CalculatePreferredValues(float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing)
         {
             if (_localeParsingRequired)
@@ -275,6 +288,7 @@ namespace TMPro
 
             return base.CalculatePreferredValues(defaultFontSize, marginSize, ignoreTextAutoSizing);
         }
+#endif
 
         #endregion
 
