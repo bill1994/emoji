@@ -20,7 +20,7 @@ set version=%version:"=%
 set version=%version: =%
 set branchTag=%name%-%version%
 
-set gitRootPath=%cd:Assets\=,%
+set gitRootPath=%cd:\Assets\=\,%
 FOR /f "tokens=1,2 delims=," %%a IN ("%gitRootPath%") do ( set relativePath=Assets\%%b&set gitRootPath=%%a&goto :break3)
 :break3
 
