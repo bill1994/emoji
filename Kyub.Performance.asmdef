@@ -1,11 +1,17 @@
 {
     "name": "Kyub.Performance",
     "references": [
-        "Kyub.Geometry",
-        "Kyub.Core"
+        "GUID:40d837b93f9871447a28629b4842c7ea",
+        "GUID:af50b871d983fd2498bf363097906a11",
+        "GUID:41175c1412c601548a1d1cc8d9a7e266"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using Kyub.EventSystems;
 
 namespace Kyub.Performance
 {
@@ -109,12 +110,12 @@ namespace Kyub.Performance
         //Prevent OnClick when multiple detected multi-touch
         protected virtual void LateUpdate()
         {
-            if (Input.touchSupported && s_eventBuffer == this && Input.touchCount > 1)
+            if (InputCompat.touchSupported && s_eventBuffer == this && InputCompat.touchCount > 1)
             {
                 _isMultiTouching = true;
             }
             else if (_isMultiTouching && 
-                ((s_eventBuffer == null && Input.touchCount == 0) || (s_eventBuffer != null && s_eventBuffer != this)))
+                ((s_eventBuffer == null && InputCompat.touchCount == 0) || (s_eventBuffer != null && s_eventBuffer != this)))
             {
                 _isMultiTouching = false;
             }
