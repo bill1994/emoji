@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
 namespace MobileInputNativePlugin
 {
@@ -126,6 +127,16 @@ namespace MobileInputNativePlugin
         #endregion
 
         #region Properties
+
+        protected BaseInput input
+        {
+            get
+            {
+                if (EventSystem.current && EventSystem.current.currentInputModule)
+                    return EventSystem.current.currentInputModule.input;
+                return null;
+            }
+        }
 
         public INativeInputField InputField
         {
@@ -270,15 +281,15 @@ namespace MobileInputNativePlugin
                 SetRectNative(this._inputObject.textViewport);
             }
             //Set Visible false when click out of rect
-            if (Application.isMobilePlatform && Input.touchCount > 0)
+            if (Application.isMobilePlatform && input.touchCount > 0)
             {
                 if (Visible && _inputObject.isFocused)
                 {
                     var v_camera = GetComponentInParent<Canvas>().rootCanvas.worldCamera;
 
-                    for (int i = 0; i < Input.touches.Length; i++)
+                    for (int i = 0; i < input.touchCount; i++)
                     {
-                        var v_touch = Input.touches[i];
+                        var v_touch = input.GetTouch(i);
                         if (v_touch.phase == TouchPhase.Began)
                         {
                             var v_isInside = RectTransformUtility.RectangleContainsScreenPoint((RectTransform)this.transform, v_touch.position, v_camera);

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MaterialUI
@@ -180,6 +181,16 @@ namespace MaterialUI
         #endregion
 
         #region Properties
+
+        protected BaseInput input
+        {
+            get
+            {
+                if (EventSystem.current && EventSystem.current.currentInputModule)
+                    return EventSystem.current.currentInputModule.input;
+                return null;
+            }
+        }
 
         public bool fadeIn
         {
@@ -919,7 +930,7 @@ namespace MaterialUI
                     return new Vector2(rectPosition.x + rectTransform.sizeDelta.x * 0.5f, rectPosition.y + rectTransform.sizeDelta.y * 0.5f);
 
                 default:
-                    return Input.mousePosition;
+                    return input.mousePosition;
             }
         }
 

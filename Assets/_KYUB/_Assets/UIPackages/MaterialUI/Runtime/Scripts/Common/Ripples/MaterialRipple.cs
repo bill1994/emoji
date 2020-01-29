@@ -27,6 +27,16 @@ namespace MaterialUI
     [ExecuteInEditMode]
     public class MaterialRipple : MonoBehaviour, IPointerEnterHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IRippleCreator, ISelectHandler, IDeselectHandler, ISubmitHandler
     {
+        protected BaseInput input
+        {
+            get
+            {
+                if (EventSystem.current && EventSystem.current.currentInputModule)
+                    return EventSystem.current.currentInputModule.input;
+                return null;
+            }
+        }
+
         /// <summary>
         /// The type of event that can trigger a ripple animation.
         /// </summary>
@@ -833,11 +843,11 @@ namespace MaterialUI
         /// <returns></returns>
         private IEnumerator ScrollCheck()
         {
-            Vector2 startPos = Input.mousePosition;
+            Vector2 startPos = input.mousePosition;
 
             yield return new WaitForSeconds(0.04f);
 
-            Vector2 endPos = Input.mousePosition;
+            Vector2 endPos = input.mousePosition;
 
             if (Vector2.Distance(startPos, endPos) < 2f)
             {

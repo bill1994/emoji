@@ -157,6 +157,16 @@ namespace MaterialUI
 
         #region Properties
 
+        protected BaseInput input
+        {
+            get
+            {
+                if (EventSystem.current && EventSystem.current.currentInputModule)
+                    return EventSystem.current.currentInputModule.input;
+                return null;
+            }
+        }
+
         bool isPressing
         {
             get
@@ -316,7 +326,7 @@ namespace MaterialUI
             //Change cached state
             if (_IsOverScrollEnabled != overScrollEnabled)
             {
-                _ImpactPosition = Input.mousePosition;
+                _ImpactPosition = input.mousePosition;
                 _IsOverScrollEnabled = overScrollEnabled;
             }
 
@@ -355,7 +365,7 @@ namespace MaterialUI
                         {
                             if (isValid)
                             {
-                                impactForce = Mathf.Clamp01((_ImpactPosition - (Vector2)Input.mousePosition).magnitude * 0.005f);
+                                impactForce = Mathf.Clamp01((_ImpactPosition - (Vector2)input.mousePosition).magnitude * 0.005f);
                                 overscrollObject.TransitionImmediate(true, impactForce);
                             }
                             else if (overscrollObject.isShow)

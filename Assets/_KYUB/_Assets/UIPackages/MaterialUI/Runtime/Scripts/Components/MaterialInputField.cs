@@ -267,7 +267,17 @@ namespace MaterialUI
 
         #endregion
 
-        #region Public Properties
+        #region Properties
+
+        protected BaseInput input
+        {
+            get
+            {
+                if (EventSystem.current && EventSystem.current.currentInputModule)
+                    return EventSystem.current.currentInputModule.input;
+                return null;
+            }
+        }
 
         public BackgroundLayoutMode backgroundLayoutMode
         {
@@ -2035,7 +2045,7 @@ namespace MaterialUI
                 float lineLength = m_LineTransform.GetProperSize().x;
 
                 m_ActiveLineTransform.sizeDelta = new Vector2(0, m_ActiveLineTransform.sizeDelta.y);
-                m_ActiveLineTransform.position = Input.mousePosition;
+                m_ActiveLineTransform.position = input.mousePosition;
                 m_ActiveLineTransform.anchoredPosition = new Vector2(Mathf.Clamp(m_ActiveLineTransform.anchoredPosition.x, -lineLength / 2, lineLength / 2), 0);
                 activeLineCanvasGroup.alpha = 1;
 

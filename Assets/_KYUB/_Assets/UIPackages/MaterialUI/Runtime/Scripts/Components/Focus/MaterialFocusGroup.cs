@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace MaterialUI
 {
@@ -61,6 +62,16 @@ namespace MaterialUI
         #endregion
 
         #region Properties
+
+        protected BaseInput input
+        {
+            get
+            {
+                if (EventSystem.current && EventSystem.current.currentInputModule)
+                    return EventSystem.current.currentInputModule.input;
+                return null;
+            }
+        }
 
         public List<KeyTriggerData> KeyTriggers
         {
