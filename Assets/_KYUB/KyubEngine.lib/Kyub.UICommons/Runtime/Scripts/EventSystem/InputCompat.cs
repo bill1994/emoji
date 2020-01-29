@@ -134,7 +134,76 @@ namespace Kyub.EventSystems
 #endif
             }
         }
+#if UNITY_NEW_INPUT_SYSTEM
+        static bool s_SimulateMouseWithTouches = true;
+#endif
+        public static bool simulateMouseWithTouches
+        {
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return s_SimulateMouseWithTouches;
+#else
+                return Input.simulateMouseWithTouches;
+#endif
+            }
+            set
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                s_SimulateMouseWithTouches = value;
+#else
+                Input.simulateMouseWithTouches = value;
+#endif
+            }
+        }
 
+        public static Vector3 gravity
+        {
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return GravitySensor.current != null && GravitySensor.current.gravity != null ? GravitySensor.current.gravity.ReadValue() : Vector3.zero;
+#else
+                return Input.gyro.gravity;
+#endif
+            }
+        }
+
+        public static Vector3 acceleration
+        {
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return LinearAccelerationSensor.current != null && LinearAccelerationSensor.current.acceleration != null ? LinearAccelerationSensor.current.acceleration.ReadValue() : Vector3.zero;
+#else
+                return Input.acceleration;
+#endif
+            }
+        }
+
+        public static bool anyKeyDown
+        {
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return Keyboard.current != null && Keyboard.current.anyKey != null ? Keyboard.current.anyKey.wasPressedThisFrame : false;
+#else
+                return Input.anyKeyDown;
+#endif
+            }
+        }
+
+        public static bool anyKey
+        {
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return Keyboard.current != null && Keyboard.current.anyKey != null ? Keyboard.current.anyKey.isPressed : false;
+#else
+                return Input.anyKey;
+#endif
+            }
+        }
 
         #endregion
 
@@ -241,7 +310,7 @@ namespace Kyub.EventSystems
                         return downArrow.ReadValue();
                 }
             }
-            if (axisName == "Mouse X")
+            else if (axisName == "Mouse X")
             {
                 return Pointer.current != null && Pointer.current.delta != null ? Pointer.current.delta.ReadValue().x : 0;
             }
@@ -428,18 +497,21 @@ namespace Kyub.EventSystems
                 else if (button == (int)MouseButton.Back)
                     control = Mouse.current.backButton;
             }
-            else if (Touchscreen.current != null)
+            else if (simulateMouseWithTouches)
             {
-                if (button >= 0 && button < Touchscreen.current.touches.Count)
+                if (Touchscreen.current != null)
                 {
-                    var touch = Touchscreen.current.touches[button];
-                    if (touch != null)
-                        control = touch.press;
+                    if (button >= 0 && button < Touchscreen.current.touches.Count)
+                    {
+                        var touch = Touchscreen.current.touches[button];
+                        if (touch != null)
+                            control = touch.press;
+                    }
                 }
-            }
-            else if (button == 0 && Pointer.current != null)
-            {
-                control = Pointer.current.press;
+                else if (button == 0 && Pointer.current != null)
+                {
+                    control = Pointer.current.press;
+                }
             }
             return control;
         }
