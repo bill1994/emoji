@@ -427,14 +427,20 @@ namespace MaterialUI
 
         public virtual void OnPointerDown(PointerEventData pointerEventData)
         {
-            if (onPress != null)
-                onPress.Invoke();
+            if (IsInteractable())
+            {
+                if (onPress != null)
+                    onPress.Invoke();
+            }
         }
 
         public virtual void OnPointerClick(PointerEventData pointerEventData)
         {
-            if (onClick != null)
-                onClick.Invoke();
+            if (IsInteractable())
+            {
+                if (onClick != null)
+                    onClick.Invoke();
+            }
         }
 
         #endregion
