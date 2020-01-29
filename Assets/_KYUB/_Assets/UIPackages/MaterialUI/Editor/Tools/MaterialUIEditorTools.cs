@@ -13,7 +13,7 @@ namespace MaterialUI
         private static GameObject m_SelectedObject;
         private static bool m_NotCanvas;
 
-        #region GeneralCreationMethods
+#region GeneralCreationMethods
 
         static string s_cachedMainFolderPath = null;
         public static string GetMainFolderPath()
@@ -33,9 +33,9 @@ namespace MaterialUI
                 {
                     var keyFolderPath = "/MaterialUI/";
                     if (folderPath.Contains(keyFolderPath))
-                        folderPath = folderPath.Split(new string[] { keyFolderPath }, System.StringSplitOptions.None)[0] + keyFolderPath + "Prefabs/";
+                        folderPath = folderPath.Split(new string[] { keyFolderPath }, System.StringSplitOptions.None)[0] + keyFolderPath + "AssetFiles/Prefabs/";
                     else
-                        folderPath = packagePath + "Prefabs/";
+                        folderPath = packagePath + "AssetFiles/Prefabs/";
 
                     if (string.IsNullOrEmpty(fullPackagePath))
                         folderPath = folderPath.Replace(Application.dataPath, "Assets");
@@ -112,9 +112,9 @@ namespace MaterialUI
             }
         }
 
-        #endregion
+#endregion
 
-        #region CreateObjects
+#region CreateObjects
 
         [MenuItem("GameObject/MaterialUI/Vector Image", false, 014)]
         private static void CreateVectorImage()
@@ -275,9 +275,9 @@ namespace MaterialUI
             m_LastInstance.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
         }
 
-        #endregion
+#endregion
 
-        #region Tools
+#region Tools
 
         [MenuItem("GameObject/MaterialUI/Tools/Attach and Setup Shadow", true, 3000)]
         public static bool CheckAttachAndSetupShadow()
@@ -356,7 +356,7 @@ namespace MaterialUI
             CreateInstance("Components/Shadow", "Shadow");
         }
 
-        #endregion
+#endregion
     }
 }
 

@@ -607,6 +607,20 @@ namespace MaterialUI
                 {
                     VectorImagePickerWindow.Show(targetDatas, objectsToUndo, onIconPickAction);
                 }
+                if (visualReference != null && visualReference.ContainsData() && 
+                    GUILayout.Button(IconDecoder.Decode(@"\ue14c"), 
+                        new GUIStyle { fontSize = iconStyle.fontSize, font = VectorImageManager.GetIconFont(VectorImageManager.materialDesignIconsFontName) }, 
+                        GUILayout.MaxWidth(20)))
+                {
+                    if (objectsToUndo != null)
+                        Undo.RecordObjects(objectsToUndo, "Set Icon");
+
+                    foreach (var imageData in targetDatas)
+                    {
+                        imageData.glyph = null;
+                        imageData.vectorFont = null;
+                    }
+                }
             }
 
             return true;

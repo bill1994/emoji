@@ -10,9 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b023249ec8aa50142ad62b315bc5f090, type: 3}
-  m_Name: ScreenShooterSettings
+  m_Name: EditorScreenshotSettings
   m_EditorClassIdentifier: 
-  Cameras: []
   ScreenshotConfigs:
   - Name: iPhone 6.5-Inch Portrait
     Width: 1242

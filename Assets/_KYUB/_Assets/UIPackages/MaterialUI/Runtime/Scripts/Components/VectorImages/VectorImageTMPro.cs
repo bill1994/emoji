@@ -19,20 +19,32 @@ namespace MaterialUI
 
         [SerializeField]
         private float m_Size = 48;
-        [SerializeField]
-        private float m_ScaledSize = 0;
+        //[SerializeField]
+        //private float m_ScaledSize = 0;
         [SerializeField]
         private VectorImageSizeMode m_SizeMode = VectorImageSizeMode.MatchMin;
         [SerializeField]
         private VectorImageData m_VectorImageData = new VectorImageData();
+        [SerializeField, Tooltip("Keep preferred size when VectorImageData is Empty?")]
+        bool m_KeepSizeWhenEmpty = true;
 
         private Canvas _RootCanvas = null;
-        private float m_LocalScaleFactor;
-        private DrivenRectTransformTracker m_Tracker = new DrivenRectTransformTracker();
+        //private float _LocalScaleFactor = 1f;
+        //private DrivenRectTransformTracker m_Tracker = new DrivenRectTransformTracker();
 
         #endregion
 
         #region Public Properties
+
+        public bool keepSizeWhenEmpty
+        {
+            get { return m_KeepSizeWhenEmpty; }
+            set
+            {
+                m_KeepSizeWhenEmpty = value;
+                RefreshScale();
+            }
+        }
 
         public float size
         {
@@ -43,17 +55,19 @@ namespace MaterialUI
                 RefreshScale();
             }
         }
-        public float scaledSize
+
+        /*public float scaledSize
         {
             get { return m_ScaledSize; }
-        }
+        }*/
+
         public VectorImageSizeMode sizeMode
         {
             get { return m_SizeMode; }
             set
             {
                 m_SizeMode = value;
-                m_Tracker.Clear();
+                //m_Tracker.Clear();
                 RefreshScale();
                 SetLayoutDirty();
             }
@@ -181,7 +195,7 @@ namespace MaterialUI
         {
             base.OnDisable();
 
-            m_Tracker.Clear();
+            //m_Tracker.Clear();
         }
 
         protected override void Start()
@@ -199,7 +213,7 @@ namespace MaterialUI
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
-            m_Tracker.Clear();
+            //m_Tracker.Clear();
             RefreshScale();
             base.OnValidate();
             SetLayoutDirty();
@@ -251,7 +265,7 @@ namespace MaterialUI
 
             if (rootCanvas == null) // When instantiating the icon for the first time
             {
-                m_ScaledSize = size;
+                //m_ScaledSize = size;
                 fontSize = Mathf.RoundToInt(size);
                 return;
             }
@@ -260,7 +274,7 @@ namespace MaterialUI
 
             if (size == 0 && sizeMode == VectorImageSizeMode.Manual)
             {
-                m_ScaledSize = 0;
+                //m_ScaledSize = 0;
                 fontSize = 0;
                 return;
             }
@@ -269,47 +283,51 @@ namespace MaterialUI
 
             if (sizeMode == VectorImageSizeMode.Manual)
             {
-                m_ScaledSize = tempSize * rootCanvas.scaleFactor;
+                //m_ScaledSize = tempSize * rootCanvas.scaleFactor;
             }
             else if (sizeMode == VectorImageSizeMode.MatchWidth)
             {
-                m_ScaledSize = rectTransform.rect.width;
-                tempSize = m_ScaledSize;
-                m_ScaledSize *= rootCanvas.scaleFactor;
+                tempSize = rectTransform.rect.width;
+                //m_ScaledSize = rectTransform.rect.width;
+                //tempSize = m_ScaledSize;
+                //m_ScaledSize *= rootCanvas.scaleFactor;
             }
             else if (sizeMode == VectorImageSizeMode.MatchHeight)
             {
-                m_ScaledSize = rectTransform.rect.height;
-                tempSize = m_ScaledSize;
-                m_ScaledSize *= rootCanvas.scaleFactor;
+                tempSize = rectTransform.rect.height;
+                //m_ScaledSize = rectTransform.rect.height;
+                //tempSize = m_ScaledSize;
+                //m_ScaledSize *= rootCanvas.scaleFactor;
             }
             else if (sizeMode == VectorImageSizeMode.MatchMin)
             {
                 Vector2 tempVector2 = new Vector2(rectTransform.rect.width, rectTransform.rect.height);
+                tempSize = Mathf.Min(tempVector2.x, tempVector2.y);
 
-                m_ScaledSize = Mathf.Min(tempVector2.x, tempVector2.y);
-                tempSize = m_ScaledSize;
-                m_ScaledSize *= rootCanvas.scaleFactor;
+                //m_ScaledSize = Mathf.Min(tempVector2.x, tempVector2.y);
+                //tempSize = m_ScaledSize;
+                //m_ScaledSize *= rootCanvas.scaleFactor;
             }
             else if (sizeMode == VectorImageSizeMode.MatchMax)
             {
                 Vector2 tempVector2 = new Vector2(rectTransform.rect.width, rectTransform.rect.height);
+                tempSize = Mathf.Max(tempVector2.x, tempVector2.y);
 
-                m_ScaledSize = Mathf.Max(tempVector2.x, tempVector2.y);
-                tempSize = m_ScaledSize;
-                m_ScaledSize *= rootCanvas.scaleFactor;
+                //m_ScaledSize = Mathf.Max(tempVector2.x, tempVector2.y);
+                //tempSize = m_ScaledSize;
+                //m_ScaledSize *= rootCanvas.scaleFactor;
             }
 
-            if (m_ScaledSize > 500)
+            /*if (m_ScaledSize > 500)
             {
                 m_LocalScaleFactor = m_ScaledSize / 500;
             }
             else
             {
                 m_LocalScaleFactor = 1f;
-            }
+            }*/
 
-            tempSize *= m_LocalScaleFactor;
+            //tempSize *= m_LocalScaleFactor;
 
             fontSize = Mathf.RoundToInt(tempSize);
 
@@ -320,14 +338,14 @@ namespace MaterialUI
             }
 #endif
 
-            m_LocalScaleFactor *= (size / Mathf.Max(size));
+            //m_LocalScaleFactor *= (size / Mathf.Max(size));
 
             
-            if (!float.IsInfinity(m_LocalScaleFactor) && !float.IsNaN(m_LocalScaleFactor) && new Vector3(m_LocalScaleFactor, m_LocalScaleFactor, m_LocalScaleFactor) != rectTransform.localScale)
+            /*if (!float.IsInfinity(m_LocalScaleFactor) && !float.IsNaN(m_LocalScaleFactor) && new Vector3(m_LocalScaleFactor, m_LocalScaleFactor, m_LocalScaleFactor) != rectTransform.localScale)
             {
                 m_Tracker.Add(this, rectTransform, DrivenTransformProperties.Scale);
                 rectTransform.localScale = new Vector3(m_LocalScaleFactor, m_LocalScaleFactor, m_LocalScaleFactor);
-            }
+            }*/
         }
 
         #endregion
@@ -346,10 +364,10 @@ namespace MaterialUI
             RefreshScale();
         }
 
-        public override float preferredWidth { get { return size; } }
+        public override float preferredWidth { get { return m_KeepSizeWhenEmpty || (m_VectorImageData != null && m_VectorImageData.ContainsData()) ? size : -1; } }
         public new float minWidth { get { return -1; } }
         public new float flexibleWidth { get { return -1; } }
-        public override float preferredHeight { get { return size; } }
+        public override float preferredHeight { get { return m_KeepSizeWhenEmpty || (m_VectorImageData != null && m_VectorImageData.ContainsData()) ? size: -1; } }
         public new float minHeight { get { return -1; } }
         public new float flexibleHeight { get { return -1; } }
 
