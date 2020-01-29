@@ -420,7 +420,7 @@ namespace Kyub.UI
             vbo.AddUIVertexQuad(this.m_CursorVerts);
             int height = Screen.height;
             zero.y = (float)height - zero.y;
-            Input.compositionCursorPos = zero;
+            input.compositionCursorPos = zero;
         }
 
         protected void CreateCursorVerts()
@@ -489,7 +489,7 @@ namespace Kyub.UI
         {
             if (IsUnityKeyboardSupported())
             {
-                if (Input.touchSupported)
+                if (input.touchSupported)
                 {
                     TouchScreenKeyboard.hideInput = shouldHideMobileInput;
                 }
@@ -509,7 +509,7 @@ namespace Kyub.UI
             }
             else
             {
-                Input.imeCompositionMode = IMECompositionMode.On;
+                input.imeCompositionMode = IMECompositionMode.On;
                 OnFocus();
             }
 
@@ -532,6 +532,16 @@ namespace Kyub.UI
         #endregion
 
         #region Internal Important Fields
+
+        protected BaseInput input
+        {
+            get
+            {
+                if (EventSystem.current && EventSystem.current.currentInputModule)
+                    return EventSystem.current.currentInputModule.input;
+                return null;
+            }
+        }
 
         System.Reflection.FieldInfo m_CachedInputRendererInfo = null;
         protected CanvasRenderer CachedInputRenderer
