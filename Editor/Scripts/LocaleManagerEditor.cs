@@ -61,6 +61,7 @@ namespace KyubEditor.Localization
                 else
                     v_target.StartingLanguage = v_possibleLanguages[v_newIndex];
                 serializedObject.Update();
+                EditorUtility.SetDirty(v_target);
             }
 
             //GUI.enabled = v_oldGuiEnabled;
