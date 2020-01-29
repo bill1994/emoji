@@ -9,7 +9,7 @@ using TMPro;
 
 namespace Kyub.UI
 {
-    public class TMP_NativeInputField : TMPro.TMP_InputField, INativeInputField
+    public partial class TMP_NativeInputField : TMPro.TMP_InputField, INativeInputField
     {
         #region Private Variables
 
@@ -192,7 +192,7 @@ namespace Kyub.UI
 
         protected override void LateUpdate()
         {
-            base.LateUpdate();
+            BaseLateUpdate();
 
             if (!isFocused && BlinkCoroutine != null)
             {
@@ -259,7 +259,7 @@ namespace Kyub.UI
             //The security character in Android is locked to 'Buller', so we must reflect this in Unity.
             //Bullet Char
             if (Application.isPlaying && asteriskChar != '•')
-                asteriskChar = '•';  
+                asteriskChar = '•';
 #endif
         }
 
@@ -384,7 +384,7 @@ namespace Kyub.UI
             }
         }
 
-        private void SafeActivateInputFieldInternal()
+        protected void SafeActivateInputFieldInternal()
         {
             if (IsUnityKeyboardSupported())
             {
@@ -434,10 +434,9 @@ namespace Kyub.UI
 #if TMP_2_0_1_OR_NEWER
         public void DeactivateInputField()
         {
-            base.DeactivateInputField();
+            DeactivateInputField(false);
         }
 #endif
-
         #endregion
 
         #region Internal Important Fields
