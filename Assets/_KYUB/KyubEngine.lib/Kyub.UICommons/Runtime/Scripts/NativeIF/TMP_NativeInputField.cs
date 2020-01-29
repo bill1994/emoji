@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using MobileInputNativePlugin;
 using TMPro;
+using Kyub.EventSystems;
 
 namespace Kyub.UI
 {
@@ -388,7 +389,7 @@ namespace Kyub.UI
         {
             if (IsUnityKeyboardSupported())
             {
-                if (Input.touchSupported)
+                if (InputCompat.touchSupported)
                 {
                     TouchScreenKeyboard.hideInput = shouldHideMobileInput;
                 }
@@ -411,7 +412,7 @@ namespace Kyub.UI
             }
             else
             {
-                Input.imeCompositionMode = IMECompositionMode.On;
+                InputCompat.imeCompositionMode = IMECompositionMode.On;
                 OnFocus();
             }
 

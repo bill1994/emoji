@@ -1,9 +1,4 @@
-﻿using UnityEngine.UI;
-using UnityEngine.InputSystem;
-using System;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.EventSystems;
+﻿using UnityEngine.EventSystems;
 using UnityEngine;
 
 namespace Kyub.EventSystems

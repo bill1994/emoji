@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Kyub.EventSystems;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -139,12 +140,12 @@ namespace MaterialUI
                     bool v_callTrigger = false;
                     if (v_keyTrigger.TriggerType == KeyTriggerData.KeyTriggerType.KeyDown)
                     {
-                        if (Input.GetKeyDown(v_keyTrigger.Key))
+                        if (InputCompat.GetKeyDown(v_keyTrigger.Key))
                             v_callTrigger = true;
                     }
                     if (v_keyTrigger.TriggerType == KeyTriggerData.KeyTriggerType.KeyUp)
                     {
-                        if (Input.GetKeyUp(v_keyTrigger.Key))
+                        if (InputCompat.GetKeyUp(v_keyTrigger.Key))
                             v_callTrigger = true;
                     }
 

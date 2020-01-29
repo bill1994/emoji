@@ -1,12 +1,12 @@
 {
   "name": "com.kyub.uicommons",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "displayName": "Kyub UI Commons",
   "description": "Contains new/better UGUIs components",
   "unity": "2019.1",
 	"dependencies": {
 		"com.unity.ugui": "1.0.0",
-		"com.unity.inputsystem": "1.0.0-preview.4",
+		"com.kyub.inputcompat": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.inputcompat",
 		"com.unity.textmeshpro": "2.1.0-preview.2"
 	},
   "keywords": [
