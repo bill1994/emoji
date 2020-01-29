@@ -1,8 +1,16 @@
-﻿using UnityEngine.InputSystem;
+﻿#if UNITY_NEW_INPUT_SYSTEM
 using System;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
+#endif
+
+#if UNITY_EDITOR
+using System.Collections.Generic;
+using System.Linq;
+#endif
+
 using UnityEngine;
 
 namespace Kyub.EventSystems
@@ -13,41 +21,81 @@ namespace Kyub.EventSystems
 
         public static string compositionString
         {
-            get { return s_lastCompositionString.ToString(); }
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return s_lastCompositionString.ToString();
+#else
+                return Input.compositionString;
+#endif
+            }
         }
 
         public static IMECompositionMode imeCompositionMode
         {
-            get { return Keyboard.current != null && Keyboard.current.imeSelected != null ? IMECompositionMode.On : IMECompositionMode.Off; }
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return Keyboard.current != null && Keyboard.current.imeSelected != null ? IMECompositionMode.On : IMECompositionMode.Off;
+#else
+                return Input.imeCompositionMode;
+#endif
+            }
             set
             {
+#if UNITY_NEW_INPUT_SYSTEM
                 var isOn = value == IMECompositionMode.On;
                 if (Keyboard.current != null)
                     Keyboard.current.SetIMEEnabled(isOn);
+#else
+                Input.imeCompositionMode = value;
+#endif
             }
         }
 
         public static Vector2 compositionCursorPos
         {
-            //Impossible to get CursorPosition in new system
-            get { return Vector2.zero; }
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                //Impossible to get CursorPosition in new system
+                return Vector2.zero;
+#else
+                return Input.compositionCursorPos;
+#endif
+            }
             set
             {
+#if UNITY_NEW_INPUT_SYSTEM
                 if (Keyboard.current != null)
                     Keyboard.current.SetIMECursorPosition(value);
+#else
+                Input.compositionCursorPos = value;
+#endif
             }
         }
 
         public static bool mousePresent
         {
-            get { return Mouse.current != null; }
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return Mouse.current != null;
+#else
+                return Input.mousePresent;
+#endif
+            }
         }
 
         public static Vector2 mousePosition
         {
             get
             {
+#if UNITY_NEW_INPUT_SYSTEM
                 return Pointer.current != null && Pointer.current.position != null ? Pointer.current.position.ReadValue() : Vector2.zero;
+#else
+                return Input.mousePosition;
+#endif
             }
         }
 
@@ -55,7 +103,11 @@ namespace Kyub.EventSystems
         {
             get
             {
+#if UNITY_NEW_INPUT_SYSTEM
                 return Mouse.current != null && Mouse.current.scroll != null ? Mouse.current.scroll.ReadValue() : Vector2.zero;
+#else
+                return Input.mouseScrollDelta;
+#endif
             }
         }
 
@@ -63,13 +115,24 @@ namespace Kyub.EventSystems
         {
             get
             {
+#if UNITY_NEW_INPUT_SYSTEM
                 return Touchscreen.current != null;
+#else
+                return Input.touchSupported;
+#endif
             }
         }
 
         public static int touchCount
         {
-            get { return Touchscreen.current != null ? Touchscreen.current.touches.Count : 0; }
+            get
+            {
+#if UNITY_NEW_INPUT_SYSTEM
+                return Touchscreen.current != null ? Touchscreen.current.touches.Count : 0;
+#else
+                return Input.touchCount;
+#endif
+            }
         }
 
 
@@ -77,10 +140,12 @@ namespace Kyub.EventSystems
 
         #region Static Constructors
 
+#if UNITY_NEW_INPUT_SYSTEM
         static InputCompat()
         {
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += HandleOnSceneLoaded;
         }
+#endif
 
         #endregion
 
@@ -88,33 +153,50 @@ namespace Kyub.EventSystems
 
         public static bool GetMouseButtonDown(int button)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             ButtonControl control = GetMouseButtonControl(button);
             return control != null ? control.wasPressedThisFrame : false;
+#else
+            return Input.GetMouseButtonDown(button);
+#endif
         }
 
         public static bool GetMouseButtonUp(int button)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             ButtonControl control = GetMouseButtonControl(button);
             return control != null ? control.wasReleasedThisFrame : false;
+#else
+            return Input.GetMouseButtonUp(button);
+#endif
         }
 
         public static bool GetMouseButton(int button)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             ButtonControl control = GetMouseButtonControl(button);
             return control != null ? control.isPressed : false;
+#else
+            return Input.GetMouseButton(button);
+#endif
         }
 
         public static Touch GetTouch(int index)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             TouchControl touch = null;
             if (Touchscreen.current != null && index >= 0 && index < Touchscreen.current.touches.Count)
                 touch = Touchscreen.current.touches[index];
 
             return ConvertToLegacyTouch(touch);
+#else
+            return Input.GetTouch(index);
+#endif
         }
 
         public static float GetAxisRaw(string axisName)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             if (axisName == "Horizontal")
             {
                 if (Joystick.current != null)
@@ -176,72 +258,100 @@ namespace Kyub.EventSystems
             }
 
             return 0;
+#else
+            return Input.GetAxisRaw(axisName);
+#endif
         }
 
         public static bool GetButtonDown(string buttonName)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(buttonName, true);
                 return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].wasPressedThisFrame : false;
             }
             return false;
+#else
+            return Input.GetButtonDown(buttonName);
+#endif
         }
 
         public static bool GetButtonUp(string buttonName)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(buttonName, true);
                 return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].wasReleasedThisFrame : false;
             }
             return false;
+#else
+            return Input.GetButtonUp(buttonName);
+#endif
         }
 
         public static bool GetButton(string buttonName)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(buttonName, true);
                 return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].isPressed : false;
             }
             return false;
+#else
+            return Input.GetButton(buttonName);
+#endif
         }
 
         public static bool GetKeyDown(KeyCode key)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(key.ToString());
                 return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].wasPressedThisFrame : false;
             }
             return false;
+#else
+            return Input.GetKeyDown(key);
+#endif
         }
 
         public static bool GetKeyUp(KeyCode key)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(key.ToString());
                 return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].wasReleasedThisFrame : false;
             }
             return false;
+#else
+            return Input.GetKeyUp(key);
+#endif
         }
 
         public static bool GetKey(KeyCode key)
         {
+#if UNITY_NEW_INPUT_SYSTEM
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(key.ToString());
                 return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].isPressed : false;
             }
             return false;
+#else
+            return Input.GetKey(key);
+#endif
         }
 
         #endregion
 
         #region Helper Static Functions
 
+#if UNITY_NEW_INPUT_SYSTEM
         static void RegisterEvents()
         {
             UnregisterEvents();
@@ -333,11 +443,13 @@ namespace Kyub.EventSystems
             }
             return control;
         }
+#endif
 
         #endregion
 
         #region Receivers
 
+#if UNITY_NEW_INPUT_SYSTEM
         static void HandleOnSceneLoaded(Scene scene1, Scene scene2)
         {
             RegisterEvents();
@@ -348,6 +460,60 @@ namespace Kyub.EventSystems
         {
             s_lastCompositionString = compositionString;
         }
+#endif
+
+        #endregion
+
+        #region Unity Compiler
+
+#if UNITY_EDITOR
+
+        [UnityEditor.Callbacks.DidReloadScripts]
+        static void OnScriptsReloaded()
+        {
+            UnityEditor.SerializedProperty enableNativePlatformBackendsForNewInputSystem = null;
+            UnityEditor.SerializedProperty disableOldInputManagerSupport = null;
+            var allPlayerSettings = Resources.FindObjectsOfTypeAll<UnityEditor.PlayerSettings>();
+            if (allPlayerSettings.Length > 0)
+            {
+                var playerSettings = Resources.FindObjectsOfTypeAll<UnityEditor.PlayerSettings>()[0];
+                var so = new UnityEditor.SerializedObject(playerSettings);
+                enableNativePlatformBackendsForNewInputSystem = so.FindProperty("enableNativePlatformBackendsForNewInputSystem");
+                disableOldInputManagerSupport = so.FindProperty("disableOldInputManagerSupport");
+            }
+
+            var supportNewInputSystem = enableNativePlatformBackendsForNewInputSystem == null || enableNativePlatformBackendsForNewInputSystem.boolValue;
+            var supportOldInputSystem = !(disableOldInputManagerSupport == null || disableOldInputManagerSupport.boolValue);
+
+            if (supportNewInputSystem && !supportOldInputSystem)
+                AddDefineSymbols(new string[] { "UNITY_NEW_INPUT_SYSTEM" });
+            else
+                RemoveDefineSymbols(new string[] { "UNITY_NEW_INPUT_SYSTEM" });
+        }
+
+        static void AddDefineSymbols(string[] symbols)
+        {
+            string definesString = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup);
+            List<string> allDefines = definesString.Split(';').ToList();
+            allDefines.AddRange(symbols.Except(allDefines));
+            UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(
+                UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup,
+                string.Join(";", allDefines.ToArray()));
+        }
+
+        static void RemoveDefineSymbols(string[] symbols)
+        {
+            string definesString = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup);
+            List<string> allDefines = definesString.Split(';').ToList();
+            foreach (var symbol in symbols)
+            {
+                allDefines.Remove(symbol);
+            }
+            UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(
+                UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup,
+                string.Join(";", allDefines.ToArray()));
+        }
+#endif
 
         #endregion
     }
