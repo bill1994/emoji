@@ -22,6 +22,8 @@ namespace MaterialUI
         [Space]
         [SerializeField] bool m_forceClip = true;
         [Space]
+        [SerializeField] bool m_AutoReparentDirectChildren = true;
+        [Space]
         [SerializeField] bool m_AutoCreateUnsafeContent = false;
         //[SerializeField] Color m_AutoCreateColor = Color.white;
         [Space]
@@ -80,9 +82,7 @@ namespace MaterialUI
         protected override void Awake()
         {
             base.Awake();
-
-            if(Content != null)
-                ResetRectTransform(m_Content, false);
+            TryInstantiateContent();
         }
 
         protected override void Start()
@@ -102,6 +102,8 @@ namespace MaterialUI
                     Content.gameObject.GetAddComponent<RectMask2D>();
                 var layoutElement = Content.gameObject.GetAddComponent<LayoutElement>();
                 layoutElement.ignoreLayout = true;
+                ResetRectTransform(m_Content, false);
+                RefreshContentChildren();
 
                 if (m_UnsafeContent == null && m_AutoCreateUnsafeContent)
                 {
@@ -165,9 +167,78 @@ namespace MaterialUI
                 Refresh();
         }
 
+        protected virtual void OnTransformChildrenChanged()
+        {
+            if(Application.isPlaying)
+                RefreshContentChildrenDelayed();
+        }
+
         #endregion
 
         #region Helper Functions
+
+        public virtual void RefreshContentChildrenDelayed()
+        {
+            if (!_isExecutingRefreshContentChildren)
+            {
+                CancelInvoke("RefreshContentChildren");
+
+                if(m_AutoReparentDirectChildren)
+                    Invoke("RefreshContentChildren", 0);
+            }
+        }
+
+        bool _isExecutingRefreshContentChildren = false;
+        public virtual void RefreshContentChildren()
+        {
+            CancelInvoke("RefreshContentChildren");
+
+            _isExecutingRefreshContentChildren = true;
+            List<Transform> childrenToMove = null;
+            if (m_Content != null && m_AutoReparentDirectChildren)
+            {
+                childrenToMove = new List<Transform>();
+                //Find Non-Content Children
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    var child = transform.GetChild(i);
+                    if (child != null && child != m_Content && child != m_UnsafeContent)
+                        childrenToMove.Add(child);
+                }
+
+                foreach (Transform child in childrenToMove)
+                {
+                    RectTransform rectChild = child as RectTransform;
+
+                    //Save transform informations
+                    var localRotation = child.localRotation;
+                    var localScale = child.localScale;
+
+                    var sizeDelta = rectChild != null? rectChild.sizeDelta : Vector2.zero;
+                    var pivot = rectChild != null? rectChild.pivot : Vector2.zero;
+                    var anchoredPosition3D = rectChild != null ? rectChild.anchoredPosition3D : child.localPosition;
+                    var anchorMin = rectChild != null? rectChild.anchorMin : Vector2.zero;
+                    var anchorMax = rectChild != null? rectChild.anchorMax : Vector2.zero;
+
+                    child.SetParent(m_Content);
+
+                    //Apply transform informations
+                    child.localRotation = localRotation;
+                    child.localScale = localScale;
+                    if (rectChild != null)
+                    {
+                        rectChild.sizeDelta = sizeDelta;
+                        rectChild.pivot = pivot;
+                        rectChild.anchoredPosition3D = anchoredPosition3D;
+                        rectChild.anchorMin = anchorMin;
+                        rectChild.anchorMax = anchorMax;
+                    }
+                    else
+                        rectChild.localPosition = anchoredPosition3D;
+                }
+            }
+            _isExecutingRefreshContentChildren = false;
+        }
 
         protected bool IsRootSafeArea()
         {
@@ -282,13 +353,13 @@ namespace MaterialUI
             //Debug.LogFormat("New safe area applied to {0}: x={1}, y={2}, w={3}, h={4} on full extents w={5}, h={6}", name, r.x, r.y, r.width, r.height, Screen.width, Screen.height);
         }
 
-        protected virtual void ResetRectTransform(RectTransform rect, bool applyAnchorMinMax = true)
+        protected virtual void ResetRectTransform(RectTransform rect, bool inflate = true)
         {
             if (rect != null)
             {
                 rect.localScale = Vector3.one;
                 rect.localEulerAngles = Vector3.zero;
-                if (applyAnchorMinMax)
+                if (inflate)
                 {
                     rect.anchorMin = Vector2.zero;
                     rect.anchorMax = Vector2.one;
@@ -297,6 +368,38 @@ namespace MaterialUI
                 rect.sizeDelta = Vector2.zero;
                 rect.pivot = new Vector2(0.5f, 0.5f);
             }
+        }
+
+        protected virtual RectTransform TryInstantiateContent()
+        {
+            if ((m_AutoReparentDirectChildren && m_Content == null) ||
+                    !m_Content.gameObject.scene.IsValid() ||
+                    !m_Content.IsChildOf(this.transform))
+            {
+                if (m_Content == null)
+                {
+                    m_Content = InstantiateContentFromRootModel();
+                }
+                else
+                {
+                    var clonedInstance = GameObject.Instantiate(m_Content);
+                    clonedInstance.name = m_Content.name;
+                    //Disable component if is scene member
+                    if(m_Content.gameObject.scene.IsValid())
+                        m_Content.gameObject.SetActive(false);
+                    m_Content = clonedInstance;
+                }
+            }
+
+            if (m_Content != null)
+            {
+                //Reparent
+                if (!m_Content.IsChildOf(this.transform))
+                    m_Content.SetParent(this.transform);
+                ResetRectTransform(m_Content, false);
+            }
+
+            return m_Content;
         }
 
 #if UNITY_EDITOR
@@ -335,6 +438,48 @@ namespace MaterialUI
         }
 
 #endif
+
+        #endregion
+
+        #region Instantiate Internal Functions
+
+        /// <summary>
+        /// Create content trying to copy layout and image properties from root
+        /// </summary>
+        /// <returns></returns>
+        protected virtual RectTransform InstantiateContentFromRootModel()
+        {
+            var content = new GameObject("Content").GetAddComponent<RectTransform>();
+
+            //Try Clone LayoutGroup
+            AddBehaviourClone(GetComponent<LayoutGroup>(), content.gameObject, true);
+            //Try Clone Background Graphic
+            AddBehaviourClone(GetComponent<Graphic>(), content.gameObject, true);
+
+            return content;
+        }
+
+        protected virtual Behaviour AddBehaviourClone(Behaviour template, GameObject target, bool disableTemplate)
+        {
+            if (template != null && target != null)
+            {
+                var cloneComponent = target.AddComponent(template.GetType()) as Behaviour;
+                if (cloneComponent != null)
+                {
+                    cloneComponent.enabled = false;
+                    var templateJson = JsonUtility.ToJson(template);
+                    //Apply Json Properties
+                    JsonUtility.FromJsonOverwrite(templateJson, cloneComponent);
+                    cloneComponent.enabled = template.enabled;
+                    if (disableTemplate)
+                        template.enabled = false;
+
+                    return cloneComponent;
+                }
+
+            }
+            return null;
+        }
 
         #endregion
 
