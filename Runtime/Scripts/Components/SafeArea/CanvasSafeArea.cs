@@ -110,7 +110,7 @@ namespace MaterialUI
 
                 if (m_UnsafeContent == null && m_AutoCreateUnsafeContent)
                 {
-                    m_UnsafeContent = new GameObject("UnsafeAreaContent").AddComponent<RectTransform>();
+                    m_UnsafeContent = new GameObject("[AUTOGEN] UnsafeAreaContent").AddComponent<RectTransform>();
                     m_UnsafeContent.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
                     m_UnsafeContent.SetParent(Content.parent);
                     //m_UnsafeContent.gameObject.GetAddComponent<RectMask2D>();
@@ -393,7 +393,7 @@ namespace MaterialUI
                 else
                 {
                     var clonedInstance = GameObject.Instantiate(m_Content);
-                    clonedInstance.name = m_Content.name;
+                    clonedInstance.name = "[AUTOGEN] " + m_Content.name;
                     //Disable component if is scene member
                     if(m_Content.gameObject.scene.IsValid())
                         m_Content.gameObject.SetActive(false);
@@ -474,7 +474,7 @@ namespace MaterialUI
         /// <returns></returns>
         protected virtual RectTransform InstantiateContentFromRootModel()
         {
-            var content = new GameObject("Content").GetAddComponent<RectTransform>();
+            var content = new GameObject("[AUTOGEN] SafeAreaContent").GetAddComponent<RectTransform>();
 
             //Try Clone LayoutGroup
             AddBehaviourClone(GetComponent<LayoutGroup>(), content.gameObject, true);
