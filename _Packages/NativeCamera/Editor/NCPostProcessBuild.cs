@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿#if UNITY_EDITOR
+
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_IOS
@@ -64,3 +66,5 @@ public class NCPostProcessBuild
 #pragma warning restore 0162
 #endif
 }
+
+#endif
