@@ -265,13 +265,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &100968
 GameObject:
   m_ObjectHideFlags: 0
@@ -577,13 +577,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &101026
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,13 +737,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &101046
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,7 +908,6 @@ GameObject:
   - component: {fileID: 11491852}
   - component: {fileID: 11469920}
   - component: {fileID: 11419002}
-  - component: {fileID: 11424352}
   - component: {fileID: 22522318}
   m_Layer: 5
   m_Name: Button - Ok
@@ -1014,7 +1013,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11491852}
   m_MaterialRipple: {fileID: 11419002}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22522318}
   m_Icon: {fileID: 0}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 11440150}
@@ -1066,22 +1064,6 @@ MonoBehaviour:
   m_MaskMode: 2
   m_CheckForScroll: 0
   m_AutoHighlightBlendAmount: 0.2
---- !u!114 &11424352
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 101190}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9242969ab3c7f540abb7f880e43c080, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TargetImage: {fileID: 11440150}
-  m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
-  m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
-  m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
 --- !u!225 &22522318
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1359,13 +1341,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &103260
 GameObject:
   m_ObjectHideFlags: 0
@@ -1519,13 +1501,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &103622
 GameObject:
   m_ObjectHideFlags: 0
@@ -2247,13 +2229,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &106410
 GameObject:
   m_ObjectHideFlags: 0
@@ -2559,13 +2541,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &106634
 GameObject:
   m_ObjectHideFlags: 0
@@ -3247,13 +3229,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &116934
 GameObject:
   m_ObjectHideFlags: 0
@@ -3918,7 +3900,6 @@ GameObject:
   - component: {fileID: 11418198}
   - component: {fileID: 11478452}
   - component: {fileID: 11455494}
-  - component: {fileID: 11434286}
   - component: {fileID: 22545952}
   m_Layer: 5
   m_Name: Button - Cancel
@@ -4024,7 +4005,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11418198}
   m_MaterialRipple: {fileID: 11455494}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22545952}
   m_Icon: {fileID: 0}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 11472414}
@@ -4076,22 +4056,6 @@ MonoBehaviour:
   m_MaskMode: 2
   m_CheckForScroll: 0
   m_AutoHighlightBlendAmount: 0.2
---- !u!114 &11434286
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 120432}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9242969ab3c7f540abb7f880e43c080, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TargetImage: {fileID: 11472414}
-  m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
-  m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
-  m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
 --- !u!225 &22545952
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4671,13 +4635,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &122496
 GameObject:
   m_ObjectHideFlags: 0
@@ -4831,13 +4795,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &122542
 GameObject:
   m_ObjectHideFlags: 0
@@ -4991,13 +4955,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &123668
 GameObject:
   m_ObjectHideFlags: 0
@@ -5151,13 +5115,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &125328
 GameObject:
   m_ObjectHideFlags: 0
@@ -5311,13 +5275,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &125650
 GameObject:
   m_ObjectHideFlags: 0
@@ -5848,13 +5812,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 28.012499
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: keyboard_arrow_right
       m_Unicode: \ue315
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &126386
 GameObject:
   m_ObjectHideFlags: 0
@@ -6008,13 +5972,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &128152
 GameObject:
   m_ObjectHideFlags: 0
@@ -6280,13 +6244,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 58.35937
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &129292
 GameObject:
   m_ObjectHideFlags: 0
@@ -6404,7 +6368,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11494810}
   m_MaterialRipple: {fileID: 11401028}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22566440}
   m_Icon: {fileID: 11471254}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 0}
@@ -6885,13 +6848,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &130096
 GameObject:
   m_ObjectHideFlags: 0
@@ -7349,13 +7312,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &131648
 GameObject:
   m_ObjectHideFlags: 0
@@ -8269,13 +8232,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &134226
 GameObject:
   m_ObjectHideFlags: 0
@@ -8429,13 +8392,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 28.012499
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: chevron_left
       m_Unicode: \ue5cb
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &134424
 GameObject:
   m_ObjectHideFlags: 0
@@ -8701,13 +8664,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &136146
 GameObject:
   m_ObjectHideFlags: 0
@@ -8861,13 +8824,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &136222
 GameObject:
   m_ObjectHideFlags: 0
@@ -9626,7 +9589,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11441758}
   m_MaterialRipple: {fileID: 11408664}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22579560}
   m_Icon: {fileID: 11497978}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 0}
@@ -10271,13 +10233,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &142694
 GameObject:
   m_ObjectHideFlags: 0
@@ -11746,13 +11708,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &147778
 GameObject:
   m_ObjectHideFlags: 0
@@ -11906,13 +11868,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &148884
 GameObject:
   m_ObjectHideFlags: 0
@@ -12482,13 +12444,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &153748
 GameObject:
   m_ObjectHideFlags: 0
@@ -13368,13 +13330,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &157844
 GameObject:
   m_ObjectHideFlags: 0
@@ -13715,13 +13677,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &158732
 GameObject:
   m_ObjectHideFlags: 0
@@ -14331,13 +14293,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &161796
 GameObject:
   m_ObjectHideFlags: 0
@@ -14979,13 +14941,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &163088
 GameObject:
   m_ObjectHideFlags: 0
@@ -15606,13 +15568,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &165422
 GameObject:
   m_ObjectHideFlags: 0
@@ -16182,13 +16144,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &167998
 GameObject:
   m_ObjectHideFlags: 0
@@ -16342,13 +16304,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &168034
 GameObject:
   m_ObjectHideFlags: 0
@@ -16896,13 +16858,13 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 46.6875
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &174144
 GameObject:
   m_ObjectHideFlags: 0
@@ -17168,13 +17130,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &175668
 GameObject:
   m_ObjectHideFlags: 0
@@ -17440,13 +17402,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &177456
 GameObject:
   m_ObjectHideFlags: 0
@@ -18305,13 +18267,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &181670
 GameObject:
   m_ObjectHideFlags: 0
@@ -19241,13 +19203,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &183812
 GameObject:
   m_ObjectHideFlags: 0
@@ -19401,13 +19363,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &184790
 GameObject:
   m_ObjectHideFlags: 0
@@ -19713,13 +19675,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &185288
 GameObject:
   m_ObjectHideFlags: 0
@@ -20025,13 +19987,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &185388
 GameObject:
   m_ObjectHideFlags: 0
@@ -20123,13 +20085,13 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 56
-  m_ScaledSize: 46.6875
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &185422
 GameObject:
   m_ObjectHideFlags: 0
@@ -20283,13 +20245,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &185580
 GameObject:
   m_ObjectHideFlags: 0
@@ -20443,13 +20405,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &186256
 GameObject:
   m_ObjectHideFlags: 0
@@ -20697,13 +20659,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &189404
 GameObject:
   m_ObjectHideFlags: 0
@@ -21121,13 +21083,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &191456
 GameObject:
   m_ObjectHideFlags: 0
@@ -22685,13 +22647,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 48
-  m_ScaledSize: 40.851562
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &196162
 GameObject:
   m_ObjectHideFlags: 0

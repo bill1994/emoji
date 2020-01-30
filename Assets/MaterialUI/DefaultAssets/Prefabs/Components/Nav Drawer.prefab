@@ -716,14 +716,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 32
-  m_ScaledSize: 32
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: access_alarm
       m_Unicode: \ue190
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &144348
 GameObject:
   m_ObjectHideFlags: 0
@@ -1882,7 +1881,6 @@ GameObject:
   - component: {fileID: 22473646}
   - component: {fileID: 22273646}
   - component: {fileID: 11473640}
-  - component: {fileID: 11473642}
   m_Layer: 5
   m_Name: PanelLayer
   m_TagString: Untagged
@@ -1947,23 +1945,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &11473642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173646}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9242969ab3c7f540abb7f880e43c080, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TargetImage: {fileID: 11473640}
-  m_RootScaler: {fileID: 0}
-  m_Sprite1X: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
-  m_Sprite2X: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
-  m_Sprite4X: {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
 --- !u!1 &173648
 GameObject:
   m_ObjectHideFlags: 0
@@ -2345,14 +2326,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 32
-  m_ScaledSize: 32
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: access_alarm
       m_Unicode: \ue190
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &191218
 GameObject:
   m_ObjectHideFlags: 0
@@ -2506,14 +2486,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 32
-  m_ScaledSize: 32
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: access_alarm
       m_Unicode: \ue190
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &194532
 GameObject:
   m_ObjectHideFlags: 0

@@ -782,14 +782,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 24
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: info_outline
       m_Unicode: \ue88f
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &148666
 GameObject:
   m_ObjectHideFlags: 0
@@ -1214,7 +1213,6 @@ GameObject:
   - component: {fileID: 11445420}
   - component: {fileID: 11417248}
   - component: {fileID: 11461418}
-  - component: {fileID: 11490908}
   - component: {fileID: 22567678}
   m_Layer: 5
   m_Name: Button - Dismissive
@@ -1320,7 +1318,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11445420}
   m_MaterialRipple: {fileID: 11461418}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22567678}
   m_Icon: {fileID: 0}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 11419058}
@@ -1332,6 +1329,12 @@ MonoBehaviour:
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
+  onClick:
+    m_PersistentCalls:
+      m_Calls: []
+  onPress:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &11461418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1366,23 +1369,6 @@ MonoBehaviour:
   m_MaskMode: 2
   m_CheckForScroll: 0
   m_AutoHighlightBlendAmount: 0.2
---- !u!114 &11490908
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 157374}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9242969ab3c7f540abb7f880e43c080, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TargetImage: {fileID: 0}
-  m_RootScaler: {fileID: 0}
-  m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
-  m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
-  m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
 --- !u!225 &22567678
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1579,7 +1565,6 @@ GameObject:
   - component: {fileID: 11468566}
   - component: {fileID: 11464936}
   - component: {fileID: 11454708}
-  - component: {fileID: 11496506}
   - component: {fileID: 22581322}
   m_Layer: 5
   m_Name: Button - Affirmative
@@ -1685,7 +1670,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11468566}
   m_MaterialRipple: {fileID: 11454708}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22581322}
   m_Icon: {fileID: 0}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 11456624}
@@ -1697,6 +1681,12 @@ MonoBehaviour:
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
+  onClick:
+    m_PersistentCalls:
+      m_Calls: []
+  onPress:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &11454708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1731,23 +1721,6 @@ MonoBehaviour:
   m_MaskMode: 2
   m_CheckForScroll: 0
   m_AutoHighlightBlendAmount: 0.2
---- !u!114 &11496506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 164564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9242969ab3c7f540abb7f880e43c080, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TargetImage: {fileID: 0}
-  m_RootScaler: {fileID: 0}
-  m_Sprite1X: {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
-  m_Sprite2X: {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
-  m_Sprite4X: {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
 --- !u!225 &22581322
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2020,7 +1993,7 @@ PrefabInstance:
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -136.16
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
@@ -2040,7 +2013,7 @@ PrefabInstance:
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
@@ -2050,7 +2023,7 @@ PrefabInstance:
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
@@ -2205,12 +2178,12 @@ PrefabInstance:
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_fontSize
-      value: 0
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 0
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
@@ -2520,7 +2493,7 @@ PrefabInstance:
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
@@ -2530,7 +2503,7 @@ PrefabInstance:
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224217559145217528, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
@@ -2685,12 +2658,12 @@ PrefabInstance:
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_fontSize
-      value: 0
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 0
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
