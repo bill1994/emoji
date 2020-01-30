@@ -1,0 +1,23 @@
+{
+  "name": "com.kyub.credentials",
+  "version": "0.1.0-alpha.1",
+  "displayName": "Kyub Secure Credentials API",
+  "description": "Cross Biometrics/Security API",
+  "unity": "2019.1",
+  "dependencies": {
+		"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core",
+		"com.kyub.serialization": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.serialization",
+		"com.kyub.materialui": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.materialui",
+		"com.kyub.serialization": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.localization"
+  },
+  "keywords": [
+			"Input"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}
