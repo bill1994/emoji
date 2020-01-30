@@ -1,0 +1,17 @@
+{
+    "name": "KyubEditor.InfinityScroll",
+    "references": [
+        "GUID:f0e35e4a2b20c0b4688ad0a3103f9f10"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

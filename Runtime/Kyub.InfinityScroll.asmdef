@@ -1,0 +1,18 @@
+{
+    "name": "Kyub.InfinityScroll",
+    "references": [
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
+        "GUID:0f58c067a5870e34eadeb4a2055fb4ce",
+        "GUID:43f813160d15da94094b77983b7241a1",
+        "GUID:af50b871d983fd2498bf363097906a11"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
