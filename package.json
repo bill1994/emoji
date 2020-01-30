@@ -1,0 +1,28 @@
+{
+  "name": "com.kyub.materialui",
+  "version": "0.1.0-alpha.1",
+  "displayName": "Kyub MaterialUI",
+  "description": "MaterialUI API",
+  "unity": "2019.1",
+	"dependencies": {
+			"com.unity.textmeshpro": "2.1.0-preview.2",
+			"com.unity.ugui": "1.0.0",
+			"com.kyub.async": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.async",
+			"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core",
+			"com.kyub.inputcompat": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.inputcompat",
+			"com.kyub.uicommons": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.uicommons",
+			"com.kyub.infinityscroll": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.infinityscroll",
+			"com.kyub.performance": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.performance"
+	},
+  "keywords": [
+    "MaterialUI",
+	"UI"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}

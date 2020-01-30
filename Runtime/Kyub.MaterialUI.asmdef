@@ -1,0 +1,21 @@
+{
+    "name": "Kyub.MaterialUI",
+    "references": [
+        "GUID:f0e35e4a2b20c0b4688ad0a3103f9f10",
+        "GUID:0f58c067a5870e34eadeb4a2055fb4ce",
+        "GUID:af50b871d983fd2498bf363097906a11",
+        "GUID:43f813160d15da94094b77983b7241a1",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:ba47530a8893ff54fba148927ac9e2ed",
+        "GUID:41175c1412c601548a1d1cc8d9a7e266"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
