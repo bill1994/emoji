@@ -1,4 +1,8 @@
-﻿#if UNITY_NEW_INPUT_SYSTEM
+﻿#if UNITY_NEW_INPUT_SYSTEM && UNITY_INPUT_SYSTEM_0_1_OR_NEWER
+#define NEW_INPUT_SYSTEM_ACTIVE
+#endif
+
+#if NEW_INPUT_SYSTEM_ACTIVE
 using System;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
@@ -23,7 +27,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return s_lastCompositionString.ToString();
 #else
                 return Input.compositionString;
@@ -35,7 +39,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return Keyboard.current != null && Keyboard.current.imeSelected != null ? IMECompositionMode.On : IMECompositionMode.Off;
 #else
                 return Input.imeCompositionMode;
@@ -43,7 +47,7 @@ namespace Kyub.EventSystems
             }
             set
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 var isOn = value == IMECompositionMode.On;
                 if (Keyboard.current != null)
                     Keyboard.current.SetIMEEnabled(isOn);
@@ -57,7 +61,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 //Impossible to get CursorPosition in new system
                 return Vector2.zero;
 #else
@@ -66,7 +70,7 @@ namespace Kyub.EventSystems
             }
             set
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 if (Keyboard.current != null)
                     Keyboard.current.SetIMECursorPosition(value);
 #else
@@ -79,7 +83,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return Mouse.current != null;
 #else
                 return Input.mousePresent;
@@ -91,7 +95,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return Pointer.current != null && Pointer.current.position != null ? Pointer.current.position.ReadValue() : Vector2.zero;
 #else
                 return Input.mousePosition;
@@ -103,7 +107,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return Mouse.current != null && Mouse.current.scroll != null ? Mouse.current.scroll.ReadValue() : Vector2.zero;
 #else
                 return Input.mouseScrollDelta;
@@ -115,7 +119,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return Touchscreen.current != null;
 #else
                 return Input.touchSupported;
@@ -127,21 +131,21 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return Touchscreen.current != null ? Touchscreen.current.touches.Count : 0;
 #else
                 return Input.touchCount;
 #endif
             }
         }
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
         static bool s_SimulateMouseWithTouches = true;
 #endif
         public static bool simulateMouseWithTouches
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return s_SimulateMouseWithTouches;
 #else
                 return Input.simulateMouseWithTouches;
@@ -149,7 +153,7 @@ namespace Kyub.EventSystems
             }
             set
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 s_SimulateMouseWithTouches = value;
 #else
                 Input.simulateMouseWithTouches = value;
@@ -161,7 +165,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return GravitySensor.current != null && GravitySensor.current.gravity != null ? GravitySensor.current.gravity.ReadValue() : Vector3.zero;
 #else
                 return Input.gyro.gravity;
@@ -173,7 +177,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return LinearAccelerationSensor.current != null && LinearAccelerationSensor.current.acceleration != null ? LinearAccelerationSensor.current.acceleration.ReadValue() : Vector3.zero;
 #else
                 return Input.acceleration;
@@ -185,7 +189,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return Keyboard.current != null && Keyboard.current.anyKey != null ? Keyboard.current.anyKey.wasPressedThisFrame : false;
 #else
                 return Input.anyKeyDown;
@@ -197,7 +201,7 @@ namespace Kyub.EventSystems
         {
             get
             {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
                 return Keyboard.current != null && Keyboard.current.anyKey != null ? Keyboard.current.anyKey.isPressed : false;
 #else
                 return Input.anyKey;
@@ -209,7 +213,7 @@ namespace Kyub.EventSystems
 
         #region Static Constructors
 
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
         static InputCompat()
         {
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += HandleOnSceneLoaded;
@@ -222,7 +226,7 @@ namespace Kyub.EventSystems
 
         public static bool GetMouseButtonDown(int button)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             ButtonControl control = GetMouseButtonControl(button);
             return control != null ? control.wasPressedThisFrame : false;
 #else
@@ -232,7 +236,7 @@ namespace Kyub.EventSystems
 
         public static bool GetMouseButtonUp(int button)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             ButtonControl control = GetMouseButtonControl(button);
             return control != null ? control.wasReleasedThisFrame : false;
 #else
@@ -242,7 +246,7 @@ namespace Kyub.EventSystems
 
         public static bool GetMouseButton(int button)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             ButtonControl control = GetMouseButtonControl(button);
             return control != null ? control.isPressed : false;
 #else
@@ -252,7 +256,7 @@ namespace Kyub.EventSystems
 
         public static Touch GetTouch(int index)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             TouchControl touch = null;
             if (Touchscreen.current != null && index >= 0 && index < Touchscreen.current.touches.Count)
                 touch = Touchscreen.current.touches[index];
@@ -265,7 +269,7 @@ namespace Kyub.EventSystems
 
         public static float GetAxisRaw(string axisName)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             if (axisName == "Horizontal")
             {
                 if (Joystick.current != null)
@@ -334,7 +338,7 @@ namespace Kyub.EventSystems
 
         public static bool GetButtonDown(string buttonName)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(buttonName, true);
@@ -348,7 +352,7 @@ namespace Kyub.EventSystems
 
         public static bool GetButtonUp(string buttonName)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(buttonName, true);
@@ -362,7 +366,7 @@ namespace Kyub.EventSystems
 
         public static bool GetButton(string buttonName)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(buttonName, true);
@@ -376,7 +380,7 @@ namespace Kyub.EventSystems
 
         public static bool GetKeyDown(KeyCode key)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(key.ToString());
@@ -390,7 +394,7 @@ namespace Kyub.EventSystems
 
         public static bool GetKeyUp(KeyCode key)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(key.ToString());
@@ -404,7 +408,7 @@ namespace Kyub.EventSystems
 
         public static bool GetKey(KeyCode key)
         {
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
             if (Keyboard.current != null)
             {
                 Key keyWithName = ConvertKeyFromName(key.ToString());
@@ -420,7 +424,7 @@ namespace Kyub.EventSystems
 
         #region Helper Static Functions
 
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
         static void RegisterEvents()
         {
             UnregisterEvents();
@@ -521,7 +525,7 @@ namespace Kyub.EventSystems
 
         #region Receivers
 
-#if UNITY_NEW_INPUT_SYSTEM
+#if NEW_INPUT_SYSTEM_ACTIVE
         static void HandleOnSceneLoaded(Scene scene1, Scene scene2)
         {
             RegisterEvents();
@@ -543,6 +547,7 @@ namespace Kyub.EventSystems
         [UnityEditor.Callbacks.DidReloadScripts]
         static void OnScriptsReloaded()
         {
+#if UNITY_INPUT_SYSTEM_0_1_OR_NEWER
             UnityEditor.SerializedProperty enableNativePlatformBackendsForNewInputSystem = null;
             UnityEditor.SerializedProperty disableOldInputManagerSupport = null;
             var allPlayerSettings = Resources.FindObjectsOfTypeAll<UnityEditor.PlayerSettings>();
@@ -561,6 +566,9 @@ namespace Kyub.EventSystems
                 AddDefineSymbols(new string[] { "UNITY_NEW_INPUT_SYSTEM" });
             else
                 RemoveDefineSymbols(new string[] { "UNITY_NEW_INPUT_SYSTEM" });
+#else
+            RemoveDefineSymbols(new string[] { "UNITY_NEW_INPUT_SYSTEM" });
+#endif
         }
 
         static void AddDefineSymbols(string[] symbols)
@@ -587,6 +595,6 @@ namespace Kyub.EventSystems
         }
 #endif
 
-        #endregion
-    }
+#endregion
+        }
 }
