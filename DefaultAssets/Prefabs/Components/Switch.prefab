@@ -246,14 +246,13 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &100004
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,14 +406,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 20
-  m_ScaledSize: 20
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &100006
 GameObject:
   m_ObjectHideFlags: 0
@@ -552,6 +550,7 @@ MonoBehaviour:
         m_Name: done
         m_Unicode: \ue876
       m_Font: {fileID: 12800000, guid: a0a40789b9baa45a68c6d593e02f648a, type: 3}
+    m_ImgUrl: 
   m_ToggleOffIcon:
     m_ImageDataType: 1
     m_Sprite: {fileID: 0}
@@ -560,7 +559,7 @@ MonoBehaviour:
         m_Name: info_outline
         m_Unicode: \ue88f
       m_Font: {fileID: 12800000, guid: a0a40789b9baa45a68c6d593e02f648a, type: 3}
-  m_CanvasGroup: {fileID: 22577546}
+    m_ImgUrl: 
   m_Interactable: 1
   m_AutoRegisterInParentGroup: 1
   m_Group: {fileID: 0}
@@ -577,7 +576,9 @@ MonoBehaviour:
   m_SwitchImage: {fileID: 8994294520288087212}
   m_BackImage: {fileID: 8994470281330216132}
   m_ShadowImage: {fileID: 11400018}
+  m_Trail: {fileID: 0}
   m_SlideSwitch: 1
+  m_SlideDirection: 0
 --- !u!114 &11409564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -674,8 +675,6 @@ GameObject:
   - component: {fileID: 22400008}
   - component: {fileID: 22200006}
   - component: {fileID: 11400018}
-  - component: {fileID: 11400016}
-  - component: {fileID: 11495498}
   - component: {fileID: 22570522}
   m_Layer: 5
   m_Name: Shadow
@@ -700,8 +699,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 0}
+  m_AnchoredPosition: {x: -12.000015, y: -1}
+  m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &22200006
 CanvasRenderer:
@@ -739,54 +738,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &11400016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbaec9a00473d954ca92aab1f07adf76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RectTransform: {fileID: 22400008}
-  m_SourceRectTransform: {fileID: 22495304}
-  m_Padding: {x: 100, y: 100}
-  m_Offset: {x: 0, y: -1}
-  m_ValuesArePercentage: 1
-  m_PaddingPercent: {x: 600, y: 600}
-  m_OffsetPercent: {x: 100, y: 100}
-  m_SnapEveryFrame: 1
-  m_SnapWidth: 1
-  m_SnapHeight: 1
-  m_SnapPositionX: 0
-  m_SnapPositionY: 0
---- !u!114 &11495498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbaec9a00473d954ca92aab1f07adf76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RectTransform: {fileID: 22400008}
-  m_SourceRectTransform: {fileID: 22495304}
-  m_Padding: {x: 0, y: 0}
-  m_Offset: {x: 0, y: -1}
-  m_ValuesArePercentage: 0
-  m_PaddingPercent: {x: 100, y: 100}
-  m_OffsetPercent: {x: 0, y: 0}
-  m_SnapEveryFrame: 1
-  m_SnapWidth: 0
-  m_SnapHeight: 0
-  m_SnapPositionX: 1
-  m_SnapPositionY: 1
 --- !u!225 &22570522
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -953,14 +904,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 24
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!225 &22500000
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1008,7 +958,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8, y: 0}
+  m_AnchoredPosition: {x: -12, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &22225694
@@ -1127,14 +1077,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 20
-  m_ScaledSize: 20
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &163526
 GameObject:
   m_ObjectHideFlags: 0
@@ -1288,11 +1237,10 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 24
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: info_outline
       m_Unicode: \ue88f
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1

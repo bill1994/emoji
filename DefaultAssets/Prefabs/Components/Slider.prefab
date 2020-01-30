@@ -1007,11 +1007,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: dcb678aff71bc544e91d4f2be1420503, type: 3}
-    m_FontSize: 16
+    m_FontSize: 48
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 48
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -1020,14 +1020,13 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 48
-  m_ScaledSize: 16
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &163782
 GameObject:
   m_ObjectHideFlags: 0
@@ -1274,8 +1273,8 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 48
-  m_fontSizeBase: 48
+  m_fontSize: 64
+  m_fontSizeBase: 64
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 0
@@ -1294,7 +1293,7 @@ MonoBehaviour:
   m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
-  m_firstOverflowCharacterIndex: -1
+  m_firstOverflowCharacterIndex: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_isTextTruncated: 0
@@ -1333,14 +1332,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 64
-  m_ScaledSize: 48
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &177086
 GameObject:
   m_ObjectHideFlags: 0
@@ -1352,7 +1350,6 @@ GameObject:
   - component: {fileID: 22491764}
   - component: {fileID: 22292558}
   - component: {fileID: 11489820}
-  - component: {fileID: 11487258}
   m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
@@ -1415,20 +1412,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &11487258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 177086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ba2584491db7aa43acc43f51c4394d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SourceGraphic: {fileID: 11428676}
-  m_DestinationGraphic: {fileID: 11489820}
 --- !u!1 &180968
 GameObject:
   m_ObjectHideFlags: 0
@@ -1769,14 +1752,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 24
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: info_outline
       m_Unicode: \ue88f
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1001 &2220893201465797561
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2436,12 +2418,12 @@ PrefabInstance:
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_fontSize
-      value: 0
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 0
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1378592828834536092, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
@@ -2686,12 +2668,12 @@ PrefabInstance:
     - target: {fileID: 1379185502123294748, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_fontSize
-      value: 0
+      value: 56
       objectReference: {fileID: 0}
     - target: {fileID: 1379185502123294748, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 0
+      value: 56
       objectReference: {fileID: 0}
     - target: {fileID: 1379185502123294748, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
