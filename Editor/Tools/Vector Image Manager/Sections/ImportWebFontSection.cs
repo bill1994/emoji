@@ -74,7 +74,7 @@ namespace MaterialUI
 					}
 					
 					string downloadInfo = vectorImageFontParser.IsFontAvailable() ? "Update" : "Download";
-					if (GUILayout.Button(downloadInfo, showDeleteButton ? EditorStyles.miniButtonMid : EditorStyles.miniButtonRight, GUILayout.Width(60f)))
+					if (GUILayout.Button(downloadInfo, showDeleteButton ? EditorStyles.miniButtonMid : EditorStyles.miniButtonRight, GUILayout.Width(80f)))
 					{
 						EditorUtility.DisplayProgressBar("Downloading font icon", "Downloading " + vectorImageFontParser.GetFontName() + "...", 0.0f);
 						

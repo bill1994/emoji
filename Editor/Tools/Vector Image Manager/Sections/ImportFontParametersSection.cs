@@ -21,7 +21,7 @@ namespace MaterialUI
             {
                 VectorImageManagerWindow.BeginContents();
                 {
-                    EditorGUILayout.HelpBox("Specify where you want to save all the fonts imported using VectorImageManager. (relative to your Assets/ folder)", MessageType.Info);
+                    EditorGUILayout.HelpBox("Specify where you want to save all the fonts imported using VectorImageManager. (relative to your Assets/MaterialUIEssentials/ folder)", MessageType.Info);
 
 					using (new GUILayout.HorizontalScope())
 					{
@@ -32,7 +32,7 @@ namespace MaterialUI
 							UpdateFontDestinationFolder(m_IconFontDestinationFolder);
 						}
 						
-						if (GUILayout.Button("Select folder", EditorStyles.miniButton, GUILayout.Width(75f)))
+						if (GUILayout.Button("Select folder", EditorStyles.miniButton, GUILayout.Width(100f)))
 						{
 							GUI.FocusControl(null);
 							
@@ -43,9 +43,9 @@ namespace MaterialUI
 								return;
 							}
 							
-							if (!folderPath.Contains(Application.dataPath))
+							if (!folderPath.Contains(Application.dataPath + VectorImageManager.rootFolder))
 							{
-								EditorUtility.DisplayDialog("Error", "The folder you select, must be inside your Assets/ folder", "Ok");
+								EditorUtility.DisplayDialog("Error", "The folder you select, must be inside your Assets/MaterialUIEssentials/ folder", "Ok");
 								return;
 							}
 							
