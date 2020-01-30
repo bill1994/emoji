@@ -1,0 +1,17 @@
+{
+    "name": "Kyub.PickerServices",
+    "references": [
+        "GUID:af50b871d983fd2498bf363097906a11",
+        "GUID:ba47530a8893ff54fba148927ac9e2ed",
+        "GUID:c29809fe3afbcae4383af594dcf0f42c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

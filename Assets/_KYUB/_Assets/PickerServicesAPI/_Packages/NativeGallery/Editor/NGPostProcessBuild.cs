@@ -1,4 +1,6 @@
-﻿#if UNITY_IOS
+﻿#if UNITY_EDITOR
+
+#if UNITY_IOS
 using UnityEditor;
 using UnityEditor.Callbacks;
 using System.IO;
@@ -65,3 +67,5 @@ public class NGPostProcessBuild
 #pragma warning restore 0162
 #endif
 }
+
+#endif

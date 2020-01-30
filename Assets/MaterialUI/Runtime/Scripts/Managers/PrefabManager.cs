@@ -25,8 +25,15 @@ namespace MaterialUI
             {
                 if (Instance.m_ResourcePrefabs == null)
                 {
-                    Instance.m_ResourcePrefabs = ScriptableObject.CreateInstance<ResourcePrefabsDatabase>();
-                    Instance.m_ResourcePrefabs.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+                    //Try load default resource
+                    Instance.m_ResourcePrefabs = Resources.Load<ResourcePrefabsDatabase>("Theme/ResourcePrefabsDatabase");
+
+                    //Create a new one
+                    if (Instance.m_ResourcePrefabs == null)
+                    {
+                        Instance.m_ResourcePrefabs = ScriptableObject.CreateInstance<ResourcePrefabsDatabase>();
+                        Instance.m_ResourcePrefabs.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+                    }
                 }
 
                 return Instance.m_ResourcePrefabs;
