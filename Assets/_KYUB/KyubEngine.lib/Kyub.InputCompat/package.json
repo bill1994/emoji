@@ -1,14 +1,12 @@
 {
   "name": "com.kyub.inputcompat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Kyub InputCompat",
   "description": "This package contains InputCompat API.",
   "unity": "2019.1",
-  "dependencies": {
-		"com.unity.inputsystem": "1.0.0-preview.4"
-  },
+  "dependencies": {},
   "keywords": [
-			"Input"
+    "Input"
   ],
   "author": {
     "name": "Kyub Interactive",
