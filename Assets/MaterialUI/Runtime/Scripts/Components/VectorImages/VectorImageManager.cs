@@ -1,6 +1,7 @@
 //  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -12,13 +13,17 @@ namespace MaterialUI
 
         //public const string materialDesignIconsFolderPath = "Assets/MaterialUI/Fonts/Resources/Material Design Icons";
 
+        public const string rootFolder = "/MaterialUIEssentials/";
+        
         public const string materialUIIconsFontName = "MaterialUI Icons";
         public const string materialDesignIconsFontName = "Material Design Icons";
 
-		private const string prefFontDestinationFolder = "PREF_VECTOR_FONT_DESTINATION_FOLDER";
+        public const string defaultFontDestinationFolder = "Resources/Vector Fonts/";
+
+        private const string prefFontDestinationFolder = "PREF_CUSTOM_VECTOR_FONT_DESTINATION_FOLDER";
 		public static string fontDestinationFolder
 		{
-			get { return PlayerPrefs.GetString(prefFontDestinationFolder, "Resources/Vector Fonts"); /*+ "/Resources";*/ }
+			get { return PlayerPrefs.GetString(prefFontDestinationFolder, "Resources/Custom Vector Fonts"); /*+ "/Resources";*/ }
 			set
 			{
 				PlayerPrefs.SetString(prefFontDestinationFolder, value);
@@ -26,14 +31,9 @@ namespace MaterialUI
 			}
 		}
 
-        private static bool FontDirExists()
-        {
-            return Directory.Exists(Application.dataPath + "/" + fontDestinationFolder);
-        }
-
         private static string[] GetFontDirectories(string fontsPath)
         {
-            if (FontDirExists())
+            if (Directory.Exists(fontsPath))
             {
                 return Directory.GetDirectories(fontsPath);
             }
@@ -42,20 +42,20 @@ namespace MaterialUI
 
         public static string[] GetAllIconSetNames()
         {
-            string fontsPath = Application.dataPath + "/" + fontDestinationFolder;
+            string fontsPath = Application.dataPath + rootFolder + fontDestinationFolder;
+            string defaultFontsPath = Application.dataPath + rootFolder + defaultFontDestinationFolder;
 
-            string[] fontStringNames = GetFontDirectories(fontsPath);
-
-            string[] fontStrings = new string[fontStringNames.Length + 2];
-
-            fontStrings[0] = materialUIIconsFontName;
-            fontStrings[1] = materialDesignIconsFontName;
-
-            for (int i = 0; i < fontStringNames.Length; i++)
+            List<string> fontStringNames = new List<string>(GetFontDirectories(defaultFontsPath));
+            if (defaultFontsPath != fontsPath)
             {
-                fontStrings[i + 2] = new DirectoryInfo(fontStringNames[i].Replace("\\", "/")).Name;
+                fontStringNames.AddRange(GetFontDirectories(fontsPath));
             }
-            return fontStrings;
+
+            for (int i = 0; i < fontStringNames.Count; i++)
+            {
+                fontStringNames[i] = new DirectoryInfo(fontStringNames[i].Replace("\\", "/")).Name;
+            }
+            return fontStringNames.ToArray();
         }
 
         public static bool IsMaterialDesignIconFont(string fontName)
@@ -71,12 +71,36 @@ namespace MaterialUI
         public static VectorImageFont GetIconFont(string name)
         {
             var trueName = !name.EndsWith(VectorImageFont.VECTOR_FONT_SUFIX) ? name + VectorImageFont.VECTOR_FONT_SUFIX : name;
-            return Resources.Load<VectorImageFont>(name + "/" + trueName);
+            var folder = GetPathRelativeToResources(defaultFontDestinationFolder);
+
+            var asset = Resources.Load<VectorImageFont>(name + "/" + trueName);
+            if(asset == null && !string.IsNullOrEmpty(folder))
+                asset = Resources.Load<VectorImageFont>(folder + "/" + name + "/" + trueName);
+            if (asset == null)
+            {
+                var customfolder = GetPathRelativeToResources(fontDestinationFolder);
+                if (!string.IsNullOrEmpty(customfolder))
+                    asset = Resources.Load<VectorImageFont>(customfolder + "/" + name + "/" + trueName);
+            }
+
+            return asset;
         }
 
         public static VectorImageSet GetIconSet(string name)
         {
-			return JsonUtility.FromJson<VectorImageSet>(Resources.Load<TextAsset>(name + "/" + name).text);
+            var folder = GetPathRelativeToResources(defaultFontDestinationFolder);
+
+            var asset = Resources.Load<TextAsset>(name + "/" + name);
+            if (asset == null && !string.IsNullOrEmpty(folder))
+                asset = Resources.Load<TextAsset>(folder + "/" + name + "/" + name);
+            if (asset == null)
+            {
+                var customfolder = GetPathRelativeToResources(fontDestinationFolder);
+                if(!string.IsNullOrEmpty(customfolder))
+                    asset = Resources.Load<TextAsset>(customfolder + "/" + name + "/" + name);
+            }
+
+            return JsonUtility.FromJson<VectorImageSet>(asset != null? asset.text : string.Empty);
         }
 
         public static string GetIconCodeFromName(string name, string setName = "*")
@@ -155,6 +179,26 @@ namespace MaterialUI
                         return set.iconGlyphList[j].name;
                     }
                 }
+            }
+            return null;
+        }
+
+        static string GetPathRelativeToResources(string path)
+        {
+            if (path.Contains("Resources"))
+            {
+                var customFolderArr = path.Split(new string[] { "Resources" }, System.StringSplitOptions.RemoveEmptyEntries);
+                var customfolder = customFolderArr.Length > 0 ? customFolderArr[customFolderArr.Length - 1] : string.Empty;
+
+                while (customfolder.Length > 0 && (customfolder.EndsWith("/") || customfolder.EndsWith("\\")))
+                {
+                    customfolder = customfolder.Length - 1 == 0 ? string.Empty : customfolder.Substring(0, customfolder.Length - 1);
+                }
+                while (customfolder.Length > 0 && (customfolder.StartsWith("/") || customfolder.StartsWith("\\")))
+                {
+                    customfolder = customfolder.Length - 1 == 0 ? string.Empty : customfolder.Substring(1, customfolder.Length - 1);
+                }
+                return customfolder;
             }
             return null;
         }
