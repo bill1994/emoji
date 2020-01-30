@@ -67,7 +67,7 @@ namespace MaterialUI
                 if (folderPath.Contains(keyFolderPath))
                     folderPath = System.IO.Path.Combine(folderPath.Split(new string[] { keyFolderPath }, System.StringSplitOptions.None)[0] + System.IO.Path.Combine(keyFolderPath, relativeFolderPath)).Replace("\\", "/");
                 else
-                    folderPath = System.IO.Path.Combine(packagePath, keyFolderPath).Replace("\\", "/");
+                    folderPath = System.IO.Path.Combine(packagePath, relativeFolderPath).Replace("\\", "/");
 
                 if (string.IsNullOrEmpty(fullPackagePath))
                     folderPath = folderPath.Replace(Application.dataPath, "Assets");
