@@ -60,7 +60,7 @@ namespace Kyub.PickerServices
 
         #region Helper Functions
 
-        protected internal override void OnActivityEndShow()
+        public override void OnActivityEndShow()
         {
             RegisterEvents();
             if(m_ExternalResources != null)
@@ -68,7 +68,7 @@ namespace Kyub.PickerServices
             base.OnActivityEndShow();
         }
 
-        protected internal override void OnActivityEndHide()
+        public override void OnActivityEndHide()
         {
             base.OnActivityEndHide();
             if (IsEventRegistered(CrossPickerServices.OnPickerFinish, HandleOnPickerFinish))
