@@ -301,6 +301,7 @@ GameObject:
   - component: {fileID: 973422429}
   - component: {fileID: 973422427}
   - component: {fileID: 973422425}
+  - component: {fileID: 973422426}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -335,6 +336,29 @@ MonoBehaviour:
   m_UseLegacyPhysicalSizeCalc: 0
   m_SupportSafeArea: 1
   onCanvasAreaChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &973422426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 973422424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Content: {fileID: 0}
+  m_UnsafeContent: {fileID: 0}
+  m_ConformX: 1
+  m_ConformY: 1
+  m_forceClip: 1
+  m_AutoReparentDirectChildren: 1
+  m_AutoCreateUnsafeContent: 1
+  m_theme: {fileID: 11400000, guid: ed9906aee4200354faea00aaadd01f35, type: 2}
+  OnApplySafeArea:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &973422427

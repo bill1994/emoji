@@ -82,13 +82,16 @@ namespace MaterialUI
         protected override void Awake()
         {
             base.Awake();
+            if (!Application.isPlaying || IsPrefab())
+                return;
+
             TryInstantiateContent();
         }
 
         protected override void Start()
         {
             base.Start();
-            if (!Application.isPlaying)
+            if (!Application.isPlaying || IsPrefab())
                 return;
 
             if (m_Content == null)
@@ -147,14 +150,14 @@ namespace MaterialUI
 
         protected override void OnCanvasHierarchyChanged()
         {
-            if (Application.isPlaying && this.isActiveAndEnabled)
+            if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
                 Refresh();
         }
 
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
-            if (Application.isPlaying && this.isActiveAndEnabled)
+            if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
             {
                 Invoke("Refresh", 0);
             }
@@ -163,13 +166,13 @@ namespace MaterialUI
 
         protected override void OnRectTransformDimensionsChange()
         {
-            if (Application.isPlaying && this.isActiveAndEnabled)
+            if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
                 Refresh();
         }
 
         protected virtual void OnTransformChildrenChanged()
         {
-            if(Application.isPlaying)
+            if(Application.isPlaying && !IsPrefab())
                 RefreshContentChildrenDelayed();
         }
 
@@ -177,7 +180,7 @@ namespace MaterialUI
 
         #region Helper Functions
 
-        public virtual void RefreshContentChildrenDelayed()
+        protected virtual void RefreshContentChildrenDelayed()
         {
             if (!_isExecutingRefreshContentChildren)
             {
@@ -189,7 +192,7 @@ namespace MaterialUI
         }
 
         bool _isExecutingRefreshContentChildren = false;
-        public virtual void RefreshContentChildren()
+        protected virtual void RefreshContentChildren()
         {
             CancelInvoke("RefreshContentChildren");
 
@@ -198,11 +201,17 @@ namespace MaterialUI
             if (m_Content != null && m_AutoReparentDirectChildren)
             {
                 childrenToMove = new List<Transform>();
+                //Generate Invalid Transforms (pre-created by this component)
+                HashSet<Transform> invalidTransforms = new HashSet<Transform>();
+                if (m_UnsafeContent != null) invalidTransforms.Add(m_UnsafeContent);
+                if (m_Content != null) invalidTransforms.Add(m_UnsafeContent);
+                if(_simulatorSpriteContent != null) invalidTransforms.Add(_simulatorSpriteContent.transform);
+
                 //Find Non-Content Children
                 for (int i = 0; i < transform.childCount; i++)
                 {
                     var child = transform.GetChild(i);
-                    if (child != null && child != m_Content && child != m_UnsafeContent)
+                    if (child != null && !invalidTransforms.Contains(child))
                         childrenToMove.Add(child);
                 }
 
@@ -379,6 +388,7 @@ namespace MaterialUI
                 if (m_Content == null)
                 {
                     m_Content = InstantiateContentFromRootModel();
+                    ResetRectTransform(m_Content, true);
                 }
                 else
                 {
@@ -388,6 +398,7 @@ namespace MaterialUI
                     if(m_Content.gameObject.scene.IsValid())
                         m_Content.gameObject.SetActive(false);
                     m_Content = clonedInstance;
+                    ResetRectTransform(m_Content, true);
                 }
             }
 
@@ -402,7 +413,21 @@ namespace MaterialUI
             return m_Content;
         }
 
+        protected virtual bool IsPrefab()
+        {
+            if (this != null)
+            {
 #if UNITY_EDITOR
+                return !string.IsNullOrEmpty(UnityEditor.AssetDatabase.GetAssetPath(this)) || UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage() != null;
+#else
+                return !gameObject.scene.IsValid();
+#endif
+            }
+            return false;
+        }
+
+#if UNITY_EDITOR
+
         protected virtual void SetupSimulatorMaskContent()
         {
             var spriteToApply = EditorSafeAreaSimulator.GetOrLoadSimulatorSprite();
