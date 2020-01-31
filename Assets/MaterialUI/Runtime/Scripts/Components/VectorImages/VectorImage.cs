@@ -134,7 +134,7 @@ namespace MaterialUI
             set
             {
                 m_VectorImageData = value;
-                updateFontAndText();
+                UpdateFontAndText();
 
                 RefreshScale();
 
@@ -156,7 +156,7 @@ namespace MaterialUI
                     return;
 
                 vectorImageData.vectorFont = (VectorImageFont) value;
-                updateFontAndText();
+                UpdateFontAndText();
             }
         }
 
@@ -172,7 +172,7 @@ namespace MaterialUI
                     return;
 
                 vectorImageData.vectorFont = value;
-                updateFontAndText();
+                UpdateFontAndText();
             }
         }
 
@@ -219,7 +219,7 @@ namespace MaterialUI
             horizontalOverflow = HorizontalWrapMode.Overflow;
             verticalOverflow = VerticalWrapMode.Overflow;
 
-            updateFontAndText();
+            UpdateFontAndText();
             RefreshScale();
 
             SetAllDirty();
@@ -238,7 +238,7 @@ namespace MaterialUI
             horizontalOverflow = HorizontalWrapMode.Overflow;
             verticalOverflow = VerticalWrapMode.Overflow;
 
-            updateFontAndText();
+            UpdateFontAndText();
 
             SetAllDirty();
             UpdateMaterial();
@@ -253,7 +253,7 @@ namespace MaterialUI
             base.OnValidate();
             SetLayoutDirty();
 
-            updateFontAndText();
+            UpdateFontAndText();
         }
 #endif
 
@@ -284,7 +284,7 @@ namespace MaterialUI
 
         public void Refresh()
         {
-            updateFontAndText();
+            UpdateFontAndText();
             RefreshScale();
 
 #if UNITY_EDITOR
@@ -306,13 +306,10 @@ namespace MaterialUI
 
         #region Internal Helper Functions
 
-        private void updateFontAndText()
+        private void UpdateFontAndText()
         {
-            if (vectorImageData != null)
-            {
-                font = vectorImageData.font;
-                text = IconDecoder.Decode(vectorImageData.glyph.unicode);//vectorImageData.glyph.unicode;
-            }
+            font = vectorImageData != null ? vectorImageData.font : null;
+            text = vectorImageData != null ? IconDecoder.Decode(vectorImageData.glyph.unicode) : string.Empty;
         }
 
         private void RefreshScale()
