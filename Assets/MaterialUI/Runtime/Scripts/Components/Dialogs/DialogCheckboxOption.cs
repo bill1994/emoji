@@ -61,7 +61,7 @@ namespace MaterialUI
                 if (m_ItemIcon != null)
                 {
                     m_ItemIcon.SetImageData(option != null ? option.imageData : null);
-                    m_ItemIcon.gameObject.SetActive(m_ItemIcon.GetImageData() != null && m_ItemIcon.GetImageData().ContainsData(true));
+                    //m_ItemIcon.gameObject.SetActive(m_ItemIcon.GetImageData() != null && m_ItemIcon.GetImageData().ContainsData(true));
                 }
                 if (m_ItemCheckbox != null)
                     m_ItemCheckbox.isOn = dialog.IsDataIndexSelected(DataIndex);

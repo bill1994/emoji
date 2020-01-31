@@ -305,7 +305,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1067,7 +1067,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11408338}
   m_MaterialRipple: {fileID: 11403594}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22533082}
   m_Icon: {fileID: 0}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 11412712}
@@ -1472,7 +1471,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11432268}
   m_MaterialRipple: {fileID: 11431120}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22598496}
   m_Icon: {fileID: 0}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 11412204}
@@ -1841,13 +1839,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 24
   m_SizeMode: 0
   m_VectorImageData:
     m_Glyph:
       m_Name: info_outline
       m_Unicode: \ue88f
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &193894
 GameObject:
   m_ObjectHideFlags: 0
@@ -2034,6 +2032,7 @@ GameObject:
   - component: {fileID: 222479080651554292}
   - component: {fileID: 114306374639843800}
   - component: {fileID: 114637999291769400}
+  - component: {fileID: 4066097054139753461}
   m_Layer: 5
   m_Name: ListContent
   m_TagString: Untagged
@@ -2108,6 +2107,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!114 &4066097054139753461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623549292954146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &1772898090261346
 GameObject:
   m_ObjectHideFlags: 0
@@ -2338,7 +2365,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 224975195060051832}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
