@@ -1,7 +1,4 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
-
-using Kyub.UI;
+﻿using Kyub.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -129,7 +126,7 @@ namespace MaterialUI
 
 
             _onDismissiveButtonClicked = onDismissiveButtonClicked;
-            
+
             if (m_ButtonSection != null)
             {
                 m_ButtonSection.SetButtons(AffirmativeButtonClicked, affirmativeButtonText, DismissiveButtonClicked, dismissiveButtonText);
@@ -175,12 +172,18 @@ namespace MaterialUI
                 m_ScrollDataView.OnReloadElement.RemoveListener(HandleOnReloadElement);
         }
 
-        public abstract void AffirmativeButtonClicked();
+        public void AffirmativeButtonClicked()
+        {
+            var oldDismissAction = _onDismissiveButtonClicked;
+            _onDismissiveButtonClicked = null;
+
+            HandleOnAffirmativeButtonClicked();
+
+            _onDismissiveButtonClicked = oldDismissAction;
+        }
 
         public virtual void DismissiveButtonClicked()
         {
-            if (_onDismissiveButtonClicked != null)
-                _onDismissiveButtonClicked.InvokeIfNotNull();
             Hide();
         }
 
@@ -190,9 +193,11 @@ namespace MaterialUI
 
         #region Receivers
 
+        protected abstract void HandleOnAffirmativeButtonClicked();
+
         protected virtual void HandleOnReloadElement(ScrollDataView.ReloadEventArgs args)
         {
-            var clickableOption = args.LayoutElement != null? args.LayoutElement.GetComponent<DialogClickableOption>() : null;
+            var clickableOption = args.LayoutElement != null ? args.LayoutElement.GetComponent<DialogClickableOption>() : null;
             if (clickableOption != null)
             {
                 clickableOption.onItemClicked.RemoveListener(HandleOnItemClicked);
@@ -214,6 +219,9 @@ namespace MaterialUI
 
         public override void OnActivityBeginHide()
         {
+            if (_onDismissiveButtonClicked != null)
+                _onDismissiveButtonClicked.InvokeIfNotNull();
+
             var canvasGroup = this.GetAddComponent<CanvasGroup>();
             canvasGroup.blocksRaycasts = false;
             base.OnActivityBeginHide();
