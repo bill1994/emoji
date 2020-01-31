@@ -1,7 +1,4 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
-
-using Kyub.UI;
+﻿using Kyub.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,7 +33,7 @@ namespace MaterialUI
             protected set
             {
                 value = value < 0 ? (!m_AllowSwitchOff ? _SelectedIndex : -1) : value;
-                value = Mathf.Clamp(value, -1, (_Options != null? _Options.Length : 0) - 1);
+                value = Mathf.Clamp(value, -1, (_Options != null ? _Options.Length : 0) - 1);
                 if (_SelectedIndex == value)
                     return;
                 _SelectedIndex = value;
@@ -76,8 +73,8 @@ namespace MaterialUI
 
         public virtual void Initialize(string[] optionsStr, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff = false)
         {
-            OptionData[] options = new OptionData[optionsStr != null? optionsStr.Length : 0];
-            for(int i=0; i<optionsStr.Length; i++)
+            OptionData[] options = new OptionData[optionsStr != null ? optionsStr.Length : 0];
+            for (int i = 0; i < optionsStr.Length; i++)
             {
                 options[i] = new OptionData(optionsStr[i], null);
             }
@@ -88,18 +85,8 @@ namespace MaterialUI
         {
             _onAffirmativeButtonClicked = onAffirmativeButtonClicked;
             BaseInitialize(options, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
-            _SelectedIndex = selectedIndexStart < 0 ? (!m_AllowSwitchOff && options.Length > 0? 0 : -1) : selectedIndexStart;
+            _SelectedIndex = selectedIndexStart < 0 ? (!m_AllowSwitchOff && options.Length > 0 ? 0 : -1) : selectedIndexStart;
             _SelectedIndex = Mathf.Clamp(_SelectedIndex, -1, (_Options != null ? _Options.Length : 0) - 1);
-        }
-
-        public override void AffirmativeButtonClicked()
-        {
-            var canvasGroup = this.GetAddComponent<CanvasGroup>();
-            canvasGroup.blocksRaycasts = false;
-
-            if (_onAffirmativeButtonClicked != null)
-                _onAffirmativeButtonClicked.InvokeIfNotNull(_SelectedIndex);
-            Hide();
         }
 
         public override bool IsDataIndexSelected(int dataIndex)
@@ -111,9 +98,19 @@ namespace MaterialUI
 
         #region Receivers
 
+        protected override void HandleOnAffirmativeButtonClicked()
+        {
+            var canvasGroup = this.GetAddComponent<CanvasGroup>();
+            canvasGroup.blocksRaycasts = false;
+
+            if (_onAffirmativeButtonClicked != null)
+                _onAffirmativeButtonClicked.InvokeIfNotNull(_SelectedIndex);
+            Hide();
+        }
+
         protected override void HandleOnItemClicked(int dataIndex)
         {
-            selectedIndex = selectedIndex == dataIndex? (!m_AllowSwitchOff ? selectedIndex : -1) : dataIndex;
+            selectedIndex = selectedIndex == dataIndex ? (!m_AllowSwitchOff ? selectedIndex : -1) : dataIndex;
         }
 
         #endregion

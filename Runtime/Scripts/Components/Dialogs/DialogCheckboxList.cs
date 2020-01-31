@@ -1,7 +1,4 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,7 +9,6 @@ namespace MaterialUI
     [AddComponentMenu("MaterialUI/Dialogs/Checkbox List", 1)]
     public class DialogCheckboxList : BaseDialogList
     {
-
         #region Private Variables
 
         private HashSet<int> m_SelectedIndexes = new HashSet<int>();
@@ -57,7 +53,7 @@ namespace MaterialUI
         #endregion
 
         #region Helper Functions
-        
+
         public virtual void Initialize(string[] optionsStr, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexesStart)
         {
             OptionData[] options = new OptionData[optionsStr != null ? optionsStr.Length : 0];
@@ -75,16 +71,6 @@ namespace MaterialUI
             selectedIndexes = selectedIndexesStart == null ? new HashSet<int>() : new HashSet<int>(selectedIndexesStart);
         }
 
-        public override void AffirmativeButtonClicked()
-        {
-            var canvasGroup = this.GetAddComponent<CanvasGroup>();
-            canvasGroup.blocksRaycasts = false;
-
-            if (_onAffirmativeButtonClicked != null)
-                _onAffirmativeButtonClicked.InvokeIfNotNull(selectedIndexes.ToArray());
-            Hide();
-        }
-
         public override bool IsDataIndexSelected(int dataIndex)
         {
             return selectedIndexes.Contains(dataIndex);
@@ -93,6 +79,16 @@ namespace MaterialUI
         #endregion
 
         #region Receivers
+
+        protected override void HandleOnAffirmativeButtonClicked()
+        {
+            var canvasGroup = this.GetAddComponent<CanvasGroup>();
+            canvasGroup.blocksRaycasts = false;
+
+            if (_onAffirmativeButtonClicked != null)
+                _onAffirmativeButtonClicked.InvokeIfNotNull(selectedIndexes.ToArray());
+            Hide();
+        }
 
         protected override void HandleOnItemClicked(int dataIndex)
         {
