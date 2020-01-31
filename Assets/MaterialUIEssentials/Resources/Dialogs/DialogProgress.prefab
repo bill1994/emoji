@@ -1267,13 +1267,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 32
   m_SizeMode: 3
   m_VectorImageData:
     m_Glyph:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &168986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1651,13 +1651,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 24
   m_SizeMode: 0
   m_VectorImageData:
     m_Glyph:
       m_Name: info_outline
       m_Unicode: \ue88f
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &193894
 GameObject:
   m_ObjectHideFlags: 0
