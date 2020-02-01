@@ -493,10 +493,26 @@ namespace MaterialUI
             base.OnDestroy();
         }
 
+#if UNITY_EDITOR
+        bool _lastIsOn = false;
+#endif
         protected virtual void Update()
         {
-            if (!Application.isPlaying)
+            if (!Application.isPlaying )
+            {
+#if UNITY_EDITOR
+                if (_lastIsOn != isOn)
+                {
+                    _lastIsOn = isOn;
+                    if (isOn)
+                        TurnOnInstant();
+                    else
+                        TurnOffInstant();
+                    OnValidate();
+                }
+#endif
                 return;
+            }
 
             if (m_AnimState > 0)
             {

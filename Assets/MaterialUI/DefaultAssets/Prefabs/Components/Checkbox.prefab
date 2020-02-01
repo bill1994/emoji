@@ -80,14 +80,13 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uE902"
   m_Size: 40
-  m_ScaledSize: 40
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &100010
 GameObject:
   m_ObjectHideFlags: 0
@@ -199,7 +198,7 @@ MonoBehaviour:
   - m_name: Icon
     m_target: {fileID: 22406412}
     m_useStyleGraphic: 0
-    m_colorOn: {r: 0, g: 0.5882353, b: 0.53333336, a: 0}
+    m_colorOn: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
     m_colorOff: {r: 0, g: 0, b: 0, a: 0.5411765}
     m_colorDisabled: {r: 0, g: 0, b: 0, a: 0.2627451}
   m_OnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
@@ -225,6 +224,7 @@ MonoBehaviour:
         m_Name: done
         m_Unicode: \ue876
       m_Font: {fileID: 12800000, guid: a0a40789b9baa45a68c6d593e02f648a, type: 3}
+    m_ImgUrl: 
   m_ToggleOffIcon:
     m_ImageDataType: 1
     m_Sprite: {fileID: 0}
@@ -233,7 +233,7 @@ MonoBehaviour:
         m_Name: info_outline
         m_Unicode: \ue88f
       m_Font: {fileID: 12800000, guid: a0a40789b9baa45a68c6d593e02f648a, type: 3}
-  m_CanvasGroup: {fileID: 22532840}
+    m_ImgUrl: 
   m_Interactable: 1
   m_AutoRegisterInParentGroup: 1
   m_Group: {fileID: 0}
@@ -692,14 +692,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 24
   m_SizeMode: 0
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: checkbox_frame
       m_Unicode: \uE900
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &169418
 GameObject:
   m_ObjectHideFlags: 0
@@ -853,14 +852,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 0
   m_SizeMode: 3
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: checkbox_check
       m_Unicode: \uE901
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
+  m_KeepSizeWhenEmpty: 1
 --- !u!1 &185616
 GameObject:
   m_ObjectHideFlags: 0
@@ -1014,11 +1012,10 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 24
   m_SizeMode: 1
-  m_MaterialUiScaler: {fileID: 0}
   m_VectorImageData:
     m_Glyph:
       m_Name: info_outline
       m_Unicode: \ue88f
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1
