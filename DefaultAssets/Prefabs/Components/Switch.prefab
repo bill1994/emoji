@@ -523,7 +523,7 @@ MonoBehaviour:
   - m_name: Icon
     m_target: {fileID: 22485786}
     m_useStyleGraphic: 0
-    m_colorOn: {r: 0, g: 0.5137255, b: 0.4666667, a: 0}
+    m_colorOn: {r: 0, g: 0.5137255, b: 0.4666667, a: 1}
     m_colorOff: {r: 0, g: 0, b: 0, a: 0.5411765}
     m_colorDisabled: {r: 0, g: 0, b: 0, a: 0.2627451}
   m_OnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
