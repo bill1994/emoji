@@ -20,6 +20,8 @@ namespace MaterialUI
         private Color m_BackDisabledColor = Color.black;
 
         [SerializeField, SerializeStyleProperty]
+        private RectTransform m_SwitchRectTransform;
+        [SerializeField, SerializeStyleProperty]
         private Graphic m_SwitchImage;
         [SerializeField, SerializeStyleProperty]
         private Graphic m_BackImage;
@@ -33,7 +35,7 @@ namespace MaterialUI
         [SerializeField]
         Slider.Direction m_SlideDirection = Slider.Direction.LeftToRight;
 
-        private RectTransform m_SwitchRectTransform;
+        
 
         private Color m_CurrentBackColor;
 
@@ -191,7 +193,8 @@ namespace MaterialUI
                 if (backImage) backImage.color = backOffColor;
             }
 
-            shadowImage.enabled = true;
+            if(shadowImage != null)
+                shadowImage.enabled = true;
 
             base.ApplyInteractableOn();
         }
@@ -201,7 +204,8 @@ namespace MaterialUI
             if(switchImage) switchImage.color = m_DisabledColor;
             if(backImage) backImage.color = backDisabledColor;
 
-            shadowImage.enabled = false;
+            if (shadowImage != null)
+                shadowImage.enabled = false;
 
             base.ApplyInteractableOff();
         }
@@ -232,8 +236,8 @@ namespace MaterialUI
         {
             base.AnimOff();
 
-            switchImage.color = Tween.QuintOut(m_CurrentColor, m_OffColor, m_AnimDeltaTime, m_AnimationDuration);
-            backImage.color = Tween.QuintOut(m_CurrentBackColor, backOffColor, m_AnimDeltaTime, m_AnimationDuration);
+            if (switchImage) switchImage.color = Tween.QuintOut(m_CurrentColor, m_OffColor, m_AnimDeltaTime, m_AnimationDuration);
+            if (backImage) backImage.color = Tween.QuintOut(m_CurrentBackColor, backOffColor, m_AnimDeltaTime, m_AnimationDuration);
 
             if (slideSwitch)
                 switchRectTransform.anchoredPosition = Tween.SeptSoftOut(switchRectTransform.anchoredPosition, GetSlideAnchoredPosition(false), m_AnimDeltaTime, m_AnimationDuration);
@@ -243,8 +247,8 @@ namespace MaterialUI
         {
             base.AnimOffComplete();
 
-            switchImage.color = m_OffColor;
-            backImage.color = backOffColor;
+            if (switchImage) switchImage.color = m_OffColor;
+            if (backImage) backImage.color = backOffColor;
 
             if (slideSwitch)
                 switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(false);
