@@ -498,7 +498,12 @@ namespace MaterialUI
             if (!Application.isPlaying)
                 return;
 
-            m_AnimDeltaTime = Time.realtimeSinceStartup - m_AnimStartTime;
+            if (m_AnimState > 0)
+            {
+                if (m_AnimStartTime < 0)
+                    m_AnimStartTime = Time.realtimeSinceStartup;
+                m_AnimDeltaTime = Time.realtimeSinceStartup - m_AnimStartTime;
+            }
 
             if (m_AnimState == 1)
             {
@@ -737,8 +742,9 @@ namespace MaterialUI
                 m_CurrentGraphicColor = m_Graphic.color;
             }
 
+            m_AnimDeltaTime = 0;
             AnimOn();
-            m_AnimStartTime = Time.realtimeSinceStartup;
+            m_AnimStartTime = -1;
             m_AnimState = 1;
 
             UpdateGraphicToggleState();
@@ -766,8 +772,9 @@ namespace MaterialUI
                 m_CurrentGraphicColor = m_Graphic.color;
             }
 
+            m_AnimDeltaTime = 0;
             AnimOff();
-            m_AnimStartTime = Time.realtimeSinceStartup;
+            m_AnimStartTime = -1;
             m_AnimState = 2;
 
             UpdateGraphicToggleState();

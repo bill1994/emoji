@@ -61,8 +61,8 @@ namespace Kyub.Extensions
             newColors = new Color[newWidth * newHeight];
             if (useBilinear)
             {
-                ratioX = 1.0f / ((float)newWidth / (tex.width - 1));
-                ratioY = 1.0f / ((float)newHeight / (tex.height - 1));
+                ratioX = 1.0f / ((float)newWidth / (tex.width - (tex.width % 2)));
+                ratioY = 1.0f / ((float)newHeight / (tex.height - (tex.height % 2)));
             }
             else
             {

@@ -13,6 +13,7 @@ namespace MaterialUI
         private SerializedProperty m_SlideDirection;
         private SerializedProperty m_SlideSwitch;
 
+        private SerializedProperty m_SwitchRectTransform;
         private SerializedProperty m_SwitchImage;
         private SerializedProperty m_BackImage;
         private SerializedProperty m_ShadowImage;
@@ -33,6 +34,7 @@ namespace MaterialUI
             m_SlideSwitch = serializedObject.FindProperty("m_SlideSwitch");
             m_SlideDirection = serializedObject.FindProperty("m_SlideDirection");
 
+            m_SwitchRectTransform = serializedObject.FindProperty("m_SwitchRectTransform");
             m_SwitchImage = serializedObject.FindProperty("m_SwitchImage");
             m_BackImage = serializedObject.FindProperty("m_BackImage");
             m_ShadowImage = serializedObject.FindProperty("m_ShadowImage");
@@ -71,6 +73,7 @@ namespace MaterialUI
             base.ComponentsSection();
 
             EditorGUI.indentLevel++;
+            LayoutStyle_PropertyField(m_SwitchRectTransform);
             LayoutStyle_PropertyField(m_SwitchImage);
             LayoutStyle_PropertyField(m_BackImage);
             LayoutStyle_PropertyField(m_ShadowImage);
