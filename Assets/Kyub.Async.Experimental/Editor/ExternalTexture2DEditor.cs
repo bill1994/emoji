@@ -48,5 +48,22 @@ namespace KyubEditor.Async.Experimental
             DrawPropertiesExcluding(serializedObject, new string[] { "m_Url", "m_Texture2D", "m_MaxSize", "m_Script" });
             serializedObject.ApplyModifiedProperties();
         }
+
+        public override bool HasPreviewGUI()
+        {
+            return true;
+        }
+
+        public override void OnPreviewGUI(Rect r, GUIStyle background)
+        {
+            base.OnPreviewGUI(r, background);
+            var texture = m_Texture2D.objectReferenceValue as Texture;
+
+            float proportion = 1;
+            if (r.width < texture.width || r.height < texture.height)
+                proportion = Mathf.Min((r.width / (float)texture.width), (r.height / (float)texture.height));
+            var size = new Vector2(texture.width, texture.height) * proportion;
+            EditorGUI.DrawPreviewTexture(new Rect(r.center - size/2, size), texture);
+        }
     }
 }

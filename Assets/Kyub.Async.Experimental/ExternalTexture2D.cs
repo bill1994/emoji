@@ -423,7 +423,7 @@ namespace Kyub.Async.Experimental
         {
             if (m_Texture2D == null)
             {
-                m_Texture2D = new Texture2D(Texture2D.whiteTexture.width, Texture2D.whiteTexture.height, TextureFormat.ARGB32, false);
+                m_Texture2D = new Texture2D(Texture2D.whiteTexture.width, Texture2D.whiteTexture.height, TextureFormat.RGB24, false);
                 m_Texture2D.hideFlags = HideFlags.NotEditable;
             }
 
@@ -480,6 +480,10 @@ namespace Kyub.Async.Experimental
                                 Clear();
 
                             var bytes = www.downloadHandler.data;
+                            var isPng = www.GetResponseHeader("Content-Type").Contains("png");
+                            if ((isPng && m_Texture2D.format != TextureFormat.ARGB32) || (!isPng && m_Texture2D.format != TextureFormat.RGB24))
+                                m_Texture2D.Resize(m_Texture2D.width, m_Texture2D.height, isPng? TextureFormat.ARGB32 : TextureFormat.RGB24, false);
+
                             m_Texture2D.LoadImage(bytes);
                             m_Texture2D.hideFlags = HideFlags.NotEditable;
                             if (hasTexture)
