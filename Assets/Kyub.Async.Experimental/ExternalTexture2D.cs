@@ -48,6 +48,7 @@ namespace Kyub.Async.Experimental
             }
             set
             {
+                value = Mathf.Max(16, m_MaxSize);
                 if (m_MaxSize == value)
                     return;
                 m_MaxSize = value;
@@ -282,7 +283,7 @@ namespace Kyub.Async.Experimental
         public ExternalTexture2D(string url, int maxSize) : base()
         {
             m_Url = url;
-            m_MaxSize = maxSize;
+            m_MaxSize = Mathf.Max(16, maxSize);
         }
 
         #endregion

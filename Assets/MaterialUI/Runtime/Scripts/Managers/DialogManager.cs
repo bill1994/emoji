@@ -181,6 +181,62 @@ namespace MaterialUI
 
         #endregion
 
+        #region Banner
+
+        public static DialogAlert ShowBanner(string titleText)
+        {
+            return ShowBanner(titleText, null);
+        }
+
+        public static DialogAlert ShowBanner(string titleText, ImageData icon)
+        {
+            return ShowBanner(titleText, icon, null, "DISMISS");
+        }
+
+        public static DialogAlert ShowBanner(string titleText, Action onAffirmativeButtonClicked, string affirmativeButtonText)
+        {
+            return ShowBanner(titleText, null, onAffirmativeButtonClicked, affirmativeButtonText);
+        }
+
+        public static DialogAlert ShowBanner(string titleText, ImageData icon, Action onAffirmativeButtonClicked, string affirmativeButtonText)
+        {
+            return ShowBanner(titleText, icon, onAffirmativeButtonClicked, affirmativeButtonText, null, null);
+        }
+
+        public static DialogAlert ShowBanner(string titleText, Action onAffirmativeButtonClicked, string affirmativeButtonText, Action onDismissiveButtonClicked, string dismissiveButtonText)
+        {
+            return ShowBanner(titleText, null, onAffirmativeButtonClicked, affirmativeButtonText, onDismissiveButtonClicked, dismissiveButtonText);
+        }
+
+        /// <summary>
+        /// Shows an banner dialog with an optional optional icon and 2 optional buttons.
+        /// <para></para>
+        /// For more customizability, use <see cref="CreateBanner"/>.
+        /// </summary>
+        public static DialogAlert ShowBanner(string titleText, ImageData icon, Action onAffirmativeButtonClicked, string affirmativeButtonText, Action onDismissiveButtonClicked, string dismissiveButtonText)
+        {
+            DialogAlert dialog = CreateBanner();
+            dialog.Initialize(null, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
+            dialog.ShowModal();
+            return dialog;
+        }
+
+        /// <summary>
+        /// Creates an alert dialog that can be modified or stored before showing.
+        /// <para></para>
+        /// For a simpler solution with less customizability, use <see cref="ShowAlert(string,Action,string,string,ImageData,Action,string)"/>.
+        /// </summary>
+        /// <returns>The Instance of the created dialog.</returns>
+        public static DialogAlert CreateBanner()
+        {
+            DialogAlert dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogBanner, Instance.transform).GetComponent<DialogAlert>();
+            CreateActivity(dialog, Instance.m_ParentCanvas);
+            //dialog.Initialize();
+            return dialog;
+        }
+
+        #endregion
+
         #region Modal
 
         /// <summary>

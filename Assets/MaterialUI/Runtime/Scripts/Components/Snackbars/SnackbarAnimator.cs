@@ -104,13 +104,13 @@ namespace MaterialUI
                 }
             }
 
-            m_OffPos.y = -m_RectTransform.GetProperSize().y * 1.05f;
-            m_RectTransform.position = m_OffPos;
+            m_OutPos.y = -m_RectTransform.GetProperSize().y * 1.05f;
+            m_RectTransform.position = m_OutPos;
             m_CurrentPosition = m_RectTransform.position.y;
 
             GetComponent<CanvasGroup>().alpha = 1f;
-            m_OnPos.y = 0f;
-            m_OffAlpha = 1f;
+            m_InPos.y = 0f;
+            m_OutAlpha = 1f;
         }
 
         #endregion

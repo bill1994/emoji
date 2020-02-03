@@ -10,6 +10,8 @@ namespace MaterialUI
     [AddComponentMenu("MaterialUI/Toast Animator", 100)]
     public class ToastAnimator : MonoBehaviour
     {
+        public enum OffsetMode { Default, Normalized }
+
         #region Private Variables
 
         [SerializeField]
@@ -28,20 +30,23 @@ namespace MaterialUI
         protected bool m_canDestroyToast = true;
         [SerializeField]
         protected float m_TimeToWait = 0f;
+        [Space]
         [SerializeField]
-        protected float m_OnPosNormalizedPos = 1 / 8f;
-        [SerializeField]
-        protected float m_OffNormalizedPos = 1 / 10f;
+        public OffsetMode m_OffsetMode = OffsetMode.Normalized;
+        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_OnPosNormalizedPos")]
+        protected float m_InOffset = 1 / 8f;
+        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_OffNormalizedPos")]
+        protected float m_OutOffset = 1 / 10f;
 
         protected int m_State;
         protected bool m_AnimDown;
-        protected Vector3 m_OnPos;
-        protected Vector3 m_OffPos;
+        protected Vector3 m_InPos;
+        protected Vector3 m_OutPos;
         protected Vector3 m_TempVec2;
         protected float m_AnimSpeed = 0.5f;
         protected float m_AnimStartTime;
         protected float m_AnimDeltaTime;
-        protected float m_OffAlpha = 0f;
+        protected float m_OutAlpha = 0f;
         protected float m_CurrentPosition;
         float m_CurrentWaitTime = -1;
 
@@ -52,7 +57,7 @@ namespace MaterialUI
 
         protected Toast _toast = null;
         protected System.Func<Toast, ToastAnimator, bool> _onToastCompleteCallback = null;
-        
+
         #endregion
 
         #region Public Properties
@@ -176,8 +181,8 @@ namespace MaterialUI
 
                 m_AnimDeltaTime = Time.realtimeSinceStartup - m_AnimStartTime;
 
-                var v_onWorldPos = m_TargetTransform != null? m_TargetTransform.TransformPoint((Vector3)m_OnPos) : m_OnPos;
-                var v_offWorldPos = m_TargetTransform != null? m_TargetTransform.TransformPoint((Vector3)m_OffPos) : m_OffPos;
+                var v_onWorldPos = m_TargetTransform != null? m_TargetTransform.TransformPoint((Vector3)m_InPos) : m_InPos;
+                var v_offWorldPos = m_TargetTransform != null? m_TargetTransform.TransformPoint((Vector3)m_OutPos) : m_OutPos;
 
                 Kyub.Performance.SustainedPerformanceManager.Refresh(this);
                 if (m_CurrentWaitTime >= 0)
@@ -219,7 +224,7 @@ namespace MaterialUI
                         m_TempVec2.y = Tween.CubeInOut(m_CurrentPosition, v_offWorldPos.y, m_AnimDeltaTime, m_AnimSpeed);
                         m_RectTransform.position = m_TempVec2;
                         SetLocalPositionZ(m_RectTransform, 0);
-                        m_CanvasGroup.alpha = Tween.CubeIn(m_CanvasGroup.alpha, m_OffAlpha, m_AnimDeltaTime, m_AnimSpeed);
+                        m_CanvasGroup.alpha = Tween.CubeIn(m_CanvasGroup.alpha, m_OutAlpha, m_AnimDeltaTime, m_AnimSpeed);
                         if (m_MoveFab)
                         {
                             m_FabRectTransform.position = new Vector3(m_FabRectTransform.position.x, m_FabStartPos + (m_RectTransform.position.y - v_offWorldPos.y), m_FabRectTransform.position.z);
@@ -248,17 +253,17 @@ namespace MaterialUI
         {
             m_TargetTransform = targetTransform;
 
-            Rect canvasRect = targetTransform != null ? targetTransform.rect : new Rect(0, 0, Screen.width, Screen.height);
+            Rect canvasRect = targetTransform != null ? targetTransform.rect : Screen.safeArea;
 
-            m_OnPos = new Vector2(canvasRect.center.x, canvasRect.yMin + canvasRect.height * m_OnPosNormalizedPos);
-            m_OffPos = new Vector2(canvasRect.center.x, canvasRect.yMin + canvasRect.height * m_OffNormalizedPos);
+            m_InPos = new Vector2(canvasRect.center.x, canvasRect.yMin + (m_OffsetMode == OffsetMode.Normalized? canvasRect.height * m_InOffset : m_InOffset));
+            m_OutPos = new Vector2(canvasRect.center.x, canvasRect.yMin + (m_OffsetMode == OffsetMode.Normalized ? canvasRect.height * m_OutOffset : m_OutOffset));
 
-            if (targetTransform != null)
+            /*if (targetTransform != null)
             {
-                //m_OnPos = targetTransform.TransformPoint((Vector3)m_OnPos);
-                //m_OffPos = targetTransform.TransformPoint((Vector3)m_OffPos);
-            }
-            m_RectTransform.position = targetTransform != null? targetTransform.TransformPoint((Vector3)m_OffPos) : m_OffPos;
+                m_InPos = targetTransform.TransformPoint((Vector3)m_InPos);
+                m_OutPos = targetTransform.TransformPoint((Vector3)m_OutPos);
+            }*/
+            m_RectTransform.position = targetTransform != null? targetTransform.TransformPoint((Vector3)m_OutPos) : m_OutPos;
             SetLocalPositionZ(m_RectTransform, 0);
 
             if(!gameObject.activeSelf)

@@ -30,6 +30,11 @@ namespace MaterialUI
         public const string DIALOG_ALERT_PATH = "Dialogs/DialogAlert";
 
         /// <summary>
+        /// Path to the banner dialog prefab.
+        /// </summary>
+        public const string DIALOG_BANNER_PATH = "Dialogs/DialogBanner";
+
+        /// <summary>
         /// Path to the progress dialog prefab.
         /// </summary>
         public const string DIALOG_PROGRESS_PATH = "Dialogs/DialogProgress";
@@ -99,6 +104,7 @@ namespace MaterialUI
             new PrefabAddress() { AssetPath = LINEAR_PROGRESS_INDICATOR_PATH },
             new PrefabAddress() { AssetPath = DIALOG_MODAL_CIRCLE_PROGRESS_PATH },
             new PrefabAddress() { AssetPath = DIALOG_ALERT_PATH },
+            new PrefabAddress() { AssetPath = DIALOG_BANNER_PATH },
             new PrefabAddress() { AssetPath = DIALOG_PROGRESS_PATH },
             new PrefabAddress() { AssetPath = DIALOG_MENU_LIST_PATH },
             new PrefabAddress() { AssetPath = DIALOG_SIMPLE_LIST_PATH },
@@ -124,6 +130,7 @@ namespace MaterialUI
         public PrefabAddress progressIndicatorLinear { get => GetOrCreatePrefabAddressWithPath_Internal(LINEAR_PROGRESS_INDICATOR_PATH); }
         public PrefabAddress dialogModalCircleProgress { get => GetOrCreatePrefabAddressWithPath_Internal(DIALOG_MODAL_CIRCLE_PROGRESS_PATH); }
         public PrefabAddress dialogAlert { get => GetOrCreatePrefabAddressWithPath_Internal(DIALOG_ALERT_PATH); }
+        public PrefabAddress dialogBanner { get => GetOrCreatePrefabAddressWithPath_Internal(DIALOG_BANNER_PATH); }
         public PrefabAddress dialogProgress { get => GetOrCreatePrefabAddressWithPath_Internal(DIALOG_PROGRESS_PATH); }
         public PrefabAddress dialogSimpleList { get => GetOrCreatePrefabAddressWithPath_Internal(DIALOG_SIMPLE_LIST_PATH); }
         public PrefabAddress dialogMenuList { get => GetOrCreatePrefabAddressWithPath_Internal(DIALOG_MENU_LIST_PATH); }

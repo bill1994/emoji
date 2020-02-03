@@ -25,6 +25,11 @@ MonoBehaviour:
     m_asset: {fileID: 1757735175856784, guid: 3aca20d2add99aa46a269aebdf8d31a5, type: 3}
     m_assetPath: Dialogs/DialogCircleModalProgress
     m_keepLoaded: 0
+  - m_name: DialogBanner
+    m_asset: {fileID: 533570843228028739, guid: 7202b61b1d1eedc4ba864c06d8492f37,
+      type: 3}
+    m_assetPath: Dialogs/DialogBanner
+    m_keepLoaded: 0
   - m_name: DialogAlert
     m_asset: {fileID: 193894, guid: 668b7bfac0563492aa60fa0fa8348791, type: 3}
     m_assetPath: Dialogs/DialogAlert
