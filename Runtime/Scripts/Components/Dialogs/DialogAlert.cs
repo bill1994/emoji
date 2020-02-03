@@ -62,14 +62,16 @@ namespace MaterialUI
 
         public void Initialize(string bodyText, Action onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
         {
-            m_TitleSection.SetTitle(titleText, icon);
-			m_ButtonSection.SetButtons(onAffirmativeButtonClicked, affirmativeButtonText, onDismissiveButtonClicked, dismissiveButtonText);
+            if(m_TitleSection != null)
+                m_TitleSection.SetTitle(titleText, icon);
+            if (m_BodyText != null)
+                m_BodyText.SetGraphicText(bodyText);
 
-            m_BodyText.SetGraphicText(bodyText);
-
-            m_ButtonSection.SetupButtonLayout(rectTransform);
-
-            //Initialize();
+            if (m_ButtonSection != null)
+            {
+                m_ButtonSection.SetButtons(onAffirmativeButtonClicked, affirmativeButtonText, onDismissiveButtonClicked, dismissiveButtonText);
+                m_ButtonSection.SetupButtonLayout(rectTransform);
+            }
         }
 
         public void AffirmativeButtonClicked()
