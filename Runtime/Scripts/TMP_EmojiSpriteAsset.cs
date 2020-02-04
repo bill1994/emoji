@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿#if UNITY_2018_3_OR_NEWER
+#define TMP_1_4_0_OR_NEWER
+#endif
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
