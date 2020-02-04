@@ -1,8 +1,10 @@
 ﻿using Kyub.UI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace MaterialUI
 {
@@ -20,7 +22,7 @@ namespace MaterialUI
         [SerializeField]
         protected DialogClickableOption m_OptionTemplate = null;
 
-        protected OptionData[] _Options;
+        protected IList<OptionData> _Options;
 
         protected Action _onDismissiveButtonClicked = null;
 
@@ -59,7 +61,7 @@ namespace MaterialUI
             set { m_OptionTemplate = value; }
         }
 
-        public virtual OptionData[] options
+        public virtual IList<OptionData> options
         {
             get
             {
@@ -76,7 +78,7 @@ namespace MaterialUI
                 if (m_ScrollDataView != null)
                 {
                     m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
-                    m_ScrollDataView.Setup(options);
+                    m_ScrollDataView.Setup(options is IList || options == null ? (IList)options : options.ToArray());
                 }
             }
         }
@@ -107,18 +109,18 @@ namespace MaterialUI
 
         #region Helper Functions
 
-        protected virtual void BaseInitialize(OptionData[] options, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
+        protected virtual void BaseInitialize<TOptionData>(IList<TOptionData> options, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText) where TOptionData : OptionData, new()
         {
             ClearList();
 
-            _Options = options;
+            _Options = options is IList<OptionData> || options == null ? (IList<OptionData>)options : options.ToArray<OptionData>();
 
 
             if (m_ScrollDataView != null)
             {
                 m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
                 m_ScrollDataView.OnReloadElement.AddListener(HandleOnReloadElement);
-                m_ScrollDataView.Setup(options);
+                m_ScrollDataView.Setup(options is IList || options == null? (IList)options : options.ToArray());
             }
 
             if (m_TitleSection != null)
