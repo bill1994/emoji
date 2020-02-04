@@ -119,7 +119,6 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 11454068}
   m_MaterialRipple: {fileID: 0}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 22565092}
   m_Icon: {fileID: 11434810}
   m_ShadowsCanvasGroup: {fileID: 22506268}
   m_BackgroundImage: {fileID: 11430954}
@@ -834,7 +833,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 3
   m_firstOverflowCharacterIndex: -1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
@@ -1026,10 +1025,10 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 24
-  m_ScaledSize: 33.9375
   m_SizeMode: 1
   m_VectorImageData:
     m_Glyph:
       m_Name: access_time
       m_Unicode: \ue192
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_KeepSizeWhenEmpty: 1

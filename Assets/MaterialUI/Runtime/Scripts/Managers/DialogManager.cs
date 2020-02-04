@@ -377,7 +377,7 @@ namespace MaterialUI
         /// <param name="options">The strings to use for the list item labels.</param>
         /// <param name="onItemClick">Called when an option is selected.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowSimpleList(string[] options, Action<int> onItemClick)
+        public static DialogRadioList ShowSimpleList(IList<string> options, Action<int> onItemClick)
         {
             return ShowSimpleList(options, onItemClick, null, null);
         }
@@ -392,11 +392,11 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowSimpleList(string[] options, Action<int> onItemClick, string titleText, ImageData icon)
+        public static DialogRadioList ShowSimpleList(IList<string> options, Action<int> onItemClick, string titleText, ImageData icon)
         {
             List<OptionData> optionsData = new List<OptionData>();
 
-            for (int i = 0; i < options.Length; i++)
+            for (int i = 0; i < options.Count; i++)
             {
                 OptionData optionData = new OptionData(options[i], null);
                 optionsData.Add(optionData);
@@ -413,7 +413,7 @@ namespace MaterialUI
         /// <param name="optionDataList">The data to use for the option list.</param>
         /// <param name="onItemClick">Called when an option is selected.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowSimpleList(OptionData[] options, Action<int> onItemClick)
+        public static DialogRadioList ShowSimpleList<TOptionData>(IList<TOptionData> options, Action<int> onItemClick) where TOptionData : OptionData, new()
         {
             return ShowSimpleList(options, onItemClick, null, null);
         }
@@ -428,7 +428,7 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowSimpleList(OptionData[] options, Action<int> onItemClick, string titleText, ImageData icon)
+        public static DialogRadioList ShowSimpleList<TOptionData>(IList<TOptionData> options, Action<int> onItemClick, string titleText, ImageData icon) where TOptionData : OptionData, new()
         {
             DialogRadioList dialog = CreateSimpleList();
             dialog.Initialize(options, onItemClick, null, titleText, icon, null, null, -1, true);
@@ -436,7 +436,7 @@ namespace MaterialUI
             return dialog;
         }
 
-        public static void ShowSimpleListAsync(OptionData[] options, Action<int> onItemClick, string titleText, ImageData icon, Action onDismiss, System.Action<DialogRadioList> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        public static void ShowSimpleListAsync<TOptionData>(IList<TOptionData> options, Action<int> onItemClick, string titleText, ImageData icon, Action onDismiss, System.Action<DialogRadioList> onCreateCallback = null, ProgressIndicator progressIndicator = null) where TOptionData : OptionData, new()
         {
             System.Action<DialogRadioList> initialize = (DialogRadioList dialog) =>
             {
@@ -476,7 +476,7 @@ namespace MaterialUI
         /// <param name="onAffirmativeButtonClicked">Called when the affirmative button is clicked.</param>
         /// <param name="affirmativeButtonText">The affirmative button text.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText = "OK")
+        public static DialogCheckboxList ShowCheckboxList(IList<string> options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText = "OK")
         {
             return ShowCheckboxList(options, onAffirmativeButtonClicked, affirmativeButtonText, null, null);
         }
@@ -492,7 +492,7 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon)
+        public static DialogCheckboxList ShowCheckboxList(IList<string> options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon)
         {
             return ShowCheckboxList(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, null, null, null);
         }
@@ -510,7 +510,7 @@ namespace MaterialUI
         /// <param name="onDismissiveButtonClicked">Called when the dismissive button is clicked.</param>
         /// <param name="dismissiveButtonText">The dismissive button text. Make null for no dismissive button.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogCheckboxList ShowCheckboxList(string[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexes = null)
+        public static DialogCheckboxList ShowCheckboxList(IList<string> options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexes = null)
         {
             DialogCheckboxList dialog = CreateCheckboxList();
             dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexes);
@@ -518,7 +518,7 @@ namespace MaterialUI
             return dialog;
         }
 
-        public static void ShowCheckboxListAsync(OptionData[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexes = null, System.Action<DialogCheckboxList> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        public static void ShowCheckboxListAsync<TOptionData>(IList<TOptionData> options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexes = null, System.Action<DialogCheckboxList> onCreateCallback = null, ProgressIndicator progressIndicator = null) where TOptionData : OptionData, new()
         {
             System.Action<DialogCheckboxList> initialize = (DialogCheckboxList dialog) =>
             {
@@ -532,9 +532,9 @@ namespace MaterialUI
         /// <summary>
         /// Creates a checkbox list dialog that can be modified or stored before showing.
         /// <para></para>
-        /// Before calling <see cref="DialogCheckboxList.Show"/>, call <see cref="DialogCheckboxList.Initialize(string[],Action{bool[]},string,string,ImageData,Action,string)"/>.
+        /// Before calling <see cref="DialogCheckboxList.Show"/>, call <see cref="DialogCheckboxList.Initialize(IList<string>,Action{bool[]},string,string,ImageData,Action,string)"/>.
         /// <para></para>
-        /// For a simpler solution with less customizability, use <see cref="ShowCheckboxList(string[],Action{bool[]},string,string,ImageData,Action,string)"/>.
+        /// For a simpler solution with less customizability, use <see cref="ShowCheckboxList(IList<string>,Action{bool[]},string,string,ImageData,Action,string)"/>.
         /// </summary>
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogCheckboxList CreateCheckboxList()
@@ -558,7 +558,7 @@ namespace MaterialUI
         /// <param name="onAffirmativeButtonClicked">Called when the affirmative button is clicked.</param>
         /// <param name="affirmativeButtonText">The affirmative button text.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowRadioList(string[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText = "OK")
+        public static DialogRadioList ShowRadioList(IList<string> options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText = "OK")
         {
             return ShowRadioList(options, onAffirmativeButtonClicked, affirmativeButtonText, 0);
         }
@@ -573,7 +573,7 @@ namespace MaterialUI
         /// <param name="affirmativeButtonText">The affirmative button text.</param>
         /// <param name="selectedIndexStart">The index of the option that will be selected when the dialog is shown.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowRadioList(string[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, int selectedIndexStart)
+        public static DialogRadioList ShowRadioList(IList<string> options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, int selectedIndexStart)
         {
             return ShowRadioList(options, onAffirmativeButtonClicked, affirmativeButtonText, null, null, selectedIndexStart);
         }
@@ -589,7 +589,7 @@ namespace MaterialUI
         /// <param name="titleText">The title text. Make null for no title.</param>
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowRadioList(string[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon)
+        public static DialogRadioList ShowRadioList(IList<string> options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon)
         {
             return ShowRadioList(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, null, null, 0);
         }
@@ -606,7 +606,7 @@ namespace MaterialUI
         /// <param name="icon">The icon next to the title. Make null for no icon.</param>
         /// <param name="selectedIndexStart">The index of the option that will be selected when the dialog is shown.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowRadioList(string[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, int selectedIndexStart)
+        public static DialogRadioList ShowRadioList(IList<string> options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, int selectedIndexStart)
         {
             return ShowRadioList(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, null, null, selectedIndexStart);
         }
@@ -625,7 +625,7 @@ namespace MaterialUI
         /// <param name="dismissiveButtonText">The dismissive button text. Make null for no dismissive button.</param>
         /// <param name="selectedIndexStart">The index of the option that will be selected when the dialog is shown.</param>
         /// <returns>The Instance of the initialized, shown dialog.</returns>
-        public static DialogRadioList ShowRadioList(string[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart = 0)
+        public static DialogRadioList ShowRadioList(IList<string> options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart = 0)
         {
             DialogRadioList dialog = CreateRadioList();
             dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexStart);
@@ -633,7 +633,7 @@ namespace MaterialUI
             return dialog;
         }
 
-        public static DialogRadioList ShowRadioList(OptionData[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart = 0, bool allowSwitchOff = false)
+        public static DialogRadioList ShowRadioList<TOptionData>(IList<TOptionData> options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart = 0, bool allowSwitchOff = false) where TOptionData : OptionData, new()
         {
             DialogRadioList dialog = CreateRadioList();
             dialog.Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexStart, allowSwitchOff);
@@ -641,7 +641,7 @@ namespace MaterialUI
             return dialog;
         }
 
-        public static void ShowRadioListAsync(OptionData[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff, System.Action<DialogRadioList> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        public static void ShowRadioListAsync<TOptionData>(IList<TOptionData> options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff, System.Action<DialogRadioList> onCreateCallback = null, ProgressIndicator progressIndicator = null) where TOptionData : OptionData, new()
         {
             System.Action<DialogRadioList> initialize = (DialogRadioList dialog) =>
             {
@@ -655,9 +655,9 @@ namespace MaterialUI
         /// <summary>
         /// Creates a radiobutton list dialog that can be modified or stored before showing.
         /// <para></para>
-        /// Before calling <see cref="DialogRadioList.Show"/>, call <see cref="DialogRadioList.Initialize(string[],Action{int},string,string,ImageData,Action,string,int)"/>.
+        /// Before calling <see cref="DialogRadioList.Show"/>, call <see cref="DialogRadioList.Initialize(IList<string>,Action{int},string,string,ImageData,Action,string,int)"/>.
         /// <para></para>
-        /// For a simpler solution with less customizability, use <see cref="ShowRadioList(string[],Action{int},string,string,ImageData,Action,string,int)"/>.
+        /// For a simpler solution with less customizability, use <see cref="ShowRadioList(IList<string>,Action{int},string,string,ImageData,Action,string,int)"/>.
         /// </summary>
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogRadioList CreateRadioList()

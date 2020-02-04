@@ -1,6 +1,8 @@
 ﻿using Kyub.UI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,7 +35,7 @@ namespace MaterialUI
             protected set
             {
                 value = value < 0 ? (!m_AllowSwitchOff ? _SelectedIndex : -1) : value;
-                value = Mathf.Clamp(value, -1, (_Options != null ? _Options.Length : 0) - 1);
+                value = Mathf.Clamp(value, -1, (_Options != null ? _Options.Count : 0) - 1);
                 if (_SelectedIndex == value)
                     return;
                 _SelectedIndex = value;
@@ -44,7 +46,7 @@ namespace MaterialUI
             }
         }
 
-        public override OptionData[] options
+        public override IList<OptionData> options
         {
             get
             {
@@ -62,7 +64,7 @@ namespace MaterialUI
                 if (m_ScrollDataView != null)
                 {
                     m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
-                    m_ScrollDataView.Setup(options);
+                    m_ScrollDataView.Setup(options is IList || options == null ? (IList)options : options.ToArray());
                 }
             }
         }
@@ -71,27 +73,33 @@ namespace MaterialUI
 
         #region Public Functions
 
-        public virtual void Initialize(string[] optionsStr, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff = false)
+        public virtual void Initialize(IList<string> optionsStr, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff = false)
         {
-            OptionData[] options = new OptionData[optionsStr != null ? optionsStr.Length : 0];
-            for (int i = 0; i < optionsStr.Length; i++)
+            OptionData[] options = new OptionData[optionsStr != null ? optionsStr.Count : 0];
+            if (optionsStr != null)
             {
-                options[i] = new OptionData(optionsStr[i], null);
+                for (int i = 0; i < optionsStr.Count; i++)
+                {
+                    options[i] = new OptionData(optionsStr[i], null);
+                }
             }
             Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexStart);
         }
 
-        public virtual void Initialize(OptionData[] options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff = false)
+        public virtual void Initialize<TOptionData>(IList<TOptionData> options, Action<int> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, int selectedIndexStart, bool allowSwitchOff = false) where TOptionData : OptionData, new()
         {
+            if (options == null)
+                options = new TOptionData[0];
+
             _onAffirmativeButtonClicked = onAffirmativeButtonClicked;
             BaseInitialize(options, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
-            _SelectedIndex = selectedIndexStart < 0 ? (!m_AllowSwitchOff && options.Length > 0 ? 0 : -1) : selectedIndexStart;
-            _SelectedIndex = Mathf.Clamp(_SelectedIndex, -1, (_Options != null ? _Options.Length : 0) - 1);
+            _SelectedIndex = selectedIndexStart < 0 ? (!m_AllowSwitchOff && options.Count > 0 ? 0 : -1) : selectedIndexStart;
+            _SelectedIndex = Mathf.Clamp(_SelectedIndex, -1, (_Options != null ? _Options.Count : 0) - 1);
         }
 
         public override bool IsDataIndexSelected(int dataIndex)
         {
-            return dataIndex >= 0 && dataIndex < options.Length && dataIndex == selectedIndex;
+            return dataIndex >= 0 && dataIndex < options.Count && dataIndex == selectedIndex;
         }
 
         #endregion

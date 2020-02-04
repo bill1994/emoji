@@ -54,18 +54,24 @@ namespace MaterialUI
 
         #region Helper Functions
 
-        public virtual void Initialize(string[] optionsStr, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexesStart)
+        public virtual void Initialize(IList<string> optionsStr, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexesStart)
         {
-            OptionData[] options = new OptionData[optionsStr != null ? optionsStr.Length : 0];
-            for (int i = 0; i < optionsStr.Length; i++)
+            OptionData[] options = new OptionData[optionsStr != null ? optionsStr.Count : 0];
+            if (optionsStr != null)
             {
-                options[i] = new OptionData(optionsStr[i], null);
+                for (int i = 0; i < optionsStr.Count; i++)
+                {
+                    options[i] = new OptionData(optionsStr[i], null);
+                }
             }
             Initialize(options, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText, selectedIndexesStart);
         }
 
-        public virtual void Initialize(OptionData[] options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexesStart)
+        public virtual void Initialize<TOptionData>(IList<TOptionData> options, Action<int[]> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText, ICollection<int> selectedIndexesStart) where TOptionData : OptionData, new()
         {
+            if (options == null)
+                options = new TOptionData[0];
+
             _onAffirmativeButtonClicked = onAffirmativeButtonClicked;
             BaseInitialize(options, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
             selectedIndexes = selectedIndexesStart == null ? new HashSet<int>() : new HashSet<int>(selectedIndexesStart);
@@ -100,7 +106,7 @@ namespace MaterialUI
                 if (m_ScrollDataView)
                     m_ScrollDataView.FullReloadAll();
             }
-            else if (dataIndex >= 0 && dataIndex < options.Length && !selectedIndexes.Contains(dataIndex))
+            else if (dataIndex >= 0 && dataIndex < options.Count && !selectedIndexes.Contains(dataIndex))
             {
                 selectedIndexes.Add(dataIndex);
                 if (onSelectedIndexChanged != null)
