@@ -13,7 +13,7 @@ namespace MaterialUI
 {
     //[ExecuteInEditMode]
     [AddComponentMenu("MaterialUI/Vector Image (TextMeshPro)", 50)]
-    public class VectorImageTMPro : TextMeshProUGUI, IVectorImage, ILayoutElement
+    public class VectorImageTMPro : TextMeshProUGUI, IVectorImage, ILayoutIgnorer
     {
         #region Private Variables
 
@@ -25,8 +25,8 @@ namespace MaterialUI
         private VectorImageSizeMode m_SizeMode = VectorImageSizeMode.MatchMin;
         [SerializeField]
         private VectorImageData m_VectorImageData = new VectorImageData();
-        [SerializeField, Tooltip("Keep preferred size when VectorImageData is Empty?")]
-        bool m_KeepSizeWhenEmpty = true;
+        [SerializeField, Tooltip("Keep in layout calculation when VectorImageData is Empty?"), UnityEngine.Serialization.FormerlySerializedAs("m_KeepSizeWhenEmpty")]
+        bool m_IncludeInLayoutWhenEmpty = true;
 
         private Canvas _RootCanvas = null;
         //private float _LocalScaleFactor = 1f;
@@ -36,12 +36,12 @@ namespace MaterialUI
 
         #region Public Properties
 
-        public bool keepSizeWhenEmpty
+        public bool includeInLayoutWhenEmpty
         {
-            get { return m_KeepSizeWhenEmpty; }
+            get { return m_IncludeInLayoutWhenEmpty; }
             set
             {
-                m_KeepSizeWhenEmpty = value;
+                m_IncludeInLayoutWhenEmpty = value;
                 RefreshScale();
             }
         }
@@ -361,13 +361,15 @@ namespace MaterialUI
             RefreshScale();
         }
 
-        public override float preferredWidth { get { return m_KeepSizeWhenEmpty || (m_VectorImageData != null && m_VectorImageData.ContainsData()) ? size : -1; } }
+        public override float preferredWidth { get { return size; } }
         public new float minWidth { get { return -1; } }
         public new float flexibleWidth { get { return -1; } }
-        public override float preferredHeight { get { return m_KeepSizeWhenEmpty || (m_VectorImageData != null && m_VectorImageData.ContainsData()) ? size: -1; } }
+        public override float preferredHeight { get { return size; } }
         public new float minHeight { get { return -1; } }
         public new float flexibleHeight { get { return -1; } }
-
+        public virtual bool ignoreLayout { get { return !m_IncludeInLayoutWhenEmpty && (m_VectorImageData == null || !m_VectorImageData.ContainsData()); } }
+        public override bool raycastTarget { get { return ignoreLayout ? false : base.raycastTarget; } set { base.raycastTarget = value; } }
+        
         #endregion
     }
 }

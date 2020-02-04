@@ -66,7 +66,7 @@ namespace MaterialUI
 
     //[ExecuteInEditMode]
     [AddComponentMenu("MaterialUI/Vector Image", 50)]
-    public class VectorImage : Text, IVectorImage
+    public class VectorImage : Text, IVectorImage, ILayoutIgnorer
     {
         #region Private Variables
 
@@ -78,8 +78,8 @@ namespace MaterialUI
         private VectorImageSizeMode m_SizeMode = VectorImageSizeMode.MatchMin;
         [SerializeField]
         private VectorImageData m_VectorImageData = new VectorImageData();
-        [SerializeField, Tooltip("Keep preferred size when VectorImageData is Empty?")]
-        bool m_KeepSizeWhenEmpty = true;
+        [SerializeField, Tooltip("Keep in layout calculation when VectorImageData is Empty?"), UnityEngine.Serialization.FormerlySerializedAs("m_KeepSizeWhenEmpty")]
+        bool m_IncludeInLayoutWhenEmpty = true;
 
         private Canvas _RootCanvas = null;
         //private float m_LocalScaleFactor;
@@ -88,6 +88,16 @@ namespace MaterialUI
         #endregion
 
         #region Public Properties
+
+        public bool includeInLayoutWhenEmpty
+        {
+            get { return m_IncludeInLayoutWhenEmpty; }
+            set
+            {
+                m_IncludeInLayoutWhenEmpty = value;
+                RefreshScale();
+            }
+        }
 
         public float size
         {
@@ -155,7 +165,7 @@ namespace MaterialUI
                 if (vectorImageData == null || vectorImageData.font == value)
                     return;
 
-                vectorImageData.vectorFont = (VectorImageFont) value;
+                vectorImageData.vectorFont = (VectorImageFont)value;
                 UpdateFontAndText();
             }
         }
@@ -228,7 +238,7 @@ namespace MaterialUI
         protected override void OnDisable()
         {
             base.OnDisable();
-            
+
             //m_Tracker.Clear();
         }
 
@@ -418,13 +428,15 @@ namespace MaterialUI
             RefreshScale();
         }
 
-        public override float preferredWidth { get { return m_KeepSizeWhenEmpty || (m_VectorImageData != null && m_VectorImageData.ContainsData()) ? size : -1; } }
+        public override float preferredWidth { get { return size; } }
         public override float minWidth { get { return -1; } }
         public override float flexibleWidth { get { return -1; } }
-        public override float preferredHeight { get { return m_KeepSizeWhenEmpty || (m_VectorImageData != null && m_VectorImageData.ContainsData()) ? size : -1; } }
+        public override float preferredHeight { get { return size; } }
         public override float minHeight { get { return -1; } }
         public override float flexibleHeight { get { return -1; } }
-
+        public virtual bool ignoreLayout { get { return !m_IncludeInLayoutWhenEmpty && (m_VectorImageData == null || !m_VectorImageData.ContainsData()); } }
+        public override bool raycastTarget { get { return ignoreLayout ? false : base.raycastTarget; } set { base.raycastTarget = value; } }
+        
         #endregion
     }
 }
