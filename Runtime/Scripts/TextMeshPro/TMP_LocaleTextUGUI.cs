@@ -59,14 +59,14 @@ namespace Kyub.Localization.UI
             }
         }
 
-#if TMP_2_0_0_OR_NEWER
+#if TMP_1_4_0_OR_NEWER
         protected System.Reflection.FieldInfo _isInputParsingRequired_Field = null;
 #endif
         protected internal bool IsInputParsingRequired_Internal
         {
             get
             {
-#if TMP_2_0_0_OR_NEWER
+#if TMP_1_4_0_OR_NEWER
                 if (_isInputParsingRequired_Field == null)
                     _isInputParsingRequired_Field = typeof(TMP_Text).GetField("m_isInputParsingRequired", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
@@ -80,7 +80,7 @@ namespace Kyub.Localization.UI
             }
             protected set
             {
-#if TMP_2_0_0_OR_NEWER
+#if TMP_1_4_0_OR_NEWER
                 if (_isInputParsingRequired_Field == null)
                     _isInputParsingRequired_Field = typeof(TMP_Text).GetField("m_isInputParsingRequired", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
@@ -92,7 +92,7 @@ namespace Kyub.Localization.UI
             }
         }
 
-#if TMP_2_0_0_OR_NEWER
+#if TMP_1_4_0_OR_NEWER
         protected enum TextInputSources { Text = 0, SetText = 1, SetCharArray = 2, String = 3 };
         protected System.Reflection.FieldInfo _inputSource_Field = null;
         protected System.Type _textInputSources_Type = null;
@@ -101,7 +101,7 @@ namespace Kyub.Localization.UI
         {
             get
             {
-#if TMP_2_0_0_OR_NEWER
+#if TMP_1_4_0_OR_NEWER
                 if (_inputSource_Field == null)
                     _inputSource_Field = typeof(TMP_Text).GetField("m_inputSource", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
@@ -115,7 +115,7 @@ namespace Kyub.Localization.UI
             }
             set
             {
-#if TMP_2_0_0_OR_NEWER
+#if TMP_1_4_0_OR_NEWER
 
                 if (_inputSource_Field == null)
                     _inputSource_Field = typeof(TMP_Text).GetField("m_inputSource", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
