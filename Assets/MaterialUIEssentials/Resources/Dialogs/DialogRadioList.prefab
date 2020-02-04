@@ -1105,7 +1105,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &138282
 GameObject:
   m_ObjectHideFlags: 0
@@ -1620,7 +1620,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &158446
 GameObject:
   m_ObjectHideFlags: 0
@@ -2004,7 +2004,7 @@ MonoBehaviour:
       m_Name: info_outline
       m_Unicode: \ue88f
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &177542
 GameObject:
   m_ObjectHideFlags: 0
@@ -2719,7 +2719,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &191226
 GameObject:
   m_ObjectHideFlags: 0
@@ -3346,8 +3346,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 96, y: 0}
-  m_SizeDelta: {x: 192, y: 0}
+  m_AnchoredPosition: {x: 100, y: 0}
+  m_SizeDelta: {x: 200, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &22264982
 CanvasRenderer:
@@ -3554,7 +3554,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding:
     m_Left: 0
-    m_Right: 8
+    m_Right: 0
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 3
@@ -3726,4 +3726,4 @@ MonoBehaviour:
       m_Name: info_outline
       m_Unicode: \ue88f
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 0
+  m_IncludeInLayoutWhenEmpty: 0

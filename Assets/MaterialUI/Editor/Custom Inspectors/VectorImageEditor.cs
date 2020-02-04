@@ -16,12 +16,12 @@ namespace MaterialUI
         private SerializedProperty m_SizeMode;
         private SerializedProperty m_Material;
         private SerializedProperty m_RaycastTarget;
-        private SerializedProperty m_KeepSizeWhenEmpty;
+        private SerializedProperty m_IncludeInLayoutWhenEmpty;
 
         void OnEnable()
         {
             OnBaseEnable();
-            m_KeepSizeWhenEmpty = serializedObject.FindProperty("m_KeepSizeWhenEmpty");
+            m_IncludeInLayoutWhenEmpty = serializedObject.FindProperty("m_IncludeInLayoutWhenEmpty");
             m_Size = serializedObject.FindProperty("m_Size");
             m_SizeMode = serializedObject.FindProperty("m_SizeMode");
             m_Material = serializedObject.FindProperty("m_Material");
@@ -42,7 +42,7 @@ namespace MaterialUI
             {
                 EditorGUILayout.PropertyField(m_Size);
             }
-            EditorGUILayout.PropertyField(m_KeepSizeWhenEmpty);
+            EditorGUILayout.PropertyField(m_IncludeInLayoutWhenEmpty);
             EditorGUILayout.Space();
 
             InspectorFields.GraphicColorMultiField("Icon", gameObject => gameObject.GetComponent<VectorImage>());
