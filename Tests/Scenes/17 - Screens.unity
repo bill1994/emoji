@@ -197,7 +197,7 @@ MonoBehaviour:
       m_Name: circle_stroke_thin
       m_Unicode: \uE90A
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &19607463
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -282,7 +282,7 @@ MonoBehaviour:
       m_Name: navigate_next
       m_Unicode: \ue409
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &38527028
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -654,7 +654,7 @@ MonoBehaviour:
       m_Name: circle_stroke_thin
       m_Unicode: \uE90A
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &92229709
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1192,7 +1192,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &422783370
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1682,7 +1682,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &579171036
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2035,7 +2035,7 @@ MonoBehaviour:
       m_Name: home
       m_Unicode: \ue88a
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &781713666
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3427,7 +3427,7 @@ MonoBehaviour:
       m_Name: circle_stroke_thin
       m_Unicode: \uE90A
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1649540891
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3512,7 +3512,7 @@ MonoBehaviour:
       m_Name: navigate_next
       m_Unicode: \ue409
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1779601385
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3791,7 +3791,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &2003700660
 CanvasGroup:
   m_ObjectHideFlags: 0
