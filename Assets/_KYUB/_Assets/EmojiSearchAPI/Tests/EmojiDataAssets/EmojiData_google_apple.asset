@@ -1,5 +1,40 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!21 &-6699272167669770611
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TextMeshPro/Sprite
+  m_Shader: {fileID: 4800000, guid: cf81c85f95fe47e1a27f6ae460cf182c, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 6bd712d13393f0946a415b7a7af2e925, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _ColorMask: 15
+    - _CullMode: 0
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9,11 +44,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6af4e0718737bf4ebe45dc4b77ed115, type: 3}
-  m_Name: EmojiData_google
+  m_Script: {fileID: 11500000, guid: 0655d4c53a38aff4f8d97fdec32b5713, type: 3}
+  m_Name: EmojiData_google_apple
   m_EditorClassIdentifier: 
-  hashCode: -909639678
-  material: {fileID: 21822462165787024}
+  hashCode: -485492972
+  material: {fileID: -6699272167669770611}
   materialHashCode: 0
   m_Version: 1.1.0
   m_FaceInfo:
@@ -36,7 +71,7 @@ MonoBehaviour:
     m_StrikethroughOffset: 0
     m_StrikethroughThickness: 0
     m_TabWidth: 0
-  spriteSheet: {fileID: 2800000, guid: d1c2662012fe65d40b5d3f4b35004093, type: 3}
+  spriteSheet: {fileID: 2800000, guid: 6bd712d13393f0946a415b7a7af2e925, type: 3}
   m_SpriteCharacterTable:
   - m_ElementType: 2
     m_Unicode: 1627332835
@@ -92021,41 +92056,7 @@ MonoBehaviour:
     pivot: {x: 0, y: 0}
     sprite: {fileID: 0}
   fallbackSpriteAssets: []
-  overrideAndroidDefinition: 1
-  androidSpriteSheet: {fileID: 2800000, guid: d1c2662012fe65d40b5d3f4b35004093, type: 3}
+  overrideAndroidDefinition: 0
+  androidSpriteSheet: {fileID: 0}
   overrideIOSDefinition: 1
-  iOSSpriteSheet: {fileID: 2800000, guid: 0c0b9f2885fec1b49b162a92a8b07d6c, type: 3}
---- !u!21 &21822462165787024
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: TextMeshPro/Sprite
-  m_Shader: {fileID: 4800000, guid: cf81c85f95fe47e1a27f6ae460cf182c, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d1c2662012fe65d40b5d3f4b35004093, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - _ColorMask: 15
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
-    m_Colors:
-    - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+  iOSSpriteSheet: {fileID: 2800000, guid: dd292445766009746a5e4de943d55739, type: 3}

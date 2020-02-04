@@ -13,82 +13,18 @@ using TMPro.SpriteAssetUtilities;
 
 namespace KyubEditor.EmojiSearch
 {
-    public class ConvertEmojiDataToTexturePackerJsonEditor : EditorWindow
+    public static class EmojiDataConversorUtility
     {
-        #region Private Variables
-
-        [SerializeField]
-        TextAsset m_textAsset = null;
-        [SerializeField]
-        Vector2Int m_gridSize = new Vector2Int(32, 32);
-        [SerializeField]
-        Vector2Int m_padding = new Vector2Int(1, 1);
-        [SerializeField]
-        Vector2Int m_spacing = new Vector2Int(2, 2);
-
-        #endregion
-
-        #region Static Init
-
-        [MenuItem("Window/TextMeshPro/Convert EmojiData to TexturePacker JSON")]
-        static void Init()
-        {
-            // Get existing open window or if none, make a new one:
-            ConvertEmojiDataToTexturePackerJsonEditor window = (ConvertEmojiDataToTexturePackerJsonEditor)EditorWindow.GetWindow(typeof(ConvertEmojiDataToTexturePackerJsonEditor));
-            window.titleContent = new GUIContent("Convert To EmojiData to TexturePacker JSON");
-            window.ShowUtility();
-        }
-
-        #endregion
-
-        #region Unity Functions
-
-        protected virtual void OnGUI()
-        {
-            EditorGUILayout.HelpBox("Use this tool to convert EmojiData Format to TexturePacket Json format (used in Sprite Import window).\n" +
-                "A file with name texturepacker_<OriginalFileName> will be generated in same folder of the json provided\n\n" +
-                "Check for the last EmojiData JSON and Spritesheets in:\nhttps://github.com/iamcal/emoji-data", MessageType.Info);
-
-            EditorGUILayout.Space();
-
-            m_textAsset = EditorGUILayout.ObjectField("EmojiData To Convert", m_textAsset, typeof(TextAsset), false) as TextAsset;
-            EditorGUILayout.Space();
-            m_gridSize = EditorGUILayout.Vector2IntField("Grid Size", m_gridSize);
-            m_padding = EditorGUILayout.Vector2IntField("Padding", m_padding);
-            m_spacing = EditorGUILayout.Vector2IntField("Spacing", m_spacing);
-            EditorGUILayout.Space();
-
-            var v_assetPath = m_textAsset != null? AssetDatabase.GetAssetPath(m_textAsset) : "";
-            GUI.enabled = m_textAsset != null && !string.IsNullOrEmpty(m_textAsset.text) && !string.IsNullOrEmpty(v_assetPath);
-            if (GUILayout.Button("Convert To TexturePacker JSON"))
-            {
-                var v_json = ConvertToEmojiOne(m_textAsset.text);
-
-                if (!string.IsNullOrEmpty(v_json))
-                {
-                    var v_fileName = System.IO.Path.GetFileName(v_assetPath);
-                    var v_newPath = v_assetPath.Replace(v_fileName, "texturepacker_" + v_fileName);
-
-                    System.IO.File.WriteAllText(Application.dataPath.Replace("Assets", "") + v_newPath, v_json);
-                    AssetDatabase.Refresh();
-                }
-                else
-                    Debug.Log("Failed to convert to TexturePacker Json");
-            }
-        }
-
-        #endregion
-
         #region Helper Functions
 
-        protected virtual string ConvertToEmojiOne(string p_json)
+        public static string ConvertToTexturePackerFormat(string json, Vector2Int gridSize, Vector2Int padding, Vector2Int spacing)
         {
             try
             {
                 //Unity cannot deserialize Dictionary, so we converted the dictionary to List using MiniJson
-                p_json = ConvertToUnityJsonFormat(p_json);
-                PreConvertedSpritesheetData v_preData = JsonUtility.FromJson<PreConvertedSpritesheetData>(p_json);
-                TexturePackerData.SpriteDataObject v_postData = v_preData.ToTexturePacketDataObject(m_gridSize, m_padding, m_spacing);
+                json = ConvertToUnityJsonFormat(json);
+                PreConvertedSpritesheetData v_preData = JsonUtility.FromJson<PreConvertedSpritesheetData>(json);
+                TexturePackerData.SpriteDataObject v_postData = v_preData.ToTexturePacketDataObject(gridSize, padding, spacing);
 
                 return JsonUtility.ToJson(v_postData);
             }
@@ -100,12 +36,12 @@ namespace KyubEditor.EmojiSearch
             return "";
         }
 
-        protected virtual string ConvertToUnityJsonFormat(string p_json)
+        static string ConvertToUnityJsonFormat(string json)
         {
-            p_json = "{\"frames\":" + p_json + "}";
+            json = "{\"frames\":" + json + "}";
 
             var v_changed = false;
-            var v_jObject = MiniJsonEditor.Deserialize(p_json) as Dictionary<string, object>;
+            var v_jObject = MiniJsonEditor.Deserialize(json) as Dictionary<string, object>;
             if (v_jObject != null)
             {
                 var v_array = v_jObject.ContainsKey("frames") ? v_jObject["frames"] as IList : null;
@@ -134,7 +70,7 @@ namespace KyubEditor.EmojiSearch
                     }
                 }
             }
-            return v_jObject != null && v_changed ? MiniJsonEditor.Serialize(v_jObject) : p_json;
+            return v_jObject != null && v_changed ? MiniJsonEditor.Serialize(v_jObject) : json;
         }
 
         #endregion
