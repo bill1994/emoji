@@ -187,7 +187,7 @@ namespace MaterialUI
 
         public Transform content
         {
-            get { return m_Content == null && this != null? this.transform : m_Content; }
+            get { return m_Content == null && this != null ? this.transform : m_Content; }
             set { m_Content = value; }
         }
 
@@ -207,8 +207,8 @@ namespace MaterialUI
         {
             get
             {
-                return m_MaterialScreens != null && m_MaterialScreens.Count > m_CurrentScreenIndex && m_CurrentScreenIndex >= 0? 
-                    m_MaterialScreens[m_CurrentScreenIndex] : 
+                return m_MaterialScreens != null && m_MaterialScreens.Count > m_CurrentScreenIndex && m_CurrentScreenIndex >= 0 ?
+                    m_MaterialScreens[m_CurrentScreenIndex] :
                     null;
             }
         }
@@ -373,7 +373,7 @@ namespace MaterialUI
             get { return m_FadeOut; }
             set { m_FadeOut = value; }
         }
-       
+
         public Tween.TweenType fadeOutTweenType
         {
             get { return m_FadeOutTweenType; }
@@ -578,13 +578,13 @@ namespace MaterialUI
         public virtual MaterialScreen PushToScreenStack(string screenName)
         {
             var materialScreen = GetScreenWithName(screenName);
-            return PushToScreenStack(materialScreen)? materialScreen : null;
+            return PushToScreenStack(materialScreen) ? materialScreen : null;
         }
 
         public virtual MaterialScreen PushToScreenStack(int screenIndex)
         {
             var materialScreen = m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null;
-            return PushToScreenStack(materialScreen)? materialScreen : null;
+            return PushToScreenStack(materialScreen) ? materialScreen : null;
         }
 
         public virtual bool PushToScreenStack(MaterialScreen screen)
@@ -685,7 +685,7 @@ namespace MaterialUI
         public void Transition(MaterialScreen screen, Type transitionType)
         {
             var screenIndex = m_MaterialScreens.IndexOf(screen);
-            if(screenIndex >= 0)
+            if (screenIndex >= 0)
                 Transition(screenIndex, transitionType);
         }
 
@@ -877,14 +877,17 @@ namespace MaterialUI
 
         protected internal void OnScreenEndTransition(int screenIndex)
         {
-            //m_ScreensTransitioning--;
-
-            //if (m_ScreensTransitioning <= 0)
-            //{
-            //    m_ScreensTransitioning = 0;
-
-                m_OnScreenEndTransition.InvokeIfNotNull(screenIndex);
-            //}
+            if (screenIndex == m_CurrentScreenIndex && m_MaterialScreens != null)
+            {
+                for (int i = 0; i < m_MaterialScreens.Count; i++)
+                {
+                    if (i != m_CurrentScreenIndex)
+                    {
+                        m_MaterialScreens[i].gameObject.SetActive(!materialScreen[i].disableWhenNotVisible);
+                    }
+                }
+            }
+            m_OnScreenEndTransition.InvokeIfNotNull(screenIndex);
         }
 
         #endregion

@@ -136,7 +136,7 @@ namespace MaterialUI
 
         public bool optionsControlledByScreenView
         {
-            get { return screenView != null? m_OptionsControlledByScreenView : false; }
+            get { return screenView != null ? m_OptionsControlledByScreenView : false; }
             set { m_OptionsControlledByScreenView = value; }
         }
 
@@ -148,7 +148,7 @@ namespace MaterialUI
 
         public bool fadeIn
         {
-            get { return optionsControlledByScreenView? screenView.fadeIn : m_FadeIn; }
+            get { return optionsControlledByScreenView ? screenView.fadeIn : m_FadeIn; }
             set { m_FadeIn = value; }
         }
 
@@ -184,7 +184,7 @@ namespace MaterialUI
 
         public float scaleInScale
         {
-            get { return optionsControlledByScreenView? screenView.scaleInScale : m_ScaleInScale; }
+            get { return optionsControlledByScreenView ? screenView.scaleInScale : m_ScaleInScale; }
             set { m_ScaleInScale = value; }
         }
 
@@ -304,7 +304,7 @@ namespace MaterialUI
 
         public float scaleOutScale
         {
-            get { return optionsControlledByScreenView? screenView.scaleOutScale : m_ScaleOutScale; }
+            get { return optionsControlledByScreenView ? screenView.scaleOutScale : m_ScaleOutScale; }
             set { m_ScaleOutScale = value; }
         }
 
@@ -403,9 +403,9 @@ namespace MaterialUI
                         TryRegisterInScreenView();
                 }
 
-                return m_ScreenView != null && (m_ScreenView.content == this.transform.parent || 
-                    (frameAnimator != null && frameAnimator.ripple != null && frameAnimator.ripple.parent == m_ScreenView.content)) ? 
-                    m_ScreenView : 
+                return m_ScreenView != null && (m_ScreenView.content == this.transform.parent ||
+                    (frameAnimator != null && frameAnimator.ripple != null && frameAnimator.ripple.parent == m_ScreenView.content)) ?
+                    m_ScreenView :
                     null;
             }
         }
@@ -445,7 +445,7 @@ namespace MaterialUI
             base.OnTransformParentChanged();
 
             var newScreenView = GetComponentInParent<ScreenView>();
-            newScreenView = newScreenView != null && (newScreenView.content == this.transform.parent || 
+            newScreenView = newScreenView != null && (newScreenView.content == this.transform.parent ||
                 (frameAnimator != null && frameAnimator.ripple != null && frameAnimator.ripple.parent == newScreenView.content)) ? newScreenView : null;
 
             if (screenView != newScreenView)
@@ -462,6 +462,9 @@ namespace MaterialUI
 
         protected virtual void HandleOnShow()
         {
+            if (screenView != null)
+                screenView.OnScreenEndTransition(screenIndex);
+
             if (onScreenEndTransitionIn != null)
                 onScreenEndTransitionIn.Invoke();
         }

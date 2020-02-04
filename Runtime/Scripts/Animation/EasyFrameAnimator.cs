@@ -624,7 +624,6 @@ namespace MaterialUI
 
         public virtual void TransitionIn()
         {
-            Debug.Log("TransitionIn " + this.name);
             //CheckValues();
 
             InterruptAnimation(false);
@@ -730,7 +729,6 @@ namespace MaterialUI
 
         public virtual void TransitionOut()
         {
-            Debug.Log("TransitionOut " + this.name);
             //CheckValues();
 
             InterruptAnimation(false);
@@ -932,7 +930,7 @@ namespace MaterialUI
                     return new Vector2(rectPosition.x + rectTransform.sizeDelta.x * 0.5f, rectPosition.y + rectTransform.sizeDelta.y * 0.5f);
 
                 default:
-                    return input != null? input.mousePosition : Vector2.zero;
+                    return input != null ? input.mousePosition : Vector2.zero;
             }
         }
 
@@ -956,7 +954,6 @@ namespace MaterialUI
 
         protected internal int InterruptAnimation(bool callEvent = true)
         {
-            Debug.Log("Interrupt " + this.name);
             _TransitionCurrentTime = transitionDuration + 1;
             int v_processedTransition = _IsTransitioning;
             if (_IsTransitioning == 1)
@@ -986,7 +983,7 @@ namespace MaterialUI
                 {
                     rectTransform.position = _TempScreenPos;
                 }
-                if(callEvent)
+                if (callEvent)
                     HandleOnShow();
             }
             else if (_IsTransitioning == 2)
@@ -1016,7 +1013,7 @@ namespace MaterialUI
                 {
                     rectTransform.position = _TempScreenPos;
                 }
-                if(callEvent)
+                if (callEvent)
                     HandleOnHide();
             }
 
