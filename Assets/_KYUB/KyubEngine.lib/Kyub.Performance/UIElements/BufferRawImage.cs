@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Kyub.EventSystems;
+using System;
 
 namespace Kyub.Performance
 {
@@ -85,7 +86,10 @@ namespace Kyub.Performance
             base.OnEnable();
             RegisterEvents();
             if (_started)
-                InitApplyRenderBuffer(1);
+            {
+                ApplyRenderBufferImmediate();
+                //    InitApplyRenderBuffer(0);
+            }
         }
 
         bool _started = false;
@@ -96,7 +100,8 @@ namespace Kyub.Performance
             RecalculateRectUV(m_uvBasedOnScreenRect);
             TryCreateClearTexture();
             texture = s_clearTexture;
-            InitApplyRenderBuffer(1);
+            ApplyRenderBufferImmediate();
+            //InitApplyRenderBuffer(0);
         }
 
         protected override void OnDisable()
@@ -263,12 +268,36 @@ namespace Kyub.Performance
         protected virtual void RegisterEvents()
         {
             UnregisterEvents();
-            SustainedPerformanceManager.OnAfterSetPerformance += HandleOnAfterSetPerformance;
+
+            SustainedPerformanceManager.OnAfterDrawBuffer += HandleOnAfterDrawBuffer;
+            //SustainedPerformanceManager.OnAfterSetPerformance += HandleOnAfterSetPerformance;
         }
 
         protected virtual void UnregisterEvents()
         {
-            SustainedPerformanceManager.OnAfterSetPerformance -= HandleOnAfterSetPerformance;
+            SustainedPerformanceManager.OnAfterDrawBuffer -= HandleOnAfterDrawBuffer;
+            //SustainedPerformanceManager.OnAfterSetPerformance -= HandleOnAfterSetPerformance;
+        }
+
+        protected virtual void ApplyRenderBufferImmediate()
+        {
+            TryCreateClearTexture();
+
+            var v_renderBuffer = SustainedPerformanceManager.GetRenderBuffer(m_renderBufferIndex);
+            //Setup RenderBuffer
+            if (v_renderBuffer != null)
+            {
+                if (v_renderBuffer != texture)
+                {
+                    texture = v_renderBuffer;
+                    RecalculateRectUV(m_uvBasedOnScreenRect);
+                }
+            }
+            //Apply clear texture
+            else
+            {
+                ClearTexture();
+            }
         }
 
         protected virtual void InitApplyRenderBuffer(int p_delayFramesCounter)
@@ -297,22 +326,8 @@ namespace Kyub.Performance
 
             if(!SustainedPerformanceManager.IsEndOfFrame)
                 yield return new WaitForEndOfFrame();
-            
-            var v_renderBuffer = SustainedPerformanceManager.GetRenderBuffer(m_renderBufferIndex);
-            //Setup RenderBuffer
-            if (v_renderBuffer != null)
-            {
-                if (v_renderBuffer != texture)
-                {
-                    texture = v_renderBuffer;
-                    RecalculateRectUV(m_uvBasedOnScreenRect);
-                }
-            }
-            //Apply clear texture
-            else
-            {
-                ClearTexture();
-            }
+
+            ApplyRenderBufferImmediate();
         }
 
         protected virtual void ClearTexture()
@@ -342,10 +357,15 @@ namespace Kyub.Performance
 
         #region Receivers
 
-        protected virtual void HandleOnAfterSetPerformance()
+        private void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> dict)
+        {
+            ApplyRenderBufferImmediate();
+        }
+
+        /*protected virtual void HandleOnAfterSetPerformance()
         {
             InitApplyRenderBuffer(0);
-        }
+        }*/
 
         #endregion
 
