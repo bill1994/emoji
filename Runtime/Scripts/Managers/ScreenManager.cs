@@ -90,8 +90,13 @@ namespace MaterialUI
 
         public static void ShowCustomScreenAsync<T>(string screenPrefabPath, Transform parent, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true) where T : MaterialScreen
         {
-            T screenWithSameName = null;
             var screenView = parent != null ? parent.GetComponentInParent<ScreenView>() : null;
+            ShowCustomScreenAsync(screenPrefabPath, screenView, initializeCallback, progressIndicator, p_searchForScreensWithSameName);
+        }
+
+        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, ScreenView screenView, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true) where T : MaterialScreen
+        {
+            T screenWithSameName = null;
             if (screenView != null)
             {
                 if (p_searchForScreensWithSameName)
@@ -158,13 +163,18 @@ namespace MaterialUI
                     currentProgress = DialogManager.ShowProgressModalCircular();
                 else
                     currentProgress.Show();
-                CreateCustomScreenAsync<T>(screenPrefabPath, parent, internalLoadCallback);
+                CreateCustomScreenAsync<T>(screenPrefabPath, screenView, internalLoadCallback);
             }
         }
 
         public static T CreateCustomScreen<T>(string screenPrefabPath, Transform parent) where T : MaterialScreen
         {
             var screenView = parent != null ? parent.GetComponentInParent<ScreenView>() : null;
+            return CreateCustomScreen<T>(screenPrefabPath, screenView);
+        }
+
+        public static T CreateCustomScreen<T>(string screenPrefabPath, ScreenView screenView) where T : MaterialScreen
+        {
             T screen = PrefabManager.InstantiateGameObject(screenPrefabPath, screenView != null ? screenView.transform : Instance.transform).GetComponent<T>();
             if (screen != null)
                 screen.name = screenPrefabPath;
@@ -175,6 +185,11 @@ namespace MaterialUI
         public static void CreateCustomScreenAsync<T>(string screenPrefabPath, Transform parent, System.Action<string, T> callback) where T : MaterialScreen
         {
             var screenView = parent != null ? parent.GetComponentInParent<ScreenView>() : null;
+            CreateCustomScreenAsync(screenPrefabPath, screenView, callback);
+        }
+
+        public static void CreateCustomScreenAsync<T>(string screenPrefabPath, ScreenView screenView, System.Action<string, T> callback) where T : MaterialScreen
+        {
             System.Action<string, GameObject> internalCallback = (path, screen) =>
             {
                 if (screen != null)
