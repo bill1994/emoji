@@ -77,8 +77,8 @@ namespace Kyub.Performance
                 if (s_instance == null)
                     s_instance = GetInstanceFastSearch();
 
-                //Metal Require Simulate FrameBuffer
-                return (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal) ||
+                //Metal/Mobile require simulate frameBuffer
+                return (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal || Application.isMobilePlatform) ||
                     (s_instance != null && s_instance.m_forceSimulateFrameBuffer);
 #endif
             }
@@ -339,8 +339,9 @@ namespace Kyub.Performance
                 TryAutoCreateRenderViews();
 
                 RegisterEvents();
-                _bufferIsDirty = true;
-                SetHighPerformanceDelayed();
+                
+                CheckBufferTextures();
+                Invalidate();
             }
         }
 
@@ -366,8 +367,10 @@ namespace Kyub.Performance
             MarkDynamicElementsDirty();
             TryAutoCreateRenderViews();
 
-            _bufferIsDirty = true;
-            SetHighPerformanceDelayed();
+            Invalidate();
+            //_bufferIsDirty = true;
+            //s_invalidCullingMask = ~0;
+            //SetHighPerformanceDelayed();
         }
 
         protected virtual void Update()
@@ -452,9 +455,9 @@ namespace Kyub.Performance
 
         #region Performance Important Functions
 
-        protected virtual void OnPerformanceUpdate()
+        protected virtual bool OnPerformanceUpdate()
         {
-            SetHighPerformanceDelayed();
+            return SetHighPerformanceDelayed();
         }
 
         #endregion
@@ -467,14 +470,14 @@ namespace Kyub.Performance
             if (Screen.width != s_lastScreenSize.x || Screen.height != s_lastScreenSize.y)
             {
                 s_lastScreenSize = new Vector2Int(Screen.width, Screen.height);
+                s_invalidCullingMask = ~0;
                 _bufferIsDirty = true;
             }
             if (_performanceIsDirty || _bufferIsDirty)
             {
                 _performanceIsDirty = false;
-                OnPerformanceUpdate();
-
-                _bufferIsDirty = false;
+                if(OnPerformanceUpdate())
+                    _bufferIsDirty = false;
             }
         }
 
@@ -551,39 +554,46 @@ namespace Kyub.Performance
         {
             CancelSetLowPerformance();
             CancelSetHighPerformance();
-            var routine = SetHighPerformanceInEndOfFrameRoutine(p_autoDisable, 0, true);
+            var bufferIsDirty = _bufferIsDirty;
+            var routine = SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, p_autoDisable, 0, true);
             while (routine.MoveNext()) { };
         }
 
         bool _highPerformanceAutoDisable = false;
         float _highPerformanceWaitTime = 0;
         Coroutine _routineSetHighPerformance = null;
-        protected virtual void SetHighPerformanceDelayed(bool p_autoDisable = true, float p_waitTime = 0)
+        protected virtual bool SetHighPerformanceDelayed(bool p_autoDisable = true, float p_waitTime = 0)
         {
             CancelSetLowPerformance();
             if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
             {
-                if (_highPerformanceWaitTime <= 0)
+                if (_routineSetHighPerformance == null || _bufferIsDirty)
                 {
                     CancelSetHighPerformance();
-                    _routineSetHighPerformance = StartCoroutine(SetHighPerformanceInEndOfFrameRoutine(p_autoDisable));
+                    var bufferIsDirty = _bufferIsDirty;
+                    _routineSetHighPerformance = StartCoroutine(SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, p_autoDisable, p_waitTime));
                 }
                 else
                 {
                     _highPerformanceWaitTime = p_waitTime;
                     _highPerformanceAutoDisable = p_autoDisable || _highPerformanceAutoDisable;
                 }
+                return true;
             }
             else
             {
                 CancelSetHighPerformance();
                 _performanceIsDirty = true;
             }
+            return false;
         }
 
         Coroutine _routineAfterDrawBuffer = null;
-        protected virtual IEnumerator SetHighPerformanceInEndOfFrameRoutine(bool p_autoDisable = true, float p_waitTime = 0, bool skipEndOfFrame = false)
+        protected virtual IEnumerator SetHighPerformanceInEndOfFrameRoutine(bool bufferIsDirty, bool p_autoDisable = true, float p_waitTime = 0, bool skipEndOfFrame = false)
         {
+            var invalidCullingMask = s_invalidCullingMask;
+            bufferIsDirty = _bufferIsDirty || bufferIsDirty;
+
             _highPerformanceAutoDisable = p_autoDisable;
             _highPerformanceWaitTime = p_waitTime;
             while (_highPerformanceWaitTime > 0)
@@ -592,7 +602,7 @@ namespace Kyub.Performance
                 yield return null;
             }
 
-            if (skipEndOfFrame)
+            if (!skipEndOfFrame)
             {
                 yield return new WaitForEndOfFrame(); //Wait until finish draw this cycle
                 s_isEndOfFrame = true;
@@ -610,19 +620,21 @@ namespace Kyub.Performance
             else
                 Application.targetFrameRate = -1;
 
-            if (_bufferIsDirty)
+            bufferIsDirty = _bufferIsDirty || bufferIsDirty;
+            if (bufferIsDirty)
             {
                 CheckBufferTextures();
                 if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
                 {
                     CancelOnAfterDrawBuffer();
+                    invalidCullingMask |= s_invalidCullingMask;
                     s_isWaitingRenderBuffer = s_useRenderBuffer && m_renderBufferMode == RenderBufferModeEnum.Delayed && !s_requireConstantRepaint && !m_forceAlwaysInvalidate;
-                    _routineAfterDrawBuffer = StartCoroutine(OnAfterDrawBufferRoutine(s_invalidCullingMask));
+                    _routineAfterDrawBuffer = StartCoroutine(OnAfterDrawBufferRoutine(invalidCullingMask));
                 }
             }
 
             if (OnSetHighPerformance != null)
-                OnSetHighPerformance(_bufferIsDirty);
+                OnSetHighPerformance(bufferIsDirty);
 
             ClearPendentInvalidTransforms();
 
@@ -681,35 +693,39 @@ namespace Kyub.Performance
             //Wait one cycle to draw to a RenderTexture
             if (s_isWaitingRenderBuffer)
             {
+                var bufferCameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
+
+                //Reset camera RenderTextures
+                foreach (var v_cameraView in bufferCameraViews)
+                {
+                    if (v_cameraView != null && v_cameraView.Camera != null)
+                        v_cameraView.Camera.targetTexture = null;
+                }
+
                 //Wait two cycles before DrawBuffer
                 _ignoreNextLayoutRebuild = true;
                 yield return null;
                 s_isWaitingRenderBuffer = false;
 
-                var v_cameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
+                yield return new WaitForEndOfFrame();
 
                 //Call finish event
                 if (OnAfterWaitingToPrepareRenderBuffer != null)
                     OnAfterWaitingToPrepareRenderBuffer(p_invalidCullingMask);
 
-                yield return new WaitForEndOfFrame();
+                bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
+                DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
                 s_isEndOfFrame = true;
-
-                //Reset camera RenderTextures
-                foreach (var v_cameraView in v_cameraViews)
-                {
-                    if (v_cameraView != null && v_cameraView.Camera != null)
-                        v_cameraView.Camera.targetTexture = null;
-                }
 
                 _ignoreNextLayoutRebuild = true;
                 //Finish Processing Buffer
             }
             else
             {
-                if (QualitySettings.antiAliasing > 1)
-                    PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
-                yield return new WaitForEndOfFrame();
+                var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
+                DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
+                if (!s_isEndOfFrame)
+                    yield return new WaitForEndOfFrame();
                 s_isEndOfFrame = true;
             }
 
@@ -740,6 +756,22 @@ namespace Kyub.Performance
             }
             return v_invalidCameraViews;
         }
+
+        protected void DrawCameraViewsWithRenderBufferState(IList<SustainedCameraView> cameraViews, bool isBuffer)
+        {
+            //prepare all cameras draw into RenderBuffer changing the render texture target based in index
+            if(cameraViews == null)
+                cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(isBuffer);
+
+            foreach (var cameraView in cameraViews)
+            {
+                if (cameraView != null)
+                {
+                    cameraView.Camera.Render();
+                }
+            }
+        }
+
         protected void UpdateLowPerformanceViewActiveStatus()
         {
             if (s_canGenerateLowPerformanceView && Application.isPlaying)
