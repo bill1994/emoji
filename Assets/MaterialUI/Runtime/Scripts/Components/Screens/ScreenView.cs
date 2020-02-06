@@ -622,9 +622,16 @@ namespace MaterialUI
             return screen;
         }
 
-        public bool RemoveFromScreenStack(int screenIndex)
+        public MaterialScreen RemoveFromScreenStack(string screenName)
         {
-            return RemoveFromScreenStack(screenIndex);
+            var materialScreen = GetScreenWithName(screenName);
+            return RemoveFromScreenStack(materialScreen) ? materialScreen : null;
+        }
+
+        public MaterialScreen RemoveFromScreenStack(int screenIndex)
+        {
+            var materialScreen = m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null;
+            return RemoveFromScreenStack(materialScreen)? materialScreen : null;
         }
 
         public virtual bool RemoveFromScreenStack(MaterialScreen screen)
@@ -721,6 +728,7 @@ namespace MaterialUI
                 {
                     processingScreenStack[i].TransitionOut();
                     processingScreenStack[i].Interrupt(true);
+                    RemoveFromScreenStack(processingScreenStack[i]);
                 }
             }
 
