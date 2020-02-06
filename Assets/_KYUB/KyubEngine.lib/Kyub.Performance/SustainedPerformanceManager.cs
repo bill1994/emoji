@@ -16,7 +16,7 @@ namespace Kyub.Performance
         public static event Action OnBeforeSetPerformance; //Before Process Performances (Useful to know if LowPerformanceView will be activated)
         public static event Action<bool> OnSetHighPerformance;
         public static event Action OnSetLowPerformance;
-        public static event Action<int> OnAfterWaitingToPrepareRenderBuffer; //Only in Delayed RenderBuffer Mode
+        //public static event Action<int> OnAfterWaitingToPrepareRenderBuffer; //Only in Delayed RenderBuffer Mode
         public static event Action OnAfterSetPerformance; //After Process Performances
         public static event Action<Dictionary<int, RenderTexture>> OnAfterDrawBuffer;
 
@@ -46,8 +46,8 @@ namespace Kyub.Performance
         protected static Dictionary<int, RenderTexture> s_renderBufferDict = new Dictionary<int, RenderTexture>();
         public static RenderTexture GetRenderBuffer(int p_bufferIndex)
         {
-            if (IsWaitingRenderBuffer || (!UseImmediateRenderBufferMode && RequiresConstantRepaint))
-                return null;
+            //if (IsWaitingRenderBuffer || (!UseImmediateRenderBufferMode && RequiresConstantRepaint))
+            //    return null;
 
             RenderTexture v_renderBuffer = null;
             if (s_renderBufferDict.ContainsKey(p_bufferIndex))
@@ -93,7 +93,7 @@ namespace Kyub.Performance
             }
         }
 
-        public static bool UseImmediateRenderBufferMode
+        /*public static bool UseImmediateRenderBufferMode
         {
             get
             {
@@ -112,7 +112,7 @@ namespace Kyub.Performance
             {
                 return s_isWaitingRenderBuffer;
             }
-        }
+        }*/
 
         public static bool UseSafeRefreshMode
         {
@@ -174,10 +174,10 @@ namespace Kyub.Performance
         [SerializeField, Tooltip("This property try simulate FrameBuffer (keep last frame between frames). \nSome platforms dicard frameBuffer every cycle so we can activate this property to simulate frameBuffer state")]
         bool m_forceSimulateFrameBuffer = false;
         [Space]
-        [Tooltip("* RenderBufferMode.Delayed will wait one cycle to draw to a RenderTexture after invalidation (it optimizes the app if invalidate will be called every cycle)\n" +
-                 "* RenderBufferModeEnum.Immediate will draw at same cycle of invalidation to a RenderTexture")]
-        [SerializeField]
-        RenderBufferModeEnum m_renderBufferMode = RenderBufferModeEnum.Immediate;
+        //[Tooltip("* RenderBufferMode.Delayed will wait one cycle to draw to a RenderTexture after invalidation (it optimizes the app if invalidate will be called every cycle)\n" +
+        //         "* RenderBufferModeEnum.Immediate will draw at same cycle of invalidation to a RenderTexture")]
+        //[SerializeField]
+        //RenderBufferModeEnum m_renderBufferMode = RenderBufferModeEnum.Immediate;
         [SerializeField, Tooltip("This property will force invalidate even if not emitted by this canvas hierarchy (Prevent Alpha-Overlap bug)")]
         bool m_safeRefreshMode = true;
         [Space]
@@ -308,7 +308,7 @@ namespace Kyub.Performance
             }
         }
 
-        public RenderBufferModeEnum RenderBufferMode
+        /*public RenderBufferModeEnum RenderBufferMode
         {
             get
             {
@@ -323,7 +323,7 @@ namespace Kyub.Performance
                 CheckBufferTextures();
                 Invalidate();
             }
-        }
+        }*/
 
         #endregion
 
@@ -628,7 +628,7 @@ namespace Kyub.Performance
                 {
                     CancelOnAfterDrawBuffer();
                     invalidCullingMask |= s_invalidCullingMask;
-                    s_isWaitingRenderBuffer = s_useRenderBuffer && m_renderBufferMode == RenderBufferModeEnum.Delayed && !s_requireConstantRepaint && !m_forceAlwaysInvalidate;
+                    //s_isWaitingRenderBuffer = s_useRenderBuffer && m_renderBufferMode == RenderBufferModeEnum.Delayed && !s_requireConstantRepaint && !m_forceAlwaysInvalidate;
                     _routineAfterDrawBuffer = StartCoroutine(OnAfterDrawBufferRoutine(invalidCullingMask));
                 }
             }
@@ -691,7 +691,7 @@ namespace Kyub.Performance
         protected IEnumerator OnAfterDrawBufferRoutine(int p_invalidCullingMask)
         {
             //Wait one cycle to draw to a RenderTexture
-            if (s_isWaitingRenderBuffer)
+            /*if (s_isWaitingRenderBuffer)
             {
                 var bufferCameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
 
@@ -721,15 +721,14 @@ namespace Kyub.Performance
                 //Finish Processing Buffer
             }
             else
-            {
+            {*/
                 var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
                 DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
                 if (!s_isEndOfFrame)
                     yield return new WaitForEndOfFrame();
                 s_isEndOfFrame = true;
-            }
-
-            s_isWaitingRenderBuffer = false;
+            //}
+            //s_isWaitingRenderBuffer = false;
 
             if (OnAfterDrawBuffer != null)
                 OnAfterDrawBuffer(new Dictionary<int, RenderTexture>(s_renderBufferDict));

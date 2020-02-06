@@ -289,11 +289,11 @@ namespace Kyub.Performance
                 yield return null;
             }
 
-            while (SustainedPerformanceManager.IsWaitingRenderBuffer)
+            /*while (SustainedPerformanceManager.IsWaitingRenderBuffer)
             {
                 ClearTexture();
                 yield return null;
-            }
+            }*/
 
             if(!SustainedPerformanceManager.IsEndOfFrame)
                 yield return new WaitForEndOfFrame();

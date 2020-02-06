@@ -169,8 +169,8 @@ namespace Kyub.Performance
             if (!IsScreenCanvasMember())
                 CanvasRebuildRegistry.RegisterRebuildListener(this);
             //We must stop drawing canvas for a frame (when switching between ScreenBuffer to RenderBuffer)
-            else if(SustainedPerformanceManager.IsWaitingRenderBuffer)
-                RegisterBufferEvents();
+            //else if(SustainedPerformanceManager.IsWaitingRenderBuffer)
+            //    RegisterBufferEvents();
         }
 
         protected override void UnregisterEvents()
@@ -185,13 +185,13 @@ namespace Kyub.Performance
         {
             UnregisterBufferEvents();
             SustainedPerformanceManager.OnAfterDrawBuffer += HandleOnAfterDrawBuffer;
-            SustainedPerformanceManager.OnAfterWaitingToPrepareRenderBuffer += HandleOnAfterWaitingToPrepareRenderBuffer;
+            //SustainedPerformanceManager.OnAfterWaitingToPrepareRenderBuffer += HandleOnAfterWaitingToPrepareRenderBuffer;
         }
 
         protected virtual void UnregisterBufferEvents()
         {
             SustainedPerformanceManager.OnAfterDrawBuffer -= HandleOnAfterDrawBuffer;
-            SustainedPerformanceManager.OnAfterWaitingToPrepareRenderBuffer -= HandleOnAfterWaitingToPrepareRenderBuffer;
+            //SustainedPerformanceManager.OnAfterWaitingToPrepareRenderBuffer -= HandleOnAfterWaitingToPrepareRenderBuffer;
         }
 
 
@@ -257,10 +257,10 @@ namespace Kyub.Performance
 
         #region SustainedPerformance Receivers
 
-        protected virtual void HandleOnAfterWaitingToPrepareRenderBuffer(int p_invalidCullingMask)
+        /*protected virtual void HandleOnAfterWaitingToPrepareRenderBuffer(int p_invalidCullingMask)
         {
             SetViewActive(false);
-        }
+        }*/
 
         protected virtual void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> p_renderBuffersDict)
         {
@@ -290,11 +290,11 @@ namespace Kyub.Performance
 
             if (IsScreenCanvasMember())
             {
-                if (SustainedPerformanceManager.IsWaitingRenderBuffer)
+                /*if (SustainedPerformanceManager.IsWaitingRenderBuffer)
                 {
                     //Register to invalidate After DrawBuffer
                     RegisterBufferEvents();
-                }
+                }*/
                 var v_viewIsActive = SustainedPerformanceManager.UseSafeRefreshMode;
                 if (!v_viewIsActive)
                 {
