@@ -234,6 +234,8 @@ namespace Kyub.Performance
                     var v_localRect = new Rect(Vector2.zero, new Vector2(Mathf.Abs(rectTransform.rect.width), Mathf.Abs(rectTransform.rect.height)));
                     var v_normalizedRect = new Rect(0, 0, 1, 1);
 
+                    var pivot = rectTransform.pivot;
+
                     if (v_localRect.width > 0 && v_localRect.height > 0)
                     {
                         var v_textureProportion = v_textureSize.x / v_textureSize.y;
@@ -242,13 +244,13 @@ namespace Kyub.Performance
                         {
                             var v_mult = v_localRect.width > 0 ? v_textureSize.x / v_localRect.width : 0;
                             v_normalizedRect = new Rect(0, 0, 1, (v_localRect.height * v_mult) / v_textureSize.y);
-                            v_normalizedRect.y = Mathf.Max(0, (1 - v_normalizedRect.height) / 2);
+                            v_normalizedRect.y = Mathf.Max(0, (1 - v_normalizedRect.height) * pivot.y);
                         }
                         else if (v_localRectProportion < v_textureProportion)
                         {
                             var v_mult = v_localRect.height > 0 ? v_textureSize.y / v_localRect.height : 0;
                             v_normalizedRect = new Rect(0, 0, (v_localRect.width * v_mult) / v_textureSize.x, 1);
-                            v_normalizedRect.x = Mathf.Max(0, (1 - v_normalizedRect.width) / 2);
+                            v_normalizedRect.x = Mathf.Max(0, (1 - v_normalizedRect.width) * pivot.x);
                         }
                     }
 
@@ -293,7 +295,8 @@ namespace Kyub.Performance
                 yield return null;
             }
 
-            yield return new WaitForEndOfFrame();
+            if(!SustainedPerformanceManager.IsEndOfFrame)
+                yield return new WaitForEndOfFrame();
             
             var v_renderBuffer = SustainedPerformanceManager.GetRenderBuffer(m_renderBufferIndex);
             //Setup RenderBuffer

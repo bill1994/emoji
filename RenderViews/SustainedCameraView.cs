@@ -108,6 +108,7 @@ namespace Kyub.Performance
                 return;
             }
             _lastCullingMask = CullingMask;
+            Camera.enabled = m_useRenderBuffer;
             TryInitRenderBuffer();
             base.Start();
         }
@@ -129,7 +130,8 @@ namespace Kyub.Performance
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
-            TryInitRenderBuffer();
+            if (Application.isPlaying && s_sceneRenderViews.Contains(this))
+                TryInitRenderBuffer();
             base.OnValidate();
         }
 #endif
@@ -152,12 +154,13 @@ namespace Kyub.Performance
             var v_camera = Camera;
             if (v_camera != null)
             {
-                if (v_camera.enabled != p_active)
+                var cameraActive = (p_active && (!m_useRenderBuffer || SustainedPerformanceManager.IsWaitingRenderBuffer));
+                if (v_camera.enabled != cameraActive)
                 {
                     //Special RenderBuffer Mode (we can't disable camera in this cycle when SustainedPerformanceManager.UseRenderBufferInHighPerformance == false)
                     //var v_canChangeCameraState = !m_useRenderBuffer || p_active || !SustainedPerformanceManager.IsWaitingRenderBuffer;
                     //if(v_canChangeCameraState)
-                    v_camera.enabled = p_active;
+                    v_camera.enabled = cameraActive;
                 }
             }
             
@@ -231,7 +234,7 @@ namespace Kyub.Performance
 
         protected virtual void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> p_renderBuffersDict)
         {
-            if (m_useRenderBuffer && !SustainedPerformanceManager.IsCameraViewInvalid(this))
+            if (m_useRenderBuffer /*&& !SustainedPerformanceManager.IsCameraViewInvalid(this)*/)
             {
                 var v_camera = Camera;
                 if (v_camera != null)
