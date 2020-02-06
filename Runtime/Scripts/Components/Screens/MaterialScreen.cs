@@ -565,8 +565,9 @@ namespace MaterialUI
                 var selfScreenIndex = screenIndex;
                 if (forceHide || selfScreenIndex == screenView.currentScreenIndex)
                 {
+                    screenView.BackToScreen(selfScreenIndex);
                     //Add next screen to stack before current screen (so we can call Hide and Destroy)
-                    var screen = screenView.PushToScreenStack(screenIndexToShow);
+                    /*var screen = screenView.PushToScreenStack(screenIndexToShow);
                     if (screen != this)
                     {
                         screenView.RemoveFromScreenStack(selfScreenIndex);
@@ -574,7 +575,7 @@ namespace MaterialUI
                         {
                             Hide(forceHide);
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -591,8 +592,9 @@ namespace MaterialUI
                 var selfScreenIndex = screenIndex;
                 if (forceHide || selfScreenIndex == screenView.currentScreenIndex)
                 {
+                    screenView.BackToScreen(selfScreenIndex);
                     //Add next screen to stack before current screen (so we can call Hide and Destroy)
-                    var screen = screenView.PushToScreenStack(screenName);
+                    /*var screen = screenView.PushToScreenStack(screenName);
                     if (screen != this)
                     {
                         screenView.RemoveFromScreenStack(selfScreenIndex);
@@ -600,7 +602,7 @@ namespace MaterialUI
                         {
                             Hide(forceHide);
                         }
-                    }
+                    }*/
                 }
             }
         }
