@@ -624,7 +624,7 @@ namespace MaterialUI
 
         public bool RemoveFromScreenStack(int screenIndex)
         {
-            return RemoveFromScreenStack(m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null);
+            return RemoveFromScreenStack(screenIndex);
         }
 
         public virtual bool RemoveFromScreenStack(MaterialScreen screen)
@@ -662,6 +662,79 @@ namespace MaterialUI
             return null;
         }
 
+        public virtual void BackToScreen(int screenIndex)
+        {
+            BackToScreen(screenIndex, Type.Out, true);
+        }
+
+        public virtual void BackToScreen(int screenIndex, Type transitionType)
+        {
+            BackToScreen(screenIndex, transitionType, true);
+        }
+
+        public virtual MaterialScreen BackToScreen(int screenIndex, Type transitionType, bool canAnimate)
+        {
+            var materialScreen = m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null;
+            BackToScreen(materialScreen, transitionType, canAnimate);
+            return materialScreen;
+        }
+
+        public virtual void BackToScreen(string screenName)
+        {
+            BackToScreen(screenName, Type.Out, true);
+        }
+
+        public virtual void BackToScreen(string screenName, Type transitionType)
+        {
+            BackToScreen(screenName, transitionType, true);
+        }
+
+        public virtual MaterialScreen BackToScreen(string screenName, Type transitionType, bool canAnimate)
+        {
+            var materialScreen = GetScreenWithName(screenName);
+            BackToScreen(materialScreen, transitionType, canAnimate);
+            return materialScreen;
+        }
+
+        public virtual void BackToScreen(MaterialScreen screen)
+        {
+            BackToScreen(screen, Type.Out, true);
+        }
+
+        public virtual void BackToScreen(MaterialScreen screen, Type transitionType)
+        {
+            BackToScreen(screen, transitionType, true);
+        }
+
+        /// <summary>
+        /// Special Function to Rollback in Screenstack 
+        /// </summary>
+        public virtual void BackToScreen(MaterialScreen screen, Type transitionType, bool animate)
+        {
+            var stackIndex = screen != null ? m_ScreenStack.IndexOf(screen) : -1;
+
+            //Revert all screens before target screen in stack
+            var processingScreenStack = new List<MaterialScreen>(m_ScreenStack);
+            for (int i = processingScreenStack.Count - 1; i > stackIndex; i--)
+            {
+                if (processingScreenStack[i] != null && processingScreenStack[i] != currentScreen)
+                {
+                    processingScreenStack[i].TransitionOut();
+                    processingScreenStack[i].Interrupt(true);
+                }
+            }
+
+            //Back to screen
+            if (screen != null)
+            {
+                var currentScreenIndex = m_CurrentScreenIndex;
+                var screenIndex = m_MaterialScreens.IndexOf(screen);
+                Transition(screenIndex, transitionType, animate);
+                //We dont want to stack the last screen
+                RemoveFromScreenStack(currentScreenIndex);
+            }
+        }
+
         public void Back()
         {
             Back(Type.Out);
@@ -669,12 +742,28 @@ namespace MaterialUI
 
         public void Back(Type transitionType)
         {
+            Back(transitionType, true);
+        }
+
+        public void Back(Type transitionType, bool animate)
+        {
             var currentScreenIndex = m_CurrentScreenIndex;
             var lastScreen = PopFromScreenStack();
             var lastScreenIndex = m_MaterialScreens.IndexOf(lastScreen);
-            Transition(lastScreenIndex, transitionType);
+            Transition(lastScreenIndex, transitionType, animate);
             //We dont want to stack the last screen
             RemoveFromScreenStack(currentScreenIndex);
+        }
+
+        public void Transition(string screenName)
+        {
+            Transition(screenName, transitionType);
+        }
+
+        public void Transition(string screenName, Type transitionType, bool animate = true)
+        {
+            var materialScreen = GetScreenWithName(screenName);
+            Transition(materialScreen, transitionType, animate);
         }
 
         public void Transition(MaterialScreen screen)
@@ -682,11 +771,11 @@ namespace MaterialUI
             Transition(screen, transitionType);
         }
 
-        public void Transition(MaterialScreen screen, Type transitionType)
+        public void Transition(MaterialScreen screen, Type transitionType, bool animate = true)
         {
             var screenIndex = m_MaterialScreens.IndexOf(screen);
             if (screenIndex >= 0)
-                Transition(screenIndex, transitionType);
+                Transition(screenIndex, transitionType, animate);
         }
 
         public void Transition(int screenIndex)
@@ -694,7 +783,7 @@ namespace MaterialUI
             Transition(screenIndex, transitionType);
         }
 
-        public void Transition(int screenIndex, Type transitionType, bool p_animate = true)
+        public void Transition(int screenIndex, Type transitionType, bool animate = true)
         {
             if (0 > screenIndex || screenIndex >= materialScreen.Count || screenIndex == currentScreenIndex) return;
 
@@ -719,7 +808,7 @@ namespace MaterialUI
                     m_MaterialScreens[m_CurrentScreenIndex].rectTransform.SetAsLastSibling();
                     m_MaterialScreens[m_CurrentScreenIndex].TransitionIn();
 
-                    if (!p_animate)
+                    if (!animate)
                         m_MaterialScreens[m_CurrentScreenIndex].Interrupt();
                 }
                 if (isValidLastScreen)
@@ -740,7 +829,7 @@ namespace MaterialUI
                     m_MaterialScreens[lastScreenIndex].rectTransform.SetAsLastSibling();
                     m_MaterialScreens[lastScreenIndex].TransitionOut();
 
-                    if (!p_animate)
+                    if (!animate)
                         m_MaterialScreens[lastScreenIndex].Interrupt(true);
                 }
             }
@@ -751,14 +840,14 @@ namespace MaterialUI
                     m_MaterialScreens[m_CurrentScreenIndex].rectTransform.SetAsLastSibling();
                     m_MaterialScreens[m_CurrentScreenIndex].TransitionIn();
 
-                    if (!p_animate)
+                    if (!animate)
                         m_MaterialScreens[m_CurrentScreenIndex].Interrupt();
                 }
                 if (isValidLastScreen)
                 {
                     m_MaterialScreens[lastScreenIndex].TransitionOut();
 
-                    if (!p_animate)
+                    if (!animate)
                         m_MaterialScreens[lastScreenIndex].Interrupt(true);
                 }
             }
@@ -771,6 +860,21 @@ namespace MaterialUI
         public void TransitionImmediate(int screenIndex)
         {
             Transition(screenIndex, transitionType, false);
+        }
+
+        public void TransitionImmediate(int screenIndex, Type transitionType)
+        {
+            Transition(screenIndex, transitionType, false);
+        }
+
+        public void TransitionImmediate(string screenName)
+        {
+            Transition(screenName, transitionType, false);
+        }
+
+        public void TransitionImmediate(string screenName, Type transitionType)
+        {
+            Transition(screenName, transitionType, false);
         }
 
         public void TransitionImmediate(MaterialScreen screen)
@@ -801,22 +905,6 @@ namespace MaterialUI
             else if (wrap)
             {
                 Transition(materialScreen.Count - 1);
-            }
-        }
-
-        public void Transition(string screenName)
-        {
-            Transition(screenName, transitionType);
-        }
-
-        public void Transition(string screenName, Type transitionType)
-        {
-            for (int i = 0; i < materialScreen.Count; i++)
-            {
-                if (materialScreen[i].name == screenName)
-                {
-                    Transition(i, transitionType);
-                }
             }
         }
 

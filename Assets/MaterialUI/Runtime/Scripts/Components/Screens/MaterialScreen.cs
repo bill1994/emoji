@@ -734,7 +734,7 @@ namespace MaterialUI
             SetupFrameAnimator();
             var processedTransition = frameAnimator != null ? frameAnimator.InterruptAnimation() : -1;
 
-            ProcessInterruption(processedTransition, canDestroy);
+            ProcessInterruption(processedTransition, canDestroy && m_DestroyOnHide);
         }
 
         protected internal void ProcessInterruption(int processedTransition, bool canDestroy)
