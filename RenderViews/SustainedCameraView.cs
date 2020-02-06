@@ -108,7 +108,7 @@ namespace Kyub.Performance
                 return;
             }
             _lastCullingMask = CullingMask;
-            Camera.enabled = m_useRenderBuffer;
+            Camera.enabled = !m_useRenderBuffer;
             TryInitRenderBuffer();
             base.Start();
         }
@@ -154,7 +154,7 @@ namespace Kyub.Performance
             var v_camera = Camera;
             if (v_camera != null)
             {
-                var cameraActive = (p_active && (!m_useRenderBuffer || SustainedPerformanceManager.IsWaitingRenderBuffer));
+                var cameraActive = p_active && !m_useRenderBuffer; //(p_active && (!m_useRenderBuffer || SustainedPerformanceManager.IsWaitingRenderBuffer));
                 if (v_camera.enabled != cameraActive)
                 {
                     //Special RenderBuffer Mode (we can't disable camera in this cycle when SustainedPerformanceManager.UseRenderBufferInHighPerformance == false)
@@ -209,7 +209,7 @@ namespace Kyub.Performance
 
             if (Camera != null && m_useRenderBuffer)
             {
-                SustainedPerformanceManager.OnAfterWaitingToPrepareRenderBuffer += HandleOnAfterWaitingToPrepareRenderBuffer;
+                //SustainedPerformanceManager.OnAfterWaitingToPrepareRenderBuffer += HandleOnAfterWaitingToPrepareRenderBuffer;
                 SustainedPerformanceManager.OnAfterDrawBuffer += HandleOnAfterDrawBuffer;
             }
         }
@@ -219,7 +219,7 @@ namespace Kyub.Performance
             SustainedPerformanceManager.OnSetHighPerformance -= HandleOnSetHighPerformance;
             SustainedPerformanceManager.OnSetLowPerformance -= HandleOnSetLowPerformance;
 
-            SustainedPerformanceManager.OnAfterWaitingToPrepareRenderBuffer -= HandleOnAfterWaitingToPrepareRenderBuffer;
+            //SustainedPerformanceManager.OnAfterWaitingToPrepareRenderBuffer -= HandleOnAfterWaitingToPrepareRenderBuffer;
             SustainedPerformanceManager.OnAfterDrawBuffer -= HandleOnAfterDrawBuffer;
         }
 
@@ -227,10 +227,10 @@ namespace Kyub.Performance
 
         #region SustainedPerformance Receivers
 
-        protected virtual void HandleOnAfterWaitingToPrepareRenderBuffer(int p_invalidCullingMask)
+        /*protected virtual void HandleOnAfterWaitingToPrepareRenderBuffer(int p_invalidCullingMask)
         {
             SetViewActive(SustainedPerformanceManager.IsCameraViewInvalid(this, p_invalidCullingMask));
-        }
+        }*/
 
         protected virtual void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> p_renderBuffersDict)
         {
