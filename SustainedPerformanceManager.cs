@@ -766,7 +766,8 @@ namespace Kyub.Performance
             {
                 if (cameraView != null)
                 {
-                    cameraView.Camera.Render();
+                    if(cameraView.IsDirty())
+                        cameraView.Camera.Render();
                 }
             }
         }
