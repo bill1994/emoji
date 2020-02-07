@@ -30,7 +30,9 @@ namespace MaterialUI
 
         #region Callbacks
 
+        [UnityEngine.Serialization.FormerlySerializedAs("m_OnScreenEndTransitionIn")]
         public UnityEvent OnShowAnimationOver = new UnityEvent();
+        [UnityEngine.Serialization.FormerlySerializedAs("m_OnScreenEndTransitionOut")]
         public UnityEvent OnHideAnimationOver = new UnityEvent();
 
         #endregion

@@ -169,10 +169,10 @@ namespace MaterialUI
 
         #region Callbacks
 
-        [SerializeField]
-        private OnScreenTransitionUnityEvent m_OnScreenEndTransition = null;
-        [SerializeField]
-        private OnScreenTransitionUnityEvent m_OnScreenBeginTransition = null;
+        [UnityEngine.Serialization.FormerlySerializedAs("m_OnScreenEndTransition")]
+        public OnScreenTransitionUnityEvent onScreenEndTransition = new OnScreenTransitionUnityEvent();
+        [UnityEngine.Serialization.FormerlySerializedAs("m_OnScreenBeginTransition")]
+        public OnScreenTransitionUnityEvent onScreenBeginTransition = new OnScreenTransitionUnityEvent();
 
         #endregion
 
@@ -498,18 +498,6 @@ namespace MaterialUI
         {
             get { return m_TransitionType; }
             set { m_TransitionType = value; }
-        }
-
-        public OnScreenTransitionUnityEvent onScreenEndTransition
-        {
-            get { return m_OnScreenEndTransition; }
-            set { m_OnScreenEndTransition = value; }
-        }
-
-        public OnScreenTransitionUnityEvent onScreenBeginTransition
-        {
-            get { return m_OnScreenBeginTransition; }
-            set { m_OnScreenBeginTransition = value; }
         }
 
         #endregion
@@ -862,7 +850,7 @@ namespace MaterialUI
 
             //m_ScreensTransitioning += 2;
 
-            m_OnScreenBeginTransition.InvokeIfNotNull(screenIndex);
+            onScreenBeginTransition.InvokeIfNotNull(screenIndex);
         }
 
         public void TransitionImmediate(int screenIndex)
@@ -983,7 +971,7 @@ namespace MaterialUI
                     }
                 }
             }
-            m_OnScreenEndTransition.InvokeIfNotNull(screenIndex);
+            onScreenEndTransition.InvokeIfNotNull(screenIndex);
         }
 
         #endregion

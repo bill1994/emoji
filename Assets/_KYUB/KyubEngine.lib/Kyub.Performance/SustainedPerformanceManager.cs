@@ -547,7 +547,10 @@ namespace Kyub.Performance
             _highPerformanceAutoDisable = false;
             _highPerformanceWaitTime = 0;
             if (_routineSetHighPerformance != null)
+            {
                 StopCoroutine(_routineSetHighPerformance);
+                _routineSetHighPerformance = null;
+            }
         }
 
         protected virtual void SetHighPerformanceImmediate(bool p_autoDisable = true)
