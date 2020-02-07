@@ -313,6 +313,28 @@ namespace MaterialUI
             }
         }
 
+        protected override void OnCanvasHierarchyChanged()
+        {
+            base.OnCanvasHierarchyChanged();
+
+            if (_Started && Application.isPlaying)
+            {
+                CancelInvoke("UpdateOverScroll");
+                Invoke("UpdateOverScroll", 0);
+            }
+        }
+
+        protected override void OnTransformParentChanged()
+        {
+            base.OnTransformParentChanged();
+
+            if (_Started && Application.isPlaying)
+            {
+                CancelInvoke("UpdateOverScroll");
+                Invoke("UpdateOverScroll", 0);
+            }
+        }
+
         protected virtual void OnScrollRectValueChanged(Vector2 normalizedValue)
         {
             _LastScrollPosition = _ScrollPosition;

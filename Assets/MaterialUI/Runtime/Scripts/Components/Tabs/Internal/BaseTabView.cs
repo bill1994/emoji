@@ -232,6 +232,24 @@ namespace MaterialUI
             }
         }
 
+        protected override void OnCanvasHierarchyChanged()
+        {
+            base.OnCanvasHierarchyChanged();
+            if (Application.isPlaying)
+            {
+                InitializeTabsAndPagesDelayed();
+            }
+        }
+
+        protected override void OnTransformParentChanged()
+        {
+            base.OnTransformParentChanged();
+            if (Application.isPlaying)
+            {
+                InitializeTabsAndPagesDelayed();
+            }
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
