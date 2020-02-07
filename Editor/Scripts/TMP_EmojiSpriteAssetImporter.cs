@@ -92,11 +92,11 @@ namespace KyubEditor.EmojiSearch
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
                     EditorGUILayout.LabelField("EmojiOne Fields", EditorStyles.boldLabel);
-                    EditorGUILayout.Space(3);
+                    GUILayout.Space(3);
                     m_gridSize = EditorGUILayout.Vector2IntField("Grid Size", m_gridSize);
                     m_padding = EditorGUILayout.Vector2IntField("Padding", m_padding);
                     m_spacing = EditorGUILayout.Vector2IntField("Spacing", m_spacing);
-                    EditorGUILayout.Space(3);
+                    GUILayout.Space(3);
                 }
             }
 
