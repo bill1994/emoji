@@ -99,6 +99,7 @@ namespace MaterialUI
                 count += m_TweenVector2Queue.tweens.Count;
                 count += m_TweenVector3Queue.tweens.Count;
                 count += m_TweenVector4Queue.tweens.Count;
+                count += m_TweenQuaternionQueue.tweens.Count;
                 count += m_TweenColorQueue.tweens.Count;
                 return count;
             }
@@ -322,6 +323,10 @@ namespace MaterialUI
             {
                 return TweenVector4(updateValue as Action<Vector4>, startValue as Func<Vector4>, targetValue as Func<Vector4>, duration, delay, callback, scaledTime, tweenType);
             }
+            else if (typeof(T) == typeof(Quaternion))
+            {
+                return TweenQuaternion(updateValue as Action<Quaternion>, startValue as Func<Quaternion>, targetValue as Func<Quaternion>, duration, delay, callback, scaledTime, tweenType);
+            }
             else if (typeof(T) == typeof(Color))
             {
                 return TweenColor(updateValue as Action<Color>, startValue as Func<Color>, targetValue as Func<Color>, duration, delay, callback, scaledTime, tweenType);
@@ -403,6 +408,10 @@ namespace MaterialUI
             else if (typeof(T) == typeof(Vector4))
             {
                 return TweenVector4Custom(updateValue as Action<Vector4>, startValue as Func<Vector4>, targetValue as Func<Vector4>, duration, animationCurve, delay, callback, scaledTime);
+            }
+            else if (typeof(T) == typeof(Quaternion))
+            {
+                return TweenQuaternionCustom(updateValue as Action<Quaternion>, startValue as Func<Quaternion>, targetValue as Func<Quaternion>, duration, animationCurve, delay, callback, scaledTime);
             }
             else if (typeof(T) == typeof(Color))
             {
@@ -1109,6 +1118,146 @@ namespace MaterialUI
             }
 
             AutoTweenVector4 tween = instance.m_TweenVector4Queue.GetTween();
+
+            int id = instance.m_TweenIdCount;
+            instance.m_TweenIdCount++;
+
+            tween.Initialize(updateValue, startValue, targetValue, duration, delay, Tween.TweenType.Custom, callback, animationCurve, scaledTime, id);
+
+            instance.m_ActiveTweens.Add(tween);
+
+            return id;
+        }
+
+        #endregion
+
+        #region Quaternion
+
+        /// <summary>
+        /// The TweenQueue of Vector4 AutoTweens.
+        /// </summary>
+        [SerializeField]
+        private TweenQueue<AutoTweenQuaternion> m_TweenQuaternionQueue = new TweenQueue<AutoTweenQuaternion>();
+
+        /// <summary>
+        /// Creates an AutoTween object that tweens a <see cref="Vector4"/> variable.
+        /// </summary>
+        /// <param name="updateValue">This is called to retrieve the target variable's value at any given time.</param>
+        /// <param name="startValue">The inital value of the tween.</param>
+        /// <param name="targetValue">The end value of the tween.</param>
+        /// <param name="duration">The duration of the tween.</param>
+        /// <param name="delay">The delay betwen when the AutoTween is created and when it begins the tween.</param>
+        /// <param name="callback">Called when the tween has finished.</param>
+        /// <param name="scaledTime">Should the tween factor in <see cref="Time.timeScale"/>?.</param>
+        /// <param name="tweenType">Type of the tween curve.</param>
+        /// <returns>The id of the tween that was created.</returns>
+        public static int TweenQuaternion(Action<Quaternion> updateValue, Quaternion startValue, Quaternion targetValue, float duration, float delay = 0f, Action callback = null, bool scaledTime = false, Tween.TweenType tweenType = Tween.TweenType.EaseOutQuint)
+        {
+            return TweenQuaternion(updateValue, () => startValue, () => targetValue, duration, delay, callback, scaledTime, tweenType);
+        }
+
+        /// <summary>
+        /// Creates an AutoTween object that tweens a variable of type <see cref="Vector4"/>.
+        /// </summary>
+        /// <param name="updateValue">This is called to retrieve the target variable's value at any given time.</param>
+        /// <param name="startValue">This is called to retrieve a desired initial value at any given time.</param>
+        /// <param name="targetValue">The end value of the tween.</param>
+        /// <param name="duration">The duration of the tween.</param>
+        /// <param name="delay">The delay betwen when the AutoTween is created and when it begins the tween.</param>
+        /// <param name="callback">Called when the tween has finished.</param>
+        /// <param name="scaledTime">Should the tween factor in <see cref="Time.timeScale"/>?.</param>
+        /// <param name="tweenType">Type of the tween curve.</param>
+        /// <returns>The id of the tween that was created.</returns>
+        public static int TweenQuaternion(Action<Quaternion> updateValue, Func<Quaternion> startValue, Quaternion targetValue, float duration, float delay = 0f, Action callback = null, bool scaledTime = false, Tween.TweenType tweenType = Tween.TweenType.EaseOutQuint)
+        {
+            return TweenQuaternion(updateValue, startValue, () => targetValue, duration, delay, callback, scaledTime, tweenType);
+        }
+
+        /// <summary>
+        /// Creates an AutoTween object that tweens a variable of type <see cref="Vector4"/>.
+        /// </summary>
+        /// <param name="updateValue">This is called to retrieve the target variable's value at any given time.</param>
+        /// <param name="startValue">This is called to retrieve a desired initial value at any given time.</param>
+        /// <param name="targetValue">This is called to retrieve a desired end value at any given time.</param>
+        /// <param name="duration">The duration of the tween.</param>
+        /// <param name="delay">The delay betwen when the AutoTween is created and when it begins the tween.</param>
+        /// <param name="callback">Called when the tween has finished.</param>
+        /// <param name="scaledTime">Should the tween factor in <see cref="Time.timeScale"/>?.</param>
+        /// <param name="tweenType">Type of the tween curve.</param>
+        /// <returns>The id of the tween that was created.</returns>
+        public static int TweenQuaternion(Action<Quaternion> updateValue, Func<Quaternion> startValue, Func<Quaternion> targetValue, float duration, float delay = 0f, Action callback = null, bool scaledTime = false, Tween.TweenType tweenType = Tween.TweenType.EaseOutQuint)
+        {
+            if (!Application.isPlaying || instance == null)
+            {
+                return -2;
+            }
+
+            AutoTweenQuaternion tween = instance.m_TweenQuaternionQueue.GetTween();
+
+            int id = instance.m_TweenIdCount;
+            instance.m_TweenIdCount++;
+
+            tween.Initialize(updateValue, startValue, targetValue, duration, delay, tweenType, callback, null, scaledTime, id);
+
+            instance.m_ActiveTweens.Add(tween);
+
+            return id;
+        }
+
+        /// <summary>
+        /// Creates an AutoTween object that tweens a variable of type <see cref="Vector4"/> that uses a custom <see cref="AnimationCurve"/>.
+        /// </summary>
+        /// <param name="updateValue">This is called to retrieve the target variable's value at any given time.</param>
+        /// <param name="startValue">The initial value of the tween.</param>
+        /// <param name="targetValue">The end value of the tween.</param>
+        /// <param name="duration">The duration of the tween.</param>
+        /// <param name="animationCurve">The custom AnimationCurve to use for the tween.</param>
+        /// <param name="delay">The delay betwen when the AutoTween is created and when it begins the tween.</param>
+        /// <param name="callback">Called when the tween has finished.</param>
+        /// <param name="scaledTime">Should the tween factor in <see cref="Time.timeScale"/>?.</param>
+        /// <returns>The id of the tween that was created.</returns>
+        public static int TweenQuaternionCustom(Action<Quaternion> updateValue, Quaternion startValue, Quaternion targetValue, float duration, AnimationCurve animationCurve, float delay = 0f, Action callback = null, bool scaledTime = false)
+        {
+            return TweenQuaternionCustom(updateValue, () => startValue, () => targetValue, duration, animationCurve, delay, callback, scaledTime);
+        }
+
+        /// <summary>
+        /// Creates an AutoTween object that tweens a variable of type <see cref="Vector4"/> that uses a custom <see cref="AnimationCurve"/>.
+        /// </summary>
+        /// <param name="updateValue">This is called to retrieve the target variable's value at any given time.</param>
+        /// <param name="startValue">This is called to retrieve a desired initial value at any given time.</param>
+        /// <param name="targetValue">The end value of the tween.</param>
+        /// <param name="duration">The duration of the tween.</param>
+        /// <param name="animationCurve">The custom AnimationCurve to use for the tween.</param>
+        /// <param name="delay">The delay betwen when the AutoTween is created and when it begins the tween.</param>
+        /// <param name="callback">Called when the tween has finished.</param>
+        /// <param name="scaledTime">Should the tween factor in <see cref="Time.timeScale"/>?.</param>
+        /// <returns>The id of the tween that was created.</returns>
+        public static int TweenQuaternionCustom(Action<Quaternion> updateValue, Func<Quaternion> startValue, Quaternion targetValue, float duration, AnimationCurve animationCurve, float delay = 0f, Action callback = null, bool scaledTime = false)
+        {
+            return TweenQuaternionCustom(updateValue, startValue, () => targetValue, duration, animationCurve, delay, callback, scaledTime);
+        }
+
+        /// <summary>
+        /// Creates an AutoTween object that tweens a variable of type <see cref="Vector4"/> that uses a custom <see cref="AnimationCurve"/>.
+        /// </summary>
+        /// <param name="updateValue">This is called to retrieve the target variable's value at any given time.</param>
+        /// <param name="startValue">This is called to retrieve a desired initial value at any given time.</param>
+        /// <param name="targetValue">This is called to retrieve a desired end value at any given time.</param>
+        /// <param name="duration">The duration of the tween.</param>
+        /// <param name="animationCurve">The custom AnimationCurve to use for the tween.</param>
+        /// <param name="delay">The delay betwen when the AutoTween is created and when it begins the tween.</param>
+        /// <param name="callback">Called when the tween has finished.</param>
+        /// <param name="scaledTime">Should the tween factor in <see cref="Time.timeScale"/>?.</param>
+        /// <returns>The id of the tween that was created.</returns>
+        public static int TweenQuaternionCustom(Action<Quaternion> updateValue, Func<Quaternion> startValue, Func<Quaternion> targetValue, float duration, AnimationCurve animationCurve, float delay = 0, Action callback = null, bool scaledTime = false)
+        {
+            if (!Application.isPlaying || instance == null)
+            {
+                return -2;
+            }
+
+            AutoTweenQuaternion tween = instance.m_TweenQuaternionQueue.GetTween();
 
             int id = instance.m_TweenIdCount;
             instance.m_TweenIdCount++;
