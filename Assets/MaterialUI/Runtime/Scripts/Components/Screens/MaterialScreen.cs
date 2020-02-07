@@ -111,7 +111,7 @@ namespace MaterialUI
 
         #region Properties
 
-        [System.Obsolete("Use OnShowAnimationOver instead (UnityUpgradable) -> MaterialUI.MaterialScreen.OnShowAnimationOver")]
+        [System.Obsolete("onScreenEndTransitionIn has been deprecated. Use OnShowAnimationOver instead -> OnShowAnimationOver")]
         public UnityEvent onScreenEndTransitionIn
         {
             get
@@ -120,7 +120,7 @@ namespace MaterialUI
             }
         }
 
-        [System.Obsolete("Use OnHideAnimationOver instead (UnityUpgradable) -> MaterialUI.MaterialScreen.OnHideAnimationOver")]
+        [System.Obsolete("onScreenEndTransitionOut has been deprecated. Use OnHideAnimationOver instead (UnityUpgradable) -> OnHideAnimationOver")]
         public UnityEvent onScreenEndTransitionOut
         {
             get
