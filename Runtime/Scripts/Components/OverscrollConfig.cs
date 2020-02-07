@@ -313,28 +313,6 @@ namespace MaterialUI
             }
         }
 
-        protected override void OnCanvasHierarchyChanged()
-        {
-            base.OnCanvasHierarchyChanged();
-
-            if (_Started && Application.isPlaying)
-            {
-                CancelInvoke("UpdateOverScroll");
-                Invoke("UpdateOverScroll", 0);
-            }
-        }
-
-        protected override void OnTransformParentChanged()
-        {
-            base.OnTransformParentChanged();
-
-            if (_Started && Application.isPlaying)
-            {
-                CancelInvoke("UpdateOverScroll");
-                Invoke("UpdateOverScroll", 0);
-            }
-        }
-
         protected virtual void OnScrollRectValueChanged(Vector2 normalizedValue)
         {
             _LastScrollPosition = _ScrollPosition;
@@ -371,7 +349,6 @@ namespace MaterialUI
                 for (int i = 0; i < m_OverscrollObjects.Length; i++)
                 {
                     var overscrollObject = m_OverscrollObjects[i];
-
                     if (overscrollObject != null)
                     {
                         var isValid = indexes.Contains(i);
@@ -379,7 +356,11 @@ namespace MaterialUI
                         if (!_IsPressing)
                         {
                             if (isValid)
+                            {
+                                if (overscrollObject.gameObject == null || !overscrollObject.gameObject.activeSelf)
+                                    CreateOverscroll(i);
                                 overscrollObject.TransitionPingPong(_AnimationDuration, impactForce, 0.3f, null);
+                            }
                             else if (!overscrollObject.isAnimating && overscrollObject.isShow)
                                 overscrollObject.Transition(false, 0f, 0.3f);
                         }
@@ -388,6 +369,8 @@ namespace MaterialUI
                         {
                             if (isValid)
                             {
+                                if (overscrollObject.gameObject == null || !overscrollObject.gameObject.activeSelf)
+                                    CreateOverscroll(i);
                                 impactForce = Mathf.Clamp01((_ImpactPosition - (Vector2)input.mousePosition).magnitude * 0.005f);
                                 overscrollObject.TransitionImmediate(true, impactForce);
                             }

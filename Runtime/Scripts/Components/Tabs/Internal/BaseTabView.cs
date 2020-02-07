@@ -232,24 +232,6 @@ namespace MaterialUI
             }
         }
 
-        protected override void OnCanvasHierarchyChanged()
-        {
-            base.OnCanvasHierarchyChanged();
-            if (Application.isPlaying)
-            {
-                InitializeTabsAndPagesDelayed();
-            }
-        }
-
-        protected override void OnTransformParentChanged()
-        {
-            base.OnTransformParentChanged();
-            if (Application.isPlaying)
-            {
-                InitializeTabsAndPagesDelayed();
-            }
-        }
-
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -293,13 +275,14 @@ namespace MaterialUI
                 overscrollConfig.Setup();
 
             //Fix Indicator size in next cycle
+            InitializeIndicator();
             InitializeIndicatorDelayed();
         }
 
         protected void InitializeIndicatorDelayed()
         {
             CancelInvoke("InitializeIndicator");
-            Invoke("InitializeIndicator", 0.05f);
+            Invoke("InitializeIndicator", 0.3f);
         }
 
         protected virtual void InitializeIndicator()
