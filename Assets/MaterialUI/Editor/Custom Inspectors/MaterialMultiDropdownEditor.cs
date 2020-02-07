@@ -21,6 +21,7 @@ namespace MaterialUI
         private SerializedProperty m_DropdownFramePivot;
         private SerializedProperty m_DropdownFramePreferredSize;
         private SerializedProperty m_CustomFramePrefabAddress;
+
         private SerializedProperty m_AlwaysDisplayHintOption;
 
         private SerializedProperty m_TextComponent;

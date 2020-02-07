@@ -18,8 +18,8 @@ MonoBehaviour:
   m_disabledFieldStyles: []
   m_extraStyleProperties: []
   m_SpinnerMode: 0
-  m_DropdownExpandPivot: {x: 1, y: 0}
-  m_DropdownFramePivot: {x: 1, y: 1}
+  m_DropdownExpandPivot: {x: 0, y: 0}
+  m_DropdownFramePivot: {x: 0, y: 1}
   m_DropdownFramePreferredSize: {x: -1, y: -1}
   OnCancelCallback:
     m_PersistentCalls:

@@ -164,10 +164,22 @@ namespace MaterialUI
             CreateInstance("Components/Buttons/Icon Button", "Icon Button");
         }
 
-        [MenuItem("GameObject/MaterialUI/Dropdown", false, 030)]
+        [MenuItem("GameObject/MaterialUI/Dropdowns/Drowdown", false, 030)]
         private static void CreateDefaultDropdown()
         {
             CreateInstance("Components/Dropdowns/Dropdown", "Dropdown");
+        }
+
+        [MenuItem("GameObject/MaterialUI/Dropdowns/MultiDropdown", false, 030)]
+        private static void CreateMultiDropdown()
+        {
+            CreateInstance("Components/Dropdowns/MultiDropdown", "MultiDropdown");
+        }
+
+        [MenuItem("GameObject/MaterialUI/Dropdowns/MenuSpinner", false, 030)]
+        private static void CreateMenuSpinner()
+        {
+            CreateInstance("Components/Dropdowns/MenuSpinner", "MenuSpinner");
         }
 
         [MenuItem("GameObject/MaterialUI/Toggles/Checkbox", false, 040)]

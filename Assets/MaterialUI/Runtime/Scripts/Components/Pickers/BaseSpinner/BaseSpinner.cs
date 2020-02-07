@@ -27,9 +27,9 @@ namespace MaterialUI
         [SerializeField]
         protected SpinnerMode m_SpinnerMode = SpinnerMode.AutoDetect;
         [SerializeField]
-        protected Vector2 m_DropdownExpandPivot = new Vector2(1, 0);
+        protected Vector2 m_DropdownExpandPivot = new Vector2(0, 0);
         [SerializeField]
-        protected Vector2 m_DropdownFramePivot = new Vector2(1, 1);
+        protected Vector2 m_DropdownFramePivot = new Vector2(0, 1);
         [SerializeField]
         protected Vector2 m_DropdownFramePreferredSize = new Vector2(-1, -1);
 
