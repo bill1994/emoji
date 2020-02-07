@@ -891,6 +891,141 @@ namespace MaterialUI
     }
 
     /// <summary>
+    /// Tween object that modifies a Vector4 each frame, over a specified period of time.
+    /// </summary>
+    public class AutoTweenQuaternion : AutoTween
+    {
+        /// <summary>
+        /// The Func to get the tween's start Quaternion.
+        /// </summary>
+        private Func<Quaternion> m_GetStartValue;
+
+        /// <summary>
+        /// The Func to get the tween's end Quaternion.
+        /// </summary>
+        private Func<Quaternion> m_GetTargetValue;
+
+        /// <summary>
+        /// The Action to update the tween's target variable.
+        /// </summary>
+        private Action<Quaternion> m_UpdateValue;
+
+        /// <summary>
+        /// The tween's start Quaternion.
+        /// </summary>
+        private Quaternion m_StartValue;
+
+        /// <summary>
+        /// The tween's end Quaternion.
+        /// </summary>
+        private Quaternion m_TargetValue;
+
+        /// <summary>
+        /// Gets a value from an element of either the initial or target value of the tween.
+        /// For example, GetValue(false, 0) would get the first element of the intial value.
+        /// Used to make inherited AutoTweens for different value types easier.
+        /// </summary>
+        /// <param name="isEnd">Get the value from the target value of the tween? Otherwise get the value from the intial value.</param>
+        /// <param name="valueIndex">The index of the value within the value being checked. Only used if the value being checked has more than 1 element (eg. Vector2).</param>
+        /// <returns>
+        /// The desired value within the initial or target values of the tween.
+        /// </returns>
+        protected override float GetValue(bool isEnd, int valueIndex)
+        {
+            return (isEnd ? m_GetTargetValue()[valueIndex] : m_GetStartValue()[valueIndex]);
+        }
+
+        /// <summary>
+        /// The number of elements in the value type being modified (eg. 1 for float/int, 2 for Vector2, 4 for Color).
+        /// </summary>
+        /// <returns></returns>
+        protected override int ValueLength()
+        {
+            return 4;
+        }
+
+        /// <summary>
+        /// Initializes the specified update value.
+        /// </summary>
+        /// <param name="updateValue">The update value.</param>
+        /// <param name="startValue">The start value.</param>
+        /// <param name="targetValue">The target value.</param>
+        /// <param name="duration">The duration.</param>
+        /// <param name="delay">The delay.</param>
+        /// <param name="tweenType">Type of the tween.</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="animationCurve">The animation curve.</param>
+        /// <param name="scaledTime">if set to <c>true</c> [scaled time].</param>
+        /// <param name="id">The identifier.</param>
+        public void Initialize(Action<Quaternion> updateValue, Func<Quaternion> startValue, Func<Quaternion> targetValue, float duration, float delay, Tween.TweenType tweenType, Action callback, AnimationCurve animationCurve, bool scaledTime, int id)
+        {
+            m_GetStartValue = startValue;
+            m_UpdateValue = updateValue;
+            m_GetTargetValue = targetValue;
+
+            base.Initialize(duration, delay, tweenType, callback, animationCurve, scaledTime, id);
+        }
+
+        /// <summary>
+        /// Called once the delay has reached 0, prepares the tween to start modifying the target variable.
+        /// </summary>
+        protected override void StartTween()
+        {
+            if (m_UpdateValue == null)
+            {
+                EndTween(false);
+                return;
+            }
+
+            base.StartTween();
+
+            try
+            {
+                m_StartValue = m_GetStartValue();
+                m_TargetValue = m_GetTargetValue();
+            }
+            catch (Exception)
+            {
+                EndTween(false);
+            }
+        }
+
+        /// <summary>
+        /// The method to be called on each tween update, excluding the final one.
+        /// </summary>
+        protected override void OnUpdateValue()
+        {
+            if (m_UpdateValue == null)
+            {
+                EndTween(false);
+                return;
+            }
+
+            Quaternion value = new Quaternion
+            (
+                Tween.Evaluate(m_TweenType, m_StartValue.x, m_TargetValue.x, m_DeltaTime, m_Duration, m_CustomCurve),
+                Tween.Evaluate(m_TweenType, m_StartValue.y, m_TargetValue.y, m_DeltaTime, m_Duration, m_CustomCurve),
+                Tween.Evaluate(m_TweenType, m_StartValue.z, m_TargetValue.z, m_DeltaTime, m_Duration, m_CustomCurve),
+                Tween.Evaluate(m_TweenType, m_StartValue.w, m_TargetValue.w, m_DeltaTime, m_Duration, m_CustomCurve)
+            );
+            m_UpdateValue(value);
+        }
+
+        /// <summary>
+        /// The method to be called on the final tween update.
+        /// </summary>
+        protected override void OnFinalUpdateValue()
+        {
+            if (m_UpdateValue == null)
+            {
+                return;
+            }
+
+            m_UpdateValue(m_TargetValue);
+        }
+    }
+
+    /// <summary>
     /// Tween object that modifies a Color each frame, over a specified period of time.
     /// </summary>
     public class AutoTweenColor : AutoTween
