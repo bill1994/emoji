@@ -278,13 +278,13 @@ namespace MaterialUI
             InitializeIndicatorDelayed();
         }
 
-        protected void InitializeIndicatorDelayed()
+        public void InitializeIndicatorDelayed()
         {
             CancelInvoke("InitializeIndicator");
-            Invoke("InitializeIndicator", 0.3f);
+            Invoke("InitializeIndicator", 0f);
         }
 
-        protected virtual void InitializeIndicator()
+        public virtual void InitializeIndicator()
         {
             if (this == null || m_Indicator == null || !Application.isPlaying)
                 return;
