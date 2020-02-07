@@ -85,7 +85,7 @@ namespace MaterialUI
             }
             set { m_TabView = value; }
         }
-        
+
         public int id
         {
             get { return m_Id; }
@@ -96,7 +96,7 @@ namespace MaterialUI
                     m_ItemIndex.SetGraphicText((m_Id + 1).ToString());
             }
         }
-        
+
         public RectTransform rectTransform
         {
             get
@@ -131,8 +131,19 @@ namespace MaterialUI
         {
             if (interactable)
             {
-                if(tabView)
+                if (tabView)
                     tabView.TabItemPointerDown(id);
+            }
+        }
+
+        protected override void OnRectTransformDimensionsChange()
+        {
+            base.OnRectTransformDimensionsChange();
+            if (Application.isPlaying)
+            {
+                //Upgrade Indicator
+                if (tabView != null && tabView.currentPage == id)
+                    tabView.InitializeIndicatorDelayed();
             }
         }
 
@@ -142,7 +153,7 @@ namespace MaterialUI
 
         protected override void HandleOnToggleChanged(bool value)
         {
-            if(tabView != null && tabView.currentPage != id && value)
+            if (tabView != null && tabView.currentPage != id && value)
                 tabView.SetPage(id);
             base.HandleOnToggleChanged(value);
 
@@ -307,7 +318,7 @@ namespace MaterialUI
                         m_ItemIcon.color = m_OffColor;
                 }
             }
-            
+
             base.ApplyInteractableOn();
         }
 
@@ -348,7 +359,7 @@ namespace MaterialUI
         {
             base.AnimOff();
 
-            if(m_ChangeIconColor && m_ItemIcon != null)
+            if (m_ChangeIconColor && m_ItemIcon != null)
                 m_ItemIcon.color = Tween.QuintOut(m_CurrentColor, m_OffColor, m_AnimDeltaTime, m_AnimationDuration);
         }
 

@@ -275,7 +275,6 @@ namespace MaterialUI
                 overscrollConfig.Setup();
 
             //Fix Indicator size in next cycle
-            InitializeIndicator();
             InitializeIndicatorDelayed();
         }
 
@@ -563,7 +562,7 @@ namespace MaterialUI
                 {
                     if (m_Indicator != null)
                         m_Indicator.anchoredPosition = vector2;
-                }, 
+                },
                 m_Indicator.anchoredPosition, new Vector2(targetPosition, 0), 0.5f);
             }
             else
