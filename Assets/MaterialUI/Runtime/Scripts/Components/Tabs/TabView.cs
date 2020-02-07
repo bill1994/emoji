@@ -63,7 +63,7 @@ namespace MaterialUI
             }
             set { m_Pages = value; }
         }
-        
+
         public float tabWidth
         {
             get { return m_TabWidth; }
@@ -74,7 +74,7 @@ namespace MaterialUI
             get { return m_TabPadding; }
             set { m_TabPadding = value; }
         }
-        
+
         public bool forceSameTabSize
         {
             get
@@ -87,11 +87,11 @@ namespace MaterialUI
                 if (m_ForceSameTabSize == value)
                     return;
                 m_ForceSameTabSize = value;
-                if(Application.isPlaying && enabled && gameObject.activeInHierarchy)
+                if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
                     InitializeTabsAndPagesDelayed();
             }
         }
-        
+
         #endregion
 
         #region Unity Functions
@@ -106,7 +106,7 @@ namespace MaterialUI
                     Invoke("TrackPages", 0);
                 else if (_lastForceSameTabSize == null || _lastForceSameTabSize != m_ForceSameTabSize)
                 {
-                    if(_lastForceSameTabSize != null)
+                    if (_lastForceSameTabSize != null)
                         InitializeTabsAndPagesDelayed();
                     _lastForceSameTabSize = m_ForceSameTabSize;
                 }
@@ -133,9 +133,9 @@ namespace MaterialUI
             {
                 if (_cachedTabChildForceExpand == null)
                     _cachedTabChildForceExpand = layoutGroup.childForceExpandWidth;
-                if(_cachedTabSpacing == null)
+                if (_cachedTabSpacing == null)
                     _cachedTabSpacing = layoutGroup.spacing;
-                layoutGroup.childForceExpandWidth = m_ForceSameTabSize? true : _cachedTabChildForceExpand.Value;
+                layoutGroup.childForceExpandWidth = m_ForceSameTabSize ? true : _cachedTabChildForceExpand.Value;
                 layoutGroup.spacing = m_ForceSameTabSize ? 0 : _cachedTabSpacing.Value;
             }
 
@@ -145,7 +145,7 @@ namespace MaterialUI
             SetupTabSize();
             InstantiateTabsFromTemplate();
 
-            float barWidth = m_ForceSameTabSize? (m_TabWidth * m_Pages.Count()) : 
+            float barWidth = m_ForceSameTabSize ? (m_TabWidth * m_Pages.Count()) :
                 ((m_TabWidth + (layoutGroup != null ? layoutGroup.spacing : 0)) * m_Pages.Count()) + layoutGroup.padding.horizontal;
 
             var barParent = m_TabsContainer.parent as RectTransform;
@@ -164,7 +164,7 @@ namespace MaterialUI
             InitializeIndicatorDelayed();
         }
 
-        protected override void InitializeIndicator()
+        public override void InitializeIndicator()
         {
             if (this == null || m_Indicator == null || !Application.isPlaying)
                 return;
@@ -235,7 +235,7 @@ namespace MaterialUI
                         longestTextWidth = Mathf.Max(longestTextWidth, layoutElement.preferredWidth);
                     }
                 }
-                if(changed)
+                if (changed)
                     m_TabItemTemplate.graphic.SetGraphicText(originalText);
             }
 
@@ -281,9 +281,9 @@ namespace MaterialUI
             if (m_Indicator == null)
                 return;
 
-            float targetPosition = m_ForceSameTabSize || m_Tabs.Length <= targetTab || targetTab < 0  || m_Tabs[targetTab] == null? 
-                targetTab * m_TabWidth : 
-                m_Tabs[targetTab].rectTransform.anchoredPosition.x - (m_Tabs[targetTab].rectTransform.GetProperSize().x/2);
+            float targetPosition = m_ForceSameTabSize || m_Tabs.Length <= targetTab || targetTab < 0 || m_Tabs[targetTab] == null ?
+                targetTab * m_TabWidth :
+                m_Tabs[targetTab].rectTransform.anchoredPosition.x - (m_Tabs[targetTab].rectTransform.GetProperSize().x / 2);
 
             float targetSize = m_ForceSameTabSize || m_Tabs.Length <= targetTab || targetTab < 0 || m_Tabs[targetTab] == null ?
                 m_TabWidth :
@@ -294,7 +294,7 @@ namespace MaterialUI
 
             if (animate)
             {
-                if(!m_ForceSameTabSize)
+                if (!m_ForceSameTabSize)
                     m_IndicatorSizeTweener = TweenManager.TweenFloat(value => m_Indicator.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, value), m_Indicator.GetProperSize().x, targetSize, 0.5f);
                 m_IndicatorTweener = TweenManager.TweenVector2(vector2 => m_Indicator.anchoredPosition = vector2, m_Indicator.anchoredPosition, new Vector2(targetPosition, 0), 0.5f);
             }
