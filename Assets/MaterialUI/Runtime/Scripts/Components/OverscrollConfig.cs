@@ -308,6 +308,7 @@ namespace MaterialUI
 
             if (_Started && Application.isPlaying)
             {
+                CancelInvoke("UpdateOverScroll");
                 Invoke("UpdateOverScroll", 0);
             }
         }
@@ -537,32 +538,32 @@ namespace MaterialUI
                 case 0:
                     localPos = new Vector2(rectTransform.rect.xMin, rectTransform.rect.center.y);
                     size = new Vector2(GetLocalHeight(rectTransform), 0f);
-                    anchorMin = new Vector2(0f, 0f);
-                    anchorMax = new Vector2(0f, 1f);
+                    anchorMin = new Vector2(0f, 0.5f);
+                    anchorMax = new Vector2(0f, 0.5f);
                     rotation = new Vector3(0f, 0f, 270f);
                     break;
                 //Right
                 case 1:
                     localPos = new Vector2(rectTransform.rect.xMax, rectTransform.rect.center.y);
                     size = new Vector2(GetLocalHeight(rectTransform), 0f);
-                    anchorMin = new Vector2(1f, 0f);
-                    anchorMax = new Vector2(1f, 1f);
+                    anchorMin = new Vector2(1f, 0.5f);
+                    anchorMax = new Vector2(1f, 0.5f);
                     rotation = new Vector3(0f, 0f, 90f);
                     break;
                 //Top
                 case 2:
                     localPos = new Vector2(rectTransform.rect.center.x, rectTransform.rect.yMax);
                     size = new Vector2(GetLocalWidth(rectTransform), 0f);
-                    anchorMin = new Vector2(0f, 1f);
-                    anchorMax = new Vector2(1f, 1f);
+                    anchorMin = new Vector2(0.5f, 1f);
+                    anchorMax = new Vector2(0.5f, 1f);
                     rotation = new Vector3(0f, 0f, 180f);
                     break;
                 //Bottom
                 case 3:
                     localPos = new Vector2(rectTransform.rect.center.x, rectTransform.rect.yMin);
                     size = new Vector2(GetLocalWidth(rectTransform), 0f);
-                    anchorMin = new Vector2(0f, 0f);
-                    anchorMax = new Vector2(1f, 0f);
+                    anchorMin = new Vector2(0.5f, 0f);
+                    anchorMax = new Vector2(0.5f, 0f);
                     rotation = new Vector3(0f, 0f, 0f);
                     break;
             }
@@ -576,7 +577,7 @@ namespace MaterialUI
             m_OverscrollObjects[i].rectTransform.pivot = new Vector2(0.5f, 0f);
             m_OverscrollObjects[i].rectTransform.localEulerAngles = rotation;
             m_OverscrollObjects[i].rectTransform.localScale = Vector3.one;
-            m_OverscrollObjects[i].rectTransform.localPosition = localPos;
+            m_OverscrollObjects[i].rectTransform.anchoredPosition = localPos;
 
             m_OverscrollObjects[i].canvasGroup = m_OverscrollObjects[i].gameObject.GetAddComponent<CanvasGroup>();
             m_OverscrollObjects[i].canvasGroup.alpha = 1;
