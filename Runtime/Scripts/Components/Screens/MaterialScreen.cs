@@ -109,17 +109,25 @@ namespace MaterialUI
 
         #endregion
 
-        #region Callbacks
-
-        [Header("Callbacks")]
-        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_OnScreenEndTransitionIn")]
-        public UnityEvent onScreenEndTransitionIn = new UnityEvent();
-        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_OnScreenEndTransitionOut")]
-        private UnityEvent onScreenEndTransitionOut = new UnityEvent();
-
-        #endregion
-
         #region Properties
+
+        [System.Obsolete("Use OnShowAnimationOver instead (UnityUpgradable) -> MaterialUI.MaterialScreen.OnShowAnimationOver")]
+        public UnityEvent onScreenEndTransitionIn
+        {
+            get
+            {
+                return OnShowAnimationOver;
+            }
+        }
+
+        [System.Obsolete("Use OnHideAnimationOver instead (UnityUpgradable) -> MaterialUI.MaterialScreen.OnHideAnimationOver")]
+        public UnityEvent onScreenEndTransitionOut
+        {
+            get
+            {
+                return OnHideAnimationOver;
+            }
+        }
 
         protected EasyFrameAnimator frameAnimator
         {
@@ -465,14 +473,14 @@ namespace MaterialUI
             if (screenView != null)
                 screenView.OnScreenEndTransition(screenIndex);
 
-            if (onScreenEndTransitionIn != null)
-                onScreenEndTransitionIn.Invoke();
+            if (OnShowAnimationOver != null)
+                OnShowAnimationOver.Invoke();
         }
 
         protected virtual void HandleOnHide()
         {
-            if (onScreenEndTransitionOut != null)
-                onScreenEndTransitionOut.Invoke();
+            if (OnHideAnimationOver != null)
+                OnHideAnimationOver.Invoke();
         }
 
         protected virtual void HandleOnInterrupt(int animationIndex)

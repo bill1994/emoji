@@ -58,8 +58,8 @@ namespace MaterialUI
 
         private SerializedProperty m_TransitionDuration;
 
-        private SerializedProperty m_OnScreenEndTransitionIn;
-        private SerializedProperty m_OnScreenEndTransitionOut;
+        private SerializedProperty OnShowAnimationOver;
+        private SerializedProperty OnHideAnimationOver;
 
         void OnEnable()
         {
@@ -111,8 +111,8 @@ namespace MaterialUI
 
             m_TransitionDuration = serializedObject.FindProperty("m_TransitionDuration");
 
-            m_OnScreenEndTransitionIn = serializedObject.FindProperty("onScreenEndTransitionIn");
-            m_OnScreenEndTransitionOut = serializedObject.FindProperty("onScreenEndTransitionOut");
+            OnShowAnimationOver = serializedObject.FindProperty("OnShowAnimationOver");
+            OnHideAnimationOver = serializedObject.FindProperty("OnHideAnimationOver");
         }
 
         public override void OnInspectorGUI()
@@ -360,8 +360,8 @@ namespace MaterialUI
                 EditorGUILayout.PropertyField(m_TransitionDuration);
             }
 
-            EditorGUILayout.PropertyField(m_OnScreenEndTransitionIn);
-            EditorGUILayout.PropertyField(m_OnScreenEndTransitionOut);
+            EditorGUILayout.PropertyField(OnShowAnimationOver);
+            EditorGUILayout.PropertyField(OnHideAnimationOver);
 
             serializedObject.ApplyModifiedProperties();
         }

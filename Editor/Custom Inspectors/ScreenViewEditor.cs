@@ -61,8 +61,8 @@ namespace MaterialUI
         private SerializedProperty m_TransitionDuration;
         private SerializedProperty m_TransitionType;
 
-        private SerializedProperty m_OnScreenBeginTransition;
-        private SerializedProperty m_OnScreenEndTransition;
+        private SerializedProperty onScreenBeginTransition;
+        private SerializedProperty onScreenEndTransition;
 
         void OnEnable()
         {
@@ -117,8 +117,8 @@ namespace MaterialUI
             m_TransitionDuration = serializedObject.FindProperty("m_TransitionDuration");
             m_TransitionType = serializedObject.FindProperty("m_TransitionType");
 
-            m_OnScreenBeginTransition = serializedObject.FindProperty("m_OnScreenBeginTransition");
-            m_OnScreenEndTransition = serializedObject.FindProperty("m_OnScreenEndTransition");
+            onScreenBeginTransition = serializedObject.FindProperty("onScreenBeginTransition");
+            onScreenEndTransition = serializedObject.FindProperty("onScreenEndTransition");
         }
 
         protected virtual void OnDisable()
@@ -407,8 +407,8 @@ namespace MaterialUI
                 EditorGUILayout.LabelField("Not controlling any MaterialScreen settings", EditorStyles.boldLabel);
             }
 
-            EditorGUILayout.PropertyField(m_OnScreenBeginTransition);
-            EditorGUILayout.PropertyField(m_OnScreenEndTransition);
+            EditorGUILayout.PropertyField(onScreenBeginTransition);
+            EditorGUILayout.PropertyField(onScreenEndTransition);
 
             serializedObject.ApplyModifiedProperties();
 
