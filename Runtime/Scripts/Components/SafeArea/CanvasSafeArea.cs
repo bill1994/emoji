@@ -32,9 +32,7 @@ namespace MaterialUI
 
         Rect _LastSafeArea = new Rect(0, 0, 0, 0);
 
-#if UNITY_EDITOR
         Image _simulatorSpriteContent = null;
-#endif
 
         #endregion
 
