@@ -251,13 +251,6 @@ namespace Kyub.UI
 
         #region Unity Functions
 
-        protected override void Start()
-        {
-            base.Start();
-            CalculateLayoutInputHorizontal();
-            CalculateLayoutInputVertical();
-        }
-
         protected override void OnRectTransformDimensionsChange()
         {
             base.OnRectTransformDimensionsChange();
