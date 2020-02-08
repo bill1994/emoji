@@ -729,7 +729,7 @@ namespace Kyub.Performance
             var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
             if (textureChanged)
                 DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
-            else
+            if(!textureChanged || !s_isEndOfFrame)
                 yield return new WaitForEndOfFrame();
             s_isEndOfFrame = true;
             //}
