@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 namespace Kyub.Performance
 {
-    public enum RenderBufferModeEnum { Immediate, Delayed }
+    //public enum RenderBufferModeEnum { Immediate, Delayed }
 
     public class SustainedPerformanceManager : Kyub.Singleton<SustainedPerformanceManager>
     {
@@ -339,7 +339,7 @@ namespace Kyub.Performance
                 TryAutoCreateRenderViews();
 
                 RegisterEvents();
-                
+
                 CheckBufferTextures();
                 Invalidate();
             }
@@ -476,7 +476,7 @@ namespace Kyub.Performance
             if (_performanceIsDirty || _bufferIsDirty)
             {
                 _performanceIsDirty = false;
-                if(OnPerformanceUpdate())
+                if (OnPerformanceUpdate())
                     _bufferIsDirty = false;
             }
         }
@@ -486,7 +486,10 @@ namespace Kyub.Performance
         {
             _lowPerformanceWaitTime = 0;
             if (_routineSetLowPerformance != null)
+            {
                 StopCoroutine(_routineSetLowPerformance);
+                _routineSetLowPerformance = null;
+            }
         }
 
         protected virtual void SetLowPerformanceDelayed(float p_waitTime = 0)
@@ -591,7 +594,6 @@ namespace Kyub.Performance
             return false;
         }
 
-        Coroutine _routineAfterDrawBuffer = null;
         protected virtual IEnumerator SetHighPerformanceInEndOfFrameRoutine(bool bufferIsDirty, bool p_autoDisable = true, float p_waitTime = 0, bool skipEndOfFrame = false)
         {
             var invalidCullingMask = s_invalidCullingMask;
@@ -623,16 +625,16 @@ namespace Kyub.Performance
             else
                 Application.targetFrameRate = -1;
 
+            IEnumerator onAfterDrawBufferEnumerator = null;
             bufferIsDirty = _bufferIsDirty || bufferIsDirty;
             if (bufferIsDirty)
             {
                 CheckBufferTextures();
                 if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
                 {
-                    CancelOnAfterDrawBuffer();
                     invalidCullingMask |= s_invalidCullingMask;
                     //s_isWaitingRenderBuffer = s_useRenderBuffer && m_renderBufferMode == RenderBufferModeEnum.Delayed && !s_requireConstantRepaint && !m_forceAlwaysInvalidate;
-                    _routineAfterDrawBuffer = StartCoroutine(OnAfterDrawBufferRoutine(invalidCullingMask));
+                    onAfterDrawBufferEnumerator = OnAfterDrawBufferRoutine(invalidCullingMask);
                 }
             }
 
@@ -648,16 +650,14 @@ namespace Kyub.Performance
 
             _routineSetHighPerformance = null;
 
+            //Draw Buffer
+            if (onAfterDrawBufferEnumerator != null)
+                yield return onAfterDrawBufferEnumerator;
+
             if (_highPerformanceAutoDisable)
                 SetLowPerformanceDelayed(m_autoDisableHighPerformanceTime);
             else
-                CancelSetLowPerformance();  
-        }
-
-        protected virtual void CancelOnAfterDrawBuffer()
-        {
-            if (_routineAfterDrawBuffer != null)
-                StopCoroutine(_routineAfterDrawBuffer);
+                CancelSetLowPerformance();
         }
 
         protected virtual void ClearPendentInvalidTransforms()
@@ -725,11 +725,11 @@ namespace Kyub.Performance
             }
             else
             {*/
-                var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
-                DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
-                if (!s_isEndOfFrame)
-                    yield return new WaitForEndOfFrame();
-                s_isEndOfFrame = true;
+            var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
+            DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
+            if (!s_isEndOfFrame)
+                yield return new WaitForEndOfFrame();
+            s_isEndOfFrame = true;
             //}
             //s_isWaitingRenderBuffer = false;
 
@@ -762,14 +762,14 @@ namespace Kyub.Performance
         protected void DrawCameraViewsWithRenderBufferState(IList<SustainedCameraView> cameraViews, bool isBuffer)
         {
             //prepare all cameras draw into RenderBuffer changing the render texture target based in index
-            if(cameraViews == null)
+            if (cameraViews == null)
                 cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(isBuffer);
 
             foreach (var cameraView in cameraViews)
             {
                 if (cameraView != null)
                 {
-                    if(cameraView.IsDirty())
+                    if (cameraView.IsDirty())
                         cameraView.Camera.Render();
                 }
             }
