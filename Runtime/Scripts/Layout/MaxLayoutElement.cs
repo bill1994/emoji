@@ -251,11 +251,26 @@ namespace Kyub.UI
 
         #region Unity Functions
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            CancelInvoke("SetDirty");
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            CalculateLayoutInputHorizontal();
+            CalculateLayoutInputVertical();
+        }
+
         protected override void OnRectTransformDimensionsChange()
         {
             base.OnRectTransformDimensionsChange();
             if (IsLayoutDirty())
-                LayoutRebuilder.MarkLayoutForRebuild(this.transform as RectTransform);
+            {
+                Invoke("SetDirty", 0);
+            }
         }
 
         #endregion
