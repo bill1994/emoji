@@ -258,6 +258,13 @@ namespace Kyub.UI
             CalculateLayoutInputVertical();
         }
 
+        protected override void OnRectTransformDimensionsChange()
+        {
+            base.OnRectTransformDimensionsChange();
+            if (IsLayoutDirty())
+                LayoutRebuilder.MarkLayoutForRebuild(this.transform as RectTransform);
+        }
+
         #endregion
 
         #region Layout Functions
@@ -285,7 +292,7 @@ namespace Kyub.UI
 
                 _CurrentPreferredWidth = Mathf.Min(parentRectWidth, _CurrentPreferredWidth, maxWidth);
 
-                float rectWidth = Mathf.Max(LayoutUtility.GetFlexibleWidth(rectTransform) > 0?  rectTransform.rect.width : 0, LayoutUtility.GetMinWidth(rectTransform), LayoutUtility.GetPreferredWidth(rectTransform)); //rectTransform.rect.width;
+                float rectWidth = Mathf.Max(LayoutUtility.GetFlexibleWidth(rectTransform) > 0 ? rectTransform.rect.width : 0, LayoutUtility.GetMinWidth(rectTransform), LayoutUtility.GetPreferredWidth(rectTransform)); //rectTransform.rect.width;
                 //Remove flexible width to force apply preferred size instead (because maxsize is the preferred size)
                 if (rectWidth >= maxWidth)
                 {
@@ -387,7 +394,7 @@ namespace Kyub.UI
 
             var maxWidth = Mathf.Max(CalculateConvertedMaxWidth(), minWidth);
             var maxHeight = Mathf.Max(CalculateConvertedMaxHeight(), minHeight);
-            
+
             if (rectTransform != null && (maxWidth > 0 || maxHeight > 0))
             {
                 var widthIsDirty = p_forceCalculate || rectSize.x > maxWidth;
@@ -403,13 +410,36 @@ namespace Kyub.UI
                 if (heightIsDirty)
                 {
                     var oldPreferredHeight = _CurrentPreferredHeight;
-                    var oldFlexibleHeight= _CurrentFlexibleHeight;
+                    var oldFlexibleHeight = _CurrentFlexibleHeight;
 
                     CalculateLayoutInputVertical();
                     changed = changed || oldPreferredHeight != _CurrentPreferredHeight || oldFlexibleHeight != _CurrentFlexibleHeight;
                 }
             }
             return changed;
+        }
+
+        protected virtual bool IsLayoutDirty()
+        {
+            var rectTransform = transform as RectTransform;
+            if (rectTransform != null)
+            {
+                var rectSize = rectTransform.rect.size;
+                var maxWidth = Mathf.Max(CalculateConvertedMaxWidth(), minWidth);
+                if (maxWidth > 0 && rectSize.x > maxWidth)
+                {
+                    return true;
+                }
+                else
+                {
+                    var maxHeight = Mathf.Max(CalculateConvertedMaxHeight(), minHeight);
+                    if (maxHeight > 0 && rectSize.y > maxHeight)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         #endregion
