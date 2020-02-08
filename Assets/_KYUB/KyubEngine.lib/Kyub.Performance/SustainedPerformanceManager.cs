@@ -629,7 +629,6 @@ namespace Kyub.Performance
             bufferIsDirty = _bufferIsDirty || bufferIsDirty;
             if (bufferIsDirty)
             {
-                CheckBufferTextures();
                 if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
                 {
                     invalidCullingMask |= s_invalidCullingMask;
@@ -725,9 +724,12 @@ namespace Kyub.Performance
             }
             else
             {*/
+            var textureChanged = CheckBufferTextures();
+
             var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
-            DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
-            if (!s_isEndOfFrame)
+            if (textureChanged)
+                DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
+            else
                 yield return new WaitForEndOfFrame();
             s_isEndOfFrame = true;
             //}
