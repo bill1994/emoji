@@ -181,7 +181,7 @@ namespace MaterialUI
                 if (!_IsPressing)
                 {
                     //foreach (var objectToDisable in m_OverscrollObjects)
-                    for(int i=0; i<m_OverscrollObjects.Length; i++)
+                    for (int i = 0; i < m_OverscrollObjects.Length; i++)
                     {
                         var overScrollObject = m_OverscrollObjects[i];
                         if (overScrollObject != null && overScrollObject.isShow && !overScrollObject.isAnimating)
@@ -582,7 +582,7 @@ namespace MaterialUI
             m_OverscrollObjects[i].rectTransform.pivot = new Vector2(0.5f, 0f);
             m_OverscrollObjects[i].rectTransform.localEulerAngles = rotation;
             m_OverscrollObjects[i].rectTransform.localScale = Vector3.one;
-            m_OverscrollObjects[i].rectTransform.anchoredPosition = localPos;
+            m_OverscrollObjects[i].rectTransform.localPosition = localPos;
 
             m_OverscrollObjects[i].canvasGroup = m_OverscrollObjects[i].gameObject.GetAddComponent<CanvasGroup>();
             m_OverscrollObjects[i].canvasGroup.alpha = 1;
@@ -603,9 +603,9 @@ namespace MaterialUI
 
             var rect = rectTransform.rect;
             var clamp = _EffectSize.x / 3.0f;
-            var offset = useMousePosition? 
-                new Vector2(Mathf.Clamp((_MousePositionNormalized.x - 0.5f) / 2f * rect.width, -clamp, clamp), 
-                            Mathf.Clamp((_MousePositionNormalized.y - 0.5f) / 2f * rect.height, -clamp, clamp)) : 
+            var offset = useMousePosition ?
+                new Vector2(Mathf.Clamp((_MousePositionNormalized.x - 0.5f) / 2f * rect.width, -clamp, clamp),
+                            Mathf.Clamp((_MousePositionNormalized.y - 0.5f) / 2f * rect.height, -clamp, clamp)) :
                 Vector2.zero;
             var localPos = Vector2.zero;
             switch (edge)
