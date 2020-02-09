@@ -52,7 +52,9 @@ namespace Kyub.UI
         protected bool m_autoPickElements = true;
         [Space]
         [SerializeField, Tooltip("force extra visible elements (before/after screen)")]
-        Vector2Int m_extraVisibleElements = new Vector2Int(1, 0);
+        Vector2Int m_extraVisibleElements = new Vector2Int(0, 0);
+        [SerializeField, Tooltip("In deep hierarchys SetParent contains a huge impact in performance. This property will try prevent recalculate amount of visible elements")]
+        bool m_optimizeDeepHierarchy = false;
         [Space]
         [SerializeField]
         protected List<GameObject> m_elements = new List<GameObject>();
@@ -121,6 +123,20 @@ namespace Kyub.UI
         #endregion
 
         #region Public Properties
+
+        public bool OptimizeDeepHierarchy
+        {
+            get
+            {
+                return m_optimizeDeepHierarchy;
+            }
+            set
+            {
+                if (m_optimizeDeepHierarchy == value)
+                    return;
+                m_optimizeDeepHierarchy = value;
+            }
+        }
 
         public RectOffset Padding
         {
@@ -322,7 +338,8 @@ namespace Kyub.UI
             if (m_elements == null)
                 return;
 
-            if (_cachedMinMaxIndex.x != GetCurrentIndex() || _cachedMinMaxIndex.y != GetLastIndex())
+            var checkIndex = CalculateSafeCachedMinMax();
+            if (_cachedMinMaxIndex.x != checkIndex.x || _cachedMinMaxIndex.y != checkIndex.y)
                 FastReloadAll();
             else
             {
@@ -825,6 +842,43 @@ namespace Kyub.UI
                 _invisibleElementsContent.gameObject.SetActive(!m_disableNonVisibleElements);
         }
 
+        protected virtual Vector2Int CalculateSafeCachedMinMax()
+        {
+            var cachedNewMinMaxIndex = new Vector2Int(GetCurrentIndex(), GetLastIndex());
+
+            if (OptimizeDeepHierarchy)
+            {
+                var deltaOld = Mathf.Abs(_cachedMinMaxIndex.y - _cachedMinMaxIndex.x);
+                var deltaNew = Mathf.Abs(cachedNewMinMaxIndex.y - cachedNewMinMaxIndex.x);
+                if (deltaNew < deltaOld)
+                {
+                    int deltaExtra = deltaOld - deltaNew;
+                    int amountBefore = deltaExtra / 2;
+                    int amountAfter = deltaExtra - amountBefore;
+
+                    if(cachedNewMinMaxIndex.x - amountBefore < 0)
+                    {
+                        int invalidBeforeAmount = Mathf.Abs(cachedNewMinMaxIndex.x - amountBefore);
+                        amountBefore -= invalidBeforeAmount;
+                        amountAfter += invalidBeforeAmount;
+                    }
+                    else if (cachedNewMinMaxIndex.y + amountAfter > m_elements.Count - 1)
+                    {
+                        int invalidAfterAmount = Mathf.Abs((cachedNewMinMaxIndex.y + amountAfter) - (m_elements.Count - 1));
+                        amountAfter -= invalidAfterAmount;
+                        amountBefore += invalidAfterAmount;
+                    }
+                    cachedNewMinMaxIndex.x -= amountBefore;
+                    cachedNewMinMaxIndex.y += amountAfter;
+
+                    //Prevent unknown behaviours
+                    cachedNewMinMaxIndex.x = Mathf.Clamp(cachedNewMinMaxIndex.x, 0, m_elements.Count - 1);
+                    cachedNewMinMaxIndex.y = Mathf.Clamp(cachedNewMinMaxIndex.y, 0, m_elements.Count - 1);
+                }
+            }
+            return cachedNewMinMaxIndex;
+        }
+
         protected virtual void ReloadAll_Internal(bool p_fullRecalc)
         {
             //Unregister events when scroll is not active
@@ -837,7 +891,8 @@ namespace Kyub.UI
             if (m_elements == null)
                 return;
 
-            _cachedMinMaxIndex = new Vector2Int(GetCurrentIndex(), GetLastIndex());
+            _cachedMinMaxIndex = CalculateSafeCachedMinMax();
+
             if (OnBeforeChangeVisibleElements != null)
                 OnBeforeChangeVisibleElements.Invoke(_lastFrameVisibleElementIndexes);
             if (_lastFrameVisibleElementIndexes != _cachedMinMaxIndex)
