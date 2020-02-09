@@ -120,7 +120,7 @@ namespace MaterialUI
 
         public override void InitializeTabs()
         {
-            if (this == null || m_TabsContainer == null || !Application.isPlaying)
+            if (this == null || m_TabsContainer == null || m_Tabs == null || !Application.isPlaying)
                 return;
 
             var contentSizeFitter = m_TabsContainer.GetComponent<ContentSizeFitter>();
@@ -166,12 +166,14 @@ namespace MaterialUI
 
         public override void InitializeIndicator()
         {
-            if (this == null || m_Indicator == null || !Application.isPlaying)
+            if (this == null || m_Indicator == null || m_Tabs == null || !Application.isPlaying)
                 return;
 
             m_Indicator.anchorMin = new Vector2(0, 0);
             m_Indicator.anchorMax = new Vector2(0, 0);
-            m_Indicator.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_ForceSameTabSize ? m_TabWidth : m_Tabs[m_CurrentPage].rectTransform.GetProperSize().x);
+
+            var currentPage = m_Tabs != null && m_CurrentPage >= 0 && m_CurrentPage < m_Tabs.Length ? m_Tabs[m_CurrentPage] : null;
+            m_Indicator.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_ForceSameTabSize || currentPage == null ? m_TabWidth : m_Tabs[m_CurrentPage].rectTransform.GetProperSize().x);
 
             if (m_Indicator != null && m_Indicator.transform.parent == m_TabItemTemplate.transform.parent)
                 m_Indicator.transform.SetAsLastSibling();
@@ -181,7 +183,7 @@ namespace MaterialUI
 
         protected override void SetupTabSize()
         {
-            if (this == null || m_TabItemTemplate == null || !Application.isPlaying)
+            if (this == null || m_TabItemTemplate == null || m_Tabs == null || !Application.isPlaying)
             {
                 m_TabWidth = -1;
                 return;
@@ -244,7 +246,7 @@ namespace MaterialUI
 
         protected override void TweenTabsContainer(int index, bool animate = true)
         {
-            if (m_TabsContainer == null)
+            if (m_TabsContainer == null || m_Tabs == null)
                 return;
 
             var v_useSameSizeCalculation = m_ForceSameTabSize || m_Tabs.Length <= index || index < 0 || m_Tabs[index] == null;
@@ -278,7 +280,7 @@ namespace MaterialUI
 
         protected override void TweenIndicator(int targetTab, bool animate = true)
         {
-            if (m_Indicator == null)
+            if (m_Indicator == null || m_Tabs == null)
                 return;
 
             float targetPosition = m_ForceSameTabSize || m_Tabs.Length <= targetTab || targetTab < 0 || m_Tabs[targetTab] == null ?
