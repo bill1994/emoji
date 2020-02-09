@@ -11,77 +11,20 @@ namespace MaterialUI
     {
         #region Canvas
 
-        /// <summary>
-        /// The parent canvas.
-        /// </summary>
-        [SerializeField]
-        private Canvas m_ParentCanvas = null;
-
-        /// <summary>
-        /// The rect transform of the manager.
-        /// </summary>
-        private RectTransform m_RectTransform;
-        /// <summary>
-        /// The rect transform of the manager.
-        /// If null, automatically gets the attached RectTransform.
-        /// </summary>
         public static RectTransform rectTransform
         {
             get
             {
-                if (Instance != null && s_instance.m_RectTransform == null)
-                {
-                    if (s_instance.m_ParentCanvas == null)
-                        s_instance.InitScreenViewSystem();
-
-                    if (s_instance.m_ParentCanvas != null)
-                    {
-                        CanvasSafeArea safeArea = s_instance.m_ParentCanvas.GetComponent<CanvasSafeArea>();
-                        Instance.m_RectTransform = safeArea != null && safeArea.Content != null ? safeArea.Content : s_instance.m_ParentCanvas.transform as RectTransform;
-                    }
-                }
-
-                return Instance.m_RectTransform;
+                return DialogManager.rectTransform;
             }
         }
 
-        #endregion
-
-        #region Unity Functions
-
-        protected override void Awake()
+        public static Canvas parentCanvas
         {
-            base.Awake();
-            if (s_instance == this)
+            get
             {
-                s_instance.InitScreenViewSystem();
+                return DialogManager.parentCanvas;
             }
-        }
-
-        #endregion
-
-        #region Init Functions
-
-        private void InitScreenViewSystem()
-        {
-            m_RectTransform = gameObject.GetAddComponent<RectTransform>();
-
-            if (m_ParentCanvas == null)
-                m_ParentCanvas = FindObjectOfType<Canvas>().transform.GetRootCanvas();
-
-            if (m_ParentCanvas != null)
-            {
-                CanvasSafeArea safeArea = m_ParentCanvas.GetComponent<CanvasSafeArea>();
-                transform.SetParent(safeArea != null && safeArea.Content != null ? safeArea.Content : m_ParentCanvas.transform, false);
-            }
-            transform.localScale = Vector3.one;
-
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.sizeDelta = Vector2.zero;
-            rectTransform.localPosition = Vector2.zero;
-            rectTransform.localRotation = Quaternion.identity;
         }
 
         #endregion
