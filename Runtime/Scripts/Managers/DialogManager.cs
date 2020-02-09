@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MaterialUI
 {
@@ -50,6 +51,17 @@ namespace MaterialUI
             }
         }
 
+        public static Canvas parentCanvas
+        {
+            get
+            {
+                if (Instance != null && s_instance.m_ParentCanvas == null)
+                    s_instance.InitDialogSystem();
+
+                return Instance.m_ParentCanvas;
+            }
+        }
+
         #endregion
 
         #region Unity Functions
@@ -60,6 +72,15 @@ namespace MaterialUI
             if (s_instance == this)
             {
                 s_instance.InitDialogSystem();
+            }
+        }
+
+        protected override void OnSceneWasLoaded(Scene p_scene, LoadSceneMode p_mode)
+        {
+            if (s_instance == this)
+            {
+                if (m_ParentCanvas == null)
+                    s_instance.InitDialogSystem();
             }
         }
 
@@ -111,7 +132,7 @@ namespace MaterialUI
                 if (onCreateCallback != null)
                     onCreateCallback(dialog);
             };
-            ShowCustomDialogAsync<DialogAlert>(PrefabManager.ResourcePrefabs.dialogAlert.Name, initialize, progressIndicator); 
+            ShowCustomDialogAsync<DialogAlert>(PrefabManager.ResourcePrefabs.dialogAlert.Name, initialize, progressIndicator);
         }
 
         /// <summary>
@@ -173,8 +194,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogAlert CreateAlert()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogAlert dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogAlert, Instance.transform).GetComponent<DialogAlert>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             //dialog.Initialize();
             return dialog;
         }
@@ -229,8 +251,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogAlert CreateBanner()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogAlert dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogBanner, Instance.transform).GetComponent<DialogAlert>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             //dialog.Initialize();
             return dialog;
         }
@@ -265,8 +288,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogProgress CreateProgressModalCircular()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogProgress dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogModalCircleProgress, Instance.transform).GetComponent<DialogProgress>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
 
             return dialog;
         }
@@ -311,8 +335,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogProgress CreateProgressLinear()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogProgress dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogProgress, Instance.transform).GetComponent<DialogProgress>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             dialog.SetupIndicator(true);
             //dialog.Initialize();
             return dialog;
@@ -358,8 +383,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogProgress CreateProgressCircular()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogProgress dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogProgress, Instance.transform).GetComponent<DialogProgress>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             dialog.SetupIndicator(false);
             //dialog.Initialize();
             return dialog;
@@ -457,8 +483,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogRadioList CreateSimpleList()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogRadioList dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogSimpleList, Instance.transform).GetComponent<DialogRadioList>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             //dialog.Initialize();
             return dialog;
         }
@@ -539,8 +566,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogCheckboxList CreateCheckboxList()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogCheckboxList dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogCheckboxList, Instance.transform).GetComponent<DialogCheckboxList>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             //dialog.Initialize();
             return dialog;
         }
@@ -662,8 +690,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogRadioList CreateRadioList()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogRadioList dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogRadioList, Instance.transform).GetComponent<DialogRadioList>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             //dialog.Initialize();
             return dialog;
         }
@@ -731,8 +760,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static T CreateCustomDialog<T>(string dialogPrefabPath) where T : MaterialFrame
         {
+            var canvas = DialogManager.parentCanvas;
             T dialog = PrefabManager.InstantiateGameObject(dialogPrefabPath, Instance.transform).GetComponent<T>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             return dialog;
         }
 
@@ -744,13 +774,13 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static void CreateCustomDialogAsync<T>(string dialogPrefabPath, System.Action<string, T> callback) where T : MaterialFrame
         {
+            var canvas = DialogManager.parentCanvas;
             System.Action<string, GameObject> internalCallback = (path, dialog) =>
             {
                 T assetComponent = null;
                 if (dialog != null)
                     assetComponent = dialog.GetComponent<T>();
-
-                CreateActivity(assetComponent, Instance.m_ParentCanvas);
+                CreateActivity(assetComponent, canvas);
                 callback(path, assetComponent);
             };
             PrefabManager.InstantiateGameObjectAsync(dialogPrefabPath, Instance.transform, internalCallback);
@@ -779,7 +809,7 @@ namespace MaterialUI
         /// <param name="onAffirmativeClicked">Called when the affirmative button is clicked.</param>
         public static DialogTimePicker ShowTimePicker(DateTime time, Action<DateTime> onAffirmativeClicked)
         {
-			return ShowTimePicker(time, onAffirmativeClicked, MaterialColor.teal500);
+            return ShowTimePicker(time, onAffirmativeClicked, MaterialColor.teal500);
         }
 
         /// <summary>
@@ -790,12 +820,13 @@ namespace MaterialUI
         /// <param name="accentColor">Color of the accent of the picker.</param>
 		public static DialogTimePicker ShowTimePicker(DateTime time, Action<DateTime> onAffirmativeClicked, Color accentColor)
         {
+            var canvas = DialogManager.parentCanvas;
             DialogTimePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogTimePicker, Instance.transform).GetComponent<DialogTimePicker>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
 
             dialog.Initialize(time, onAffirmativeClicked, accentColor);
             dialog.Show();
-			return dialog;
+            return dialog;
         }
 
         /// <summary>
@@ -808,8 +839,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogTimePicker CreateTimePicker()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogTimePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogTimePicker, Instance.transform).GetComponent<DialogTimePicker>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
 
             //dialog.Initialize();
             return dialog;
@@ -835,20 +867,22 @@ namespace MaterialUI
             return ShowMonthPicker(year, month, onAffirmativeClicked, MaterialColor.teal500);
         }
 
-		public static DialogDatePicker ShowMonthPicker(int year, int month, Action<DateTime> onAffirmativeClicked, Color accentColor)
+        public static DialogDatePicker ShowMonthPicker(int year, int month, Action<DateTime> onAffirmativeClicked, Color accentColor)
         {
+            var canvas = DialogManager.parentCanvas;
             DialogDatePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogMonthPicker, Instance.transform).GetComponent<DialogDatePicker>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
 
             dialog.Initialize(year, month, 1, onAffirmativeClicked, null, accentColor);
             dialog.Show();
             return dialog;
         }
 
-		public static DialogDatePicker ShowMonthPicker(int year, int month, Action<DateTime> onAffirmativeClicked, Action onDismissiveClicked, Color accentColor)
+        public static DialogDatePicker ShowMonthPicker(int year, int month, Action<DateTime> onAffirmativeClicked, Action onDismissiveClicked, Color accentColor)
         {
+            var canvas = DialogManager.parentCanvas;
             DialogDatePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogMonthPicker, Instance.transform).GetComponent<DialogDatePicker>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
 
             dialog.Initialize(year, month, 1, onAffirmativeClicked, onDismissiveClicked, accentColor);
             dialog.Show();
@@ -857,8 +891,9 @@ namespace MaterialUI
 
         public static DialogDatePicker CreateMonthPicker()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogDatePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogMonthPicker, Instance.transform).GetComponent<DialogDatePicker>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             //dialog.Initialize();
             return dialog;
         }
@@ -901,12 +936,13 @@ namespace MaterialUI
         /// <param name="accentColor">Color of the accent of the picker.</param>
 		public static DialogDatePicker ShowDatePicker(int year, int month, int day, Action<DateTime> onAffirmativeClicked, Color accentColor)
         {
+            var canvas = DialogManager.parentCanvas;
             DialogDatePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogDatePicker, Instance.transform).GetComponent<DialogDatePicker>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
 
             dialog.Initialize(year, month, day, onAffirmativeClicked, null, accentColor);
             dialog.Show();
-			return dialog;
+            return dialog;
         }
 
         /// <summary>
@@ -920,12 +956,13 @@ namespace MaterialUI
         /// <param name="accentColor">Color of the accent of the picker.</param>
 		public static DialogDatePicker ShowDatePicker(int year, int month, int day, Action<DateTime> onAffirmativeClicked, Action onDismissiveClicked, Color accentColor)
         {
+            var canvas = DialogManager.parentCanvas;
             DialogDatePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogDatePicker, Instance.transform).GetComponent<DialogDatePicker>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
 
             dialog.Initialize(year, month, day, onAffirmativeClicked, onDismissiveClicked, accentColor);
             dialog.Show();
-			return dialog;
+            return dialog;
         }
 
         /// <summary>
@@ -938,8 +975,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogDatePicker CreateDatePicker()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogDatePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogDatePicker, Instance.transform).GetComponent<DialogDatePicker>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
 
             //dialog.Initialize();
             return dialog;
@@ -1063,8 +1101,9 @@ namespace MaterialUI
         /// <returns>The Instance of the created dialog.</returns>
         public static DialogPrompt CreatePrompt()
         {
+            var canvas = DialogManager.parentCanvas;
             DialogPrompt dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogPrompt, Instance.transform).GetComponent<DialogPrompt>();
-            CreateActivity(dialog, Instance.m_ParentCanvas);
+            CreateActivity(dialog, canvas);
             //dialog.Initialize();
             return dialog;
         }
