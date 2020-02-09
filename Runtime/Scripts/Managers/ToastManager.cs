@@ -15,8 +15,6 @@ namespace MaterialUI
         [SerializeField]
         protected bool m_KeepBetweenScenes = true;
         [Space]
-        [SerializeField]
-        protected Canvas m_ParentCanvas = null;
 		[SerializeField]
         protected int m_MaxQueueSize = int.MaxValue;
 
@@ -30,7 +28,7 @@ namespace MaterialUI
         //[SerializeField]
         //protected int m_DefaultFontSize = 14;
 
-        protected Queue<KeyValuePair<Toast, Canvas>> m_ToastQueue;
+        protected Queue<KeyValuePair<Toast, Canvas>> m_ToastQueue = new Queue<KeyValuePair<Toast, Canvas>>();
 
         protected Dictionary<string, ToastAnimator> _AnimatorsCache = new Dictionary<string, ToastAnimator>();
 
@@ -38,46 +36,25 @@ namespace MaterialUI
 
         #endregion
 
-        #region Unity Functions
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            if (s_instance == this)
-            {
-                InitSystem();
-            }
-        }
-
-        #endregion
-
         #region Internal Helper Functions (Instance)
 
-        protected virtual void InitSystem()
+        protected ToastAnimator InstantiateSnackbarAnimator(string assetPath, out string cacheKey, Transform parent)
         {
-            SetCanvas(null);
-            //m_CurrentAnimator = InstantiateToastAnimator();
-            m_ToastQueue = new Queue<KeyValuePair<Toast, Canvas>>();
-        }
-
-        protected ToastAnimator InstantiateSnackbarAnimator(string assetPath, out string cacheKey)
-        {
-            var pair = InstantiateAnimator_Internal(assetPath, PrefabManager.ResourcePrefabs.snackbar);
+            var pair = InstantiateAnimator_Internal(assetPath, PrefabManager.ResourcePrefabs.snackbar, parent);
 
             cacheKey = pair.Key;
             return pair.Value;
         }
 
-        protected ToastAnimator InstantiateToastAnimator(string assetPath, out string cacheKey)
+        protected ToastAnimator InstantiateToastAnimator(string assetPath, out string cacheKey, Transform parent)
         {
-            var pair = InstantiateAnimator_Internal(assetPath, PrefabManager.ResourcePrefabs.toast);
+            var pair = InstantiateAnimator_Internal(assetPath, PrefabManager.ResourcePrefabs.toast, parent);
 
             cacheKey = pair.Key;
             return pair.Value;
         }
 
-        private KeyValuePair<string, ToastAnimator> InstantiateAnimator_Internal(string assetPath, PrefabAddress defaultAdress)
+        private KeyValuePair<string, ToastAnimator> InstantiateAnimator_Internal(string assetPath, PrefabAddress defaultAdress, Transform parent)
         {
             if (string.IsNullOrEmpty(assetPath))
             {
@@ -97,6 +74,9 @@ namespace MaterialUI
                 if (!string.IsNullOrEmpty(assetPath))
                     _AnimatorsCache[assetPath] = currentAnimator;
             }
+            
+            if(currentAnimator != null)
+                currentAnimator.transform.SetParent(parent);
 
             return new KeyValuePair<string,ToastAnimator>(assetPath, currentAnimator);
         }
@@ -109,13 +89,21 @@ namespace MaterialUI
             {
                 KeyValuePair<Toast, Canvas> pair = m_ToastQueue.Dequeue();
                 m_CurrentToast = pair.Key;
-                SetCanvas(pair.Value);
+
+                Transform parent = null;
+                if (pair.Value != null)
+                {
+                    CanvasSafeArea safeArea = pair.Value.GetComponent<CanvasSafeArea>();
+                    parent = safeArea != null && safeArea.Content != null ? safeArea.Content : pair.Value.transform;
+                }
+                if (parent == null)
+                    parent = DialogManager.rectTransform;
 
                 var cacheKey = "";
                 var assetPath = m_CurrentToast != null ? m_CurrentToast.assetPath : "";
                 var currentAnimator = m_CurrentToast is Snackbar? 
-                    InstantiateSnackbarAnimator(assetPath, out cacheKey) : 
-                    InstantiateToastAnimator(assetPath, out cacheKey);
+                    InstantiateSnackbarAnimator(assetPath, out cacheKey, parent) : 
+                    InstantiateToastAnimator(assetPath, out cacheKey, parent);
 
                 if (currentAnimator != null)
                 {
@@ -128,46 +116,6 @@ namespace MaterialUI
                 else
                     m_CurrentToast = null;
             }
-        }
-
-        protected void SetCanvas(Canvas canvas)
-        {
-            if (canvas != null)
-            {
-                m_ParentCanvas = canvas;
-            }
-
-            if (m_ParentCanvas == null)
-            {
-                m_ParentCanvas = GetComponentInParent<Canvas>();
-                if (m_ParentCanvas == null)
-                {
-                    //Find canvas in scene
-                    var canvasArray = FindObjectsOfType<Canvas>();
-                    foreach (var canvasMember in canvasArray)
-                    {
-                        if (canvasMember != null && 
-                            canvasMember.gameObject.scene.IsValid() && 
-                            canvasMember.enabled && 
-                            canvasMember.gameObject.activeInHierarchy)
-                        {
-                            m_ParentCanvas = canvasMember;
-                            break;
-                        }
-                    }
-                }
-
-                if (m_ParentCanvas != null)
-                    m_ParentCanvas = m_ParentCanvas.rootCanvas;
-            }
-
-            if (m_ParentCanvas != null)
-            {
-                CanvasSafeArea safeArea = m_ParentCanvas.GetComponent<CanvasSafeArea>();
-                transform.SetParent(safeArea != null && safeArea.Content != null ? safeArea.Content : m_ParentCanvas.transform, false);
-            }
-
-            transform.localPosition = Vector3.zero;
         }
 
         #endregion
@@ -194,13 +142,9 @@ namespace MaterialUI
 
             Canvas canvas = null;
             if (canvasHierarchy != null)
-            {
                 canvas = canvasHierarchy.GetRootCanvas();
-                if (canvas != null)
-                {
-                    Instance.m_ParentCanvas = canvas;
-                }
-            }
+            else
+                canvas = DialogManager.parentCanvas;
 
             Instance.m_ToastQueue.Enqueue(new KeyValuePair<Toast, Canvas>(new Toast(content, duration, panelColor, textColor, fontSize, customAssetPath), canvas));
             Instance.StartQueue();
@@ -231,13 +175,9 @@ namespace MaterialUI
 
             Canvas canvas = null;
             if (canvasHierarchy != null)
-            {
                 canvas = canvasHierarchy.GetRootCanvas();
-                if (canvas != null)
-                {
-                    Instance.m_ParentCanvas = canvas;
-                }
-            }
+            else
+                canvas = DialogManager.parentCanvas;
 
             Instance.m_ToastQueue.Enqueue(new KeyValuePair<Toast, Canvas>(new Snackbar(content, duration, panelColor, textColor, fontSize, actionName, onActionButtonClicked, customAssetPath), canvas));
             Instance.StartQueue();
