@@ -180,7 +180,8 @@ namespace Kyub.UI
                 return;
 
             //Special case that horizontal and vertical scroll enabled
-            if (_cachedMinMaxIndex.x != GetCurrentIndex() || _cachedMinMaxIndex.y != GetLastIndex() || IsConstraintScrollActive())
+            var checkIndex = CalculateSafeCachedMinMax();
+            if (_cachedMinMaxIndex.x != checkIndex.x || _cachedMinMaxIndex.y != checkIndex.y || IsConstraintScrollActive())
                 FastReloadAll();
             else
             {
@@ -197,7 +198,7 @@ namespace Kyub.UI
             if (m_elements == null)
                 return;
 
-            _cachedMinMaxIndex = new Vector2Int(GetCurrentIndex(), GetLastIndex());
+            _cachedMinMaxIndex = CalculateSafeCachedMinMax();
             if (OnBeforeChangeVisibleElements != null)
                 OnBeforeChangeVisibleElements.Invoke(_lastFrameVisibleElementIndexes);
             if (_lastFrameVisibleElementIndexes != _cachedMinMaxIndex)
