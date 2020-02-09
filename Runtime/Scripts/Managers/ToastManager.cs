@@ -74,9 +74,13 @@ namespace MaterialUI
                 if (!string.IsNullOrEmpty(assetPath))
                     _AnimatorsCache[assetPath] = currentAnimator;
             }
-            
-            if(currentAnimator != null)
+
+            if (currentAnimator != null)
+            {
                 currentAnimator.transform.SetParent(parent);
+                currentAnimator.transform.localScale = Vector3.one;
+                currentAnimator.transform.localRotation = Quaternion.identity;
+            }
 
             return new KeyValuePair<string,ToastAnimator>(assetPath, currentAnimator);
         }
