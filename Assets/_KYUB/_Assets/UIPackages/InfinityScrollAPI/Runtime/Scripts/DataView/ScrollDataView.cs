@@ -670,6 +670,7 @@ namespace Kyub.UI
         {
             if (m_data != null && m_data.Count > 0)
             {
+                Dictionary<GameObject, Stack<GameObject>> templatedPerObjectToReturn = new Dictionary<GameObject, Stack<GameObject>>();
                 var v_currentVisibleIndexRange = ScrollLayoutGroup.VisibleElementsIndexRange;
                 for (int i = p_oldVisibleIndexRange.x; i <= p_oldVisibleIndexRange.y; i++)
                 {
@@ -681,7 +682,20 @@ namespace Kyub.UI
                         //Is a DataView Object
                         if (v_element != null && v_dataIndex >= 0)
                         {
-                            ReturnToPool(v_dataIndex, v_element);
+                            var template = GetTemplateFromDataIndex(v_dataIndex);
+                            //Add in template list (we will try recycle this objects first)
+                            if (template != null)
+                            {
+                                Stack<GameObject> templateObjects = null;
+                                if (!templatedPerObjectToReturn.TryGetValue(template, out templateObjects) || templateObjects == null)
+                                {
+                                    templateObjects = new Stack<GameObject>();
+                                    templatedPerObjectToReturn[template] = templateObjects;
+                                }
+                                templateObjects.Push(v_element);
+                            }
+                            
+                            //ReturnToPool(v_dataIndex, v_element);
                             ScrollLayoutGroup[i] = null;
                         }
                     }
@@ -700,9 +714,23 @@ namespace Kyub.UI
                         //Is a DataView Object
                         if (v_dataIndex >= 0)
                         {
-                            var v_poolObject = CreateOrPopFromPool(v_dataIndex);
+                            var template = GetTemplateFromDataIndex(v_dataIndex);
+                            GameObject poolObject = null;
+                            Stack<GameObject> stack = null;
+                            if (template != null)
+                            {
+                                if(templatedPerObjectToReturn.TryGetValue(template, out stack) && stack != null)
+                                    poolObject = stack.Pop();
+                                //We dont need this stack anymore
+                                if (stack == null || stack.Count == 0)
+                                    templatedPerObjectToReturn.Remove(template);
+                            }
+                            //Pick from Default pool if we cant recycle previous deactivated templates
+                            if(poolObject == null)
+                                poolObject = CreateOrPopFromPool(template);
+
                             var v_oldElement = ScrollLayoutGroup[i];
-                            ScrollLayoutGroup[i] = v_poolObject != null ? v_poolObject.gameObject : null;
+                            ScrollLayoutGroup[i] = poolObject != null ? poolObject.gameObject : null;
                             if (v_oldElement != null)
                             {
                                 v_oldElement.gameObject.SetActive(false);
@@ -711,6 +739,18 @@ namespace Kyub.UI
                         }
                     }
                 }
+
+                //Return unused objects deactivate this cycle too pool
+                foreach (var pair in templatedPerObjectToReturn)
+                {
+                    var elementsToReturn = pair.Value;
+                    foreach(var elementToReturn in elementsToReturn)
+                    {
+                        ReturnToPool(pair.Key, elementToReturn);
+                    }
+                }
+                templatedPerObjectToReturn.Clear();
+
                 if (v_needApplyTemplateNames)
                     InitTemplates();
             }
