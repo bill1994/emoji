@@ -103,6 +103,7 @@ namespace Kyub.UI
         bool _previousActiveSelf = false;
         protected override void OnDisable()
         {
+            CancelInvoke();
             UnregisterEvents();
             base.OnDisable();
 
@@ -117,9 +118,7 @@ namespace Kyub.UI
         {
             base.OnRectTransformDimensionsChange();
             if (enabled)
-            {
-                ApplyElementSize();
-            }
+                SetElementSizeDirty();
         }
 
         protected override void OnTransformParentChanged()
@@ -131,6 +130,12 @@ namespace Kyub.UI
         #endregion
 
         #region Helper Functions
+
+        public virtual void SetElementSizeDirty()
+        {
+            CancelInvoke("ApplyElementSize");
+            Invoke("ApplyElementSize", 0);
+        }
 
         protected virtual void RegisterEvents()
         {

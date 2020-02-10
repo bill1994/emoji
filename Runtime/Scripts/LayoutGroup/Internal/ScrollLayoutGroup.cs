@@ -528,7 +528,7 @@ namespace Kyub.UI
 
         #region Public Layout Functions
 
-        public void SetCachedElementSize(int p_index, float p_itemSize)
+        public virtual void SetCachedElementSize(int p_index, float p_itemSize)
         {
             FixLayoutInconsistencies();
             if (_scrollElementsCachedSize.Count > p_index && p_index >= 0)
@@ -1263,24 +1263,19 @@ namespace Kyub.UI
 
         public static float CalculateElementSize(Component p_object, bool p_isVerticalLayout)
         {
-            //Ignore inactive game objects
-            //if (p_object != null && !p_object.gameObject.activeSelf)
-            //    return 0;
-
             var v_elementTransform = p_object != null ? p_object.transform as RectTransform : null;
-            var v_layout = v_elementTransform != null ? v_elementTransform.GetComponent<LayoutElement>() : null;
-            float v_elementSize = 0;
-            Vector2 v_clampValues = new Vector2(-1, -1);
-            if (v_layout != null && v_layout.enabled && !v_layout.ignoreLayout)
-                v_clampValues = p_isVerticalLayout ? new Vector2(v_layout.minHeight, v_layout.preferredHeight) : new Vector2(v_layout.minWidth, v_layout.preferredWidth);
-            //Apply Preferred Size
-            if (v_clampValues.y >= 0)
-                v_elementSize = v_clampValues.y;
-            else
-                v_elementSize = v_elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(v_elementTransform) : GetLocalWidth(v_elementTransform)) : 100;
-            //Apply Min
-            if (v_clampValues.x >= 0)
-                v_elementSize = Mathf.Max(v_clampValues.x, v_elementSize);
+            float v_elementSize = v_elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(v_elementTransform) : GetLocalWidth(v_elementTransform)) : 100;
+            var ignoreLayouts = v_elementTransform != null ? v_elementTransform.GetComponents<ILayoutIgnorer>() : null;
+            foreach (var ignoreLayout in ignoreLayouts)
+            {
+                if (ignoreLayout.ignoreLayout)
+                {
+                    return v_elementSize;
+                }
+            }
+
+            var preferredSize = v_elementTransform == null ? 0 : LayoutUtility.GetLayoutProperty(v_elementTransform, (layout) => p_isVerticalLayout ? Mathf.Max(layout.minHeight, layout.preferredHeight) : Mathf.Max(layout.minWidth, layout.preferredWidth), 0);
+            v_elementSize = Mathf.Max(preferredSize, v_elementSize);
 
             return v_elementSize;
         }
