@@ -94,11 +94,11 @@ namespace Kyub.UI
                     v_rectTransform.pivot = Content.pivot;
                     if (IsVertical())
                     {
-                        _layoutSize.x = Mathf.Max(_layoutSize.x, LayoutUtility.GetPreferredWidth(v_rectTransform));
+                        _layoutSize.x = Mathf.Max(_layoutSize.x, GetSafePreferredWidth(v_rectTransform));
                         if (Mathf.Abs(GetLocalHeight(v_rectTransform) - v_itemSize) > SIZE_ERROR)
                             SetLocalHeight(v_rectTransform, v_itemSize);
 
-                        SetLayoutElementPreferredSize(v_layout, new Vector2(-1, v_itemSize));
+                        //SetLayoutElementPreferredSize(v_layout, new Vector2(-1, v_itemSize));
 
                         //Apply Padding Horizontal
                         var v_width = GetLocalWidth(Content) - (m_padding.left + m_padding.right);
@@ -107,11 +107,11 @@ namespace Kyub.UI
                     }
                     else
                     {
-                        _layoutSize.y = Mathf.Max(_layoutSize.y, LayoutUtility.GetPreferredHeight(v_rectTransform));
+                        _layoutSize.y = Mathf.Max(_layoutSize.y, GetSafePreferredHeight(v_rectTransform));
                         if (Mathf.Abs(GetLocalWidth(v_rectTransform) - v_itemSize) > SIZE_ERROR)
                             SetLocalWidth(v_rectTransform, v_itemSize);
 
-                        SetLayoutElementPreferredSize(v_layout, new Vector2(v_itemSize, -1));
+                        //SetLayoutElementPreferredSize(v_layout, new Vector2(v_itemSize, -1));
 
                         //Apply Padding Vertical
                         var v_height = GetLocalHeight(Content) - (m_padding.top + m_padding.bottom);
@@ -186,7 +186,7 @@ namespace Kyub.UI
             {
                 var elementRectTransform = i >= 0 && m_elements.Count > i && m_elements[i] != null ? m_elements[i].transform as RectTransform : null;
                 if (elementRectTransform != null)
-                    _layoutSize[anotherAxis] = Mathf.Max(_layoutSize[anotherAxis], LayoutUtility.GetPreferredSize(elementRectTransform, anotherAxis));
+                    _layoutSize[anotherAxis] = Mathf.Max(_layoutSize[anotherAxis], GetSafePreferredSize(elementRectTransform, anotherAxis));
             }
             return _layoutSize[anotherAxis];
         }

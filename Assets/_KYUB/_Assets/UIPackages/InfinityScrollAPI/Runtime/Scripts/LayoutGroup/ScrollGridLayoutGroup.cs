@@ -369,7 +369,7 @@ namespace Kyub.UI
                         if (Mathf.Abs(GetLocalHeight(v_rectTransform) - v_itemSize) > SIZE_ERROR)
                             SetLocalHeight(v_rectTransform, v_itemSize);
 
-                        SetLayoutElementPreferredSize(v_layout, new Vector2(-1, v_itemSize));
+                        //SetLayoutElementPreferredSize(v_layout, new Vector2(-1, v_itemSize));
                         //Apply Padding Horizontal
                         if (Mathf.Abs(GetLocalWidth(v_rectTransform) - _cachedConstraintCellSize) > SIZE_ERROR)
                             SetLocalWidth(v_rectTransform, _cachedConstraintCellSize);
@@ -380,7 +380,7 @@ namespace Kyub.UI
                         if (Mathf.Abs(GetLocalWidth(v_rectTransform) - v_itemSize) > SIZE_ERROR)
                             SetLocalWidth(v_rectTransform, v_itemSize);
 
-                        SetLayoutElementPreferredSize(v_layout, new Vector2(v_itemSize, -1));
+                        //SetLayoutElementPreferredSize(v_layout, new Vector2(v_itemSize, -1));
                         //Apply Padding Vertical
                         if (Mathf.Abs(GetLocalHeight(v_rectTransform) - _cachedConstraintCellSize) > SIZE_ERROR)
                             SetLocalHeight(v_rectTransform, _cachedConstraintCellSize);

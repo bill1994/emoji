@@ -83,7 +83,7 @@ namespace Kyub.UI
             base.OnEnable();
             if (_started && gameObject.activeInHierarchy && enabled)
             {
-                ApplyElementSize();
+                SetElementSizeDirty();
                 //Force recalculate element
                 if (!_previousActiveSelf && ScrollLayoutGroup != null)
                     ScrollLayoutGroup.SetCachedElementsLayoutDirty();
@@ -97,13 +97,13 @@ namespace Kyub.UI
         {
             base.Start();
             _started = true;
-            ApplyElementSize();
+            SetElementSizeDirty();
         }
 
         bool _previousActiveSelf = false;
         protected override void OnDisable()
         {
-            CancelInvoke();
+            _applyElementSizeRoutine = null;
             UnregisterEvents();
             base.OnDisable();
 
@@ -133,8 +133,16 @@ namespace Kyub.UI
 
         public virtual void SetElementSizeDirty()
         {
-            CancelInvoke("ApplyElementSize");
-            Invoke("ApplyElementSize", 0);
+            if (_applyElementSizeRoutine == null && enabled && gameObject.activeInHierarchy)
+                _applyElementSizeRoutine = StartCoroutine(ApplyElementSizeRoutine());
+        }
+
+        Coroutine _applyElementSizeRoutine = null;
+        protected virtual IEnumerator ApplyElementSizeRoutine()
+        {
+            yield return null;
+
+            ApplyElementSize();
         }
 
         protected virtual void RegisterEvents()
@@ -156,6 +164,7 @@ namespace Kyub.UI
 
         protected void ApplyElementSize()
         {
+            _applyElementSizeRoutine = null;
             if (ScrollLayoutGroup != null && LayoutElementIndex >= 0)
             {
                 ScrollLayoutGroup.SetCachedElementSize(LayoutElementIndex, ScrollLayoutGroup.CalculateElementSize(transform, ScrollLayoutGroup.IsVertical()));
