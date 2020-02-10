@@ -80,6 +80,7 @@ namespace MaterialUI
                 currentAnimator.transform.SetParent(parent);
                 currentAnimator.transform.localScale = Vector3.one;
                 currentAnimator.transform.localRotation = Quaternion.identity;
+                currentAnimator.transform.SetAsLastSibling();
             }
 
             return new KeyValuePair<string,ToastAnimator>(assetPath, currentAnimator);
