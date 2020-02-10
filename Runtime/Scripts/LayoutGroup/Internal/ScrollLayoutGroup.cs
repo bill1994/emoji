@@ -234,7 +234,7 @@ namespace Kyub.UI
             {
                 if (m_elements[i] == value)
                     return;
-                if(m_elements[i] != null)
+                if (m_elements[i] != null)
                     _objectsToSendToInvisibleContentParent.Remove(m_elements[i]);
                 m_elements[i] = value;
                 if (OnElementChanged != null)
@@ -748,9 +748,9 @@ namespace Kyub.UI
                 var v_group = Content.GetComponent<LayoutGroup>();
                 if (v_group != null)
                     v_group.enabled = false;
-                var v_fitter = Content.GetComponent<ContentSizeFitter>();
-                if (v_fitter != null)
-                    v_fitter.enabled = false;
+                //var v_fitter = Content.GetComponent<ContentSizeFitter>();
+                //if (v_fitter != null)
+                //    v_fitter.enabled = false;
             }
         }
 
@@ -804,7 +804,7 @@ namespace Kyub.UI
                         var v_element = m_elements[i];
                         if (v_element != null)
                         {
-                            if(v_element.transform.parent != Content)
+                            if (v_element.transform.parent != Content)
                                 v_element.transform.SetParent(Content, false);
                             v_element.transform.SetSiblingIndex(i + m_startingSibling);
                         }
@@ -866,7 +866,7 @@ namespace Kyub.UI
                     int amountBefore = deltaExtra / 2;
                     int amountAfter = deltaExtra - amountBefore;
 
-                    if(cachedNewMinMaxIndex.x - amountBefore < 0)
+                    if (cachedNewMinMaxIndex.x - amountBefore < 0)
                     {
                         int invalidBeforeAmount = Mathf.Abs(cachedNewMinMaxIndex.x - amountBefore);
                         amountBefore -= invalidBeforeAmount;
@@ -938,11 +938,13 @@ namespace Kyub.UI
         protected internal const float SIZE_ERROR = 0.01f;
         protected abstract void Reload(GameObject p_obj, int p_indexReload);
 
-        protected virtual void SetLayoutElementPreferredSize(LayoutElement p_layout, Vector2 p_preferredSize)
+        /*protected virtual void SetLayoutElementPreferredSize(LayoutElement p_layout, Vector2 p_preferredSize)
         {
             if (p_layout != null)
             {
                 var v_fitter = p_layout.GetComponent<ContentSizeFitter>();
+                if(v_fitter == null)
+                    v_fitter = GetComponent<ContentSizeFitter>();
                 if (v_fitter != null && v_fitter.enabled)
                     p_preferredSize = new Vector2(-1, -1);
                 if (p_layout.preferredWidth >= 0)
@@ -950,7 +952,7 @@ namespace Kyub.UI
                 if (p_layout.preferredHeight >= 0)
                     p_layout.preferredHeight = p_preferredSize.y;
             }
-        }
+        }*/
 
         protected internal HashSet<GameObject> _objectsToSendToInvisibleContentParent = new HashSet<GameObject>();
         protected virtual void TrySendObjectsToInvisibleContentParent()
@@ -1277,10 +1279,31 @@ namespace Kyub.UI
                 }
             }
 
-            var preferredSize = v_elementTransform == null ? 0 : LayoutUtility.GetLayoutProperty(v_elementTransform, (layout) => p_isVerticalLayout ? Mathf.Max(layout.minHeight, layout.preferredHeight) : Mathf.Max(layout.minWidth, layout.preferredWidth), 0);
+            float preferredSize = GetSafePreferredSize(v_elementTransform, p_isVerticalLayout ? 1 : 0);
             v_elementSize = Mathf.Max(preferredSize, v_elementSize);
 
             return v_elementSize;
+        }
+
+        public static float GetSafePreferredWidth(RectTransform rect)
+        {
+            var preferredSize = rect == null ? 0 :
+                LayoutUtility.GetLayoutProperty(rect, (layout) => Mathf.Max(layout.minWidth, layout.preferredWidth), -1);
+
+            return preferredSize;
+        }
+
+        public static float GetSafePreferredHeight(RectTransform rect)
+        {
+            var preferredSize = rect == null ? 0 :
+                LayoutUtility.GetLayoutProperty(rect, (layout) => Mathf.Max(layout.minHeight, layout.preferredHeight), -1);
+
+            return preferredSize;
+        }
+
+        public static float GetSafePreferredSize(RectTransform rect, int axis)
+        {
+            return axis == 0 ? GetSafePreferredWidth(rect) : GetSafePreferredHeight(rect);
         }
 
         #endregion
@@ -1367,7 +1390,7 @@ namespace Kyub.UI
             if (executing != CanvasUpdate.PostLayout)
                 return;
 
-            if(!Application.isPlaying)
+            if (!Application.isPlaying)
                 SetCachedElementsLayoutDirty();
         }
 
@@ -1383,4 +1406,3 @@ namespace Kyub.UI
 
     }
 }
-
