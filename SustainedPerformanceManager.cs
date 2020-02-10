@@ -444,7 +444,7 @@ namespace Kyub.Performance
         {
             if (_ignoreNextLayoutRebuild)
             {
-                ClearPendentInvalidTransforms();
+                ClearPendentInvalidTransforms(false);
                 _ignoreNextLayoutRebuild = false;
             }
             else
@@ -494,7 +494,6 @@ namespace Kyub.Performance
 
         protected virtual void SetLowPerformanceDelayed(float p_waitTime = 0)
         {
-            CancelSetHighPerformance();
             if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
             {
                 if (_lowPerformanceWaitTime <= 0)
@@ -596,6 +595,7 @@ namespace Kyub.Performance
 
         protected virtual IEnumerator SetHighPerformanceInEndOfFrameRoutine(bool bufferIsDirty, bool p_autoDisable = true, float p_waitTime = 0, bool skipEndOfFrame = false)
         {
+            CancelSetLowPerformance();
             var invalidCullingMask = s_invalidCullingMask;
             bufferIsDirty = _bufferIsDirty || bufferIsDirty;
 
@@ -640,7 +640,7 @@ namespace Kyub.Performance
             if (OnSetHighPerformance != null)
                 OnSetHighPerformance(bufferIsDirty);
 
-            ClearPendentInvalidTransforms();
+            ClearPendentInvalidTransforms(onAfterDrawBufferEnumerator == null);
 
             _bufferIsDirty = false;
             _ignoreNextLayoutRebuild = true;
@@ -651,7 +651,10 @@ namespace Kyub.Performance
 
             //Draw Buffer
             if (onAfterDrawBufferEnumerator != null)
+            {
                 yield return onAfterDrawBufferEnumerator;
+                ClearPendentInvalidTransforms();
+            }
 
             if (_highPerformanceAutoDisable)
                 SetLowPerformanceDelayed(m_autoDisableHighPerformanceTime);
@@ -659,7 +662,7 @@ namespace Kyub.Performance
                 CancelSetLowPerformance();
         }
 
-        protected virtual void ClearPendentInvalidTransforms()
+        protected virtual void ClearPendentInvalidTransforms(bool clearInvalidCullingMask = true)
         {
             if (UseSafeRefreshMode)
                 s_invalidComplexShape = null;
@@ -672,7 +675,8 @@ namespace Kyub.Performance
             }
 
             s_pendentInvalidRectTransforms.Clear();
-            s_invalidCullingMask = _defaultInvalidCullingMask;
+            if (clearInvalidCullingMask)
+                s_invalidCullingMask = _defaultInvalidCullingMask;
         }
 
         protected virtual void CallOnBeforeSetPerformance()
@@ -724,12 +728,12 @@ namespace Kyub.Performance
             }
             else
             {*/
-            var textureChanged = CheckBufferTextures();
+            CheckBufferTextures();
 
             var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
-            if (textureChanged)
-                DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
-            if(!textureChanged || !s_isEndOfFrame)
+            DrawDirtyCameraViewsWithRenderBufferState(bufferCameraViews, true);
+
+            if (!s_isEndOfFrame)
                 yield return new WaitForEndOfFrame();
             s_isEndOfFrame = true;
             //}
@@ -761,7 +765,7 @@ namespace Kyub.Performance
             return v_invalidCameraViews;
         }
 
-        protected void DrawCameraViewsWithRenderBufferState(IList<SustainedCameraView> cameraViews, bool isBuffer)
+        protected void DrawDirtyCameraViewsWithRenderBufferState(IList<SustainedCameraView> cameraViews, bool isBuffer)
         {
             //prepare all cameras draw into RenderBuffer changing the render texture target based in index
             if (cameraViews == null)
