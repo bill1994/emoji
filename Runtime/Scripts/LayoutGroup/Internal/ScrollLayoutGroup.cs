@@ -1266,11 +1266,14 @@ namespace Kyub.UI
             var v_elementTransform = p_object != null ? p_object.transform as RectTransform : null;
             float v_elementSize = v_elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(v_elementTransform) : GetLocalWidth(v_elementTransform)) : 100;
             var ignoreLayouts = v_elementTransform != null ? v_elementTransform.GetComponents<ILayoutIgnorer>() : null;
-            foreach (var ignoreLayout in ignoreLayouts)
+            if (ignoreLayouts != null)
             {
-                if (ignoreLayout.ignoreLayout)
+                foreach (var ignoreLayout in ignoreLayouts)
                 {
-                    return v_elementSize;
+                    if (ignoreLayout.ignoreLayout)
+                    {
+                        return v_elementSize;
+                    }
                 }
             }
 
@@ -1279,8 +1282,6 @@ namespace Kyub.UI
 
             return v_elementSize;
         }
-
-
 
         #endregion
 
