@@ -494,6 +494,7 @@ namespace Kyub.Performance
 
         protected virtual void SetLowPerformanceDelayed(float p_waitTime = 0)
         {
+            CancelSetHighPerformance();
             if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
             {
                 if (_lowPerformanceWaitTime <= 0)
@@ -595,7 +596,6 @@ namespace Kyub.Performance
 
         protected virtual IEnumerator SetHighPerformanceInEndOfFrameRoutine(bool bufferIsDirty, bool p_autoDisable = true, float p_waitTime = 0, bool skipEndOfFrame = false)
         {
-            CancelSetLowPerformance();
             var invalidCullingMask = s_invalidCullingMask;
             bufferIsDirty = _bufferIsDirty || bufferIsDirty;
 
@@ -728,12 +728,12 @@ namespace Kyub.Performance
             }
             else
             {*/
-            CheckBufferTextures();
+            var textureChanged = CheckBufferTextures();
 
             var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
-            DrawDirtyCameraViewsWithRenderBufferState(bufferCameraViews, true);
-
-            if (!s_isEndOfFrame)
+            if (textureChanged)
+                DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
+            if (!textureChanged || !s_isEndOfFrame)
                 yield return new WaitForEndOfFrame();
             s_isEndOfFrame = true;
             //}
@@ -765,7 +765,7 @@ namespace Kyub.Performance
             return v_invalidCameraViews;
         }
 
-        protected void DrawDirtyCameraViewsWithRenderBufferState(IList<SustainedCameraView> cameraViews, bool isBuffer)
+        protected void DrawCameraViewsWithRenderBufferState(IList<SustainedCameraView> cameraViews, bool isBuffer)
         {
             //prepare all cameras draw into RenderBuffer changing the render texture target based in index
             if (cameraViews == null)
