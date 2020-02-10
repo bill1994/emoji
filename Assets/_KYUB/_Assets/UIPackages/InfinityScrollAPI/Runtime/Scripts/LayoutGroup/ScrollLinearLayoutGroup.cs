@@ -73,7 +73,8 @@ namespace Kyub.UI
                     UnregisterVisibleElement(p_indexReload);
                 else
                     RegisterVisibleElement(p_indexReload);
-                p_obj.transform.name = "[" + p_indexReload + "] " + System.Text.RegularExpressions.Regex.Replace(p_obj.transform.name, @"^\[[0-9]+\] ", "");
+                if(Application.isEditor)
+                    p_obj.transform.name = "[" + p_indexReload + "] " + System.Text.RegularExpressions.Regex.Replace(p_obj.transform.name, @"^\[[0-9]+\] ", "");
             }
 
             Vector3 v_elementPosition = GetElementPosition(p_indexReload);

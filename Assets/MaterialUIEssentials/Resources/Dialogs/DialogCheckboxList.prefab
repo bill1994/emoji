@@ -1048,6 +1048,7 @@ MonoBehaviour:
   m_disableNonVisibleElements: 1
   m_autoPickElements: 1
   m_extraVisibleElements: {x: 0, y: 0}
+  m_optimizeDeepHierarchy: 1
   m_elements:
   - {fileID: 179608}
   m_startingSibling: 0

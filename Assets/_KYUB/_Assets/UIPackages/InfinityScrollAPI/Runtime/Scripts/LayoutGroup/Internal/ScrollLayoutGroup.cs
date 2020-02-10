@@ -54,7 +54,7 @@ namespace Kyub.UI
         [SerializeField, Tooltip("force extra visible elements (before/after screen)")]
         Vector2Int m_extraVisibleElements = new Vector2Int(0, 0);
         [SerializeField, Tooltip("In deep hierarchys SetParent contains a huge impact in performance. This property will try prevent recalculate amount of visible elements")]
-        bool m_optimizeDeepHierarchy = false;
+        bool m_optimizeDeepHierarchy = true;
         [Space]
         [SerializeField]
         protected List<GameObject> m_elements = new List<GameObject>();
@@ -234,6 +234,8 @@ namespace Kyub.UI
             {
                 if (m_elements[i] == value)
                     return;
+                if(m_elements[i] != null)
+                    _objectsToSendToInvisibleContentParent.Remove(m_elements[i]);
                 m_elements[i] = value;
                 if (OnElementChanged != null)
                     OnElementChanged.Invoke(i);
@@ -319,6 +321,7 @@ namespace Kyub.UI
 
         protected virtual void Update()
         {
+            TrySendObjectsToInvisibleContentParent();
             TryRecalculateLayout();
         }
 
@@ -391,13 +394,16 @@ namespace Kyub.UI
 
         public void ClearElements()
         {
+            _objectsToSendToInvisibleContentParent.Clear();
             m_elements.Clear();
             ReplaceElements(m_elements);
         }
 
         public void ReplaceElements(IList<GameObject> p_elements)
         {
+            _objectsToSendToInvisibleContentParent.Clear();
             m_elements = p_elements != null ? new List<GameObject>(p_elements) : new List<GameObject>();
+            _objectsToSendToInvisibleContentParent.Clear();
             SetCachedElementsLayoutDirty(true);
             if (OnAllElementsReplaced != null)
                 OnAllElementsReplaced.Invoke();
@@ -448,6 +454,8 @@ namespace Kyub.UI
         {
             if (p_index >= 0 && p_index < m_elements.Count)
             {
+                if (m_elements[p_index] != null)
+                    _objectsToSendToInvisibleContentParent.Remove(m_elements[p_index]);
                 m_elements.RemoveAt(p_index);
                 SetCachedElementsLayoutDirty(true);
                 if (OnElementsRemoved != null)
@@ -796,7 +804,8 @@ namespace Kyub.UI
                         var v_element = m_elements[i];
                         if (v_element != null)
                         {
-                            v_element.transform.SetParent(Content, false);
+                            if(v_element.transform.parent != Content)
+                                v_element.transform.SetParent(Content, false);
                             v_element.transform.SetSiblingIndex(i + m_startingSibling);
                         }
                     }
@@ -804,11 +813,12 @@ namespace Kyub.UI
                     //Now we must pick non-mapped objects (Templates?)
                     for (int i = 0; i < _invisibleElementsContent.childCount; i++)
                     {
-                        var v_transform = _invisibleElementsContent.GetChild(i);
-                        if (v_transform != null)
+                        var v_element = _invisibleElementsContent.GetChild(i);
+                        if (v_element != null)
                         {
-                            v_transform.transform.SetParent(Content, false);
-                            v_transform.transform.SetSiblingIndex(i);
+                            if (v_element.transform.parent != Content)
+                                v_element.transform.SetParent(Content, false);
+                            v_element.transform.SetSiblingIndex(i);
                         }
                     }
                 }
@@ -942,6 +952,20 @@ namespace Kyub.UI
             }
         }
 
+        protected internal HashSet<GameObject> _objectsToSendToInvisibleContentParent = new HashSet<GameObject>();
+        protected virtual void TrySendObjectsToInvisibleContentParent()
+        {
+            if (_invisibleElementsContent != null)
+            {
+                foreach (var v_object in _objectsToSendToInvisibleContentParent)
+                {
+                    if (v_object != null)
+                        v_object.transform.SetParent(_invisibleElementsContent, false);
+                }
+            }
+            _objectsToSendToInvisibleContentParent.Clear();
+        }
+
         protected virtual void RegisterVisibleElement(int p_index)
         {
             GameObject v_object = p_index >= 0 && m_elements.Count > p_index ? m_elements[p_index] : null;
@@ -960,6 +984,7 @@ namespace Kyub.UI
                     v_object.transform.SetParent(Content, false);
                     v_object.transform.SetSiblingIndex(Mathf.Clamp(p_index - _cachedMinMaxIndex.x + m_startingSibling, 0, Content.childCount - 1));
                 }
+                _objectsToSendToInvisibleContentParent.Remove(v_object);
                 //if (!v_object.activeSelf)
                 //    v_object.SetActive(true);
                 if (v_object.activeSelf && OnElementBecameVisible != null)
@@ -974,7 +999,8 @@ namespace Kyub.UI
             {
                 if (_invisibleElementsContent != null && Application.isPlaying)
                 {
-                    v_object.transform.SetParent(_invisibleElementsContent, false);
+                    _objectsToSendToInvisibleContentParent.Add(v_object);
+                    //v_object.transform.SetParent(_invisibleElementsContent, false);
                 }
                 if (OnElementBecameInvisible != null)
                     OnElementBecameInvisible.Invoke(v_object, p_index);
