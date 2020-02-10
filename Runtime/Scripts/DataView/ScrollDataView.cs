@@ -172,6 +172,7 @@ namespace Kyub.UI
 
         protected virtual void Update()
         {
+            TrySendObjectsToPoolParent();
             TryRemapIndexes();
         }
 
@@ -961,16 +962,17 @@ namespace Kyub.UI
                     v_poolObject.gameObject.SetActive(true);
 
                     //We Poped the object, so we must cancel the pool Recalc Function
-                    var v_index = _objectsToSendToPoolParent.IndexOf(v_poolObject);
-                    if (v_index >= 0)
-                        _objectsToSendToPoolParent.RemoveAt(v_index);
+                    _objectsToSendToPoolParent.Remove(v_poolObject);
+
+                    //if(_objectsToSendToPoolParent.Count == 0)
+                    //    CancelInvoke("SendObjectsToPoolParent");
                 }
             }
             return v_poolObject;
         }
 
-        List<GameObject> _objectsToSendToPoolParent = new List<GameObject>();
-        protected virtual void SendObjectsToPoolParent()
+        HashSet<GameObject> _objectsToSendToPoolParent = new HashSet<GameObject>();
+        protected virtual void TrySendObjectsToPoolParent()
         {
             if (_poolContent != null)
             {
@@ -1011,8 +1013,8 @@ namespace Kyub.UI
                         v_poolOfType.Add(p_object);
                         //p_object.transform.SetParent(_poolContent, false);
                         _objectsToSendToPoolParent.Add(p_object);
-                        CancelInvoke("SendObjectsToPoolParent");
-                        Invoke("SendObjectsToPoolParent", 0.1f);
+                        //CancelInvoke("SendObjectsToPoolParent");
+                        //Invoke("SendObjectsToPoolParent", 0.1f);
                         return true;
                     }
                 }
