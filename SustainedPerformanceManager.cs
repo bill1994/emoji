@@ -640,7 +640,7 @@ namespace Kyub.Performance
             if (OnSetHighPerformance != null)
                 OnSetHighPerformance(bufferIsDirty);
 
-            ClearPendentInvalidTransforms(onAfterDrawBufferEnumerator == null);
+            ClearPendentInvalidTransforms();
 
             _bufferIsDirty = false;
             _ignoreNextLayoutRebuild = true;
@@ -651,10 +651,7 @@ namespace Kyub.Performance
 
             //Draw Buffer
             if (onAfterDrawBufferEnumerator != null)
-            {
                 yield return onAfterDrawBufferEnumerator;
-                ClearPendentInvalidTransforms();
-            }
 
             if (_highPerformanceAutoDisable)
                 SetLowPerformanceDelayed(m_autoDisableHighPerformanceTime);
@@ -696,6 +693,7 @@ namespace Kyub.Performance
 
         protected IEnumerator OnAfterDrawBufferRoutine(int p_invalidCullingMask)
         {
+            p_invalidCullingMask |= s_invalidCullingMask;
             //Wait one cycle to draw to a RenderTexture
             /*if (s_isWaitingRenderBuffer)
             {
@@ -728,12 +726,11 @@ namespace Kyub.Performance
             }
             else
             {*/
-            var textureChanged = CheckBufferTextures();
-
+            CheckBufferTextures();
             var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
-            if (textureChanged)
+            if (s_isEndOfFrame)
                 DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
-            if (!textureChanged || !s_isEndOfFrame)
+            else
                 yield return new WaitForEndOfFrame();
             s_isEndOfFrame = true;
             //}
