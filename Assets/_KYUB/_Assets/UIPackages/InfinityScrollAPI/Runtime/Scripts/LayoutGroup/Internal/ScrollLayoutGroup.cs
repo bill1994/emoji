@@ -1288,16 +1288,14 @@ namespace Kyub.UI
 
         public static float GetSafePreferredWidth(RectTransform rect)
         {
-            var preferredSize = rect == null ? 0 :
-                LayoutUtility.GetLayoutProperty(rect, (layout) => Mathf.Max(layout.minWidth, layout.preferredWidth), -1);
+            var preferredSize = rect == null ? 0 : LayoutUtility.GetPreferredWidth(rect);
 
             return preferredSize;
         }
 
         public static float GetSafePreferredHeight(RectTransform rect)
         {
-            var preferredSize = rect == null ? 0 :
-                LayoutUtility.GetLayoutProperty(rect, (layout) => Mathf.Max(layout.minHeight, layout.preferredHeight), -1);
+            var preferredSize = rect == null ? 0 : LayoutUtility.GetPreferredHeight(rect);
 
             return preferredSize;
         }
