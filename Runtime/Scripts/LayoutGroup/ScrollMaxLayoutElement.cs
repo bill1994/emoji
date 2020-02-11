@@ -83,7 +83,7 @@ namespace Kyub.UI
             base.OnEnable();
             if (_started && gameObject.activeInHierarchy && enabled)
             {
-                SetElementSizeDirty();
+                //ApplyElementSize();
                 //Force recalculate element
                 if (!_previousActiveSelf && ScrollLayoutGroup != null)
                     ScrollLayoutGroup.SetCachedElementsLayoutDirty();
@@ -97,13 +97,13 @@ namespace Kyub.UI
         {
             base.Start();
             _started = true;
-            SetElementSizeDirty();
+            //SetElementSizeDirty();
         }
 
         bool _previousActiveSelf = false;
         protected override void OnDisable()
         {
-            _applyElementSizeRoutine = null;
+            //_applyElementSizeRoutine = null;
             UnregisterEvents();
             base.OnDisable();
 
@@ -114,24 +114,25 @@ namespace Kyub.UI
             _previousActiveSelf = gameObject.activeSelf;
         }
 
-        protected override void OnRectTransformDimensionsChange()
+        /*protected override void OnRectTransformDimensionsChange()
         {
             base.OnRectTransformDimensionsChange();
             if (enabled)
                 SetElementSizeDirty();
-        }
+        }*/
 
         protected override void OnTransformParentChanged()
         {
             base.OnTransformParentChanged();
             ScrollLayoutGroup = ScrollLayoutGroup.GetComponentInParent<ScrollLayoutGroup>(this, true);
+            SetDirty();
         }
 
         #endregion
 
         #region Helper Functions
 
-        public virtual void SetElementSizeDirty()
+        /*public virtual void SetElementSizeDirty()
         {
             if (_applyElementSizeRoutine == null && enabled && gameObject.activeInHierarchy)
                 _applyElementSizeRoutine = StartCoroutine(ApplyElementSizeRoutine());
@@ -143,7 +144,7 @@ namespace Kyub.UI
             yield return null;
 
             ApplyElementSize();
-        }
+        }*/
 
         protected virtual void RegisterEvents()
         {
@@ -164,7 +165,7 @@ namespace Kyub.UI
 
         protected void ApplyElementSize()
         {
-            _applyElementSizeRoutine = null;
+            //_applyElementSizeRoutine = null;
             if (ScrollLayoutGroup != null && LayoutElementIndex >= 0)
             {
                 ScrollLayoutGroup.SetCachedElementSize(LayoutElementIndex, ScrollLayoutGroup.CalculateElementSize(transform, ScrollLayoutGroup.IsVertical()));
@@ -181,8 +182,8 @@ namespace Kyub.UI
             {
                 _isVisible = false;
                 LayoutElementIndex = p_index;
-                if (OnBecameVisible != null)
-                    OnBecameVisible.Invoke();
+                if (OnBecameInvisible != null)
+                    OnBecameInvisible.Invoke();
             }
             else if (LayoutElementIndex >= 0 && p_index == LayoutElementIndex)
             {
@@ -197,14 +198,32 @@ namespace Kyub.UI
             {
                 _isVisible = true;
                 LayoutElementIndex = p_index;
-                if (OnBecameInvisible != null)
-                    OnBecameInvisible.Invoke();
+                if (OnBecameVisible != null)
+                    OnBecameVisible.Invoke();
             }
             else if (LayoutElementIndex >= 0 && p_index == LayoutElementIndex)
             {
                 _isVisible = false;
                 LayoutElementIndex = -1;
             }
+        }
+
+        #endregion
+
+        #region Override
+
+        public override void CalculateLayoutInputHorizontal()
+        {
+            base.CalculateLayoutInputHorizontal();
+            if (ScrollLayoutGroup != null && !ScrollLayoutGroup.IsVertical())
+                ApplyElementSize();
+        }
+
+        public override void CalculateLayoutInputVertical()
+        {
+            base.CalculateLayoutInputVertical();
+            if (ScrollLayoutGroup != null && ScrollLayoutGroup.IsVertical())
+                ApplyElementSize();
         }
 
         #endregion

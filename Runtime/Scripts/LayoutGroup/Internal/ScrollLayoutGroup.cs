@@ -11,7 +11,7 @@ namespace Kyub.UI
     [DisallowMultipleComponent]
     [ExecuteInEditMode]
     [RequireComponent(typeof(RectTransform))]
-    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ICanvasElement
+    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ICanvasElement, ILayoutGroup
     {
         #region Helper Classes
         [System.Serializable]
@@ -322,7 +322,7 @@ namespace Kyub.UI
         protected virtual void Update()
         {
             TrySendObjectsToInvisibleContentParent();
-            TryRecalculateLayout();
+            //TryRecalculateLayout();
         }
 
         protected Vector2 _lastScrollValue = new Vector2(-1, -1);
@@ -572,6 +572,8 @@ namespace Kyub.UI
                 _cachedMinMaxIndex = new Vector2Int(-1, -1);
             }
             _layoutDirty = true;
+            LayoutRebuilder.MarkLayoutForRebuild(this.transform as RectTransform)
+                ;
         }
 
         public virtual void TryRecalculateLayout(bool p_force = false)
@@ -1266,7 +1268,6 @@ namespace Kyub.UI
         public static float CalculateElementSize(Component p_object, bool p_isVerticalLayout)
         {
             var v_elementTransform = p_object != null ? p_object.transform as RectTransform : null;
-            float v_elementSize = v_elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(v_elementTransform) : GetLocalWidth(v_elementTransform)) : 100;
             var ignoreLayouts = v_elementTransform != null ? v_elementTransform.GetComponents<ILayoutIgnorer>() : null;
             if (ignoreLayouts != null)
             {
@@ -1274,15 +1275,16 @@ namespace Kyub.UI
                 {
                     if (ignoreLayout.ignoreLayout)
                     {
+                        float v_elementSize = v_elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(v_elementTransform) : GetLocalWidth(v_elementTransform)) : 100;
                         return v_elementSize;
                     }
                 }
             }
 
             float preferredSize = GetSafePreferredSize(v_elementTransform, p_isVerticalLayout ? 1 : 0);
-            v_elementSize = Mathf.Max(preferredSize, v_elementSize);
+            //v_elementSize = Mathf.Max(preferredSize, v_elementSize);
 
-            return v_elementSize;
+            return preferredSize;
         }
 
         public static float GetSafePreferredWidth(RectTransform rect)
@@ -1373,12 +1375,24 @@ namespace Kyub.UI
         protected Vector2 _layoutSize = new Vector2(-1, -1);
         public virtual void CalculateLayoutInputHorizontal()
         {
+            TryRecalculateLayout();
             _layoutSize = new Vector2(GetLocalWidth(Content), _layoutSize.y);
         }
 
         public virtual void CalculateLayoutInputVertical()
         {
+            TryRecalculateLayout();
             _layoutSize = new Vector2(_layoutSize.x, GetLocalHeight(Content));
+        }
+
+        public void SetLayoutHorizontal()
+        {
+            TryRecalculateLayout();
+        }
+
+        public void SetLayoutVertical()
+        {
+            TryRecalculateLayout();
         }
 
         #endregion
