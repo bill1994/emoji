@@ -104,6 +104,7 @@ namespace Kyub.UI
         protected override void OnDisable()
         {
             //_applyElementSizeRoutine = null;
+            CancelInvoke();
             UnregisterEvents();
             base.OnDisable();
 
@@ -118,7 +119,7 @@ namespace Kyub.UI
         {
             base.OnRectTransformDimensionsChange();
             if (enabled)
-                SetElementSizeDirty();
+                ApplyElementSize();
         }*/
 
         protected override void OnTransformParentChanged()
@@ -132,19 +133,11 @@ namespace Kyub.UI
 
         #region Helper Functions
 
-        /*public virtual void SetElementSizeDirty()
+        public virtual void SetElementSizeDirty()
         {
-            if (_applyElementSizeRoutine == null && enabled && gameObject.activeInHierarchy)
-                _applyElementSizeRoutine = StartCoroutine(ApplyElementSizeRoutine());
+            if(!IsInvoking("ApplyElementSize"))
+                Invoke("ApplyElementSize", 0);
         }
-
-        Coroutine _applyElementSizeRoutine = null;
-        protected virtual IEnumerator ApplyElementSizeRoutine()
-        {
-            yield return null;
-
-            ApplyElementSize();
-        }*/
 
         protected virtual void RegisterEvents()
         {
