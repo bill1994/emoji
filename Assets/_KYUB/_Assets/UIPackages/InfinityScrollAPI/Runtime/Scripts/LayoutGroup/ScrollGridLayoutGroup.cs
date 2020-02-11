@@ -564,6 +564,7 @@ namespace Kyub.UI
 
         public override void CalculateLayoutInputHorizontal()
         {
+            TryRecalculateLayout();
             var isVertical = IsVertical();
             if (isVertical)
             {
@@ -578,6 +579,7 @@ namespace Kyub.UI
 
         public override void CalculateLayoutInputVertical()
         {
+            TryRecalculateLayout();
             var isVertical = IsVertical();
             if (!isVertical)
             {
