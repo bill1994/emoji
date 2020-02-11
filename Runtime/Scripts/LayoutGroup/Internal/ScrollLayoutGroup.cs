@@ -1280,29 +1280,10 @@ namespace Kyub.UI
                 }
             }
 
-            float preferredSize = GetSafePreferredSize(v_elementTransform, p_isVerticalLayout ? 1 : 0);
+            float preferredSize = LayoutUtilityEx.GetPreferredSize(v_elementTransform, p_isVerticalLayout ? 1 : 0);
             //v_elementSize = Mathf.Max(preferredSize, v_elementSize);
 
             return preferredSize;
-        }
-
-        public static float GetSafePreferredWidth(RectTransform rect)
-        {
-            var preferredSize = rect == null ? 0 : LayoutUtility.GetPreferredWidth(rect);
-
-            return preferredSize;
-        }
-
-        public static float GetSafePreferredHeight(RectTransform rect)
-        {
-            var preferredSize = rect == null ? 0 : LayoutUtility.GetPreferredHeight(rect);
-
-            return preferredSize;
-        }
-
-        public static float GetSafePreferredSize(RectTransform rect, int axis)
-        {
-            return axis == 0 ? GetSafePreferredWidth(rect) : GetSafePreferredHeight(rect);
         }
 
         #endregion
