@@ -97,6 +97,10 @@ namespace Kyub.UI
         protected Vector2Int _lastFrameVisibleElementIndexes = new Vector2Int(-1, -1);
         protected Vector2Int _cachedMinMaxIndex = new Vector2Int(-1, -1);
 
+#if UNITY_EDITOR
+        protected DrivenRectTransformTracker m_trackers = new DrivenRectTransformTracker();
+#endif
+
         #endregion
 
         #region Callbacks
@@ -305,6 +309,9 @@ namespace Kyub.UI
 
         protected override void OnDisable()
         {
+#if UNITY_EDITOR
+            m_trackers.Clear();
+#endif
             base.OnDisable();
             UnregisterScrollRectEvents();
             Invoke("RevertInvisibleElementsToMainContent", 0.01f);
@@ -893,12 +900,14 @@ namespace Kyub.UI
 
         protected virtual void ReloadAll_Internal(bool p_fullRecalc)
         {
+#if UNITY_EDITOR
+            m_trackers.Clear();
+#endif
             //Unregister events when scroll is not active
             if (GetContentSize() < GetParentContentSize())
                 UnregisterScrollRectEvents();
             else if (enabled && gameObject.activeInHierarchy)
                 RegisterScrollRectEvents();
-
 
             if (m_elements == null)
                 return;
@@ -975,6 +984,10 @@ namespace Kyub.UI
             GameObject v_object = p_index >= 0 && m_elements.Count > p_index ? m_elements[p_index] : null;
             if (v_object != null)
             {
+#if UNITY_EDITOR
+                m_trackers.Add(this, v_object.transform as RectTransform,
+                 DrivenTransformProperties.Anchors | DrivenTransformProperties.AnchoredPosition | DrivenTransformProperties.SizeDelta);
+#endif
                 if (Content != null)
                 {
                     var v_rectTransform = v_object.transform as RectTransform;
