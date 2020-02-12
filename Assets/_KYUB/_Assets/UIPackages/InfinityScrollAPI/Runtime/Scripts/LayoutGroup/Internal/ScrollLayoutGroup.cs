@@ -52,9 +52,9 @@ namespace Kyub.UI
         protected bool m_autoPickElements = true;
         [Space]
         [SerializeField, Tooltip("force extra visible elements (before/after screen)")]
-        Vector2Int m_extraVisibleElements = new Vector2Int(0, 0);
+        protected Vector2Int m_extraVisibleElements = new Vector2Int(0, 0);
         [SerializeField, Tooltip("In deep hierarchys SetParent contains a huge impact in performance. This property will try prevent recalculate amount of visible elements")]
-        bool m_optimizeDeepHierarchy = true;
+        protected bool m_optimizeDeepHierarchy = true;
         [Space]
         [SerializeField]
         protected List<GameObject> m_elements = new List<GameObject>();
@@ -62,7 +62,7 @@ namespace Kyub.UI
         [Header("Layout Fields")]
         [Space]
         [SerializeField]
-        int m_startingSibling = 0;
+        protected int m_startingSibling = 0;
         [Space]
         [SerializeField]
         protected RectOffset m_padding = new RectOffset();
@@ -74,11 +74,11 @@ namespace Kyub.UI
         protected ScrollRect m_scrollRect = null;
         [Space]
         [SerializeField]
-        int m_minContentSize = -1;
+        protected int m_minContentSize = -1;
         [SerializeField]
-        bool m_autoMinContentSize = false;
+        protected bool m_autoMinContentSize = false;
         [SerializeField]
-        MinContentSizeAlign m_minContentSizeAlign = MinContentSizeAlign.SameAsScrollDirection;
+        protected MinContentSizeAlign m_minContentSizeAlign = MinContentSizeAlign.SameAsScrollDirection;
 
         [Header("Scroll Optimizer Fields")]
         [SerializeField, Range(0, 20), Tooltip("Delta distance Value that will be used while scrolling to call ScrollEvent (in local content space)")]
@@ -356,7 +356,7 @@ namespace Kyub.UI
         {
             if (m_autoPickElements && !Application.isPlaying)
             {
-                if(!IsInvoking("RecalculateLayout"))
+                if (!IsInvoking("RecalculateLayout"))
                     Invoke("RecalculateLayout", 0);
             }
         }
@@ -871,7 +871,8 @@ namespace Kyub.UI
 
         protected virtual Vector2Int CalculateSafeCachedMinMax()
         {
-            var cachedNewMinMaxIndex = new Vector2Int(GetCurrentIndex(), GetLastIndex());
+            var current = GetCurrentIndex();
+            var cachedNewMinMaxIndex = new Vector2Int(current, GetLastIndex(current));
 
             if (OptimizeDeepHierarchy)
             {
@@ -1082,6 +1083,7 @@ namespace Kyub.UI
                     }
                 }
 
+                Func<int, float> getElementSize = (i) => { return i >= 0 && i < _scrollElementsCachedSize.Count ? _scrollElementsCachedSize[i] : 0; };
                 var v_delta = m_spacing < 0 ? -m_spacing : 0; // we must do it to prevent bug when spacing is negative
                 //Find current index based in old cachedIndex (Optimized Search)
                 if (v_index < _elementsLayoutPosition.Count)
@@ -1091,7 +1093,9 @@ namespace Kyub.UI
                     {
                         for (int i = Mathf.Max(0, v_initialLoopIndex); i >= 0; i--)
                         {
-                            if (v_anchoredPosition >= (_elementsLayoutPosition[i] + v_delta))
+                            //Search first valid element
+                            var elementPosition = (_elementsLayoutPosition[i] + v_delta);
+                            if (v_anchoredPosition >= elementPosition)
                             {
                                 break;
                             }
@@ -1102,10 +1106,11 @@ namespace Kyub.UI
                     {
                         for (int i = Mathf.Max(0, v_initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
                         {
-                            if (v_anchoredPosition < (_elementsLayoutPosition[i] + v_delta))
+                            //Search first valid element
+                            var elementPosition = (_elementsLayoutPosition[i] + v_delta);
+                            if (v_anchoredPosition < elementPosition ||
+                                v_anchoredPosition < (elementPosition + getElementSize(i)))
                             {
-                                if (i != v_initialLoopIndex)
-                                    v_index--;
                                 break;
                             }
                             v_index++;
@@ -1117,10 +1122,11 @@ namespace Kyub.UI
             return v_index;
         }
 
-        protected virtual int GetLastIndex()
+        protected virtual int GetLastIndex(int currentIndex)
         {
-            var v_currentIndex = GetCurrentIndex();
-            var v_lastIndex = v_currentIndex;
+            if (currentIndex < 0)
+                currentIndex = GetCurrentIndex();
+            var v_lastIndex = currentIndex;
             var v_contentTransform = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform : this.transform) as RectTransform;
 
             var v_contentMaxSize = IsVertical() ? GetLocalHeight(v_contentTransform) : GetLocalWidth(v_contentTransform);
@@ -1129,16 +1135,21 @@ namespace Kyub.UI
                 v_contentMaxSize += Mathf.Abs(IsVertical() ? Content.anchoredPosition.y : Content.anchoredPosition.x);
             }
 
-            var v_initialLoopIndex = v_currentIndex;
+            var v_initialLoopIndex = currentIndex;
+            Func<int, float> getElementSize = (i) => { return i >= 0 && i < _scrollElementsCachedSize.Count ? _scrollElementsCachedSize[i] : 0; };
             for (int i = Mathf.Max(0, v_initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
             {
-                if (_elementsLayoutPosition[i] > v_contentMaxSize)
+                //Search first invalid element
+                if (_elementsLayoutPosition[i] > v_contentMaxSize &&
+                    (_elementsLayoutPosition[i] + getElementSize(i)) > v_contentMaxSize)
                 {
+                    //Revert to previous valid element
+                    v_lastIndex--;
                     break;
                 }
                 v_lastIndex++;
             }
-            v_lastIndex = Mathf.Clamp(v_lastIndex + m_extraVisibleElements.y, v_currentIndex, m_elements.Count - 1);
+            v_lastIndex = Mathf.Clamp(v_lastIndex + m_extraVisibleElements.y, currentIndex, m_elements.Count - 1);
             return v_lastIndex;
         }
 

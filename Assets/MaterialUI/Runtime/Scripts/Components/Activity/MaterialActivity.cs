@@ -229,7 +229,7 @@ namespace MaterialUI
             target.anchorMax = Vector2.one;
             target.pivot = new Vector2(0.5f, 0.5f);
             target.sizeDelta = Vector2.zero;
-            target.localPosition = Vector2.zero;
+            target.anchoredPosition = Vector2.zero;
             target.localRotation = Quaternion.identity;
 
             var layoutElement = target.GetComponent<LayoutElement>();
