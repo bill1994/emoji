@@ -94,11 +94,13 @@ namespace MaterialUI
 
             if (m_Content == null)
             {
-                Debug.LogError("Cannot apply safe area - no Content RectTransform found on " + name);
-                Destroy(this);
+                Debug.LogWarning("Cannot apply safe area - no Content RectTransform found on " + name);
+                Refresh();
+                //Destroy(this);
             }
             else
             {
+                var hasNotch = HasNotch();
                 if (m_forceClip)
                     Content.gameObject.GetAddComponent<RectMask2D>();
                 var layoutElement = Content.gameObject.GetAddComponent<LayoutElement>();
@@ -106,7 +108,7 @@ namespace MaterialUI
                 ResetRectTransform(m_Content, false);
                 RefreshContentChildren();
 
-                if (m_UnsafeContent == null && m_AutoCreateUnsafeContent)
+                if (m_UnsafeContent == null && m_AutoCreateUnsafeContent && hasNotch)
                 {
                     m_UnsafeContent = new GameObject("[AUTOGEN] UnsafeAreaContent").AddComponent<RectTransform>();
                     m_UnsafeContent.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
@@ -170,7 +172,7 @@ namespace MaterialUI
 
         protected virtual void OnTransformChildrenChanged()
         {
-            if(Application.isPlaying && !IsPrefab())
+            if (Application.isPlaying && !IsPrefab())
                 RefreshContentChildrenDelayed();
         }
 
@@ -184,7 +186,7 @@ namespace MaterialUI
             {
                 CancelInvoke("RefreshContentChildren");
 
-                if(m_AutoReparentDirectChildren)
+                if (m_AutoReparentDirectChildren)
                     Invoke("RefreshContentChildren", 0);
             }
         }
@@ -203,7 +205,7 @@ namespace MaterialUI
                 HashSet<Transform> invalidTransforms = new HashSet<Transform>();
                 if (m_UnsafeContent != null) invalidTransforms.Add(m_UnsafeContent);
                 if (m_Content != null) invalidTransforms.Add(m_UnsafeContent);
-                if(_simulatorSpriteContent != null) invalidTransforms.Add(_simulatorSpriteContent.transform);
+                if (_simulatorSpriteContent != null) invalidTransforms.Add(_simulatorSpriteContent.transform);
 
                 //Find Non-Content Children
                 for (int i = 0; i < transform.childCount; i++)
@@ -221,11 +223,11 @@ namespace MaterialUI
                     var localRotation = child.localRotation;
                     var localScale = child.localScale;
 
-                    var sizeDelta = rectChild != null? rectChild.sizeDelta : Vector2.zero;
-                    var pivot = rectChild != null? rectChild.pivot : Vector2.zero;
+                    var sizeDelta = rectChild != null ? rectChild.sizeDelta : Vector2.zero;
+                    var pivot = rectChild != null ? rectChild.pivot : Vector2.zero;
                     var anchoredPosition3D = rectChild != null ? rectChild.anchoredPosition3D : child.localPosition;
-                    var anchorMin = rectChild != null? rectChild.anchorMin : Vector2.zero;
-                    var anchorMax = rectChild != null? rectChild.anchorMax : Vector2.zero;
+                    var anchorMin = rectChild != null ? rectChild.anchorMin : Vector2.zero;
+                    var anchorMax = rectChild != null ? rectChild.anchorMax : Vector2.zero;
 
                     child.SetParent(m_Content);
 
@@ -292,6 +294,13 @@ namespace MaterialUI
             return safeArea;
         }
 
+        public bool HasNotch()
+        {
+            var safeArea = GetSafeArea();
+            var screen = new Rect(0, 0, Screen.width, Screen.height);
+            return safeArea.x != screen.x || safeArea.y != screen.y || safeArea.width != screen.width || safeArea.height != screen.height;
+        }
+
         public virtual Rect GetSafeArea()
         {
             Rect nsa = new Rect(0, 0, Screen.width, Screen.height);
@@ -346,8 +355,11 @@ namespace MaterialUI
             anchorMin.y /= Screen.height;
             anchorMax.x /= Screen.width;
             anchorMax.y /= Screen.height;
-            m_Content.anchorMin = anchorMin;
-            m_Content.anchorMax = anchorMax;
+            if (m_Content != null)
+            {
+                m_Content.anchorMin = anchorMin;
+                m_Content.anchorMax = anchorMax;
+            }
 
 #if UNITY_EDITOR
             SetupSimulatorMaskContent();
@@ -379,9 +391,9 @@ namespace MaterialUI
 
         protected virtual RectTransform TryInstantiateContent()
         {
-            if ((m_AutoReparentDirectChildren && m_Content == null) ||
-                    !m_Content.gameObject.scene.IsValid() ||
-                    !m_Content.IsChildOf(this.transform))
+            if ((m_AutoReparentDirectChildren && m_Content == null && HasNotch()) ||
+                    m_Content != null && !m_Content.gameObject.scene.IsValid() ||
+                    m_Content != null && !m_Content.IsChildOf(this.transform))
             {
                 if (m_Content == null)
                 {
@@ -393,7 +405,7 @@ namespace MaterialUI
                     var clonedInstance = GameObject.Instantiate(m_Content);
                     clonedInstance.name = "[AUTOGEN] " + m_Content.name;
                     //Disable component if is scene member
-                    if(m_Content.gameObject.scene.IsValid())
+                    if (m_Content.gameObject.scene.IsValid())
                         m_Content.gameObject.SetActive(false);
                     m_Content = clonedInstance;
                     ResetRectTransform(m_Content, true);
@@ -428,7 +440,7 @@ namespace MaterialUI
 
         protected virtual void SetupSimulatorMaskContent()
         {
-            var spriteToApply = EditorSafeAreaSimulator.GetOrLoadSimulatorSprite();
+            var spriteToApply = m_UnsafeContent != null && Application.isPlaying ? EditorSafeAreaSimulator.GetOrLoadSimulatorSprite() : null;
             if (Application.isPlaying && spriteToApply != null && m_UnsafeContent != null)
             {
                 if (_simulatorSpriteContent == null)
@@ -438,7 +450,7 @@ namespace MaterialUI
                     _simulatorSpriteContent.transform.SetParent(Content.parent);
                     _simulatorSpriteContent.transform.SetSiblingIndex(Content.transform.GetSiblingIndex() + 1);
                     _simulatorSpriteContent.type = Image.Type.Sliced;
-                    
+
                     var layoutElement = _simulatorSpriteContent.gameObject.GetAddComponent<LayoutElement>();
                     layoutElement.ignoreLayout = true;
                 }
@@ -453,7 +465,7 @@ namespace MaterialUI
             }
             else if (_simulatorSpriteContent != null)
             {
-                if(Application.isPlaying)
+                if (Application.isPlaying)
                     GameObject.Destroy(_simulatorSpriteContent.gameObject);
                 else
                     GameObject.DestroyImmediate(_simulatorSpriteContent.gameObject);
@@ -541,6 +553,6 @@ namespace MaterialUI
 #endif
         }
 
-#endregion
+        #endregion
     }
 }
