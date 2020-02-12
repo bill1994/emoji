@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Kyub;
 
 namespace MaterialUI
 {
@@ -12,29 +13,8 @@ namespace MaterialUI
     /// </summary>
     /// <seealso cref="UnityEngine.MonoBehaviour" />
     [AddComponentMenu("MaterialUI/Managers/Ripple Manager")]
-    public class RippleManager : MonoBehaviour
+    public class RippleManager : Singleton<RippleManager>
     {
-        /// <summary>
-        /// The in-scene instance.
-        /// </summary>
-        private static RippleManager m_Instance;
-        /// <summary>
-        /// The in-scene instance.
-        /// If null, automatically creates one.
-        /// </summary>
-        public static RippleManager instance
-        {
-            get
-            {
-                if (m_Instance == null)
-                {
-                    m_Instance = new GameObject("RippleManager", typeof(RippleManager)).GetComponent<RippleManager>();
-                }
-
-                return m_Instance;
-            }
-        }
-
         /// <summary>
         /// The VectorImageData to use for all Ripples.
         /// </summary>
@@ -69,49 +49,12 @@ namespace MaterialUI
         /// </summary>
         private Queue<Ripple> m_QueuedRipples = new Queue<Ripple>();
 
-        [SerializeField]
-        protected Canvas m_Canvas = null;
-
-        protected virtual void Awake()
-        {
-            FindCanvas();
-        }
-
         /// <summary>
         /// See MonoBehaviour.OnApplicationQuit.
         /// </summary>
         protected virtual void OnApplicationQuit()
         {
             Ripple.ResetMaterial();
-        }
-
-        protected void FindCanvas()
-        {
-            if (m_Canvas == null)
-            {
-                m_Canvas = GetComponentInParent<Canvas>();
-                if (m_Canvas == null)
-                {
-                    //Find canvas in scene
-                    var canvasArray = FindObjectsOfType<Canvas>();
-                    foreach (var canvasMember in canvasArray)
-                    {
-                        if (canvasMember != null &&
-                            canvasMember.gameObject.scene.IsValid() &&
-                            canvasMember.enabled &&
-                            canvasMember.gameObject.activeInHierarchy)
-                        {
-                            m_Canvas = canvasMember;
-                            break;
-                        }
-                    }
-                }
-
-                if (m_Canvas != null)
-                    m_Canvas = m_Canvas.rootCanvas;
-            }
-
-            transform.localPosition = Vector3.zero;
         }
 
         /// <summary>
@@ -121,12 +64,19 @@ namespace MaterialUI
         /// <returns>A ripple object, ready to Setup and expand.</returns>
         public Ripple GetRipple()
         {
-            if (m_QueuedRipples.Count <= 0)
+            //Try pick ripple from pool
+            Ripple ripple = m_QueuedRipples.Count > 0 ? m_QueuedRipples.Dequeue() : null;
+            while (m_QueuedRipples.Count > 0 && ripple == null)
             {
-                CreateRipple();
+                ripple = m_QueuedRipples.Dequeue();
             }
 
-            Ripple ripple = m_QueuedRipples.Dequeue();
+            //Create a new one if failed to retrieve from pool
+            if (ripple == null)
+            {
+                CreateRipple();
+                ripple = m_QueuedRipples.Dequeue();
+            }
             m_ActiveRipples.Add(ripple);
             ripple.gameObject.SetActive(true);
             return ripple;
@@ -137,10 +87,7 @@ namespace MaterialUI
         /// </summary>
         private void CreateRipple()
         {
-            if (m_Canvas == null)
-                FindCanvas();
-
-            Ripple ripple = PrefabManager.InstantiateGameObject("Ripple", m_Canvas != null? m_Canvas.transform : null).GetComponent<Ripple>();
+            Ripple ripple = PrefabManager.InstantiateGameObject("Ripple", DialogManager.rectTransform).GetComponent<Ripple>();
             ripple.Create(rippleCount, rippleImageData);
             rippleCount++;
 
@@ -189,7 +136,7 @@ namespace MaterialUI
             _ripplesToRelease.Clear();
         }
 
-        
+
 
         private void Update()
         {

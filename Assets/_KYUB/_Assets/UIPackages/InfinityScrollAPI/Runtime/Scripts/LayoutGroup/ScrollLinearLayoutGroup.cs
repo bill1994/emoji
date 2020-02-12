@@ -73,7 +73,7 @@ namespace Kyub.UI
                     UnregisterVisibleElement(p_indexReload);
                 else
                     RegisterVisibleElement(p_indexReload);
-                if(Application.isEditor)
+                if (Application.isEditor)
                     p_obj.transform.name = "[" + p_indexReload + "] " + System.Text.RegularExpressions.Regex.Replace(p_obj.transform.name, @"^\[[0-9]+\] ", "");
             }
 
@@ -164,7 +164,7 @@ namespace Kyub.UI
         {
             TryRecalculateLayout();
             var isVertical = IsVertical();
-            if(isVertical && !IsFullRecalcRequired())
+            if (isVertical && !IsFullRecalcRequired())
                 CalculateAnotherAxisPreferredSize(isVertical);
             else
                 _layoutSize = new Vector2(GetLocalWidth(Content), _layoutSize.y);
@@ -172,7 +172,7 @@ namespace Kyub.UI
 
         public override void CalculateLayoutInputVertical()
         {
-            TryRecalculateLayout();
+            //TryRecalculateLayout();
             var isVertical = IsVertical();
             if (!isVertical && !IsFullRecalcRequired())
                 CalculateAnotherAxisPreferredSize(isVertical);

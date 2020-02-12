@@ -11,7 +11,7 @@ namespace Kyub.UI
     [DisallowMultipleComponent]
     [ExecuteInEditMode]
     [RequireComponent(typeof(RectTransform))]
-    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ICanvasElement, ILayoutGroup
+    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ILayoutGroup/*, ICanvasElement*/
     {
         #region Helper Classes
         [System.Serializable]
@@ -300,16 +300,17 @@ namespace Kyub.UI
             if (!Application.isPlaying)
                 Init();
 
-            CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this);
+            //CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this);
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             UnregisterScrollRectEvents();
-            Invoke("RevertInvisibleElementsToMainContent", 0.01f);
+            if (!IsInvoking("RevertInvisibleElementsToMainContent"))
+                Invoke("RevertInvisibleElementsToMainContent", 0);
 
-            CanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
+            //CanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
         }
 
         protected override void OnDestroy()
@@ -364,8 +365,8 @@ namespace Kyub.UI
             {
                 base.OnRectTransformDimensionsChange();
                 var v_newDimension = new Vector2(GetLocalWidth(this.transform as RectTransform), GetLocalHeight(this.transform as RectTransform));
-                if ((v_newDimension.x == 0 || Mathf.Abs(_oldDimension.x - v_newDimension.x) > Mathf.Abs(_oldDimension.x * 0.01f)) ||
-                    (v_newDimension.y == 0 || Mathf.Abs(_oldDimension.y - v_newDimension.y) > Mathf.Abs(_oldDimension.y * 0.01f)))
+                if ((v_newDimension.x == 0 || Mathf.Abs(_oldDimension.x - v_newDimension.x) > Mathf.Epsilon) ||
+                    (v_newDimension.y == 0 || Mathf.Abs(_oldDimension.y - v_newDimension.y) > Mathf.Epsilon))
                 {
                     _oldDimension = v_newDimension;
                     SetCachedElementsLayoutDirty();
@@ -571,9 +572,26 @@ namespace Kyub.UI
                 _lastFrameVisibleElementIndexes = new Vector2Int(-1, -1);
                 _cachedMinMaxIndex = new Vector2Int(-1, -1);
             }
-            _layoutDirty = true;
-            LayoutRebuilder.MarkLayoutForRebuild(this.transform as RectTransform)
-                ;
+            if (!_layoutDirty)
+            {
+                _layoutDirty = true;
+                if (!CanvasUpdateRegistry.IsRebuildingLayout())
+                {
+                    MarkLayoutForRebuild();
+                }
+                else if (!IsInvoking("MarkLayoutForRebuild"))
+                    Invoke("MarkLayoutForRebuild", 0);
+            }
+
+        }
+
+        protected void MarkLayoutForRebuild()
+        {
+            if (this != null)
+            {
+                CancelInvoke("MarkLayoutForRebuild");
+                LayoutRebuilder.MarkLayoutForRebuild(this.transform as RectTransform);
+            }
         }
 
         public virtual void TryRecalculateLayout(bool p_force = false)
@@ -587,7 +605,7 @@ namespace Kyub.UI
                     _cachedMinMaxIndex = new Vector2Int(-1, -1);
                 RecalculateLayout();
 
-                var v_contentSize = GetContentSize();
+                /*var v_contentSize = GetContentSize();
                 if ((IsVertical() && Mathf.Abs(Content.localPosition.y) > v_contentSize) ||
                     (!IsVertical() && Mathf.Abs(Content.localPosition.x) > v_contentSize)
                    )
@@ -597,7 +615,8 @@ namespace Kyub.UI
                 else
                 {
                     _layoutDirty = false;
-                }
+                }*/
+                _layoutDirty = false;
             }
         }
 
@@ -610,14 +629,18 @@ namespace Kyub.UI
             return _lastFrameVisibleElementIndexes.x < 0 && _lastFrameVisibleElementIndexes.y < 0 && _cachedMinMaxIndex.x < 0 && _cachedMinMaxIndex.y < 0;
         }
 
-        protected void RecalculateAfterDragRebuild()
+        /*protected void RecalculateAfterDragRebuild()
         {
-            if (ScrollRect != null)
-                ScrollRect.Rebuild(CanvasUpdate.PostLayout);
-            _lastFrameVisibleElementIndexes = new Vector2Int(-1, -1);
-            _cachedMinMaxIndex = new Vector2Int(-1, -1);
-            Invoke("RecalculateLayout", 0.1f);
-        }
+            if (!IsInvoking("RecalculateLayout"))
+            {
+                if (ScrollRect != null)
+                    ScrollRect.Rebuild(CanvasUpdate.PostLayout);
+                _lastFrameVisibleElementIndexes = new Vector2Int(-1, -1);
+                _cachedMinMaxIndex = new Vector2Int(-1, -1);
+
+                Invoke("RecalculateLayout", 0.1f);
+            }
+        }*/
 
         //Element RectTransform Size
         protected float GetElementSize(int p_index)
@@ -1359,30 +1382,30 @@ namespace Kyub.UI
 
         public virtual void CalculateLayoutInputVertical()
         {
-            TryRecalculateLayout();
+            //TryRecalculateLayout();
             _layoutSize = new Vector2(_layoutSize.x, GetLocalHeight(Content));
         }
 
         public void SetLayoutHorizontal()
         {
-            TryRecalculateLayout();
+            //TryRecalculateLayout();
         }
 
         public void SetLayoutVertical()
         {
-            TryRecalculateLayout();
+            //TryRecalculateLayout();
         }
 
         #endregion
 
-        #region ICanvas Rebuild Element (Editor Only)
+        /*#region ICanvas Rebuild Element (Editor Only)
 
         void ICanvasElement.Rebuild(CanvasUpdate executing)
         {
             if (executing != CanvasUpdate.PostLayout)
                 return;
 
-            if (!Application.isPlaying)
+            if (!Application.isPlaying || _layoutDirty)
                 SetCachedElementsLayoutDirty();
         }
 
@@ -1394,7 +1417,7 @@ namespace Kyub.UI
         {
         }
 
-        #endregion
+        #endregion*/
 
     }
 }

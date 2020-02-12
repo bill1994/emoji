@@ -218,10 +218,10 @@ namespace Kyub.UI
             //Reload current Elements
             for (int i = _cachedMinMaxIndex.x; i <= _cachedMinMaxIndex.y; i++)
             {
-                var v_element = m_elements.Count > i && i >=0? m_elements[i] : null;
+                var v_element = m_elements.Count > i && i >= 0 ? m_elements[i] : null;
                 //in 'p_fullRecalc == false' we only reload elements that was not previous loaded in last roll
                 if (i >= 0 && i < m_elements.Count && v_element != null &&
-                    (p_fullRecalc || i < _lastFrameVisibleElementIndexes.x || i > _lastFrameVisibleElementIndexes.y || 
+                    (p_fullRecalc || i < _lastFrameVisibleElementIndexes.x || i > _lastFrameVisibleElementIndexes.y ||
                     (v_element.transform.parent != Content && !IsOutOfConstraintBounds(i)))
                    )
                 {
@@ -303,11 +303,11 @@ namespace Kyub.UI
                 {
                     var v_parentWidth = GetLocalWidth(Content.parent as RectTransform);
                     var v_newWidth = Mathf.Max(
-                        m_padding.left + m_padding.right + ((m_cellSize.x + m_constraintSpacing) * m_defaultConstraintCount) - m_constraintSpacing, 
+                        m_padding.left + m_padding.right + ((m_cellSize.x + m_constraintSpacing) * m_defaultConstraintCount) - m_constraintSpacing,
                         v_parentWidth);
                     ScrollRect.horizontal = ScrollRect != null && Mathf.Abs(v_newWidth - v_parentWidth) > SIZE_ERROR;
                     //Apply size larger than content.parent size
-                    if(ScrollRect.horizontal)
+                    if (ScrollRect.horizontal)
                         SetLocalWidth(Content, v_newWidth);
                     else
                         base.ApplyContentConstraintSize();
@@ -317,10 +317,10 @@ namespace Kyub.UI
                 {
                     var v_parentHeight = GetLocalHeight(Content.parent as RectTransform);
                     var v_newHeight = Mathf.Max(
-                        m_padding.top + m_padding.bottom + ((m_cellSize.y + m_constraintSpacing) * m_defaultConstraintCount) - m_constraintSpacing, 
+                        m_padding.top + m_padding.bottom + ((m_cellSize.y + m_constraintSpacing) * m_defaultConstraintCount) - m_constraintSpacing,
                         v_parentHeight);
                     ScrollRect.vertical = ScrollRect != null && Mathf.Abs(v_newHeight - v_parentHeight) > SIZE_ERROR;
-                    if(ScrollRect.vertical)
+                    if (ScrollRect.vertical)
                         SetLocalHeight(Content, v_newHeight);
                     else
                         base.ApplyContentConstraintSize();
@@ -344,7 +344,7 @@ namespace Kyub.UI
                     UnregisterVisibleElement(p_indexReload);
                 else
                     RegisterVisibleElement(p_indexReload);
-                if(Application.isEditor)
+                if (Application.isEditor)
                     p_obj.transform.name = "[" + p_indexReload + "] " + System.Text.RegularExpressions.Regex.Replace(p_obj.transform.name, @"^\[[0-9]+\] ", "");
             }
 
@@ -579,11 +579,11 @@ namespace Kyub.UI
 
         public override void CalculateLayoutInputVertical()
         {
-            TryRecalculateLayout();
+            //TryRecalculateLayout();
             var isVertical = IsVertical();
             if (!isVertical)
             {
-                if(!IsFullRecalcRequired())
+                if (!IsFullRecalcRequired())
                     CalculateAnotherAxisPreferredSize(isVertical);
                 else
                     _layoutSize = new Vector2(_layoutSize.x, _cachedConstraintSize);
@@ -606,6 +606,6 @@ namespace Kyub.UI
 
         #endregion
 
-        
+
     }
 }

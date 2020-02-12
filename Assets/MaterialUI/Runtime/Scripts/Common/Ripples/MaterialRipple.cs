@@ -720,7 +720,7 @@ namespace MaterialUI
         {
             if (!m_RipplesEnabled) return;
 
-            m_CurrentRipple = RippleManager.instance.GetRipple();
+            m_CurrentRipple = RippleManager.Instance.GetRipple();
             m_CurrentRipple.Setup(rippleData, worldPosition, this, oscillate);
             m_CurrentRipple.Expand();
         }
