@@ -135,7 +135,7 @@ namespace Kyub.UI
 
         public virtual void SetElementSizeDirty()
         {
-            if(!IsInvoking("ApplyElementSize"))
+            if (!IsInvoking("ApplyElementSize") && LayoutElementIndex >= 0 && _isVisible)
                 Invoke("ApplyElementSize", 0);
         }
 
@@ -159,7 +159,7 @@ namespace Kyub.UI
         protected void ApplyElementSize()
         {
             //_applyElementSizeRoutine = null;
-            if (ScrollLayoutGroup != null && LayoutElementIndex >= 0)
+            if (ScrollLayoutGroup != null && LayoutElementIndex >= 0 && _isVisible)
             {
                 ScrollLayoutGroup.SetCachedElementSize(LayoutElementIndex, ScrollLayoutGroup.CalculateElementSize(transform, ScrollLayoutGroup.IsVertical()));
             }
