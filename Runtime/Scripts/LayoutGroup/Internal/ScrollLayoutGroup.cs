@@ -53,7 +53,7 @@ namespace Kyub.UI
         [Space]
         [SerializeField, Tooltip("force extra visible elements (before/after screen)")]
         protected Vector2Int m_extraVisibleElements = new Vector2Int(0, 0);
-        [SerializeField, Tooltip("In deep hierarchys SetParent contains a huge impact in performance. This property will try prevent recalculate amount of visible elements")]
+        [SerializeField, Tooltip("In deep hierarchys SetParent contains a huge impact in performance. This property will try prevent recalculate amount of visible element, avoiding SetParent and SetSiblingIndex")]
         protected bool m_optimizeDeepHierarchy = true;
         [Space]
         [SerializeField]
@@ -874,7 +874,7 @@ namespace Kyub.UI
             var current = GetCurrentIndex();
             var cachedNewMinMaxIndex = new Vector2Int(current, GetLastIndex(current));
 
-            if (OptimizeDeepHierarchy)
+            if (m_optimizeDeepHierarchy)
             {
                 var deltaOld = Mathf.Abs(_cachedMinMaxIndex.y - _cachedMinMaxIndex.x);
                 var deltaNew = Mathf.Abs(cachedNewMinMaxIndex.y - cachedNewMinMaxIndex.x);
@@ -1000,8 +1000,10 @@ namespace Kyub.UI
                         v_rectTransform.anchorMin = Content.anchorMin;
                         v_rectTransform.anchorMax = Content.anchorMax;
                     }
-                    v_object.transform.SetParent(Content, false);
-                    v_object.transform.SetSiblingIndex(Mathf.Clamp(p_index - _cachedMinMaxIndex.x + m_startingSibling, 0, Content.childCount - 1));
+                    if (v_object.transform != Content)
+                        v_object.transform.SetParent(Content, false);
+                    if (!m_optimizeDeepHierarchy || m_spacing < 0)
+                        v_object.transform.SetSiblingIndex(Mathf.Clamp(p_index - _cachedMinMaxIndex.x + m_startingSibling, 0, Content.childCount - 1));
                 }
                 _objectsToSendToInvisibleContentParent.Remove(v_object);
                 //if (!v_object.activeSelf)
