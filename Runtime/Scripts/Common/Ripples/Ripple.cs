@@ -365,7 +365,7 @@ namespace MaterialUI
             {
                 m_RippleCreator.OnDestroyRipple();
             }
-            RippleManager.instance.ReleaseRipple(this);
+            RippleManager.Instance.ReleaseRipple(this);
         }
 
         /// <summary>
@@ -430,7 +430,7 @@ namespace MaterialUI
                     {
                         m_RippleCreator.OnDestroyRipple();
                     }
-                    RippleManager.instance.ReleaseRipple(this);
+                    RippleManager.Instance.ReleaseRipple(this);
                 }
             }
             else if (m_State == 3)
