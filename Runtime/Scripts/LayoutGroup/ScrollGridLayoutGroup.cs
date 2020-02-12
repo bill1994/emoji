@@ -422,6 +422,8 @@ namespace Kyub.UI
                     }
                 }
 
+                var elementSize = IsVertical() ? m_cellSize.y : m_cellSize.x;
+                //Func<int, float> getElementSize = (i) => { return i >= 0 && i < _scrollElementsCachedSize.Count ? _scrollElementsCachedSize[i] : 0; };
                 var v_delta = m_spacing < 0 ? -m_spacing : 0; // we must do it to prevent bug when spacing is negative
                 //Find current index based in old cachedIndex (Optimized Search)
                 if (v_index < _elementsLayoutPosition.Count)
@@ -431,7 +433,9 @@ namespace Kyub.UI
                     {
                         for (int i = v_initialLoopIndex; i >= 0; i -= _cachedConstraintCount)
                         {
-                            if (v_anchoredPosition >= (_elementsLayoutPosition[i] + v_delta))
+                            //Search first valid element
+                            var elementPosition = (_elementsLayoutPosition[i] + v_delta);
+                            if (v_anchoredPosition >= elementPosition)
                             {
                                 break;
                             }
@@ -440,9 +444,12 @@ namespace Kyub.UI
                     }
                     else
                     {
-                        for (int i = v_initialLoopIndex + _cachedConstraintCount; i < _elementsLayoutPosition.Count; i += _cachedConstraintCount)
+                        for (int i = v_initialLoopIndex; i < _elementsLayoutPosition.Count; i += _cachedConstraintCount)
                         {
-                            if (v_anchoredPosition < (_elementsLayoutPosition[i] + v_delta))
+                            //Search first valid element
+                            var elementPosition = (_elementsLayoutPosition[i] + v_delta);
+                            if (v_anchoredPosition < elementPosition ||
+                                v_anchoredPosition < (elementPosition + elementSize))
                             {
                                 break;
                             }
@@ -453,6 +460,37 @@ namespace Kyub.UI
             }
             v_index = Mathf.Clamp(v_index, 0, m_elements.Count);
             return v_index;
+        }
+
+        protected override int GetLastIndex(int currentIndex)
+        {
+            if (currentIndex < 0)
+                currentIndex = GetCurrentIndex();
+            var v_lastIndex = currentIndex;
+            var v_contentTransform = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform : this.transform) as RectTransform;
+
+            var v_contentMaxSize = IsVertical() ? GetLocalHeight(v_contentTransform) : GetLocalWidth(v_contentTransform);
+            if (Content != null)
+            {
+                v_contentMaxSize += Mathf.Abs(IsVertical() ? Content.anchoredPosition.y : Content.anchoredPosition.x);
+            }
+
+            var v_initialLoopIndex = currentIndex;
+            var elementSize = IsVertical() ? m_cellSize.y : m_cellSize.x;
+            for (int i = Mathf.Max(0, v_initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
+            {
+                //Search first invalid element
+                if (_elementsLayoutPosition[i] > v_contentMaxSize &&
+                    (_elementsLayoutPosition[i] + elementSize) > v_contentMaxSize)
+                {
+                    //Revert to previous valid element
+                    v_lastIndex--;
+                    break;
+                }
+                v_lastIndex++;
+            }
+            v_lastIndex = Mathf.Clamp(v_lastIndex + m_extraVisibleElements.y, currentIndex, m_elements.Count - 1);
+            return v_lastIndex;
         }
 
         protected override Vector3 GetElementPosition(int p_index)
