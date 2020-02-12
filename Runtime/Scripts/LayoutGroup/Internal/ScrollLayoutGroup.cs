@@ -355,7 +355,10 @@ namespace Kyub.UI
         protected virtual void OnTransformChildrenChanged()
         {
             if (m_autoPickElements && !Application.isPlaying)
-                SetCachedElementsLayoutDirty(true);
+            {
+                if(!IsInvoking("RecalculateLayout"))
+                    Invoke("RecalculateLayout", 0);
+            }
         }
 
         Vector2 _oldDimension = new Vector2(-1, -1);
@@ -605,18 +608,20 @@ namespace Kyub.UI
                     _cachedMinMaxIndex = new Vector2Int(-1, -1);
                 RecalculateLayout();
 
-                /*var v_contentSize = GetContentSize();
-                if ((IsVertical() && Mathf.Abs(Content.localPosition.y) > v_contentSize) ||
-                    (!IsVertical() && Mathf.Abs(Content.localPosition.x) > v_contentSize)
+                var v_contentSize = GetContentSize();
+                if (ScrollRect != null &&
+                    ((IsVertical() && Mathf.Abs(Content.localPosition.y) > v_contentSize) ||
+                    (!IsVertical() && Mathf.Abs(Content.localPosition.x) > v_contentSize))
                    )
                 {
-                    RecalculateAfterDragRebuild();
+                    ScrollRect.Rebuild(CanvasUpdate.PostLayout);
+                    SetCachedElementsLayoutDirty();
                 }
                 else
                 {
+                    CancelInvoke("MarkLayoutForRebuild");
                     _layoutDirty = false;
-                }*/
-                _layoutDirty = false;
+                }
             }
         }
 
@@ -628,19 +633,6 @@ namespace Kyub.UI
         {
             return _lastFrameVisibleElementIndexes.x < 0 && _lastFrameVisibleElementIndexes.y < 0 && _cachedMinMaxIndex.x < 0 && _cachedMinMaxIndex.y < 0;
         }
-
-        /*protected void RecalculateAfterDragRebuild()
-        {
-            if (!IsInvoking("RecalculateLayout"))
-            {
-                if (ScrollRect != null)
-                    ScrollRect.Rebuild(CanvasUpdate.PostLayout);
-                _lastFrameVisibleElementIndexes = new Vector2Int(-1, -1);
-                _cachedMinMaxIndex = new Vector2Int(-1, -1);
-
-                Invoke("RecalculateLayout", 0.1f);
-            }
-        }*/
 
         //Element RectTransform Size
         protected float GetElementSize(int p_index)
