@@ -528,7 +528,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &41775059
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -614,7 +614,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &57546331
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -712,7 +712,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &73783616
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -810,7 +810,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &79287514
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -907,7 +907,7 @@ MonoBehaviour:
       m_Name: gps_off
       m_Unicode: \ue1b5
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &79947977
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -994,7 +994,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &137738990
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1080,7 +1080,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &148427880
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1178,7 +1178,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &202241071
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1446,7 +1446,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &318377462
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1610,7 +1610,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &400005949
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1695,7 +1695,7 @@ MonoBehaviour:
       m_Name: signal_wifi_off
       m_Unicode: \ue1da
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &405304885
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2007,7 +2007,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2419,7 +2419,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &510877277
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2864,7 +2864,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2984,7 +2984,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &614962619
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3082,7 +3082,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &645085226
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3181,7 +3181,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &680564818
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3700,7 +3700,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &741333778
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3984,7 +3984,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &804052816
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4311,7 +4311,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &848165543
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4716,7 +4716,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &875438288
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4802,7 +4802,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &943524197
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4900,7 +4900,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &950191142
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4999,7 +4999,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &963620945
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5086,7 +5086,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &984733354
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5171,7 +5171,7 @@ MonoBehaviour:
       m_Name: signal_wifi_off
       m_Unicode: \ue1da
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1013167094
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5357,7 +5357,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1028832451
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5684,7 +5684,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1102648918
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5782,7 +5782,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1115332177
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5880,7 +5880,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1122735200
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -6041,72 +6041,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1128025331}
   m_CullTransparentMesh: 0
---- !u!1 &1144792651
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1144792655}
-  - component: {fileID: 1144792654}
-  - component: {fileID: 1144792652}
-  m_Layer: 0
-  m_Name: EventSystem
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1144792652
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96898d74cec571b4183360e4855e452e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
---- !u!114 &1144792654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
-  m_DragThreshold: 5
---- !u!4 &1144792655
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1217785370
 GameObject:
   m_ObjectHideFlags: 0
@@ -6206,7 +6140,7 @@ RectTransform:
   m_Children:
   - {fileID: 700702003}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -6673,7 +6607,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1389303830
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -6771,7 +6705,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1412979323
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -6869,7 +6803,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1422544289
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -6967,7 +6901,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1455352946
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -7064,7 +6998,7 @@ MonoBehaviour:
       m_Name: gps_off
       m_Unicode: \ue1b5
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1468636989
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7073,6 +7007,74 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1468636986}
   m_CullTransparentMesh: 0
+--- !u!1 &1469249403
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1469249406}
+  - component: {fileID: 1469249405}
+  - component: {fileID: 1469249404}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1469249404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469249403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96898d74cec571b4183360e4855e452e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &1469249405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469249403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9d4d96e4987a7447b87e8b4a0d42dde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+  m_ReferenceDpi: 100
+  m_BaseDragThreshold: 10
+--- !u!4 &1469249406
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469249403}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1482738018
 GameObject:
   m_ObjectHideFlags: 0
@@ -7151,7 +7153,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1482738021
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7234,7 +7236,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7584,7 +7586,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1502120874
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7669,7 +7671,7 @@ MonoBehaviour:
       m_Name: gps_off
       m_Unicode: \ue1b5
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1519702915
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7881,7 +7883,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1611574437
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -8057,7 +8059,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1644662737
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8220,7 +8222,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1696168593
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -8547,7 +8549,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1730975924
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -8708,7 +8710,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1805626598
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -8806,7 +8808,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1847039243
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9311,7 +9313,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1886868833
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9397,7 +9399,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1916117665
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9495,7 +9497,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &1925861842
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9594,7 +9596,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1947188502
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10521,7 +10523,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &2037011026
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -10619,7 +10621,7 @@ MonoBehaviour:
       m_Name: radio_ring
       m_Unicode: \uE906
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &2101943391
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -10780,7 +10782,7 @@ MonoBehaviour:
       m_Name: radio_dot
       m_Unicode: \uE905
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!225 &2110362715
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -10879,7 +10881,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &2112710052
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10964,7 +10966,7 @@ MonoBehaviour:
       m_Name: signal_wifi_off
       m_Unicode: \ue1da
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &2120315956
 CanvasRenderer:
   m_ObjectHideFlags: 0

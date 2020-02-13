@@ -1336,7 +1336,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &198036290
 GameObject:
   m_ObjectHideFlags: 0
@@ -1461,7 +1461,7 @@ MonoBehaviour:
       m_Name: brush
       m_Unicode: \ue3ae
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &210426092
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1555,7 +1555,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &228065868
 GameObject:
   m_ObjectHideFlags: 0
@@ -1633,7 +1633,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &228065871
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1843,7 +1843,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &252860500
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2284,7 +2284,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &269559676
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2543,7 +2543,7 @@ MonoBehaviour:
       m_Name: color_lens
       m_Unicode: \ue3b7
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &286083863
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2689,7 +2689,7 @@ MonoBehaviour:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &308901577
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2734,7 +2734,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 40.444443, y: 0}
+  m_SizeDelta: {x: 39.413414, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &309741032
 MonoBehaviour:
@@ -4328,7 +4328,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4643,7 +4643,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 97.666664, y: 0}
+  m_SizeDelta: {x: 95.066574, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &565724572
 MonoBehaviour:
@@ -5125,7 +5125,7 @@ MonoBehaviour:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &618612152
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5219,7 +5219,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &641089322
 GameObject:
   m_ObjectHideFlags: 0
@@ -5799,7 +5799,7 @@ MonoBehaviour:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &728079639
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6468,7 +6468,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 94, y: 0}
+  m_SizeDelta: {x: 91.58321, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &891468388
 MonoBehaviour:
@@ -6520,6 +6520,74 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 891468386}
   m_CullTransparentMesh: 0
+--- !u!1 &894919917
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 894919920}
+  - component: {fileID: 894919919}
+  - component: {fileID: 894919918}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &894919918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894919917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96898d74cec571b4183360e4855e452e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &894919919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894919917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9d4d96e4987a7447b87e8b4a0d42dde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+  m_ReferenceDpi: 100
+  m_BaseDragThreshold: 10
+--- !u!4 &894919920
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894919917}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &901085202
 GameObject:
   m_ObjectHideFlags: 0
@@ -6648,7 +6716,7 @@ MonoBehaviour:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &908396043
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7619,7 +7687,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &990736682
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7843,7 +7911,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1017768067
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8136,7 +8204,7 @@ MonoBehaviour:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1024214162
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8221,7 +8289,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1028092076
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8638,7 +8706,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1078889110
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9088,7 +9156,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1142425359
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9097,72 +9165,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1142425356}
   m_CullTransparentMesh: 0
---- !u!1 &1144792651
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1144792655}
-  - component: {fileID: 1144792654}
-  - component: {fileID: 1144792652}
-  m_Layer: 0
-  m_Name: EventSystem
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1144792652
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96898d74cec571b4183360e4855e452e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
---- !u!114 &1144792654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
-  m_DragThreshold: 5
---- !u!4 &1144792655
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1165928023
 GameObject:
   m_ObjectHideFlags: 0
@@ -9453,7 +9455,7 @@ RectTransform:
   m_Children:
   - {fileID: 1298889028}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -9850,7 +9852,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 63.77778, y: 0}
+  m_SizeDelta: {x: 62.76025, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1301299298
 MonoBehaviour:
@@ -9993,7 +9995,7 @@ MonoBehaviour:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1304579096
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10136,7 +10138,7 @@ MonoBehaviour:
       m_Name: opacity
       m_Unicode: \ue91c
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1316005084
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10489,7 +10491,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1353150598
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10668,7 +10670,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1381001843
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11332,7 +11334,7 @@ MonoBehaviour:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1487954905
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11432,7 +11434,7 @@ MonoBehaviour:
       m_Name: slider_popup
       m_Unicode: \uE907
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1495712915
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11517,7 +11519,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1498750737
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -12204,7 +12206,7 @@ MonoBehaviour:
       m_Name: format_paint
       m_Unicode: \ue243
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1619304994
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -12457,7 +12459,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1638829762
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13350,7 +13352,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1845173416
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13911,7 +13913,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1936074781
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -14005,7 +14007,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &1958682088
 GameObject:
   m_ObjectHideFlags: 0
@@ -14353,7 +14355,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -15004,7 +15006,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &2028293456
 GameObject:
   m_ObjectHideFlags: 0
@@ -15650,7 +15652,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &2133045682
 CanvasRenderer:
   m_ObjectHideFlags: 0

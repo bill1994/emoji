@@ -210,7 +210,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1777743
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -296,7 +296,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &13116953
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -508,7 +508,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &66887893
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -594,7 +594,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &96248262
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -682,7 +682,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &114625054
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -868,7 +868,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &141751059
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -966,7 +966,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &158649682
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1177,7 +1177,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1271,7 +1271,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &220998394
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1359,7 +1359,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &227649592
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1574,7 +1574,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &275843071
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1662,7 +1662,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &279966342
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1707,7 +1707,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998932}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &286173726
@@ -1895,7 +1895,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &317842155
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2054,6 +2054,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0.12941177, g: 0.58431375, b: 0.9490196, a: 1}
   m_BackOffColor: {r: 0.56078434, g: 0.7882353, b: 0.972549, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 13116951}
   m_SwitchImage: {fileID: 13116952}
   m_BackImage: {fileID: 1854205326}
   m_ShadowImage: {fileID: 2074176723}
@@ -2183,7 +2184,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &477457176
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2358,7 +2359,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &556923872
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2443,7 +2444,7 @@ MonoBehaviour:
       m_Name: location_on
       m_Unicode: \ue0c8
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &612157934
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2605,7 +2606,7 @@ MonoBehaviour:
       m_Name: location_on
       m_Unicode: \ue0c8
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &696632136
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2650,7 +2651,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9999237}
+  m_AnchoredPosition: {x: 0, y: -0.99993134}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &732890941
@@ -2851,7 +2852,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998932}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &768260982
@@ -3028,7 +3029,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3212,7 +3213,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &853693097
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3514,7 +3515,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9999008}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1053407709
@@ -3665,7 +3666,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1054601889
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3710,7 +3711,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9999237}
+  m_AnchoredPosition: {x: 0, y: -0.99993134}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1054908687
@@ -3861,7 +3862,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1059984600
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3947,7 +3948,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1067814791
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4035,7 +4036,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1096333841
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4171,72 +4172,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1144792651
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1144792655}
-  - component: {fileID: 1144792654}
-  - component: {fileID: 1144792652}
-  m_Layer: 0
-  m_Name: EventSystem
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1144792652
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96898d74cec571b4183360e4855e452e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
---- !u!114 &1144792654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
-  m_DragThreshold: 5
---- !u!4 &1144792655
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1183706780
 GameObject:
   m_ObjectHideFlags: 0
@@ -4326,7 +4261,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1183706784
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4434,7 +4369,7 @@ RectTransform:
   m_Children:
   - {fileID: 1796272282}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -4591,6 +4526,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_BackOffColor: {r: 0, g: 0, b: 0, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 1350222426}
   m_SwitchImage: {fileID: 1350222427}
   m_BackImage: {fileID: 1777742}
   m_ShadowImage: {fileID: 1330082085}
@@ -4744,7 +4680,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1238238292
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4832,7 +4768,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1256765997
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4918,7 +4854,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1260018372
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5006,7 +4942,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1260431258
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5051,7 +4987,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9999237}
+  m_AnchoredPosition: {x: 0, y: -0.99993134}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1270776563
@@ -5203,7 +5139,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1303675758
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5301,7 +5237,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1303999744
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5346,7 +5282,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.999897}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1330082083
@@ -5500,7 +5436,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1339819044
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5586,7 +5522,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1350222428
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5745,6 +5681,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_BackOffColor: {r: 0, g: 0, b: 0, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 1260018370}
   m_SwitchImage: {fileID: 1260018371}
   m_BackImage: {fileID: 1794262710}
   m_ShadowImage: {fileID: 286173728}
@@ -5845,7 +5782,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9999008}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1401819251
@@ -5999,7 +5936,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1412782374
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6097,7 +6034,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1431506883
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6182,7 +6119,7 @@ MonoBehaviour:
       m_Name: location_on
       m_Unicode: \ue0c8
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1470547300
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6270,7 +6207,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1495142032
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6429,6 +6366,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_BackOffColor: {r: 0, g: 0, b: 0, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 1067814789}
   m_SwitchImage: {fileID: 1067814790}
   m_BackImage: {fileID: 1431506882}
   m_ShadowImage: {fileID: 1914795080}
@@ -6632,6 +6570,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 1, g: 0.59607846, b: 0, a: 1}
   m_BackOffColor: {r: 1, g: 0.8, b: 0.5019608, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 275843069}
   m_SwitchImage: {fileID: 275843070}
   m_BackImage: {fileID: 853693096}
   m_ShadowImage: {fileID: 1401819253}
@@ -6761,7 +6700,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1517782896
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6947,7 +6886,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1585172202
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6992,7 +6931,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9999008}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1617112005
@@ -7181,7 +7120,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1653414479
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7266,7 +7205,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1690871672
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7377,7 +7316,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7484,7 +7423,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1736133484
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7662,7 +7601,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1758202502
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7850,7 +7789,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1794262711
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8030,7 +7969,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1804435370
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8189,6 +8128,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0.29803923, g: 0.6862745, b: 0.3137255, a: 1}
   m_BackOffColor: {r: 0.64705884, g: 0.8392157, b: 0.654902, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 1831512654}
   m_SwitchImage: {fileID: 1831512655}
   m_BackImage: {fileID: 1238238291}
   m_ShadowImage: {fileID: 1054908689}
@@ -8319,7 +8259,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1831512656
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8404,7 +8344,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1832633390
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8502,7 +8442,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1854205327
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8587,7 +8527,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1861465923
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8746,6 +8686,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_BackOffColor: {r: 0, g: 0, b: 0, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 1303675756}
   m_SwitchImage: {fileID: 1303675757}
   m_BackImage: {fileID: 1736133483}
   m_ShadowImage: {fileID: 1617112007}
@@ -8949,6 +8890,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0.9529412, g: 0.2627451, b: 0.21176471, a: 1}
   m_BackOffColor: {r: 0.93333334, g: 0.6, b: 0.6, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 1585172200}
   m_SwitchImage: {fileID: 1585172201}
   m_BackImage: {fileID: 158649681}
   m_ShadowImage: {fileID: 2005232129}
@@ -9081,7 +9023,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1876852709
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9240,6 +9182,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_BackOffColor: {r: 0, g: 0, b: 0, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 96248260}
   m_SwitchImage: {fileID: 96248261}
   m_BackImage: {fileID: 2092438644}
   m_ShadowImage: {fileID: 1053407711}
@@ -9340,7 +9283,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.999897}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1914795078
@@ -9491,7 +9434,7 @@ MonoBehaviour:
       m_Name: circle_stroke
       m_Unicode: \uE903
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1929227063
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9687,6 +9630,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_BackOffColor: {r: 0, g: 0, b: 0, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 1653414477}
   m_SwitchImage: {fileID: 1653414478}
   m_BackImage: {fileID: 1303999743}
   m_ShadowImage: {fileID: 768260984}
@@ -9740,6 +9684,74 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!1 &1959175389
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1959175392}
+  - component: {fileID: 1959175391}
+  - component: {fileID: 1959175390}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1959175390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1959175389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96898d74cec571b4183360e4855e452e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &1959175391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1959175389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9d4d96e4987a7447b87e8b4a0d42dde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+  m_ReferenceDpi: 100
+  m_BaseDragThreshold: 10
+--- !u!4 &1959175392
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1959175389}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2005232125
 GameObject:
   m_ObjectHideFlags: 0
@@ -9776,7 +9788,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.999897}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &2005232127
@@ -10001,6 +10013,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_BackOffColor: {r: 0, g: 0, b: 0, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 141751057}
   m_SwitchImage: {fileID: 141751058}
   m_BackImage: {fileID: 1183706783}
   m_ShadowImage: {fileID: 732890943}
@@ -10232,7 +10245,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &2059480064
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10277,7 +10290,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.9998779}
+  m_AnchoredPosition: {x: 0, y: -0.9998932}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &2074176721
@@ -10441,7 +10454,7 @@ MonoBehaviour:
       m_Name: switch_back
       m_Unicode: \uE908
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &2092438645
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10529,7 +10542,7 @@ MonoBehaviour:
       m_Name: circle
       m_Unicode: \uE902
     m_Font: {fileID: 11400000, guid: e47de54244d37e245a398b5d7db36eff, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &2115038207
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10688,6 +10701,7 @@ MonoBehaviour:
   m_BackOnColor: {r: 0, g: 0.5882353, b: 0.53333336, a: 1}
   m_BackOffColor: {r: 0, g: 0, b: 0, a: 1}
   m_BackDisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
+  m_SwitchRectTransform: {fileID: 2059480062}
   m_SwitchImage: {fileID: 2059480063}
   m_BackImage: {fileID: 1804435369}
   m_ShadowImage: {fileID: 1270776565}
