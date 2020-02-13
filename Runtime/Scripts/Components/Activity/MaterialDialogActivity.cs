@@ -292,7 +292,6 @@ namespace MaterialUI
             {
                 LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
                 tweener.Tween("hide", (tag) => { hideAction.InvokeIfNotNull(); });
-
             }
             else
                 hideAction.InvokeIfNotNull();

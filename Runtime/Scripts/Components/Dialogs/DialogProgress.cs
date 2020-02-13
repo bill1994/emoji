@@ -50,6 +50,10 @@ namespace MaterialUI
 
         protected override void ValidateKeyTriggers(MaterialFocusGroup p_materialKeyFocus)
         {
+            if (p_materialKeyFocus != null)
+            {
+                p_materialKeyFocus.KeyTriggers.Clear();
+            }
         }
 
         public void Initialize(string bodyText, string titleText, ImageData icon, bool startStationaryAtZero = true)
