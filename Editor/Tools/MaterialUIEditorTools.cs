@@ -321,6 +321,47 @@ namespace MaterialUI
 
         #region Tools
 
+        [MenuItem("GameObject/MaterialUI/Optimize Hierarchy Drawcalls", true)]
+        [MenuItem("Assets/MaterialUI/Optimize Hierarchy Drawcalls", true)]
+        static bool ValidateOptimizeImageDrawcalls()
+        {
+            // Return false if no GameObject is selected or if more then one is selected
+            return Selection.gameObjects != null && Selection.gameObjects.Length == 1 && Selection.activeGameObject != null;
+        }
+
+        static Sprite s_FillSquareSprite = null;
+        [MenuItem("GameObject/MaterialUI/Optimize Hierarchy Drawcalls", false, 3000)]
+        [MenuItem("Assets/MaterialUI/Optimize Hierarchy Drawcalls", false, 3000)]
+        static void OptimizeImageDrawcalls()
+        {
+            if (s_FillSquareSprite == null)
+            {
+                var defaultImagesAPIFolder = GetSubfolderInAPI("DefaultAssets/Images/Fills");
+                var fillSquarePath = System.IO.Path.Combine(defaultImagesAPIFolder, "Fill Square.psd").Replace("\\", "/");
+                s_FillSquareSprite = AssetDatabase.LoadAssetAtPath<Sprite>(fillSquarePath);
+            }
+
+            var count = 0;
+            if (s_FillSquareSprite != null)
+            {
+                var selectedGameObjects = Selection.gameObjects;
+                foreach (var gameObject in selectedGameObjects)
+                {
+                    var images = gameObject.GetComponentsInChildren<Image>(true);
+                    foreach (var image in images)
+                    {
+                        if (image.sprite == null)
+                        {
+                            image.sprite = s_FillSquareSprite;
+                            count++;
+                        }
+                    }
+                }
+            }
+
+            Debug.Log("Optimized Images: " + count);
+        }
+
         [MenuItem("Window/MaterialUI/Import Essential Resources", false, 2050)]
         public static void ImportEssentialResources()
         {
