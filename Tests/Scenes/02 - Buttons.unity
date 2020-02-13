@@ -602,8 +602,8 @@ MonoBehaviour:
   m_Text: {fileID: 317443947}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 50.666668, y: 14.666667}
-  m_Size: {x: 80.66667, y: 32.666668}
+  m_ContentSize: {x: 53.71925, y: 16.671492}
+  m_Size: {x: 83.71925, y: 34.671494}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -1046,7 +1046,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1868,8 +1868,8 @@ MonoBehaviour:
   m_Text: {fileID: 259418318}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 62.666668, y: 14.666667}
-  m_Size: {x: 92.66667, y: 32.666668}
+  m_ContentSize: {x: 63.907383, y: 16.671492}
+  m_Size: {x: 93.90738, y: 34.671494}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -2176,8 +2176,8 @@ MonoBehaviour:
   m_Text: {fileID: 569484359}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 50.666668, y: 14.666667}
-  m_Size: {x: 80.66667, y: 32.666668}
+  m_ContentSize: {x: 53.71925, y: 16.671492}
+  m_Size: {x: 83.71925, y: 34.671494}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -2597,7 +2597,7 @@ MonoBehaviour:
       m_Name: clear
       m_Unicode: \ue14c
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &368413811
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2760,8 +2760,8 @@ MonoBehaviour:
   m_Text: {fileID: 1219664654}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 84, y: 16}
-  m_Size: {x: 114, y: 34}
+  m_ContentSize: {x: 85.71925, y: 16}
+  m_Size: {x: 115.71925, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -3237,8 +3237,8 @@ MonoBehaviour:
   m_Text: {fileID: 145030654}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 54, y: 14.666667}
-  m_Size: {x: -1, y: 32.666668}
+  m_ContentSize: {x: 54, y: 16.671492}
+  m_Size: {x: -1, y: 34.671494}
   m_FitWidthToContent: 0
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -3621,7 +3621,7 @@ MonoBehaviour:
       m_Name: clear
       m_Unicode: \ue14c
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &552800924
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4827,7 +4827,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5110,8 +5110,8 @@ MonoBehaviour:
   m_Text: {fileID: 542976603}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 54, y: 14.666667}
-  m_Size: {x: -1, y: 32.666668}
+  m_ContentSize: {x: 54, y: 16.671492}
+  m_Size: {x: -1, y: 34.671494}
   m_FitWidthToContent: 0
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -5558,8 +5558,8 @@ MonoBehaviour:
   m_Text: {fileID: 1900619011}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 65.333336, y: 14.666667}
-  m_Size: {x: 95.333336, y: 32.666668}
+  m_ContentSize: {x: 67.61216, y: 16.671492}
+  m_Size: {x: 97.61216, y: 34.671494}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -5904,8 +5904,8 @@ MonoBehaviour:
   m_Text: {fileID: 1653253080}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 64, y: 14.666667}
-  m_Size: {x: 94, y: 32.666668}
+  m_ContentSize: {x: 67.61216, y: 16.671492}
+  m_Size: {x: 97.61216, y: 34.671494}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -6212,8 +6212,8 @@ MonoBehaviour:
   m_Text: {fileID: 1891691226}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 64, y: 14.666667}
-  m_Size: {x: 94, y: 32.666668}
+  m_ContentSize: {x: 67.61216, y: 16.671492}
+  m_Size: {x: 97.61216, y: 34.671494}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -6366,7 +6366,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1108702196}
   m_CullTransparentMesh: 0
---- !u!1 &1144792651
+--- !u!1 &1122117112
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6374,9 +6374,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1144792655}
-  - component: {fileID: 1144792654}
-  - component: {fileID: 1144792652}
+  - component: {fileID: 1122117115}
+  - component: {fileID: 1122117114}
+  - component: {fileID: 1122117113}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -6384,13 +6384,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1144792652
+--- !u!114 &1122117113
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
+  m_GameObject: {fileID: 1122117112}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96898d74cec571b4183360e4855e452e, type: 3}
@@ -6403,34 +6403,36 @@ MonoBehaviour:
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 0
---- !u!114 &1144792654
+--- !u!114 &1122117114
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
+  m_GameObject: {fileID: 1122117112}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Script: {fileID: 11500000, guid: d9d4d96e4987a7447b87e8b4a0d42dde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
-  m_DragThreshold: 5
---- !u!4 &1144792655
+  m_DragThreshold: 10
+  m_ReferenceDpi: 100
+  m_BaseDragThreshold: 10
+--- !u!4 &1122117115
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1144792651}
+  m_GameObject: {fileID: 1122117112}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1168248539
 GameObject:
@@ -6586,8 +6588,8 @@ MonoBehaviour:
   m_Text: {fileID: 248653200}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 54, y: 14.666667}
-  m_Size: {x: -1, y: 32.666668}
+  m_ContentSize: {x: 54, y: 16.671492}
+  m_Size: {x: -1, y: 34.671494}
   m_FitWidthToContent: 0
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -6719,7 +6721,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7147,7 +7149,7 @@ RectTransform:
   m_Children:
   - {fileID: 1787532209}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -7463,8 +7465,8 @@ MonoBehaviour:
   m_Text: {fileID: 923739981}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 62.666668, y: 14.666667}
-  m_Size: {x: 92.66667, y: 32.666668}
+  m_ContentSize: {x: 63.907383, y: 16.671492}
+  m_Size: {x: 93.90738, y: 34.671494}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -7690,7 +7692,7 @@ MonoBehaviour:
       m_Name: color_lens
       m_Unicode: \ue3b7
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1279967528
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7775,7 +7777,7 @@ MonoBehaviour:
       m_Name: check
       m_Unicode: \ue5ca
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1291093641
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8420,7 +8422,7 @@ MonoBehaviour:
       m_Name: check
       m_Unicode: \ue5ca
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1387111494
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8561,8 +8563,8 @@ MonoBehaviour:
   m_Text: {fileID: 672443346}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 84, y: 16}
-  m_Size: {x: 114, y: 34}
+  m_ContentSize: {x: 85.71925, y: 16}
+  m_Size: {x: 115.71925, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -9418,8 +9420,8 @@ MonoBehaviour:
   m_Text: {fileID: 1841993819}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 49.333336, y: 16}
-  m_Size: {x: 79.333336, y: 34}
+  m_ContentSize: {x: 49.597687, y: 16}
+  m_Size: {x: 79.59769, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -9664,8 +9666,8 @@ MonoBehaviour:
   m_Text: {fileID: 1987078484}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 65.333336, y: 14.666667}
-  m_Size: {x: 95.333336, y: 32.666668}
+  m_ContentSize: {x: 67.61216, y: 16.671492}
+  m_Size: {x: 97.61216, y: 34.671494}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -9872,8 +9874,8 @@ MonoBehaviour:
   m_Text: {fileID: 1341905879}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 49.333336, y: 16}
-  m_Size: {x: 79.333336, y: 34}
+  m_ContentSize: {x: 49.597687, y: 16}
+  m_Size: {x: 79.59769, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -10179,7 +10181,7 @@ MonoBehaviour:
       m_Name: invert_colors
       m_Unicode: \ue891
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
-  m_KeepSizeWhenEmpty: 1
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!222 &1674591900
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13240,8 +13242,8 @@ MonoBehaviour:
   m_Text: {fileID: 35182313}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 34, y: 14.666667}
-  m_Size: {x: -1, y: 32.666668}
+  m_ContentSize: {x: 34, y: 16.671492}
+  m_Size: {x: -1, y: 34.671494}
   m_FitWidthToContent: 0
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
