@@ -52,8 +52,9 @@ namespace MaterialUI
         /// <summary>
         /// See MonoBehaviour.OnApplicationQuit.
         /// </summary>
-        protected virtual void OnApplicationQuit()
+        protected override void OnApplicationQuit()
         {
+            base.OnApplicationQuit();
             Ripple.ResetMaterial();
         }
 
