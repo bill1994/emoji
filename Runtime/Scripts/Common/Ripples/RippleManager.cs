@@ -15,14 +15,21 @@ namespace MaterialUI
     [AddComponentMenu("MaterialUI/Managers/Ripple Manager")]
     public class RippleManager : Singleton<RippleManager>
     {
-        /// <summary>
-        /// The VectorImageData to use for all Ripples.
-        /// </summary>
+        #region Variables
+
         private VectorImageData m_RippleImageData;
-        /// <summary>
-        /// The VectorImageData to use for all Ripples.
-        /// If null, automatically gets the 'circle' icon from the built-in MaterialUIIcons pack.
-        /// </summary>
+
+        private static int s_rippleCount;
+
+        private List<Ripple> m_ActiveRipples = new List<Ripple>();
+        private Queue<Ripple> m_QueuedRipples = new Queue<Ripple>();
+
+        protected List<Ripple> _ripplesToRelease = new List<Ripple>();
+
+        #endregion
+
+        #region Properties
+
         public VectorImageData rippleImageData
         {
             get
@@ -35,35 +42,35 @@ namespace MaterialUI
             }
         }
 
-        /// <summary>
-        /// The number of ripples, active or pooled (queued), in the scene.
-        /// </summary>
-        private static int rippleCount;
+        #endregion
 
-        /// <summary>
-        /// The active ripples in the scene.
-        /// </summary>
-        private List<Ripple> m_ActiveRipples = new List<Ripple>();
-        /// <summary>
-        /// The queued (pooled) ripples in the scene.
-        /// </summary>
-        private Queue<Ripple> m_QueuedRipples = new Queue<Ripple>();
+        #region Unity Functions
 
-        /// <summary>
-        /// See MonoBehaviour.OnApplicationQuit.
-        /// </summary>
         protected override void OnApplicationQuit()
         {
             base.OnApplicationQuit();
-            Ripple.ResetMaterial();
+            if (s_instance == this)
+                Ripple.ResetMaterial();
         }
+
+        protected virtual void Update()
+        {
+            if (s_instance == this)
+            {
+                TryReleaseRipplesStack();
+            }
+        }
+
+        #endregion
+
+        #region Public Functions
 
         /// <summary>
         /// Gets the next queued ripple.
         /// If none available, one will be created.
         /// </summary>
         /// <returns>A ripple object, ready to Setup and expand.</returns>
-        public Ripple GetRipple()
+        public virtual Ripple GetRipple()
         {
             //Try pick ripple from pool
             Ripple ripple = m_QueuedRipples.Count > 0 ? m_QueuedRipples.Dequeue() : null;
@@ -84,13 +91,26 @@ namespace MaterialUI
         }
 
         /// <summary>
+        /// Calls <see cref="ResetRipple"/> with the specified ripple and adds it back into the queue.
+        /// </summary>
+        /// <param name="ripple">The ripple to reset and queue.</param>
+        public virtual void ReleaseRipple(Ripple ripple)
+        {
+            _ripplesToRelease.Add(ripple);
+        }
+
+        #endregion
+
+        #region Helper Functions
+
+        /// <summary>
         /// Creates a new Ripple and adds it to the queue.
         /// </summary>
-        private void CreateRipple()
+        protected virtual void CreateRipple()
         {
             Ripple ripple = PrefabManager.InstantiateGameObject("Ripple", DialogManager.rectTransform).GetComponent<Ripple>();
-            ripple.Create(rippleCount, rippleImageData);
-            rippleCount++;
+            ripple.Create(s_rippleCount, rippleImageData);
+            s_rippleCount++;
 
             ReleaseRippleImmediate(ripple);
         }
@@ -99,7 +119,7 @@ namespace MaterialUI
         /// Resets a ripple's data, ready to reuse.
         /// </summary>
         /// <param name="ripple">The ripple.</param>
-        private void ResetRipple(Ripple ripple)
+        protected virtual void ResetRipple(Ripple ripple)
         {
             ripple.rectTransform.SetParent(transform);
             ripple.rectTransform.localScale = Vector3.zero;
@@ -110,24 +130,14 @@ namespace MaterialUI
             ripple.ClearData();
         }
 
-        /// <summary>
-        /// Calls <see cref="ResetRipple"/> with the specified ripple and adds it back into the queue.
-        /// </summary>
-        /// <param name="ripple">The ripple to reset and queue.</param>
-        public void ReleaseRipple(Ripple ripple)
-        {
-            _ripplesToRelease.Add(ripple);
-        }
-
-        protected void ReleaseRippleImmediate(Ripple ripple)
+        protected virtual void ReleaseRippleImmediate(Ripple ripple)
         {
             ResetRipple(ripple);
             ripple.gameObject.SetActive(false);
             m_QueuedRipples.Enqueue(ripple);
         }
 
-        protected List<Ripple> _ripplesToRelease = new List<Ripple>();
-        protected void TryReleaseRipplesStack()
+        protected virtual void TryReleaseRipplesStack()
         {
             foreach (var v_ripple in _ripplesToRelease)
             {
@@ -137,11 +147,6 @@ namespace MaterialUI
             _ripplesToRelease.Clear();
         }
 
-
-
-        private void Update()
-        {
-            TryReleaseRipplesStack();
-        }
+        #endregion
     }
 }
