@@ -1,0 +1,271 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MaterialUIDefaultAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 1bb28103db00a43489c84c437caff585, type: 3}
+    - {fileID: 102900000, guid: 651fb5122a861ff4ebe9b5e8413ebe10, type: 3}
+    - {fileID: 102900000, guid: e423ed38fca84a548a7a49c6bde34d5d, type: 3}
+    - {fileID: 102900000, guid: e9362ef89cb37a549aaa35514d31dca8, type: 3}
+    - {fileID: 102900000, guid: 99362bfded051214bb51d24ce59e40d9, type: 3}
+    - {fileID: 102900000, guid: 7b5fd010311b47547aabf982085d5795, type: 3}
+    - {fileID: 102900000, guid: 90aab9f236faf5c4c84cf592668ed0c2, type: 3}
+    - {fileID: 102900000, guid: dd9bfa7c3a610134db679388c2a71a82, type: 3}
+    - {fileID: 2800000, guid: 60dace465524d9642b5deeb7e3ce612f, type: 3}
+    - {fileID: 2800000, guid: 626dfa39ba2af2e41bbbb1ba79c2846a, type: 3}
+    - {fileID: 2800000, guid: 15616052fa4d9b242844335f83850afb, type: 3}
+    totalSpriteSurfaceArea: 861572
+    bindAsDefault: 1
+    storedHash:
+      serializedVersion: 2
+      Hash: 987cf8d737f84b8f97a3b1e87c452ce1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 2f212220bd9fb014cb8a157530c94935, type: 3}
+  - {fileID: 21300000, guid: 87fe2150c2e187246977e000167278ba, type: 3}
+  - {fileID: 21300000, guid: c143e150bd357e5459a47f7c6b517b92, type: 3}
+  - {fileID: 21300000, guid: 74a7ff609c538d545834a44901b98bf8, type: 3}
+  - {fileID: 21300000, guid: ced282904bd778d448a51ba967129765, type: 3}
+  - {fileID: 21300000, guid: ffe07bd00ca76aa4d87c5a4eced0a426, type: 3}
+  - {fileID: 21300000, guid: 89e1ac918e3383f4d8cea5e7501afc4e, type: 3}
+  - {fileID: 21300000, guid: 2f20e7b1b12f24948899055307d53b44, type: 3}
+  - {fileID: 21300000, guid: 66992f02c9ec3d542af7cca4ea3fa59a, type: 3}
+  - {fileID: 21300000, guid: 8ee9ad12dfb2470409fe689ae2608483, type: 3}
+  - {fileID: 21300000, guid: 15616052fa4d9b242844335f83850afb, type: 3}
+  - {fileID: 21300000, guid: 906c4a52e0d16e54090f0f708715645d, type: 3}
+  - {fileID: 21300000, guid: 2f31d5a2dd59b1e44a3f47a0677145e4, type: 3}
+  - {fileID: 21300000, guid: ac88c4e2b841ae142a7336701476effe, type: 3}
+  - {fileID: 21300000, guid: ea5374f26645a6843a8727fbebe2cdb0, type: 3}
+  - {fileID: 21300000, guid: f38276f26ae43ee44b1636b8d59b2e2f, type: 3}
+  - {fileID: 21300000, guid: 62c4e4038fe9e91438b574f3faf8ba90, type: 3}
+  - {fileID: 21300000, guid: ebb63d23e5a72e84c8929a67a56b35ce, type: 3}
+  - {fileID: 21300000, guid: e4946e2335448254b9009840123ecef2, type: 3}
+  - {fileID: 21300000, guid: 1221fc434f05e4244ae2ae197ef4ed66, type: 3}
+  - {fileID: 21300000, guid: b0687463dfef1434fb05b8aebf20288a, type: 3}
+  - {fileID: 21300000, guid: 64fd17930f5cd684aa28020f760f1a18, type: 3}
+  - {fileID: 21300000, guid: c977c993b8c61f5408f4b92576c71fa5, type: 3}
+  - {fileID: 21300000, guid: 7601c4a3947338541a5b31ee9e213f45, type: 3}
+  - {fileID: 21300000, guid: 648720b378d1ef74f890277194c2aa6f, type: 3}
+  - {fileID: 21300000, guid: 599dc4b36e5d49f46b7fa8c8ca46a55c, type: 3}
+  - {fileID: 21300000, guid: 018605c3f58c48444a3e49f01b4bd9c1, type: 3}
+  - {fileID: 21300000, guid: e7222dd356fe3244ea9fed37aeacff62, type: 3}
+  - {fileID: 21300000, guid: 8fce8ee3ce7255546b856f1b872abd64, type: 3}
+  - {fileID: 21300000, guid: 396673f31a59c7742a69f12f00e1ab5b, type: 3}
+  - {fileID: 21300000, guid: 819e7bf3fbee9c045b3793e73881f6d1, type: 3}
+  - {fileID: 21300000, guid: 93c8d024b3370744099465377c7b06dc, type: 3}
+  - {fileID: 21300000, guid: 4ae26f24e04dc8a4392f7cf180abee6d, type: 3}
+  - {fileID: 21300000, guid: 45f96034c8c2e2946a1ddea0b128fcd3, type: 3}
+  - {fileID: 21300000, guid: bbd40b444aec6234fa5c5d19b3d99e54, type: 3}
+  - {fileID: 21300000, guid: 88844764ac023d6439dd4036bb478a3b, type: 3}
+  - {fileID: 21300000, guid: 9b2ae7a44750d1d49b41d25d5a7624f3, type: 3}
+  - {fileID: 21300000, guid: 1ecb58f4f2e7d304bbfb59b28a2d0b85, type: 3}
+  - {fileID: 21300000, guid: 854073a53c8ce4f4b89a042e4ae872ad, type: 3}
+  - {fileID: 21300000, guid: 8a0543160c2f21d4eb87531958766bf5, type: 3}
+  - {fileID: 21300000, guid: 3816bd46861f0994fbc41dec19c9b629, type: 3}
+  - {fileID: 21300000, guid: 60dace465524d9642b5deeb7e3ce612f, type: 3}
+  - {fileID: 21300000, guid: a8bf17666e0b49a45b97f3c4522392f8, type: 3}
+  - {fileID: 21300000, guid: 0b80a4763e7d81c45b20a1cabfc52106, type: 3}
+  - {fileID: 21300000, guid: 8e5e2aa66b6b481438f15f22bc96a954, type: 3}
+  - {fileID: 21300000, guid: 6bfec7d6b8723274995715e50a7fb3a0, type: 3}
+  - {fileID: 21300000, guid: 0f412ed6f67debf4a8bd189b99c7aac1, type: 3}
+  - {fileID: 21300000, guid: b6147ef61476e7a469c850b647a997f4, type: 3}
+  - {fileID: 21300000, guid: 3a46c417dde19c4409cb672a1c41a1ae, type: 3}
+  - {fileID: 21300000, guid: de553647b3f1cc441b8bade87cd4b350, type: 3}
+  - {fileID: 21300000, guid: af0fa2877934a4444ac2fdb8299b46f4, type: 3}
+  - {fileID: 21300000, guid: 9be76d87900d6f944837b7b0143faafe, type: 3}
+  - {fileID: 21300000, guid: 0efbd0a791296af499587ef3418b08a1, type: 3}
+  - {fileID: 21300000, guid: 28891ac769ca5404aacfd96d1c51891b, type: 3}
+  - {fileID: 21300000, guid: c9f5bbd7d8fd0254a9615aa586b466e8, type: 3}
+  - {fileID: 21300000, guid: 925c7f2845cf85045b592992d742cf0b, type: 3}
+  - {fileID: 21300000, guid: 23a92d383560cb8478c1f5d21b4fbeb2, type: 3}
+  - {fileID: 21300000, guid: cdaece38f0d021a44b32672e79c17b54, type: 3}
+  - {fileID: 21300000, guid: b3b1f358ce766d946ae041127983b3d0, type: 3}
+  - {fileID: 21300000, guid: 494cbba8577f1684a94ccee3a6826ac3, type: 3}
+  - {fileID: 21300000, guid: 0ea484b806189bb409b0f166664453ba, type: 3}
+  - {fileID: 21300000, guid: 39a278e84225d1245b0a5c42a3555918, type: 3}
+  - {fileID: 21300000, guid: 626dfa39ba2af2e41bbbb1ba79c2846a, type: 3}
+  - {fileID: 21300000, guid: 341be759dfa0a5248a39a98198327d5c, type: 3}
+  - {fileID: 21300000, guid: 16f9ad592272cd0478d073f5400ff14f, type: 3}
+  - {fileID: 21300000, guid: 7207606983d259b45933793656d882f2, type: 3}
+  - {fileID: 21300000, guid: 2203396930ad85847b23c60f81efaec4, type: 3}
+  - {fileID: 21300000, guid: f0ae6789f9d16db479e1aa093496f32a, type: 3}
+  - {fileID: 21300000, guid: 367d62b9c7d1ba645a650a1faf768935, type: 3}
+  - {fileID: 21300000, guid: 35be62c9c1ef6cb4c9987837a9deef02, type: 3}
+  - {fileID: 21300000, guid: ce4b7ac9fc527fa4aaa1abd7fadc4545, type: 3}
+  - {fileID: 21300000, guid: 737a9b0a6fec22c44bdae952fff26077, type: 3}
+  - {fileID: 21300000, guid: 678dc22ac613e284488343c73d6e9fc6, type: 3}
+  - {fileID: 21300000, guid: d4adf48a59ef68d41b276ecf17fd33d2, type: 3}
+  - {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  - {fileID: 21300000, guid: ff0d5bfaf0bed3647b5c0a860ccb4955, type: 3}
+  - {fileID: 21300000, guid: 8ab0ca3bb0f27e04eaeef9103a1a08d7, type: 3}
+  - {fileID: 21300000, guid: a418d65b58c5fc343ae0ad5b5275aaff, type: 3}
+  - {fileID: 21300000, guid: 90db8eabb91855d4da74dc3306ba952c, type: 3}
+  - {fileID: 21300000, guid: b25991fb072d0794d86b0edded3bd32e, type: 3}
+  - {fileID: 21300000, guid: a993b20c72f6c9d4dbfbd83c99bd6561, type: 3}
+  - {fileID: 21300000, guid: 21831a1cfe8ceac4dbf4920b5e01c5bf, type: 3}
+  - {fileID: 21300000, guid: 6aa91c2c7110f774184427f926c153a0, type: 3}
+  - {fileID: 21300000, guid: 8bf83e5cae8523f42aaad848c6750340, type: 3}
+  - {fileID: 21300000, guid: d8e46d9c4c30ef643a82a2f3d6c9795f, type: 3}
+  - {fileID: 21300000, guid: 92274ecc73c79854e967593848538411, type: 3}
+  - {fileID: 21300000, guid: c6650e0d6495aea42802c5f7e6f3582f, type: 3}
+  - {fileID: 21300000, guid: c0f3ce1d53d22644e9638ca86fc2e46a, type: 3}
+  - {fileID: 21300000, guid: 05b83a2d556523d46858dd7e37a75cb8, type: 3}
+  - {fileID: 21300000, guid: a19d7f2dee2d03046bcd70fd50d12138, type: 3}
+  - {fileID: 21300000, guid: a1df806d174324844a92ea3e25548a08, type: 3}
+  - {fileID: 21300000, guid: cd68188da8f0b3c43a485542f273b19b, type: 3}
+  - {fileID: 21300000, guid: 01fd0dbd35846914c83a6b73c30730b8, type: 3}
+  - {fileID: 21300000, guid: 95e777dd43a8b6f46849cbdbd1a457b1, type: 3}
+  - {fileID: 21300000, guid: 02ba48fdecd48af4fb6b323455c30ac4, type: 3}
+  - {fileID: 21300000, guid: 1404cc1ef9bb4ac4791efb2897f6e06e, type: 3}
+  - {fileID: 21300000, guid: a7667b5eee8e57147aaa71311d36a077, type: 3}
+  - {fileID: 21300000, guid: 6835a17eff2f16844b04bf0fd81070ac, type: 3}
+  - {fileID: 21300000, guid: 8027b48ed00ec5844b38dc25b4eaee31, type: 3}
+  - {fileID: 21300000, guid: 0ff363cef873ca345ad49148e6ae7a42, type: 3}
+  - {fileID: 21300000, guid: 19d53ade5519710438f3952ce2d210f1, type: 3}
+  - {fileID: 21300000, guid: c1d88dde383d41745a74c5dc517fbd66, type: 3}
+  - {fileID: 21300000, guid: dc06b30fffa427b40afef59a98051d79, type: 3}
+  - {fileID: 21300000, guid: 4632e30f91dea0f4aa25484074b47098, type: 3}
+  - {fileID: 21300000, guid: fcce502f169c3d64c8c483e5fad45b2f, type: 3}
+  - {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
+  - {fileID: 21300000, guid: b4a65d9f0ce3a7748aaf7dbfc8aaf25c, type: 3}
+  - {fileID: 21300000, guid: a3d827afcb0284a498b44c1780911384, type: 3}
+  - {fileID: 21300000, guid: 6b232aef422bfa0428bbf5e0e9ffead7, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Border 2-Slice Half Round
+  - Fill Square
+  - circle_lg
+  - circle_border_md
+  - Border 2-Slice Roundcut
+  - Fill 2-Slice Pointy
+  - circle_sm
+  - roundedsquare_shadow_4
+  - circle_shadow_1_40px
+  - Fill Circlecut sm sided
+  - ShadowLine_Small
+  - Border 2-Slice Diagonal sided
+  - Fill 2-Slice Roundcut
+  - Border Squarecut lg sided
+  - roundedsquare_stroke_400%
+  - Fill 2-Slice Half Round sided
+  - Border 2-Slice Half Round sided
+  - circle_shadow_3_20px
+  - Fill Squarecut lg sided
+  - Fill Squareout lg
+  - Border Circledouble sm
+  - Border Round sm
+  - square_dotted_md
+  - Fill Circledouble sm
+  - circle_lg_inverse
+  - Border Round lg sided
+  - Border Circlecut sm sided
+  - circle_border_sm
+  - roundedsquare_shadow_3
+  - Border 2-Slice Pointy sided
+  - Border Square lg
+  - Fill 45cut lg
+  - Border Squareout sm
+  - Border Squarecut sm
+  - Border 2-Slice Round
+  - Fill 2-Slice Pointy sided
+  - Fill Round sm
+  - Fill 45cut sm sided
+  - circle_md_inverse
+  - Border 2-Slice Pointy
+  - Fill Circledouble lg
+  - Ripple
+  - Fill 45cut sm
+  - Border 45cut sm sided
+  - Fill Squarecut lg
+  - Border Squarecut lg
+  - circle_shadow_1_20px
+  - Border Circleout lg sided
+  - Fill 2-Slice Half Round
+  - Fill 2-Slice Diagonal sided
+  - circle_shadow_3_56px
+  - Border Round lg
+  - Fill Circledouble sm sided
+  - Border Circledouble sm sided
+  - Border Circleout lg
+  - roundedsquare_100%
+  - Fill 2-Slice Round sided
+  - Fill Squarecut sm
+  - circle_md
+  - Border Circledouble lg sided
+  - Fill 45cut lg sided
+  - Fill Squarecut sm sided
+  - ShadowLine_Large
+  - Fill Circlecut lg sided
+  - Fill Round sm sided
+  - circle_shadow_2_40px
+  - Fill 2-Slice Diagonal
+  - Fill Circlecut lg
+  - circle_shadow_3_40px
+  - Border Squareout sm sided
+  - roundedsquare_shadow_2
+  - Border Circleout sm
+  - circle_sm_inverse
+  - Fill Circledouble lg sided
+  - roundedsquare_stroke_100%
+  - Border Circlecut sm
+  - Border Round sm sided
+  - Fill Circleout lg sided
+  - Border Squareout lg
+  - Fill Squareout lg sided
+  - circle_shadow_1_56px
+  - Border Squareout lg sided
+  - Fill Circleout sm
+  - Border 2-Slice Round sided
+  - roundedsquare_200%
+  - Fill Circlecut sm
+  - Border 45cut sm
+  - Border Circlecut lg sided
+  - circle_shadow_2_20px
+  - Fill Circleout sm sided
+  - Fill Circleout lg
+  - Border Squarecut sm sided
+  - Fill Squareout sm
+  - Fill 2-Slice Round
+  - Fill Round lg sided
+  - Fill Squareout sm sided
+  - Border Square sm
+  - circle_shadow_2_56px
+  - Border 2-Slice Diagonal
+  - Border Circlecut lg
+  - Border Circledouble lg
+  - roundedsquare_shadow_1
+  - circle_border_lg
+  - Fill Round lg
+  - Border 45cut lg sided
+  - roundedsquare_stroke_200%
+  - roundedsquare_400%
+  - Border 45cut lg
+  - Border Circleout sm sided
+  m_Tag: MaterialUIDefaultAtlas
+  m_IsVariant: 0

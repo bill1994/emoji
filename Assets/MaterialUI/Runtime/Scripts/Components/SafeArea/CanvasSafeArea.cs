@@ -100,41 +100,7 @@ namespace MaterialUI
             }
             else
             {
-                var hasNotch = HasNotch();
-                if (m_forceClip)
-                    Content.gameObject.GetAddComponent<RectMask2D>();
-                var layoutElement = Content.gameObject.GetAddComponent<LayoutElement>();
-                layoutElement.ignoreLayout = true;
-                ResetRectTransform(m_Content, false);
-                RefreshContentChildren();
-
-                if (m_UnsafeContent == null && m_AutoCreateUnsafeContent && hasNotch)
-                {
-                    m_UnsafeContent = new GameObject("[AUTOGEN] UnsafeAreaContent").AddComponent<RectTransform>();
-                    m_UnsafeContent.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
-                    m_UnsafeContent.SetParent(Content.parent);
-                    //m_UnsafeContent.gameObject.GetAddComponent<RectMask2D>();
-                    m_UnsafeContent.transform.SetSiblingIndex(Content.transform.GetSiblingIndex());
-
-                    var unsafeLayoutElement = m_UnsafeContent.gameObject.GetAddComponent<LayoutElement>();
-                    unsafeLayoutElement.ignoreLayout = true;
-
-                    if (Theme.Enabled)
-                    {
-                        var unsafeImage = m_UnsafeContent.gameObject.GetAddComponent<Image>();
-                        unsafeImage.raycastTarget = false;
-                        unsafeImage.color = Theme.UnsafeContentColor;
-                    }
-                }
-
-#if UNITY_EDITOR
-                EditorSafeAreaSimulator.RegisterSafeAreaComponent(this);
-                SetupSimulatorMaskContent();
-#endif
-
-                ResetRectTransform(m_UnsafeContent, true);
-
-                Refresh();
+                TryInit();
             }
         }
 
@@ -167,7 +133,17 @@ namespace MaterialUI
         protected override void OnRectTransformDimensionsChange()
         {
             if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
-                Refresh();
+            {
+                if (HasNotch() && 
+                    ((m_UnsafeContent == null && m_AutoCreateUnsafeContent) || 
+                    ((m_AutoReparentDirectChildren && m_Content == null) ||
+                     (m_Content != null && !m_Content.gameObject.scene.IsValid()) ||
+                     (m_Content != null && !m_Content.IsChildOf(this.transform)))
+                    ))
+                {
+                    TryInit();
+                }
+            }
         }
 
         protected virtual void OnTransformChildrenChanged()
@@ -392,8 +368,8 @@ namespace MaterialUI
         protected virtual RectTransform TryInstantiateContent()
         {
             if ((m_AutoReparentDirectChildren && m_Content == null && HasNotch()) ||
-                    m_Content != null && !m_Content.gameObject.scene.IsValid() ||
-                    m_Content != null && !m_Content.IsChildOf(this.transform))
+                    (m_Content != null && !m_Content.gameObject.scene.IsValid()) ||
+                    (m_Content != null && !m_Content.IsChildOf(this.transform)))
             {
                 if (m_Content == null)
                 {
@@ -421,6 +397,57 @@ namespace MaterialUI
             }
 
             return m_Content;
+        }
+
+        protected virtual void TryInit()
+        {
+            TryInstantiateContent();
+            if (Content != null)
+            {
+                if (m_forceClip)
+                    Content.gameObject.GetAddComponent<RectMask2D>();
+                var layoutElement = Content.gameObject.GetAddComponent<LayoutElement>();
+                layoutElement.ignoreLayout = true;
+                ResetRectTransform(m_Content, false);
+                RefreshContentChildren();
+            }
+
+            TryInstantiateUnsafeContent();
+            if (m_UnsafeContent != null)
+            {
+#if UNITY_EDITOR
+                EditorSafeAreaSimulator.RegisterSafeAreaComponent(this);
+                SetupSimulatorMaskContent();
+#endif
+
+                ResetRectTransform(m_UnsafeContent, true);
+            }
+            Refresh();
+        }
+
+        protected virtual RectTransform TryInstantiateUnsafeContent()
+        {
+            var hasNotch = HasNotch();
+            if (m_UnsafeContent == null && m_AutoCreateUnsafeContent && hasNotch)
+            {
+                m_UnsafeContent = new GameObject("[AUTOGEN] UnsafeAreaContent").AddComponent<RectTransform>();
+                m_UnsafeContent.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
+                m_UnsafeContent.SetParent(Content.parent);
+                //m_UnsafeContent.gameObject.GetAddComponent<RectMask2D>();
+                m_UnsafeContent.transform.SetSiblingIndex(Content.transform.GetSiblingIndex());
+
+                var unsafeLayoutElement = m_UnsafeContent.gameObject.GetAddComponent<LayoutElement>();
+                unsafeLayoutElement.ignoreLayout = true;
+
+                if (Theme.Enabled)
+                {
+                    var unsafeImage = m_UnsafeContent.gameObject.GetAddComponent<Image>();
+                    unsafeImage.raycastTarget = false;
+                    unsafeImage.color = Theme.UnsafeContentColor;
+                }
+            }
+
+            return m_UnsafeContent;
         }
 
         protected virtual bool IsPrefab()
