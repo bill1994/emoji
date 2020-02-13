@@ -822,9 +822,14 @@ namespace MaterialUI
                     _SlideScreenPos = rectTransform.parent.TransformPoint(_SlideScreenPos);
             }
 
-            enabled = true;
+            
             _IsTransitioning = 2;
             _TransitionCurrentTime = -1;
+
+            if (!gameObject.activeInHierarchy)
+                InterruptAnimation();
+            else
+                enabled = true;
         }
 
         public virtual void TransitionOutImmediate()
