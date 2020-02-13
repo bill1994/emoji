@@ -1551,15 +1551,14 @@ namespace MaterialUI
 
         public virtual void ActivateInputField()
         {
+            Select();
+        }
+
+        public virtual void Select()
+        {
             if (inputField != null)
             {
-                var method = inputField.GetType().GetMethod("ActivateInputField", System.Reflection.BindingFlags.Instance| System.Reflection.BindingFlags.Public);
-                if (method != null)
-                {
-                    var parameters = method.GetParameters();
-                    if (parameters == null || parameters.Length == 0)
-                        method.Invoke(inputField, null);
-                }
+                inputField.Select();
             }
         }
 
