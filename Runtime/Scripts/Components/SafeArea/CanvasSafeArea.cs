@@ -444,6 +444,10 @@ namespace MaterialUI
                     var unsafeImage = m_UnsafeContent.gameObject.GetAddComponent<Image>();
                     unsafeImage.raycastTarget = false;
                     unsafeImage.color = Theme.UnsafeContentColor;
+                    unsafeImage.sprite = Theme.UnsafeContentSprite;
+
+                    var canvasRenderer = unsafeImage.gameObject.GetAddComponent<CanvasRenderer>();
+                    canvasRenderer.cullTransparentMesh = true;
                 }
             }
 

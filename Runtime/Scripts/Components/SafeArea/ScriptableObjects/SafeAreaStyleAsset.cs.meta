@@ -3,7 +3,9 @@ guid: c6843514a190d7749a70b52ad3ec0931
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_unsafeContentSprite: {fileID: 21300000, guid: 87fe2150c2e187246977e000167278ba,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

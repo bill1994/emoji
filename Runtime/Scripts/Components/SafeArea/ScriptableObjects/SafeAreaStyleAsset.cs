@@ -23,6 +23,8 @@ namespace MaterialUI
         [Header("Notch Configs")]
         [SerializeField]
         Color m_unsafeContentColor = Color.black;
+        [SerializeField]
+        Sprite m_unsafeContentSprite = null;
 
         [Header("Android Bar Configs")]
         [SerializeField]
@@ -46,6 +48,7 @@ namespace MaterialUI
         public bool Enabled { get { return m_enabled; } set { m_enabled = value; } }
         public FullScreenModeEnum FullScreenMode { get { return m_fullScreenMode; } set { m_fullScreenMode = value; } }
         public Color UnsafeContentColor { get { return m_unsafeContentColor; } set { m_unsafeContentColor = value; } }
+        public Sprite UnsafeContentSprite { get { return m_unsafeContentSprite; } set { m_unsafeContentSprite = value; } }
         public bool UseLightIconsOnStatusBar { get { return m_useLightIconsOnStatusBar; } set { m_useLightIconsOnStatusBar = value; } }
         public bool UseLightIconsOnNavigationBar { get { return m_useLightIconsOnNavigationBar; } set { m_useLightIconsOnNavigationBar = value; } }
         public Color StatusBarColor { get { return m_statusBarColor; } set { m_statusBarColor = value; } }
