@@ -13,7 +13,7 @@ namespace MaterialUI
         [System.Serializable]
         public class IntUnityEvent : UnityEngine.Events.UnityEvent<int> { };
 
-        public enum EnsureStateModeEnum { None, OnEnable, Start, Both}
+        public enum EnsureStateModeEnum { None, OnEnable, Start, Both }
 
         #region Private Variables
 
@@ -28,6 +28,8 @@ namespace MaterialUI
         bool m_SortByHierarchyDepth = true;
 
         protected List<ToggleBase> _Toggles = new List<ToggleBase>();
+        protected bool _indexIsDirty = false;
+        protected bool _HasStarted = false;
 
         #endregion
 
@@ -51,7 +53,11 @@ namespace MaterialUI
                 if (selectedIndexInternal == value)
                     return;
 
-                SetToggleValue(value, true, true);
+                selectedIndexInternal = value;
+                _indexIsDirty = true;
+
+                if (gameObject.activeInHierarchy && enabled && !IsInvoking("TryApplyIndexDirty"))
+                    Invoke("TryApplyIndexDirty", 0);
             }
         }
 
@@ -96,7 +102,7 @@ namespace MaterialUI
                 if (m_SortByHierarchyDepth == value)
                     return;
                 m_SortByHierarchyDepth = value;
-                if(_HasStarted && m_SortByHierarchyDepth && Application.isPlaying)
+                if (_HasStarted && m_SortByHierarchyDepth && Application.isPlaying)
                     SortRegisteredMembersDelayed();
             }
         }
@@ -117,23 +123,6 @@ namespace MaterialUI
 
         #region Unity Functions
 
-        protected bool _HasStarted = false;
-        protected override void Start()
-        {
-            _HasStarted = true;
-            if (GetCurrentSelectedToggle(false) != null)
-                SetToggleValue(selectedIndexInternal, true, true);
-            else if(!m_AllowSwitchOff)
-                SetToggleValue(ActiveToggles().FirstOrDefault(), true, true);
-
-            //CallOnISelectedIndexChangedEvent();
-            if (ensureStateMode == EnsureStateModeEnum.Start || ensureStateMode == EnsureStateModeEnum.Both)
-            {
-                EnsureValidState();
-            }
-            base.Start();
-        }
-
         protected override void OnEnable()
         {
             if (ensureStateMode == EnsureStateModeEnum.OnEnable ||
@@ -141,7 +130,37 @@ namespace MaterialUI
             {
                 EnsureValidStateDelayed();
             }
+            else if (_HasStarted)
+            {
+                TryApplyIndexDirty();
+            }
+
             base.OnEnable();
+        }
+
+        protected override void Start()
+        {
+            _HasStarted = true;
+
+            if (!_indexIsDirty)
+            {
+                if (GetCurrentSelectedToggle(false) != null)
+                    SetToggleValue(selectedIndexInternal, true, true);
+                else if (!m_AllowSwitchOff)
+                    SetToggleValue(ActiveToggles().FirstOrDefault(), true, true);
+            }
+
+            //CallOnISelectedIndexChangedEvent();
+            if (ensureStateMode == EnsureStateModeEnum.Start || ensureStateMode == EnsureStateModeEnum.Both)
+            {
+                EnsureValidState();
+            }
+            else
+            {
+                TryApplyIndexDirty();
+            }
+
+            base.Start();
         }
 
         protected override void OnDisable()
@@ -164,10 +183,17 @@ namespace MaterialUI
         {
             if (Application.isPlaying)
             {
-                if (GetCurrentSelectedToggle(false) != null || m_AllowSwitchOff)
-                    SetToggleValue(selectedIndexInternal, true, true);
-                else if (!m_AllowSwitchOff)
-                    SetToggleValue(ActiveToggles().FirstOrDefault(), true, true);
+                if (gameObject.activeInHierarchy && enabled)
+                {
+                    if (GetCurrentSelectedToggle(false) != null || m_AllowSwitchOff)
+                        SetToggleValue(selectedIndexInternal, true, true);
+                    else if (!m_AllowSwitchOff)
+                        SetToggleValue(ActiveToggles().FirstOrDefault(), true, true);
+                }
+                else
+                {
+                    TryApplyIndexDirty(true);
+                }
                 ApplyGroupAllowSwitchOffOnAll();
             }
         }
@@ -212,7 +238,7 @@ namespace MaterialUI
                 return null;
             }
 
-            var toggle = selectedIndexInternal >=0 && selectedIndexInternal < _Toggles.Count? _Toggles[selectedIndexInternal] : null;
+            var toggle = selectedIndexInternal >= 0 && selectedIndexInternal < _Toggles.Count ? _Toggles[selectedIndexInternal] : null;
             //Valid Toggle
             if (!ensureValidToggle || (toggle != null && toggle.isOn))
             {
@@ -391,6 +417,8 @@ namespace MaterialUI
                 return;
             }
 
+            TryApplyIndexDirty();
+
             //Remove Self Disabled Toggles or Nulls
             for (int i = 0; i < _Toggles.Count; i++)
             {
@@ -408,9 +436,9 @@ namespace MaterialUI
             if (!allowSwitchOff && !AnyTogglesOn() && _Toggles.Count != 0)
             {
                 int toggleIndex = 0;
-                
+
                 //Get first Non-null toggle
-                while (toggleIndex >=0 && toggleIndex < _Toggles.Count && _Toggles[toggleIndex] == null)
+                while (toggleIndex >= 0 && toggleIndex < _Toggles.Count && _Toggles[toggleIndex] == null)
                 {
                     toggleIndex++;
                 }
@@ -429,7 +457,7 @@ namespace MaterialUI
         public bool AnyTogglesOn()
         {
             var currentToggle = GetCurrentSelectedToggle(false);
-            if(currentToggle == null || !currentToggle.isOn)
+            if (currentToggle == null || !currentToggle.isOn)
                 return _Toggles.Find(x => x.isOn) != null;
 
             return true;
@@ -443,7 +471,7 @@ namespace MaterialUI
 
         public bool SetToggleValue(int toggleIndex, bool isOn, bool sendCallback = true)
         {
-            var toggle = toggleIndex >=0 && toggleIndex < _Toggles.Count ? _Toggles[toggleIndex] : null;
+            var toggle = toggleIndex >= 0 && toggleIndex < _Toggles.Count ? _Toggles[toggleIndex] : null;
 
             return SetToggleValue(toggle, isOn, sendCallback);
         }
@@ -491,6 +519,25 @@ namespace MaterialUI
 
         #region  Helper Functions
 
+        protected virtual void TryApplyIndexDirty()
+        {
+            TryApplyIndexDirty(true);
+        }
+
+        //Delayed SetCurrentIndex
+        protected virtual void TryApplyIndexDirty(bool force)
+        {
+            if (IsInvoking("TryApplyIndexDirty"))
+                CancelInvoke("TryApplyIndexDirty");
+
+            if (_indexIsDirty || force)
+            {
+                _indexIsDirty = false;
+                SortRegisteredMembers(false);
+                SetToggleValue(selectedIndexInternal, true, true);
+            }
+        }
+
         protected void SetAllTogglesOff(bool sendCallback = true)
         {
             SetSelectedIndexInternal(-1);
@@ -513,6 +560,7 @@ namespace MaterialUI
 
         protected void SetSelectedIndexInternal(int value)
         {
+            _indexIsDirty = false;
             if (selectedIndexInternal == value)
                 return;
 
@@ -536,10 +584,15 @@ namespace MaterialUI
 
         protected void SortRegisteredMembers()
         {
+            SortRegisteredMembers(true);
+        }
+
+        protected void SortRegisteredMembers(bool keepSameToggle)
+        {
             CancelInvoke("CallOnSelectedIndexChangedEvent");
             var toggle = GetCurrentSelectedToggle(false);
 
-            _Toggles.Sort((a,b) => 
+            _Toggles.Sort((a, b) =>
             {
                 var aPair = GetHierarchyDepth(a);
                 var bPair = GetHierarchyDepth(b);
@@ -550,17 +603,20 @@ namespace MaterialUI
                     return aPair.Key.CompareTo(bPair.Key);
             });
 
-            //Keep same selected toggle
-            if(!allowSwitchOff && Application.isPlaying && toggle == null)
-                toggle = GetCurrentSelectedToggle(true);
-            selectedIndexInternal = toggle != null? _Toggles.IndexOf(toggle) : -1;
+            if (keepSameToggle)
+            {
+                //Keep same selected toggle
+                if (!allowSwitchOff && Application.isPlaying && toggle == null)
+                    toggle = GetCurrentSelectedToggle(true);
+                selectedIndexInternal = toggle != null ? _Toggles.IndexOf(toggle) : -1;
+            }
         }
 
         protected KeyValuePair<int, int> GetHierarchyDepth(ToggleBase toggle)
         {
             int depth = -1;
             int sibling = toggle != null ? toggle.transform.GetSiblingIndex() : -1;
-            var transform = toggle != null? toggle.transform : null;
+            var transform = toggle != null ? toggle.transform : null;
             while (transform != null)
             {
                 depth++;
