@@ -348,14 +348,19 @@ namespace MaterialUI
                 foreach (var gameObject in selectedGameObjects)
                 {
                     var images = gameObject.GetComponentsInChildren<Image>(true);
+                    var changed = false;
                     foreach (var image in images)
                     {
                         if (image.sprite == null)
                         {
                             image.sprite = s_FillSquareSprite;
+                            EditorUtility.SetDirty(image);
+                            changed = true;
                             count++;
                         }
                     }
+                    if(changed)
+                        EditorUtility.SetDirty(gameObject);
                 }
             }
 
