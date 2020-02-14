@@ -53,12 +53,14 @@ namespace Kyub.EventSystems
 
         protected override void Awake()
         {
+            base.Awake();
             TryUpdatePixelDrag();
         }
 
 
         protected override void Update()
         {
+            base.Update();
             TryUpdatePixelDrag();
         }
 
