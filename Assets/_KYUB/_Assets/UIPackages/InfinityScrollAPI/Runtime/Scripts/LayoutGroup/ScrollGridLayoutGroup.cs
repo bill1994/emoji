@@ -489,7 +489,7 @@ namespace Kyub.UI
                 }
                 v_lastIndex++;
             }
-            v_lastIndex = Mathf.Clamp(v_lastIndex + m_extraVisibleElements.y, currentIndex, m_elements.Count - 1);
+            v_lastIndex = Mathf.Clamp(v_lastIndex, currentIndex, m_elements.Count - 1);
             return v_lastIndex;
         }
 

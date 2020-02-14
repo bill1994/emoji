@@ -11,7 +11,7 @@ namespace Kyub.UI
     [DisallowMultipleComponent]
     [ExecuteInEditMode]
     [RequireComponent(typeof(RectTransform))]
-    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ILayoutGroup/*, ICanvasElement*/
+    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement/*, ILayoutGroup*/
     {
         #region Helper Classes
         [System.Serializable]
@@ -51,8 +51,10 @@ namespace Kyub.UI
         [SerializeField]
         protected bool m_autoPickElements = true;
         [Space]
-        [SerializeField, Tooltip("force extra visible elements (before/after screen)")]
-        protected Vector2Int m_extraVisibleElements = new Vector2Int(0, 0);
+        [SerializeField, Tooltip("Minimum amount of visible elements to display. Set -1 to always show all elements")]
+        protected int m_minVisibleElements = 0;
+        [SerializeField, Tooltip("Amount of elements to awake when scroll reach the end of current visible area")]
+        protected int m_elementsToAwakePerStep = 1;
         [SerializeField, Tooltip("In deep hierarchys SetParent contains a huge impact in performance. This property will try prevent recalculate amount of visible element, avoiding SetParent and SetSiblingIndex")]
         protected bool m_optimizeDeepHierarchy = true;
         [Space]
@@ -267,18 +269,32 @@ namespace Kyub.UI
             }
         }
 
-        public Vector2Int ExtraVisibleElements
+        public int MinVisibleElements
         {
             get
             {
-                return m_extraVisibleElements;
+                return m_minVisibleElements;
             }
             set
             {
-                if (m_extraVisibleElements == value)
+                if (m_minVisibleElements == value)
                     return;
-                m_extraVisibleElements = value;
+                m_minVisibleElements = value;
                 SetCachedElementsLayoutDirty(true);
+            }
+        }
+
+        public int ElementsToAwakePerStep
+        {
+            get
+            {
+                return m_elementsToAwakePerStep;
+            }
+            set
+            {
+                if (m_elementsToAwakePerStep == value)
+                    return;
+                m_elementsToAwakePerStep = value;
             }
         }
 
@@ -299,8 +315,6 @@ namespace Kyub.UI
             RevertInvisibleElementsToMainContent();
             if (!Application.isPlaying)
                 Init();
-
-            //CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this);
         }
 
         protected override void OnDisable()
@@ -309,8 +323,6 @@ namespace Kyub.UI
             UnregisterScrollRectEvents();
             if (!IsInvoking("RevertInvisibleElementsToMainContent"))
                 Invoke("RevertInvisibleElementsToMainContent", 0);
-
-            //CanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
         }
 
         protected override void OnDestroy()
@@ -323,7 +335,8 @@ namespace Kyub.UI
         protected virtual void Update()
         {
             TrySendObjectsToInvisibleContentParent();
-            //TryRecalculateLayout();
+            //As we are not an LayoutGroup we must check for layout recalcs in Update
+            TryRecalculateLayout();
         }
 
         protected Vector2 _lastScrollValue = new Vector2(-1, -1);
@@ -578,24 +591,24 @@ namespace Kyub.UI
             if (!_layoutDirty)
             {
                 _layoutDirty = true;
-                if (!CanvasUpdateRegistry.IsRebuildingLayout())
+                /*if (!CanvasUpdateRegistry.IsRebuildingLayout())
                 {
                     MarkLayoutForRebuild();
                 }
                 else if (!IsInvoking("MarkLayoutForRebuild"))
-                    Invoke("MarkLayoutForRebuild", 0);
+                    Invoke("MarkLayoutForRebuild", 0);*/
             }
 
         }
 
-        protected void MarkLayoutForRebuild()
+        /*protected void MarkLayoutForRebuild()
         {
             if (this != null)
             {
                 CancelInvoke("MarkLayoutForRebuild");
                 LayoutRebuilder.MarkLayoutForRebuild(this.transform as RectTransform);
             }
-        }
+        }*/
 
         public virtual void TryRecalculateLayout(bool p_force = false)
         {
@@ -619,7 +632,7 @@ namespace Kyub.UI
                 }
                 else
                 {
-                    CancelInvoke("MarkLayoutForRebuild");
+                    //CancelInvoke("MarkLayoutForRebuild");
                     _layoutDirty = false;
                 }
             }
@@ -869,40 +882,67 @@ namespace Kyub.UI
                 _invisibleElementsContent.gameObject.SetActive(!m_disableNonVisibleElements);
         }
 
+        protected int CalculateVisibleElementsCountThisFrame(Vector2Int currentVisibleElements)
+        {
+            var range = m_minVisibleElements < 0 ? m_elements.Count : m_minVisibleElements;
+            if (m_optimizeDeepHierarchy)
+                Mathf.Max(range, Math.Abs(_lastFrameVisibleElementIndexes.y + 1 - _lastFrameVisibleElementIndexes.x));
+
+            return Mathf.Max(Math.Abs(currentVisibleElements.y + 1 - currentVisibleElements.x), range);
+        }
+
         protected virtual Vector2Int CalculateSafeCachedMinMax()
         {
             var current = GetCurrentIndex();
             var cachedNewMinMaxIndex = new Vector2Int(current, GetLastIndex(current));
 
-            if (m_optimizeDeepHierarchy)
+            var currentRange = Math.Abs(cachedNewMinMaxIndex.y + 1 - cachedNewMinMaxIndex.x);
+            var targetRange = CalculateVisibleElementsCountThisFrame(cachedNewMinMaxIndex);
+
+            //Calculate the targetVisible range based in previous activated elements
+            if (currentRange < targetRange)
             {
-                var deltaOld = Mathf.Abs(_cachedMinMaxIndex.y - _cachedMinMaxIndex.x);
-                var deltaNew = Mathf.Abs(cachedNewMinMaxIndex.y - cachedNewMinMaxIndex.x);
-                if (deltaNew < deltaOld)
+                var elementsBefore = cachedNewMinMaxIndex.x - Mathf.Max(0, _lastFrameVisibleElementIndexes.x);
+                var elementsAfter = Mathf.Max(0, _lastFrameVisibleElementIndexes.y) - cachedNewMinMaxIndex.y;
+                var elementsExtra = Mathf.Max(0, targetRange - (elementsAfter + elementsBefore + currentRange));
+
+                //Donate from extra elements to lowest one
+                while (elementsExtra > 0)
                 {
-                    int deltaExtra = deltaOld - deltaNew;
-                    int amountBefore = deltaExtra / 2;
-                    int amountAfter = deltaExtra - amountBefore;
-
-                    if (cachedNewMinMaxIndex.x - amountBefore < 0)
-                    {
-                        int invalidBeforeAmount = Mathf.Abs(cachedNewMinMaxIndex.x - amountBefore);
-                        amountBefore -= invalidBeforeAmount;
-                        amountAfter += invalidBeforeAmount;
-                    }
-                    else if (cachedNewMinMaxIndex.y + amountAfter > m_elements.Count - 1)
-                    {
-                        int invalidAfterAmount = Mathf.Abs((cachedNewMinMaxIndex.y + amountAfter) - (m_elements.Count - 1));
-                        amountAfter -= invalidAfterAmount;
-                        amountBefore += invalidAfterAmount;
-                    }
-                    cachedNewMinMaxIndex.x -= amountBefore;
-                    cachedNewMinMaxIndex.y += amountAfter;
-
-                    //Prevent unknown behaviours
-                    cachedNewMinMaxIndex.x = Mathf.Clamp(cachedNewMinMaxIndex.x, 0, m_elements.Count - 1);
-                    cachedNewMinMaxIndex.y = Mathf.Clamp(cachedNewMinMaxIndex.y, 0, m_elements.Count - 1);
+                    elementsExtra--;
+                    if (elementsBefore < elementsAfter)
+                        elementsBefore++;
+                    else
+                        elementsAfter++;
                 }
+
+                var elementsToAwakePerStep = Mathf.Max(0, m_elementsToAwakePerStep - 1);
+                if (elementsAfter < 0)
+                {
+                    //Try pick donation from elements before or extra elements
+                    while (elementsAfter < elementsToAwakePerStep && elementsBefore > 0)
+                    {
+                        elementsAfter++;
+                        elementsBefore--;
+                    }
+                }
+                else if (elementsBefore < 0)
+                {
+                    //Try pick donation from elements after or extra elements
+                    while (elementsBefore < elementsToAwakePerStep && elementsAfter > 0)
+                    {
+                        elementsBefore++;
+                        elementsAfter--;
+                    }
+                }
+
+                if (cachedNewMinMaxIndex.x - elementsBefore < 0)
+                    elementsAfter += elementsBefore - cachedNewMinMaxIndex.x;
+                else if (cachedNewMinMaxIndex.y + elementsBefore > m_elements.Count)
+                    elementsBefore += (cachedNewMinMaxIndex.y + elementsBefore) - m_elements.Count;
+
+                cachedNewMinMaxIndex.x -= Mathf.Max(0, elementsBefore);
+                cachedNewMinMaxIndex.y += Mathf.Min(m_elements.Count, elementsAfter);
             }
             return cachedNewMinMaxIndex;
         }
@@ -1120,7 +1160,7 @@ namespace Kyub.UI
                     }
                 }
             }
-            v_index = Mathf.Clamp(v_index - m_extraVisibleElements.x, 0, m_elements.Count - 1);
+            v_index = Mathf.Clamp(v_index, 0, m_elements.Count - 1);
             return v_index;
         }
 
@@ -1151,7 +1191,7 @@ namespace Kyub.UI
                 }
                 v_lastIndex++;
             }
-            v_lastIndex = Mathf.Clamp(v_lastIndex + m_extraVisibleElements.y, currentIndex, m_elements.Count - 1);
+            v_lastIndex = Mathf.Clamp(v_lastIndex, currentIndex, m_elements.Count - 1);
             return v_lastIndex;
         }
 
@@ -1283,13 +1323,13 @@ namespace Kyub.UI
         public static void SetLocalWidth(RectTransform p_rectTransform, float p_newSize)
         {
             SetLocalSize(p_rectTransform, new Vector2(p_newSize, p_rectTransform.rect.size.y));
-            LayoutRebuilder.MarkLayoutForRebuild(p_rectTransform);
+            //MarkLayoutForRebuild();
         }
 
         public static void SetLocalHeight(RectTransform p_rectTransform, float p_newSize)
         {
             SetLocalSize(p_rectTransform, new Vector2(p_rectTransform.rect.size.x, p_newSize));
-            LayoutRebuilder.MarkLayoutForRebuild(p_rectTransform);
+            //MarkLayoutForRebuild();
         }
 
         public static float CalculateElementSize(Component p_object, bool p_isVerticalLayout)
@@ -1391,7 +1431,7 @@ namespace Kyub.UI
             _layoutSize = new Vector2(_layoutSize.x, GetLocalHeight(Content));
         }
 
-        public void SetLayoutHorizontal()
+        /*public void SetLayoutHorizontal()
         {
             //TryRecalculateLayout();
         }
@@ -1399,30 +1439,9 @@ namespace Kyub.UI
         public void SetLayoutVertical()
         {
             //TryRecalculateLayout();
-        }
+        }*/
 
         #endregion
-
-        /*#region ICanvas Rebuild Element (Editor Only)
-
-        void ICanvasElement.Rebuild(CanvasUpdate executing)
-        {
-            if (executing != CanvasUpdate.PostLayout)
-                return;
-
-            if (!Application.isPlaying || _layoutDirty)
-                SetCachedElementsLayoutDirty();
-        }
-
-        void ICanvasElement.LayoutComplete()
-        {
-        }
-
-        void ICanvasElement.GraphicUpdateComplete()
-        {
-        }
-
-        #endregion*/
 
     }
 }
