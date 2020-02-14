@@ -884,7 +884,7 @@ namespace Kyub.UI
 
         protected int CalculateVisibleElementsCountThisFrame(Vector2Int currentVisibleElements)
         {
-            var range = m_minVisibleElements < 0 ? m_elements.Count : m_minVisibleElements;
+            var range = m_minVisibleElements < 0 ? m_elements.Count-1 : m_minVisibleElements;
             if (m_optimizeDeepHierarchy)
                 Mathf.Max(range, Math.Abs(_lastFrameVisibleElementIndexes.y + 1 - _lastFrameVisibleElementIndexes.x));
 
@@ -938,11 +938,11 @@ namespace Kyub.UI
 
                 if (cachedNewMinMaxIndex.x - elementsBefore < 0)
                     elementsAfter += elementsBefore - cachedNewMinMaxIndex.x;
-                else if (cachedNewMinMaxIndex.y + elementsBefore > m_elements.Count)
-                    elementsBefore += (cachedNewMinMaxIndex.y + elementsBefore) - m_elements.Count;
+                else if (cachedNewMinMaxIndex.y + elementsBefore > m_elements.Count-1)
+                    elementsBefore += (cachedNewMinMaxIndex.y + elementsBefore) - (m_elements.Count-1);
 
-                cachedNewMinMaxIndex.x -= Mathf.Max(0, elementsBefore);
-                cachedNewMinMaxIndex.y += Mathf.Min(m_elements.Count, elementsAfter);
+                cachedNewMinMaxIndex.x = Mathf.Clamp(cachedNewMinMaxIndex.x - Mathf.Max(0, elementsBefore), 0, m_elements.Count - 1);
+                cachedNewMinMaxIndex.y = Mathf.Clamp(cachedNewMinMaxIndex.y + Mathf.Max(0, elementsAfter), 0, m_elements.Count - 1);
             }
             return cachedNewMinMaxIndex;
         }
