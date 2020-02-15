@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 namespace Kyub.UI
 {
     [ExecuteInEditMode]
-    public class ScrollMaxLayoutElement : MaxLayoutElement
+    public class ScrollMaxLayoutElement : MaxLayoutElement, ILayoutController
     {
         #region Private Variables
 
@@ -97,13 +97,11 @@ namespace Kyub.UI
         {
             base.Start();
             _started = true;
-            //SetElementSizeDirty();
         }
 
         bool _previousActiveSelf = false;
         protected override void OnDisable()
         {
-            //_applyElementSizeRoutine = null;
             CancelInvoke();
             UnregisterEvents();
             base.OnDisable();
@@ -119,7 +117,7 @@ namespace Kyub.UI
         {
             base.OnRectTransformDimensionsChange();
             if (enabled)
-                ApplyElementSize();
+                SetElementSizeDirty();
         }*/
 
         protected override void OnTransformParentChanged()
@@ -158,7 +156,7 @@ namespace Kyub.UI
 
         protected void ApplyElementSize()
         {
-            //_applyElementSizeRoutine = null;
+            CancelInvoke("ApplyElementSize");
             if (ScrollLayoutGroup != null && LayoutElementIndex >= 0 && _isVisible)
             {
                 ScrollLayoutGroup.SetCachedElementSize(LayoutElementIndex, ScrollLayoutGroup.CalculateElementSize(transform, ScrollLayoutGroup.IsVertical()));
@@ -208,13 +206,21 @@ namespace Kyub.UI
         public override void CalculateLayoutInputHorizontal()
         {
             base.CalculateLayoutInputHorizontal();
-            if (ScrollLayoutGroup != null && !ScrollLayoutGroup.IsVertical())
-                ApplyElementSize();
         }
 
         public override void CalculateLayoutInputVertical()
         {
             base.CalculateLayoutInputVertical();
+        }
+
+        public virtual void SetLayoutHorizontal()
+        {
+            if (ScrollLayoutGroup != null && !ScrollLayoutGroup.IsVertical())
+                ApplyElementSize();
+        }
+
+        public virtual void SetLayoutVertical()
+        {
             if (ScrollLayoutGroup != null && ScrollLayoutGroup.IsVertical())
                 ApplyElementSize();
         }
