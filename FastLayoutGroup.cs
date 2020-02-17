@@ -27,7 +27,7 @@ namespace Kyub.UI.Experimental
         protected List<IFastLayoutFeedback> children { get { return m_Children; } }
 
         protected HashSet<IFastLayoutFeedback> _dirtyChildren = new HashSet<IFastLayoutFeedback>();
-        DrivenAxis _dirtyAxis = DrivenAxis.None;
+        protected DrivenAxis _dirtyAxis = DrivenAxis.None;
 
         protected float _cachedRectHeight = -1;
         protected float _cachedRectWidth = -1;
@@ -231,6 +231,8 @@ namespace Kyub.UI.Experimental
             //Prevent change size while calculating feedback
             if ((_dirtyAxis & parentControlledAxis) != 0)
                 SetDirty();
+            else
+                _dirtyAxis &= ~(DrivenAxis.Horizontal | DrivenAxis.Vertical);
         }
 
         protected virtual void OnTransformChildrenChanged()
@@ -243,7 +245,6 @@ namespace Kyub.UI.Experimental
         {
             SetDirty();
         }
-
 #endif
         #endregion
 

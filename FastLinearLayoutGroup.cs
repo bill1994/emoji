@@ -35,8 +35,10 @@ namespace Kyub.UI.Experimental
         {
             get
             {
-                return (childForceExpandHeight ? DrivenAxis.Vertical : DrivenAxis.None) |
+                var driven = (childForceExpandHeight ? DrivenAxis.Vertical : DrivenAxis.None) |
                     (childForceExpandWidth ? DrivenAxis.Horizontal : DrivenAxis.None);
+
+                return driven;
             }
             set { }
         }
@@ -60,6 +62,21 @@ namespace Kyub.UI.Experimental
 
         protected FastLinearLayoutGroup()
         { }
+
+        #endregion
+
+        #region Unity Functions
+
+        protected override void OnRectTransformDimensionsChange()
+        {
+            CalculateRectTransformDimensions();
+
+            //Prevent change size while calculating feedback
+            if ((_dirtyAxis & parentControlledAxis & (isVertical ? DrivenAxis.Vertical : DrivenAxis.Horizontal)) != 0)
+                SetDirty();
+            else
+                _dirtyAxis &= ~(DrivenAxis.Horizontal | DrivenAxis.Vertical);
+        }
 
         #endregion
 
