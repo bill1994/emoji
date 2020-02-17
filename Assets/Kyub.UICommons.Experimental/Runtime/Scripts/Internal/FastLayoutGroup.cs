@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Kyub.UI.Experimental
 {
-    public abstract class FastLayoutGroup : UIBehaviour, IFastLayoutFeedbackGroup
+    public abstract class FastLayoutGroup : UIBehaviour, IFastLayoutGroup
     {
         #region Private Variables
 
@@ -119,7 +119,7 @@ namespace Kyub.UI.Experimental
                 if (parent == null)
                     return true;
                 var parentLayout = transform.parent.GetComponent(typeof(ILayoutController));
-                return parentLayout == null || !(parentLayout is ILayoutGroup) || !(parentLayout is IFastLayoutFeedbackGroup);
+                return parentLayout == null || !(parentLayout is ILayoutGroup) || !(parentLayout is IFastLayoutGroup);
             }
         }
 
@@ -141,7 +141,7 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        DrivenAxis IFastLayoutFeedbackGroup.parentControlledAxis
+        DrivenAxis IFastLayoutGroup.parentControlledAxis
         {
             get
             {
@@ -153,7 +153,7 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        DrivenAxis IFastLayoutFeedbackGroup.childrenControlledAxis
+        DrivenAxis IFastLayoutGroup.childrenControlledAxis
         {
             get
             {
@@ -228,8 +228,15 @@ namespace Kyub.UI.Experimental
             base.OnRectTransformDimensionsChange();
             CalculateRectTransformDimensions();
 
+            var isDirty = (_dirtyAxis & parentControlledAxis) != 0;
+            //We will only set dirty if value of new rect is smaller than preferred size
+            if (isDirty &&
+                (_dirtyAxis.HasFlag(DrivenAxis.Vertical) && _cachedRectHeight < m_TotalPreferredSize.y) ||
+                (_dirtyAxis.HasFlag(DrivenAxis.Horizontal) && _cachedRectWidth < m_TotalPreferredSize.x))
+                isDirty = false;
+
             //Prevent change size while calculating feedback
-            if ((_dirtyAxis & parentControlledAxis) != 0)
+            if (isDirty)
                 SetDirty();
             else
                 _dirtyAxis &= ~(DrivenAxis.Horizontal | DrivenAxis.Vertical);
@@ -482,7 +489,7 @@ namespace Kyub.UI.Experimental
 
         public virtual void SetElementDirty(IFastLayoutFeedback driven, DrivenAxis dirtyAxis)
         {
-            if (dirtyAxis.HasFlag(DrivenAxis.Ignore) || (dirtyAxis & childrenControlledAxis) != 0)
+            if (driven != null && (dirtyAxis.HasFlag(DrivenAxis.Ignore) || (dirtyAxis & childrenControlledAxis) != 0))
             {
                 if (!isDirty)
                     MarkLayoutForRebuild();
@@ -565,6 +572,8 @@ namespace Kyub.UI.Experimental
                         layoutFeedbackElement.CalculateLayoutInputVertical();
                     }
                 }
+                else if (i < m_Children.Count && layoutFeedbackElement != m_Children[i])
+                    SetElementDirty(m_Children[i], DrivenAxis.Ignore);
             }
         }
 
