@@ -221,7 +221,6 @@ namespace Kyub.UI.Experimental
             base.OnEnable();
             SetDirty();
             SendFeedback();
-            CheckAutoDestroy();
         }
 
         protected override void OnDisable()
@@ -242,7 +241,6 @@ namespace Kyub.UI.Experimental
             _group = null;
             SetDirty();
             SendFeedback();
-            CheckAutoDestroy();
         }
 
         protected override void OnRectTransformDimensionsChange()
@@ -265,7 +263,9 @@ namespace Kyub.UI.Experimental
 
         protected virtual void CheckAutoDestroy()
         {
-            hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+#if UNITY_EDITOR
+            hideFlags = HideFlags.HideInInspector | HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+#endif
             if (group == null || group.rectTransform == null)
             {
                 if (Application.isPlaying)
@@ -296,6 +296,8 @@ namespace Kyub.UI.Experimental
                 group.SetElementDirty(this, _dirtyAxis);
                 _dirtyAxis = 0;
             }
+            else
+                CheckAutoDestroy();
         }
 
         protected virtual void CalculateLayoutIgnore()
