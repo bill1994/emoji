@@ -532,7 +532,6 @@ namespace Kyub.UI.Experimental
                 if (layoutFeedbackElement == null)
                 {
                     layoutFeedbackElement = rect.gameObject.AddComponent<FastLayoutFeedback>();
-                    ((FastLayoutFeedback)layoutFeedbackElement).hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
                     layoutFeedbackElement.CalculateLayoutInputHorizontal();
                     layoutFeedbackElement.CalculateLayoutInputVertical();
                 }
@@ -560,7 +559,6 @@ namespace Kyub.UI.Experimental
                 if (layoutFeedbackElement == null)
                 {
                     layoutFeedbackElement = rect.gameObject.AddComponent<FastLayoutFeedback>();
-                    ((FastLayoutFeedback)layoutFeedbackElement).hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
                     if (isRebuildingLayout)
                     {
                         layoutFeedbackElement.CalculateLayoutInputHorizontal();
