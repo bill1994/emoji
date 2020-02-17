@@ -12,7 +12,7 @@ namespace Kyub.UI.Experimental
 
     public interface IFastLayoutFeedback : ILayoutElement, ILayoutController
     {
-        IFastLayoutFeedbackGroup group { get; }
+        IFastLayoutGroup group { get; }
         RectTransform rectTransform { get; }
         float cachedMinWidth { get; }
         float cachedMinHeight { get; }
@@ -28,7 +28,7 @@ namespace Kyub.UI.Experimental
         void SendFeedback();
     }
 
-    public interface IFastLayoutFeedbackGroup : ILayoutElement, ILayoutController
+    public interface IFastLayoutGroup : ILayoutElement, ILayoutController
     {
         RectTransform rectTransform { get; }
         DrivenAxis parentControlledAxis { get; set; }
@@ -36,7 +36,5 @@ namespace Kyub.UI.Experimental
         bool isDirty { get; }
 
         void SetElementDirty(IFastLayoutFeedback driven, DrivenAxis dirtyAxis);
-
-       
     }
 }
