@@ -26,7 +26,7 @@ namespace Kyub.UI.Experimental
         protected bool _cachedLayoutIgnore = false;
 
         [System.NonSerialized] protected RectTransform _rect;
-        [System.NonSerialized] protected IFastLayoutFeedbackGroup _group;
+        [System.NonSerialized] protected IFastLayoutGroup _group;
 
         [System.NonSerialized] protected int m_CachedRectTransformHash = 0;
 
@@ -34,12 +34,12 @@ namespace Kyub.UI.Experimental
 
         #region Properties
 
-        public virtual IFastLayoutFeedbackGroup group
+        public virtual IFastLayoutGroup group
         {
             get
             {
                 if ((_group == null || _group.rectTransform == null))
-                    _group = this != null && transform.parent != null? transform.parent.GetComponent<IFastLayoutFeedbackGroup>() : null;
+                    _group = this != null && transform.parent != null? transform.parent.GetComponent<IFastLayoutGroup>() : null;
 
                 return _group;
             }
@@ -221,6 +221,7 @@ namespace Kyub.UI.Experimental
             base.OnEnable();
             SetDirty();
             SendFeedback();
+            CheckAutoDestroy();
         }
 
         protected override void OnDisable()
@@ -241,6 +242,7 @@ namespace Kyub.UI.Experimental
             _group = null;
             SetDirty();
             SendFeedback();
+            CheckAutoDestroy();
         }
 
         protected override void OnRectTransformDimensionsChange()
@@ -296,8 +298,6 @@ namespace Kyub.UI.Experimental
                 group.SetElementDirty(this, _dirtyAxis);
                 _dirtyAxis = 0;
             }
-            else
-                CheckAutoDestroy();
         }
 
         protected virtual void CalculateLayoutIgnore()

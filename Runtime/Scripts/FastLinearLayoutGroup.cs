@@ -71,8 +71,15 @@ namespace Kyub.UI.Experimental
         {
             CalculateRectTransformDimensions();
 
+            var isDirty = (_dirtyAxis & parentControlledAxis & (isVertical ? DrivenAxis.Vertical : DrivenAxis.Horizontal)) != 0;
+            //We will only set dirty if value of new rect is smaller than preferred size
+            if (isDirty && 
+                (isVertical && _cachedRectHeight < m_TotalPreferredSize.y) ||
+                (!isVertical && _cachedRectWidth < m_TotalPreferredSize.x))
+                isDirty = false;
+
             //Prevent change size while calculating feedback
-            if ((_dirtyAxis & parentControlledAxis & (isVertical ? DrivenAxis.Vertical : DrivenAxis.Horizontal)) != 0)
+            if (isDirty)
                 SetDirty();
             else
                 _dirtyAxis &= ~(DrivenAxis.Horizontal | DrivenAxis.Vertical);
@@ -84,7 +91,7 @@ namespace Kyub.UI.Experimental
 
         public override void SetElementDirty(IFastLayoutFeedback driven, DrivenAxis dirtyAxis)
         {
-            if (dirtyAxis.HasFlag(DrivenAxis.Ignore) || (dirtyAxis & childrenControlledAxis) != 0)
+            if (driven != null && (dirtyAxis.HasFlag(DrivenAxis.Ignore) || (dirtyAxis & childrenControlledAxis) != 0))
             {
                 if (!isDirty)
                     MarkLayoutForRebuild();
