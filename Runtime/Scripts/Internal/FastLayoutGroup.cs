@@ -257,7 +257,7 @@ namespace Kyub.UI.Experimental
 
         #region Helper Functions
 
-        protected virtual void CalculateRectTransformDimensions(bool canDirtyInLayoutRebuild = false)
+        protected virtual void CalculateRectTransformDimensions()
         {
             cachedRectWidth = rectTransform.sizeDelta.x;
             cachedRectHeight = rectTransform.sizeDelta.y;
@@ -500,7 +500,7 @@ namespace Kyub.UI.Experimental
 
         protected virtual void MarkLayoutForRebuild()
         {
-            if (!IsActive())
+            if (IsDestroyed() || !IsActive())
                 return;
 
             if (!CanvasUpdateRegistry.IsRebuildingLayout())

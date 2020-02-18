@@ -255,7 +255,8 @@ namespace Kyub.UI.Experimental
         protected override void OnValidate()
         {
             base.OnValidate();
-            CheckAutoDestroy();
+            if(!IsInvoking("CheckAutoDestroy"))
+                Invoke("CheckAutoDestroy", 0);
         }
 #endif
 
@@ -266,6 +267,7 @@ namespace Kyub.UI.Experimental
         protected virtual void CheckAutoDestroy()
         {
 #if UNITY_EDITOR
+            CancelInvoke("CheckAutoDestroy");
             hideFlags = HideFlags.HideInInspector | HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
 #endif
             if (group == null || group.rectTransform == null)

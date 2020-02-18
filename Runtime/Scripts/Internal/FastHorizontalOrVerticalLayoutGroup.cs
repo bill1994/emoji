@@ -80,6 +80,24 @@ namespace Kyub.UI.Experimental
 
         #region Helper Functions
 
+        protected virtual void CalcRectTransformChanged(bool isVertical)
+        {
+            CalculateRectTransformDimensions();
+
+            var isDirty = (_dirtyAxis & parentControlledAxis & (isVertical ? DrivenAxis.Vertical : DrivenAxis.Horizontal)) != 0;
+            //We will only set dirty if value of new rect is smaller than preferred size or if flexible size is empty
+            if (isDirty &&
+                (isVertical && (_cachedRectHeight < m_TotalPreferredSize.y || m_TotalFlexibleSize.y == 0)) ||
+                (!isVertical && (_cachedRectWidth < m_TotalPreferredSize.x || m_TotalFlexibleSize.x == 0)))
+                isDirty = false;
+
+            //Prevent change size while calculating feedback
+            if (isDirty)
+                SetDirty();
+            else
+                _dirtyAxis &= ~(DrivenAxis.Horizontal | DrivenAxis.Vertical);
+        }
+
         /// <summary>
         /// Calculate the layout element properties for this layout element along the given axis.
         /// </summary>
