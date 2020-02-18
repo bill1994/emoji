@@ -69,20 +69,7 @@ namespace Kyub.UI.Experimental
 
         protected override void OnRectTransformDimensionsChange()
         {
-            CalculateRectTransformDimensions();
-
-            var isDirty = (_dirtyAxis & parentControlledAxis & (isVertical ? DrivenAxis.Vertical : DrivenAxis.Horizontal)) != 0;
-            //We will only set dirty if value of new rect is smaller than preferred size
-            if (isDirty && 
-                (isVertical && _cachedRectHeight < m_TotalPreferredSize.y) ||
-                (!isVertical && _cachedRectWidth < m_TotalPreferredSize.x))
-                isDirty = false;
-
-            //Prevent change size while calculating feedback
-            if (isDirty)
-                SetDirty();
-            else
-                _dirtyAxis &= ~(DrivenAxis.Horizontal | DrivenAxis.Vertical);
+            CalcRectTransformChanged(isVertical);
         }
 
         #endregion
@@ -98,8 +85,8 @@ namespace Kyub.UI.Experimental
 
                 //Special case when added element will affect other elements size
                 if (dirtyAxis.HasFlag(DrivenAxis.Ignore) && 
-                    ((isVertical && parentControlledAxis.HasFlag(DrivenAxis.Vertical)) ||
-                    (!isVertical && parentControlledAxis.HasFlag(DrivenAxis.Horizontal))))
+                    ((isVertical && m_TotalFlexibleSize.y > 0) ||
+                    (!isVertical && m_TotalFlexibleSize.x > 0)))
                 {
                     isAxisDirty = true;
                 }
