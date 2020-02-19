@@ -106,7 +106,6 @@ namespace Kyub.UI
 
         #endregion
 
-
         #region Unity Functions
 
         protected override void OnEnable()
