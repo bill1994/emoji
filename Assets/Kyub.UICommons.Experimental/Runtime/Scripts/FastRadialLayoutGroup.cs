@@ -1,37 +1,10 @@
-﻿
-/// Credit Danny Goodayle 
-/// Sourced from - http://www.justapixel.co.uk/radial-layouts-nice-and-simple-in-unity3ds-ui-system/
-/// Updated by ddreaper - removed dependency on a custom ScrollRect script. Now implements drag interfaces and standard Scroll Rect.
-/// Chid Layout fix by John Hattan - enables an options 
-
-/*
-Radial Layout Group by Just a Pixel (Danny Goodayle) - http://www.justapixel.co.uk
-Copyright (c) 2015
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Kyub.UI
+namespace Kyub.UI.Experimental
 {
-    [AddComponentMenu("Kyub UI/Radial Layout Group")]
-    public class RadialLayoutGroup : LayoutGroup
+    public class FastRadialLayoutGroup : FastLayoutGroup
     {
         #region Private Variables
 
@@ -47,6 +20,28 @@ namespace Kyub.UI
         #endregion
 
         #region Public Properties
+        protected override DrivenAxis parentControlledAxis
+        {
+            get
+            {
+                var driven = DrivenAxis.Horizontal | DrivenAxis.Vertical;
+
+                return driven;
+            }
+            set { }
+        }
+
+        protected override DrivenAxis childrenControlledAxis
+        {
+            get
+            {
+                return  DrivenAxis.None;
+            }
+            set
+            {
+
+            }
+        }
 
         public float startAngle
         {
@@ -154,17 +149,9 @@ namespace Kyub.UI
         protected virtual void SetChildrenAlongAxis(int axis)
         {
             var isVertical = axis == 1;
-            //Get active children
-            List<RectTransform> activeChildren = new List<RectTransform>();
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                RectTransform child = (RectTransform)transform.GetChild(i);
-                if (child != null && child.gameObject.activeSelf)
-                    activeChildren.Add(child);
-            }
 
             float maxAngle = m_MaxAngle == m_MinAngle ? m_MinAngle + 360 : m_MaxAngle;
-            float offsetAngle = transform.childCount == 0 ? 0 : (maxAngle - m_MinAngle) / activeChildren.Count;
+            float offsetAngle = transform.childCount == 0 ? 0 : (maxAngle - m_MinAngle) / children.Count;
 
             //Calculate Initial Position
             var preferredSize = GetTotalPreferredSize(axis);
@@ -179,15 +166,15 @@ namespace Kyub.UI
             //Set radius if value is negative
             var radius = m_Radius[axis];
             if (radius <= 0)
-                radius = (size - paddingSize) / 2.0f ;
+                radius = (size - paddingSize) / 2.0f;
 
             //We must offset content to middle
             pos += (preferredSize - (axis == 0 ? padding.horizontal : padding.vertical)) / 2;
 
             float currentAngle = m_StartAngle;
-            for (int i = 0; i < activeChildren.Count; i++)
+            for (int i = 0; i < children.Count; i++)
             {
-                RectTransform child = (RectTransform)transform.GetChild(i);
+                RectTransform child = children[i].rectTransform;
                 if (child != null)
                 {
                     float currentPos = pos;
@@ -200,7 +187,7 @@ namespace Kyub.UI
                         currentPos += Mathf.Cos(currentAngle * Mathf.Deg2Rad) * radius;
                     }
                     //ChildAlongAxis calculatee position relative to top-bottom axis so we must place this position at the middle of the object
-                    currentPos -= (isVertical ? child.sizeDelta.y : child.sizeDelta.x)/2.0f;
+                    currentPos -= (isVertical ? child.sizeDelta.y : child.sizeDelta.x) / 2.0f;
                     SetChildAlongAxis(child, axis, currentPos);
                     currentAngle += offsetAngle;
                 }
@@ -220,8 +207,8 @@ namespace Kyub.UI
             if (radius <= 0)
                 radius = (size - paddingSize) / 2.0f;
 
-            
-            float preferredSize = (radius* 2) + paddingSize;
+
+            float preferredSize = (radius * 2) + paddingSize;
 
             SetLayoutInputForAxis(-1, preferredSize, -1, axis);
         }

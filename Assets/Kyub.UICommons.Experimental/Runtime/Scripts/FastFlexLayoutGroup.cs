@@ -190,13 +190,13 @@ namespace Kyub.UI.Experimental
         {
             CalculateRectTransformDimensions();
 
-            var isDirty = isAxisDirty;
+            var isDirty = _dirtyAxis != DrivenAxis.None;
 
             //We will only set dirty if value of new rect is smaller than preferred size or if flexible size is empty
-            /*if (isDirty &&
-                (isVertical && (_cachedRectHeight < m_TotalPreferredSize.y || m_TotalFlexibleSize.y == 0)) ||
-                (!isVertical && (_cachedRectWidth < m_TotalPreferredSize.x || m_TotalFlexibleSize.x == 0)))
-                isDirty = false;*/
+            if (isDirty &&
+                (!isVertical && _dirtyAxis.HasFlag(DrivenAxis.Vertical) && !_dirtyAxis.HasFlag(DrivenAxis.Horizontal) && (_cachedRectHeight < m_TotalPreferredSize.y || m_TotalFlexibleSize.y == 0)) ||
+                (isVertical && !_dirtyAxis.HasFlag(DrivenAxis.Vertical) && _dirtyAxis.HasFlag(DrivenAxis.Horizontal) && (_cachedRectWidth < m_TotalPreferredSize.x || m_TotalFlexibleSize.x == 0)))
+                isDirty = false;
 
             //Prevent change size while calculating feedback
             if (isDirty)
