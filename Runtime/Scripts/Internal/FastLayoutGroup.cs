@@ -9,10 +9,16 @@ namespace Kyub.UI.Experimental
 {
     public abstract class FastLayoutGroup : UIBehaviour, IFastLayoutGroup
     {
-        #region Private Variables
+        #region Helper Classes
 
         [System.Serializable]
         public class IntUnityEvent : UnityEvent<int> { };
+
+        #endregion
+
+        #region Private Variables
+
+        [SerializeField] bool m_ReverseOrder = false;
 
         [SerializeField] protected RectOffset m_Padding = new RectOffset();
         [SerializeField] protected TextAnchor m_ChildAlignment = TextAnchor.UpperLeft;
@@ -35,6 +41,18 @@ namespace Kyub.UI.Experimental
         #endregion
 
         #region Properties
+
+        public bool reverseOrder
+        {
+            get
+            {
+                return m_ReverseOrder;
+            }
+            set
+            {
+                SetProperty(ref m_ReverseOrder, value);
+            }
+        }
 
         /// <summary>
         /// The padding to add around the child layout elements.
@@ -551,6 +569,12 @@ namespace Kyub.UI.Experimental
                 }
             }
             m_Tracker.Clear();
+
+            if (m_ReverseOrder)
+            {
+                children.Reverse();
+                _initialDirtyIndex = _initialDirtyIndex >= 0 ? m_Children.Count - 1 - _initialDirtyIndex : -1;
+            }
         }
 
         protected virtual void ValidateLayoutFeedbacksInChildren()

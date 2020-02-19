@@ -4,10 +4,6 @@ using UnityEngine.UI;
 
 namespace Kyub.UI.Experimental
 {
-    /// <summary>
-    /// Abstract base class for HorizontalLayoutGroup and VerticalLayoutGroup to generalize common functionality.
-    /// </summary>
-    ///
     [ExecuteAlways]
     public abstract class FastHorizontalOrVerticalLayoutGroup : FastLayoutGroup
     {
@@ -20,8 +16,6 @@ namespace Kyub.UI.Experimental
         [SerializeField] protected bool m_ChildControlHeight = true;
         [SerializeField] protected bool m_ChildScaleWidth = false;
         [SerializeField] protected bool m_ChildScaleHeight = false;
-
-        [SerializeField] bool m_ReverseOrder = false;
 
         #endregion
 
@@ -61,20 +55,6 @@ namespace Kyub.UI.Experimental
             m_ChildControlHeight = false;
         }
 #endif
-
-        #endregion
-
-        #region Overriden Functions
-
-        public override void CalculateLayoutInputHorizontal()
-        {
-            base.CalculateLayoutInputHorizontal();
-            if (m_ReverseOrder)
-            {
-                children.Reverse();
-                _initialDirtyIndex = _initialDirtyIndex >= 0? m_Children.Count - 1 - _initialDirtyIndex : -1;
-            }
-        }
 
         #endregion
 
