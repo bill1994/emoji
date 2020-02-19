@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 namespace Kyub.UI.Experimental
 {
+    [ExecuteAlways]
     public class FastRadialLayoutGroup : FastLayoutGroup
     {
         #region Private Variables
@@ -20,6 +21,7 @@ namespace Kyub.UI.Experimental
         #endregion
 
         #region Public Properties
+
         protected override DrivenAxis parentControlledAxis
         {
             get
@@ -107,6 +109,18 @@ namespace Kyub.UI.Experimental
         {
             base.OnEnable();
             SetDirty();
+        }
+
+        protected override void OnRectTransformDimensionsChange()
+        {
+            CalculateRectTransformDimensions();
+
+            var isDirty = (_dirtyAxis & parentControlledAxis) != 0;
+            //Prevent change size while calculating feedback
+            if (isDirty)
+                SetDirty();
+            else
+                _dirtyAxis &= ~(DrivenAxis.Horizontal | DrivenAxis.Vertical);
         }
 
 #if UNITY_EDITOR
