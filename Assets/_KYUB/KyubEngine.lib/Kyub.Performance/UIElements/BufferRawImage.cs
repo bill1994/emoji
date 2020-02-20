@@ -12,7 +12,7 @@ namespace Kyub.Performance
     public class BufferRawImage : RawImage, IPointerDownHandler, IPointerClickHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [System.Serializable]
-        public class Vector2UnityEvent : UnityEvent<Vector2> { };
+        public class OnClickUnityEvent : UnityEvent<PointerEventData, Vector2> { };
 
         #region Private Variables
 
@@ -28,7 +28,7 @@ namespace Kyub.Performance
 
         #region Callback
 
-        public Vector2UnityEvent OnClick = new Vector2UnityEvent();
+        public OnClickUnityEvent OnClick = new OnClickUnityEvent();
 
         #endregion
 
@@ -119,7 +119,7 @@ namespace Kyub.Performance
             {
                 _isMultiTouching = true;
             }
-            else if (_isMultiTouching && 
+            else if (_isMultiTouching &&
                 ((s_eventBuffer == null && InputCompat.touchCount == 0) || (s_eventBuffer != null && s_eventBuffer != this)))
             {
                 _isMultiTouching = false;
@@ -140,53 +140,53 @@ namespace Kyub.Performance
 
         protected bool _isDragging = false;
         protected bool _isMultiTouching = false;
-        public void OnBeginDrag(PointerEventData eventData)
+        public virtual void OnBeginDrag(PointerEventData eventData)
         {
             _isDragging = true;
             s_eventBuffer = this;
         }
 
-        public void OnDrag(PointerEventData eventData)
+        public virtual void OnDrag(PointerEventData eventData)
         {
             _isDragging = true;
             s_eventBuffer = this;
         }
 
-        public void OnEndDrag(PointerEventData eventData)
+        public virtual void OnEndDrag(PointerEventData eventData)
         {
             _isDragging = false;
             //s_eventBuffer = null;
         }
 
-        public void OnPointerDown(PointerEventData eventData)
+        public virtual void OnPointerDown(PointerEventData eventData)
         {
             s_eventBuffer = this;
         }
 
-        public void OnPointerUp(PointerEventData eventData)
+        public virtual void OnPointerUp(PointerEventData eventData)
         {
             //s_eventBuffer = null;
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        public virtual void OnPointerExit(PointerEventData eventData)
         {
             s_eventBuffer = null;
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        public virtual void OnPointerEnter(PointerEventData eventData)
         {
             s_eventBuffer = this;
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        public virtual void OnPointerClick(PointerEventData eventData)
         {
             if (!_isDragging && !_isMultiTouching)
             {
                 //s_eventBuffer = this;
-                var v_convertedPosition = ConvertPosition(eventData.position);
+                var convertedPosition = ConvertPosition(eventData.position);
                 //Debug.Log("OnPointerClick Screen: " + eventData.position + " Converted: " + v_convertedPosition);
                 if (OnClick != null)
-                    OnClick.Invoke(v_convertedPosition);
+                    OnClick.Invoke(eventData, convertedPosition);
                 //s_eventBuffer = null;
             }
         }
@@ -324,7 +324,7 @@ namespace Kyub.Performance
                 yield return null;
             }*/
 
-            if(!SustainedPerformanceManager.IsEndOfFrame)
+            if (!SustainedPerformanceManager.IsEndOfFrame)
                 yield return new WaitForEndOfFrame();
 
             ApplyRenderBufferImmediate();
