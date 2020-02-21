@@ -197,6 +197,7 @@ namespace MaterialUI
 
         public override void Hide()
         {
+            SetCanvasActive(true);
             System.Action onHide = () =>
             {
                 if (this == null)
