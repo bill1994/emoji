@@ -385,19 +385,22 @@ namespace MaterialUI
             get { return m_Interactable; }
             set
             {
-                m_Interactable = value;
-                toggle.interactable = value;
+                if (m_Interactable != value || value != toggle.interactable)
+                {
+                    m_Interactable = value;
+                    toggle.interactable = value;
 
-                if (value)
-                {
-                    ApplyInteractableOn();
+                    if (value)
+                    {
+                        ApplyInteractableOn();
+                    }
+                    else
+                    {
+                        ApplyInteractableOff();
+                    }
+                    UpdateGraphicToggleState();
+                    ApplyCanvasGroupChanged();
                 }
-                else
-                {
-                    ApplyInteractableOff();
-                }
-                UpdateGraphicToggleState();
-                ApplyCanvasGroupChanged();
             }
         }
 
