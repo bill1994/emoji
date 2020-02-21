@@ -623,8 +623,8 @@ namespace Kyub.UI
 
                 var v_contentSize = GetContentSize();
                 if (ScrollRect != null &&
-                    ((IsVertical() && Mathf.Abs(Content.localPosition.y) > v_contentSize) ||
-                    (!IsVertical() && Mathf.Abs(Content.localPosition.x) > v_contentSize))
+                    ((IsVertical() && Mathf.Abs(Content.anchoredPosition.y) > v_contentSize) ||
+                    (!IsVertical() && Mathf.Abs(Content.anchoredPosition.x) > v_contentSize))
                    )
                 {
                     ScrollRect.Rebuild(CanvasUpdate.PostLayout);
@@ -884,7 +884,7 @@ namespace Kyub.UI
 
         protected int CalculateVisibleElementsCountThisFrame(Vector2Int currentVisibleElements)
         {
-            var range = m_minVisibleElements < 0 ? m_elements.Count-1 : m_minVisibleElements;
+            var range = m_minVisibleElements < 0 ? m_elements.Count - 1 : m_minVisibleElements;
             if (m_optimizeDeepHierarchy)
                 Mathf.Max(range, Math.Abs(_lastFrameVisibleElementIndexes.y + 1 - _lastFrameVisibleElementIndexes.x));
 
@@ -938,8 +938,8 @@ namespace Kyub.UI
 
                 if (cachedNewMinMaxIndex.x - elementsBefore < 0)
                     elementsAfter += elementsBefore - cachedNewMinMaxIndex.x;
-                else if (cachedNewMinMaxIndex.y + elementsBefore > m_elements.Count-1)
-                    elementsBefore += (cachedNewMinMaxIndex.y + elementsBefore) - (m_elements.Count-1);
+                else if (cachedNewMinMaxIndex.y + elementsBefore > m_elements.Count - 1)
+                    elementsBefore += (cachedNewMinMaxIndex.y + elementsBefore) - (m_elements.Count - 1);
 
                 cachedNewMinMaxIndex.x = Mathf.Clamp(cachedNewMinMaxIndex.x - Mathf.Max(0, elementsBefore), 0, m_elements.Count - 1);
                 cachedNewMinMaxIndex.y = Mathf.Clamp(cachedNewMinMaxIndex.y + Mathf.Max(0, elementsAfter), 0, m_elements.Count - 1);
