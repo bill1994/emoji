@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 using static MaterialUI.MaterialMenuSpinner;
-using static MaterialUI.AssetAdressEditor;
 
 namespace MaterialUI
 {

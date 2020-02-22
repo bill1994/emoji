@@ -668,8 +668,8 @@ namespace MaterialUI
                     var parentRect = rectTransformParent.rect;
                     var selfRect = rectTransform.rect;
 
-                    Vector2 selfLocalMin = rectTransformParent.InverseTransformDirection(rectTransformParent.TransformDirection(new Vector2(selfRect.xMin, selfRect.yMin)));
-                    Vector2 selfLocalMax = rectTransformParent.InverseTransformDirection(rectTransformParent.TransformDirection(new Vector2(selfRect.xMax, selfRect.yMax)));
+                    Vector2 selfLocalMin = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMin, selfRect.yMin)));
+                    Vector2 selfLocalMax = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMax, selfRect.yMax)));
                     selfRect = Rect.MinMaxRect(selfLocalMin.x, selfLocalMin.y, selfLocalMax.x, selfLocalMax.y);
 
                     if (slideInDirection == ScreenView.SlideDirection.Up)
@@ -701,7 +701,7 @@ namespace MaterialUI
                     }*/
                 }
 
-                var localRectPosition = rectTransform.anchoredPosition3D;
+                var localRectPosition = rectTransform.localPosition;
                 switch (slideInDirection)
                 {
                     case ScreenView.SlideDirection.Left:
@@ -770,8 +770,8 @@ namespace MaterialUI
                     var parentRect = rectTransformParent.rect;
                     var selfRect = rectTransform.rect;
 
-                    Vector2 selfLocalMin = rectTransformParent.InverseTransformDirection(rectTransformParent.TransformDirection(new Vector2(selfRect.xMin, selfRect.yMin)));
-                    Vector2 selfLocalMax = rectTransformParent.InverseTransformDirection(rectTransformParent.TransformDirection(new Vector2(selfRect.xMax, selfRect.yMax)));
+                    Vector2 selfLocalMin = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMin, selfRect.yMin)));
+                    Vector2 selfLocalMax = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMax, selfRect.yMax)));
                     selfRect = Rect.MinMaxRect(selfLocalMin.x, selfLocalMin.y, selfLocalMax.x, selfLocalMax.y);
 
                     if (slideInDirection == ScreenView.SlideDirection.Up)
@@ -802,7 +802,7 @@ namespace MaterialUI
                     }*/
                 }
 
-                var localRectPosition = rectTransform.anchoredPosition3D;
+                var localRectPosition = rectTransform.localPosition;
                 switch (slideOutDirection)
                 {
                     case ScreenView.SlideDirection.Left:
@@ -822,7 +822,7 @@ namespace MaterialUI
                     _SlideScreenPos = rectTransform.parent.TransformPoint(_SlideScreenPos);
             }
 
-            
+
             _IsTransitioning = 2;
             _TransitionCurrentTime = -1;
 
