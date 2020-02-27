@@ -14,6 +14,8 @@ namespace Kyub.UI.Experimental
         [System.Serializable]
         public class IntUnityEvent : UnityEvent<int> { };
 
+        public enum ForceExpandMode { Inflate, KeepSizeWhenChildControl }
+
         #endregion
 
         #region Private Variables
