@@ -8,6 +8,9 @@ namespace Kyub.UI.Experimental
     public abstract class FastHorizontalOrVerticalLayoutGroup : FastLayoutGroup
     {
         #region Private Variables
+        [SerializeField, Tooltip("- Inflate will act exactly like old Horizontal/Vertical LayoutGroup changing child flexible size to 1.\n" +
+                                 "- KeepSizeWhenChildControl will prevent change flexible size when controlled by child, but will expand spacement between elements. ")]
+        ForceExpandMode m_ForceExpandMode = ForceExpandMode.KeepSizeWhenChildControl;
 
         [SerializeField] protected float m_Spacing = 0;
         [SerializeField] protected bool m_ChildForceExpandWidth = true;
@@ -34,6 +37,8 @@ namespace Kyub.UI.Experimental
         public bool childScaleWidth { get { return m_ChildScaleWidth; } set { SetProperty(ref m_ChildScaleWidth, value); } }
 
         public bool childScaleHeight { get { return m_ChildScaleHeight; } set { SetProperty(ref m_ChildScaleHeight, value); } }
+
+        public ForceExpandMode forceExpandMode { get { return m_ForceExpandMode; } set { SetProperty(ref m_ForceExpandMode, value); } }
 
         #endregion
 

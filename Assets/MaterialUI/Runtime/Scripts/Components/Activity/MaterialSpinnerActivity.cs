@@ -103,7 +103,7 @@ namespace MaterialUI
             if (frameActivity != null)
                 Component.DestroyImmediate(frameActivity);
 
-            frame.transform.SetParent(this.transform);
+            frame.transform.SetParent(this.transform, false);
             m_Frame = frame;
             if (frame is MaterialDialogFrame)
                 (frame as MaterialDialogFrame).activity = this;

@@ -15,10 +15,12 @@ namespace KyubEditor.UI
     public class HorizontalOrVerticalLayoutGroupExEditor : HorizontalOrVerticalLayoutGroupEditor
     {
         SerializedProperty m_ReverseOrder = null;
+        SerializedProperty m_ForceExpandMode = null;
 
         protected override void OnEnable()
         {
             m_ReverseOrder = serializedObject.FindProperty("m_ReverseOrder");
+            m_ForceExpandMode = serializedObject.FindProperty("m_ForceExpandMode");
             base.OnEnable();
         }
 
@@ -26,10 +28,12 @@ namespace KyubEditor.UI
         {
             serializedObject.Update();
             EditorGUILayout.PropertyField(m_ReverseOrder);
-            EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();
-            //EditorGUILayout.Space();
+            EditorGUILayout.Space();
             base.OnInspectorGUI();
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(m_ForceExpandMode);
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

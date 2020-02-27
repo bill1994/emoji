@@ -26,6 +26,7 @@ namespace KyubEditor.UI.Experimental
         SerializedProperty m_ChildForceExpandWidth;
         SerializedProperty m_ChildForceExpandHeight;
         SerializedProperty m_ReverseOrder;
+        SerializedProperty m_ForceExpandMode;
 
         protected virtual void OnEnable()
         {
@@ -39,6 +40,7 @@ namespace KyubEditor.UI.Experimental
             m_ChildForceExpandWidth = serializedObject.FindProperty("m_ChildForceExpandWidth");
             m_ChildForceExpandHeight = serializedObject.FindProperty("m_ChildForceExpandHeight");
             m_ReverseOrder = serializedObject.FindProperty("m_ReverseOrder");
+            m_ForceExpandMode = serializedObject.FindProperty("m_ForceExpandMode");
         }
 
         public override void OnInspectorGUI()
@@ -50,6 +52,7 @@ namespace KyubEditor.UI.Experimental
             EditorGUILayout.PropertyField(m_Spacing, true);
             EditorGUILayout.PropertyField(m_ChildAlignment, true);
 
+            EditorGUILayout.PropertyField(m_ForceExpandMode);
             Rect rect = EditorGUILayout.GetControlRect();
             rect = EditorGUI.PrefixLabel(rect, -1, EditorGUIUtility.TrTextContent("Control Child Size"));
             rect.width = Mathf.Max(50, (rect.width - 4) / 3);
@@ -76,7 +79,6 @@ namespace KyubEditor.UI.Experimental
             rect.x += rect.width + 2;
             ToggleLeft(rect, m_ChildForceExpandHeight, EditorGUIUtility.TrTextContent("Height"));
             EditorGUIUtility.labelWidth = 0;
-
             serializedObject.ApplyModifiedProperties();
         }
 

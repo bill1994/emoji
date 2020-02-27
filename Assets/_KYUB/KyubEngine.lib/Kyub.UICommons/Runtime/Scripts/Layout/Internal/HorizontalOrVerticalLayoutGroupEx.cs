@@ -11,8 +11,16 @@ namespace Kyub.UI
     [ExecuteAlways]
     public abstract class HorizontalOrVerticalLayoutGroupEx : HorizontalOrVerticalLayoutGroup
     {
+        public enum ForceExpandMode { Inflate, KeepSizeWhenChildControl }
+
+        [SerializeField, Tooltip("- Inflate will act exactly like old Horizontal/Vertical LayoutGroup changing child flexible size to 1.\n" +
+            "- KeepSizeWhenChildControl will prevent change flexible size when controlled by child, but will expand spacement between elements. ")]
+        ForceExpandMode m_ForceExpandMode = ForceExpandMode.KeepSizeWhenChildControl;
         [SerializeField]
         bool m_ReverseOrder = false;
+
+        public bool reverseOrder { get { return m_ReverseOrder; } set { SetProperty(ref m_ReverseOrder, value); } }
+        public ForceExpandMode forceExpandMode { get { return m_ForceExpandMode; } set { SetProperty(ref m_ForceExpandMode, value); } }
 
         public override void CalculateLayoutInputHorizontal()
         {
@@ -181,7 +189,7 @@ namespace Kyub.UI
             }
 
             //Prevent expand when child control size
-            if (childForceExpand && (flexible < 0 || !controlSize))
+            if (childForceExpand && (m_ForceExpandMode == ForceExpandMode.Inflate || !controlSize))
                 flexible = Mathf.Max(flexible, 1);
 
             //Prevent negative values on return
