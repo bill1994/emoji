@@ -192,9 +192,12 @@ namespace KyubEditor.EmojiSearch
 
                 // Attempt to extract Unicode value from name
                 int unicode;
-                int indexOfSeperator = sprite.name.IndexOf('-');
-                if (indexOfSeperator != -1)
-                    unicode = TMP_TextUtilities.StringHexToInt(sprite.name.Substring(indexOfSeperator + 1));
+                int indexOfSeparator = sprite.name.IndexOf('-');
+                if (indexOfSeparator != -1)
+                {
+                    string substring = sprite.name.Substring(0, indexOfSeparator);
+                    unicode = TMP_TextUtilities.StringHexToInt(substring);
+                }
                 else
                     unicode = TMP_TextUtilities.StringHexToInt(sprite.name);
 
