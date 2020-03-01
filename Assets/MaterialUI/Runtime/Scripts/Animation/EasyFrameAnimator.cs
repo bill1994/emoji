@@ -171,11 +171,8 @@ namespace MaterialUI
         #region Callbacks
 
         [Header("Callbacks")]
-        [SerializeField]
         public UnityEvent onEndTransitionIn = new UnityEvent();
-        [SerializeField]
         public UnityEvent onEndTransitionOut = new UnityEvent();
-        [SerializeField]
         public IntUnityEvent onInterruptAnimation = new IntUnityEvent();
 
         #endregion
