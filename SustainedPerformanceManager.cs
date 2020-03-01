@@ -536,8 +536,7 @@ namespace Kyub.Performance
 
             ClearPendentInvalidTransforms();
 
-            //if(!IsEndOfFrame)
-            //    _ignoreNextLayoutRebuild = true;
+            _ignoreNextLayoutRebuild = true;
 
             CallOnAfterSetPerformance();
 
