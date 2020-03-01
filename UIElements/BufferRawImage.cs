@@ -97,7 +97,6 @@ namespace Kyub.Performance
         {
             base.Start();
             _started = true;
-            RecalculateRectUV(m_uvBasedOnScreenRect);
             TryCreateClearTexture();
             texture = s_clearTexture;
             ApplyRenderBufferImmediate();
@@ -128,9 +127,10 @@ namespace Kyub.Performance
         protected override void OnRectTransformDimensionsChange()
         {
             base.OnRectTransformDimensionsChange();
-            RecalculateRectUV(m_uvBasedOnScreenRect);
-            if(IsActive())
+            if (IsActive())
                 InitApplyRenderBuffer(1);
+            else
+                RecalculateRectUV(m_uvBasedOnScreenRect);
         }
 
         #endregion
@@ -289,16 +289,13 @@ namespace Kyub.Performance
             if (v_renderBuffer != null)
             {
                 if (v_renderBuffer != texture)
-                {
                     texture = v_renderBuffer;
-                    RecalculateRectUV(m_uvBasedOnScreenRect);
-                }
             }
             //Apply clear texture
             else
-            {
                 ClearTexture();
-            }
+
+            RecalculateRectUV(m_uvBasedOnScreenRect);
         }
 
         protected virtual void InitApplyRenderBuffer(int p_delayFramesCounter = 1)
@@ -373,7 +370,7 @@ namespace Kyub.Performance
 
         //protected virtual void HandleOnAfterSetPerformance()
         //{
-            //InitApplyRenderBuffer();
+        //InitApplyRenderBuffer();
         //}
 
         #endregion
