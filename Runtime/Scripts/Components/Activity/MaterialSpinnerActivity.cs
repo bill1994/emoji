@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using MaterialUI.Extensions;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -291,7 +292,7 @@ namespace MaterialUI
         void ShowFrame(System.Action callback)
         {
             if (m_Frame != null)
-                m_Frame.OnActivityBeginShow();
+                m_Frame.SendMessageToAll("OnActivityBeginShow");
 
             System.Action showAction = () =>
             {
@@ -299,7 +300,7 @@ namespace MaterialUI
                     m_Frame.transform.localPosition = GetValidLocalPositionInsideActivity(m_Frame);
                 callback.InvokeIfNotNull();
                 if (m_Frame != null)
-                    m_Frame.OnActivityEndShow();
+                    m_Frame.SendMessageToAll("OnActivityEndShow");
             };
 
             if (m_Frame)
@@ -327,13 +328,13 @@ namespace MaterialUI
         void HideFrame(System.Action callback)
         {
             if (m_Frame != null)
-                m_Frame.OnActivityBeginHide();
+                m_Frame.SendMessageToAll("OnActivityBeginHide");
 
             System.Action hideAction = () =>
             {
                 callback.InvokeIfNotNull();
                 if (m_Frame != null)
-                    m_Frame.OnActivityEndHide();
+                    m_Frame.SendMessageToAll("OnActivityEndHide");
             };
 
             var tweener = frame != null ? frame.GetAddComponent<EasyFrameAnimator>() : null;

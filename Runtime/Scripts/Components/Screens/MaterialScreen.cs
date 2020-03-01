@@ -1,6 +1,7 @@
 ﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using MaterialUI.Extensions;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -470,6 +471,7 @@ namespace MaterialUI
 
         protected virtual void HandleOnShow()
         {
+            this.SendMessageToAll("OnActivityEndShow");
             if (screenView != null)
                 screenView.OnScreenEndTransition(screenIndex);
 
@@ -479,6 +481,7 @@ namespace MaterialUI
 
         protected virtual void HandleOnHide()
         {
+            this.SendMessageToAll("OnActivityEndHide");
             if (OnHideAnimationOver != null)
                 OnHideAnimationOver.Invoke();
         }
@@ -705,6 +708,7 @@ namespace MaterialUI
             if (frameAnimator != null)
             {
                 SetupFrameAnimator();
+                this.SendMessageToAll("OnActivityBeginShow");
                 frameAnimator.TransitionIn();
             }
         }
@@ -714,6 +718,7 @@ namespace MaterialUI
             if (frameAnimator != null)
             {
                 SetupFrameAnimator();
+                this.SendMessageToAll("OnActivityBeginHide");
                 frameAnimator.TransitionOut();
             }
         }
