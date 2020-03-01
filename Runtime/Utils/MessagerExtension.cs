@@ -19,7 +19,7 @@ namespace MaterialUI.Extensions
             {
                 Type type = objectToCheck.GetType();
                 MethodInfo methodInfo = MaterialPortableReflection.GetDeclaredMethod(type, methodName);
-                if (objectToCheck != null)
+                if (methodInfo != null)
                 {
                     methodInfo.Invoke(objectToCheck, parameters);
                 }

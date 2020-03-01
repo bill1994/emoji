@@ -498,8 +498,20 @@ namespace MaterialUI
             if (_IsTransitioning > 0)
             {
                 Kyub.Performance.SustainedPerformanceManager.Refresh(rectTransform);
+                //Skip first cycle (so we can wait until layout rebuild)
                 if (_TransitionCurrentTime < 0)
+                {
                     _TransitionCurrentTime = 0;
+                    return;
+                }
+                //Setup
+                else if (_TransitionCurrentTime == 0)
+                {
+                    if (_IsTransitioning == 1)
+                        ConfigureAnimation(true);
+                    else if (_IsTransitioning == 2)
+                        ConfigureAnimation(false);
+                }
                 _TransitionCurrentTime += Time.smoothDeltaTime;
 
                 if (transitionCurrentTime <= transitionDuration)
@@ -635,89 +647,7 @@ namespace MaterialUI
                 gameObject.SetActive(true);
 
             _TempScreenPos = rectTransform.position;
-
-            if (rippleIn)
-            {
-                SetupRipple();
-                ripple.SetSiblingIndex(rectTransform.GetSiblingIndex());
-                Vector2 tempSize = rectTransform.GetProperSize();
-                rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-                rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-                _TempRippleScale = rectTransform.localScale;
-                rectTransform.SetParent(ripple, true);
-                rectTransform.sizeDelta = tempSize;
-            }
-            if (fadeIn)
-            {
-                canvasGroup.alpha = fadeInAlpha;
-            }
-            if (scaleIn)
-            {
-                rectTransform.localScale = new Vector3(scaleInScale, scaleInScale, scaleInScale);
-            }
-            if (slideIn)
-            {
-                if (autoSlideInAmount)
-                {
-                    var rectTransformParent = rectTransform.parent as RectTransform;
-
-                    //Create Rect To Compare Distance
-                    var parentRect = rectTransformParent.rect;
-                    var selfRect = rectTransform.rect;
-
-                    Vector2 selfLocalMin = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMin, selfRect.yMin)));
-                    Vector2 selfLocalMax = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMax, selfRect.yMax)));
-                    selfRect = Rect.MinMaxRect(selfLocalMin.x, selfLocalMin.y, selfLocalMax.x, selfLocalMax.y);
-
-                    if (slideInDirection == ScreenView.SlideDirection.Up)
-                        slideInAmount = Mathf.Abs(selfRect.yMin - parentRect.yMax);
-                    else if (slideInDirection == ScreenView.SlideDirection.Down)
-                        slideInAmount = Mathf.Abs(selfRect.yMax - parentRect.yMin);
-                    else if (slideInDirection == ScreenView.SlideDirection.Left)
-                        slideInAmount = Mathf.Abs(selfRect.xMax - parentRect.xMin);
-                    else
-                        slideInAmount = Mathf.Abs(selfRect.xMin - parentRect.xMax);
-
-                    /*bool isVertical = (slideInDirection == ScreenView.SlideDirection.Up ||
-                                       slideInDirection == ScreenView.SlideDirection.Down);
-
-                    if (isVertical)
-                    {
-
-                        slideInAmount = rectTransform.localScale.y * rectTransform.GetProperSize().y * slideInPercent * 0.01f;
-
-                        if (parentRect != null)
-                            slideInAmount += Mathf.Abs(slideInAmount - (rectTransformParent.localScale.y * rectTransformParent.GetProperSize().y * slideInPercent * 0.01f));
-                    }
-                    else
-                    {
-                        slideInAmount = rectTransform.localScale.x * rectTransform.GetProperSize().x * slideInPercent * 0.01f;
-
-                        if (rectTransformParent != null)
-                            slideInAmount += Mathf.Abs(slideInAmount - (rectTransformParent.localScale.x * rectTransformParent.GetProperSize().x * slideInPercent * 0.01f));
-                    }*/
-                }
-
-                var localRectPosition = rectTransform.localPosition;
-                switch (slideInDirection)
-                {
-                    case ScreenView.SlideDirection.Left:
-                        _SlideScreenPos = new Vector2(localRectPosition.x - slideInAmount, localRectPosition.y);
-                        break;
-                    case ScreenView.SlideDirection.Right:
-                        _SlideScreenPos = new Vector2(localRectPosition.x + slideInAmount, localRectPosition.y);
-                        break;
-                    case ScreenView.SlideDirection.Up:
-                        _SlideScreenPos = new Vector2(localRectPosition.x, localRectPosition.y + slideInAmount);
-                        break;
-                    case ScreenView.SlideDirection.Down:
-                        _SlideScreenPos = new Vector2(localRectPosition.x, localRectPosition.y - slideInAmount);
-                        break;
-                }
-                if (rectTransform.parent != null)
-                    _SlideScreenPos = rectTransform.parent.TransformPoint(_SlideScreenPos);
-                rectTransform.position = _SlideScreenPos;
-            }
+            ConfigureAnimation(true);
 
             enabled = true;
             _IsTransitioning = 1;
@@ -734,92 +664,7 @@ namespace MaterialUI
             //canvasGroup.blocksRaycasts = false;
 
             _TempScreenPos = rectTransform.position;
-
-            if (rippleOut)
-            {
-                SetupRipple();
-                _TempRippleSize = GetRippleTargetSize();
-                ripple.sizeDelta = _TempRippleSize;
-                ripple.anchoredPosition = Vector2.zero;
-                ripple.SetSiblingIndex(rectTransform.GetSiblingIndex());
-                Vector2 tempSize = rectTransform.GetProperSize();
-                rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-                rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-                _TempRippleScale = rectTransform.localScale;
-                rectTransform.SetParent(ripple, true);
-                rectTransform.sizeDelta = tempSize;
-            }
-            if (fadeOut)
-            {
-                canvasGroup.alpha = 1f;
-            }
-            if (scaleOut)
-            {
-                rectTransform.localScale = new Vector3(1f, 1f, 1f);
-            }
-            if (slideOut)
-            {
-                if (autoSlideOutAmount)
-                {
-                    var rectTransformParent = rectTransform.parent as RectTransform;
-
-                    //Create Rect To Compare Distance
-                    var parentRect = rectTransformParent.rect;
-                    var selfRect = rectTransform.rect;
-
-                    Vector2 selfLocalMin = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMin, selfRect.yMin)));
-                    Vector2 selfLocalMax = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMax, selfRect.yMax)));
-                    selfRect = Rect.MinMaxRect(selfLocalMin.x, selfLocalMin.y, selfLocalMax.x, selfLocalMax.y);
-
-                    if (slideInDirection == ScreenView.SlideDirection.Up)
-                        slideOutAmount = Mathf.Abs(selfRect.yMin - parentRect.yMax);
-                    else if (slideInDirection == ScreenView.SlideDirection.Down)
-                        slideOutAmount = Mathf.Abs(selfRect.yMax - parentRect.yMin);
-                    else if (slideInDirection == ScreenView.SlideDirection.Left)
-                        slideOutAmount = Mathf.Abs(selfRect.xMax - parentRect.xMin);
-                    else
-                        slideOutAmount = Mathf.Abs(selfRect.xMin - parentRect.xMax);
-
-                    /*bool isVertical = (slideOutDirection == ScreenView.SlideDirection.Up ||
-                                       slideOutDirection == ScreenView.SlideDirection.Down);
-
-                    if (isVertical)
-                    {
-                        slideOutAmount = rectTransform.localScale.y * rectTransform.GetProperSize().y * slideInPercent * 0.01f;
-
-                        if (rectTransformParent != null)
-                            slideOutAmount += Mathf.Abs(slideOutAmount - (rectTransformParent.localScale.y * rectTransformParent.GetProperSize().y * slideInPercent * 0.01f));
-                    }
-                    else
-                    {
-                        slideOutAmount = rectTransform.localScale.x * rectTransform.GetProperSize().x * slideInPercent * 0.01f;
-
-                        if (rectTransformParent != null)
-                            slideOutAmount += Mathf.Abs(slideOutAmount - (rectTransformParent.localScale.x * rectTransformParent.GetProperSize().x * slideInPercent * 0.01f));
-                    }*/
-                }
-
-                var localRectPosition = rectTransform.localPosition;
-                switch (slideOutDirection)
-                {
-                    case ScreenView.SlideDirection.Left:
-                        _SlideScreenPos = new Vector2(localRectPosition.x - slideOutAmount, localRectPosition.y);
-                        break;
-                    case ScreenView.SlideDirection.Right:
-                        _SlideScreenPos = new Vector2(localRectPosition.x + slideOutAmount, localRectPosition.y);
-                        break;
-                    case ScreenView.SlideDirection.Up:
-                        _SlideScreenPos = new Vector2(localRectPosition.x, localRectPosition.y + slideOutAmount);
-                        break;
-                    case ScreenView.SlideDirection.Down:
-                        _SlideScreenPos = new Vector2(localRectPosition.x, localRectPosition.y - slideOutAmount);
-                        break;
-                }
-                if (rectTransform.parent != null)
-                    _SlideScreenPos = rectTransform.parent.TransformPoint(_SlideScreenPos);
-            }
-
-
+            ConfigureAnimation(false);
             _IsTransitioning = 2;
             _TransitionCurrentTime = -1;
 
@@ -904,6 +749,144 @@ namespace MaterialUI
         #endregion
 
         #region Internal Helper Functions
+
+        protected virtual void ConfigureAnimation(bool isIn)
+        {
+            if (isIn)
+            {
+                if (rippleIn)
+                {
+                    SetupRipple();
+                    ripple.SetSiblingIndex(rectTransform.GetSiblingIndex());
+                    Vector2 tempSize = rectTransform.GetProperSize();
+                    rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+                    rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+                    _TempRippleScale = rectTransform.localScale;
+                    rectTransform.SetParent(ripple, true);
+                    rectTransform.sizeDelta = tempSize;
+                }
+                if (fadeIn)
+                {
+                    canvasGroup.alpha = fadeInAlpha;
+                }
+                if (scaleIn)
+                {
+                    rectTransform.localScale = new Vector3(scaleInScale, scaleInScale, scaleInScale);
+                }
+                if (slideIn)
+                {
+                    if (autoSlideInAmount)
+                    {
+                        var rectTransformParent = rectTransform.parent as RectTransform;
+
+                        //Create Rect To Compare Distance
+                        var parentRect = rectTransformParent.rect;
+                        var selfRect = rectTransform.rect;
+
+                        Vector2 selfLocalMin = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMin, selfRect.yMin)));
+                        Vector2 selfLocalMax = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMax, selfRect.yMax)));
+                        selfRect = Rect.MinMaxRect(selfLocalMin.x, selfLocalMin.y, selfLocalMax.x, selfLocalMax.y);
+
+                        if (slideInDirection == ScreenView.SlideDirection.Up)
+                            slideInAmount = Mathf.Abs(selfRect.yMin - parentRect.yMax);
+                        else if (slideInDirection == ScreenView.SlideDirection.Down)
+                            slideInAmount = Mathf.Abs(selfRect.yMax - parentRect.yMin);
+                        else if (slideInDirection == ScreenView.SlideDirection.Left)
+                            slideInAmount = Mathf.Abs(selfRect.xMax - parentRect.xMin);
+                        else
+                            slideInAmount = Mathf.Abs(selfRect.xMin - parentRect.xMax);
+                    }
+
+                    var localRectPosition = rectTransform.localPosition;
+                    switch (slideInDirection)
+                    {
+                        case ScreenView.SlideDirection.Left:
+                            _SlideScreenPos = new Vector2(localRectPosition.x - slideInAmount, localRectPosition.y);
+                            break;
+                        case ScreenView.SlideDirection.Right:
+                            _SlideScreenPos = new Vector2(localRectPosition.x + slideInAmount, localRectPosition.y);
+                            break;
+                        case ScreenView.SlideDirection.Up:
+                            _SlideScreenPos = new Vector2(localRectPosition.x, localRectPosition.y + slideInAmount);
+                            break;
+                        case ScreenView.SlideDirection.Down:
+                            _SlideScreenPos = new Vector2(localRectPosition.x, localRectPosition.y - slideInAmount);
+                            break;
+                    }
+                    if (rectTransform.parent != null)
+                        _SlideScreenPos = rectTransform.parent.TransformPoint(_SlideScreenPos);
+                    rectTransform.position = _SlideScreenPos;
+                }
+            }
+            else
+            {
+                if (rippleOut)
+                {
+                    SetupRipple();
+                    _TempRippleSize = GetRippleTargetSize();
+                    ripple.sizeDelta = _TempRippleSize;
+                    ripple.anchoredPosition = Vector2.zero;
+                    ripple.SetSiblingIndex(rectTransform.GetSiblingIndex());
+                    Vector2 tempSize = rectTransform.GetProperSize();
+                    rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+                    rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+                    _TempRippleScale = rectTransform.localScale;
+                    rectTransform.SetParent(ripple, true);
+                    rectTransform.sizeDelta = tempSize;
+                }
+                if (fadeOut)
+                {
+                    canvasGroup.alpha = 1f;
+                }
+                if (scaleOut)
+                {
+                    rectTransform.localScale = new Vector3(1f, 1f, 1f);
+                }
+                if (slideOut)
+                {
+                    if (autoSlideOutAmount)
+                    {
+                        var rectTransformParent = rectTransform.parent as RectTransform;
+
+                        //Create Rect To Compare Distance
+                        var parentRect = rectTransformParent.rect;
+                        var selfRect = rectTransform.rect;
+
+                        Vector2 selfLocalMin = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMin, selfRect.yMin)));
+                        Vector2 selfLocalMax = rectTransformParent.InverseTransformPoint(rectTransform.TransformPoint(new Vector2(selfRect.xMax, selfRect.yMax)));
+                        selfRect = Rect.MinMaxRect(selfLocalMin.x, selfLocalMin.y, selfLocalMax.x, selfLocalMax.y);
+
+                        if (slideInDirection == ScreenView.SlideDirection.Up)
+                            slideOutAmount = Mathf.Abs(selfRect.yMin - parentRect.yMax);
+                        else if (slideInDirection == ScreenView.SlideDirection.Down)
+                            slideOutAmount = Mathf.Abs(selfRect.yMax - parentRect.yMin);
+                        else if (slideInDirection == ScreenView.SlideDirection.Left)
+                            slideOutAmount = Mathf.Abs(selfRect.xMax - parentRect.xMin);
+                        else
+                            slideOutAmount = Mathf.Abs(selfRect.xMin - parentRect.xMax);
+                    }
+
+                    var localRectPosition = rectTransform.localPosition;
+                    switch (slideOutDirection)
+                    {
+                        case ScreenView.SlideDirection.Left:
+                            _SlideScreenPos = new Vector2(localRectPosition.x - slideOutAmount, localRectPosition.y);
+                            break;
+                        case ScreenView.SlideDirection.Right:
+                            _SlideScreenPos = new Vector2(localRectPosition.x + slideOutAmount, localRectPosition.y);
+                            break;
+                        case ScreenView.SlideDirection.Up:
+                            _SlideScreenPos = new Vector2(localRectPosition.x, localRectPosition.y + slideOutAmount);
+                            break;
+                        case ScreenView.SlideDirection.Down:
+                            _SlideScreenPos = new Vector2(localRectPosition.x, localRectPosition.y - slideOutAmount);
+                            break;
+                    }
+                    if (rectTransform.parent != null)
+                        _SlideScreenPos = rectTransform.parent.TransformPoint(_SlideScreenPos);
+                }
+            }
+        }
 
         protected void SetupRipple()
         {
