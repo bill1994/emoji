@@ -92058,5 +92058,5 @@ MonoBehaviour:
   fallbackSpriteAssets: []
   overrideAndroidDefinition: 0
   androidSpriteSheet: {fileID: 0}
-  overrideIOSDefinition: 0
-  iOSSpriteSheet: {fileID: 0}
+  overrideIOSDefinition: 1
+  iOSSpriteSheet: {fileID: 2800000, guid: dd292445766009746a5e4de943d55739, type: 3}

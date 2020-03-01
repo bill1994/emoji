@@ -20,7 +20,7 @@ namespace Kyub.Performance
         [SerializeField]
         int m_renderBufferIndex = 0;
         [SerializeField, Tooltip("Disable it to make RawImage scale based on aspect ratio. Otherwise will try compare with SelfScreenRect to discover the NormalizedRect inside GlobalScreenRect")]
-        bool m_uvBasedOnScreenRect = true;
+        bool m_uvBasedOnScreenRect = false;
         [SerializeField,]
         Vector2 m_offsetUV = new Vector2(0, 0);
 
@@ -87,8 +87,8 @@ namespace Kyub.Performance
             RegisterEvents();
             if (_started)
             {
-                ApplyRenderBufferImmediate();
-                //    InitApplyRenderBuffer(0);
+                //ApplyRenderBufferImmediate();
+                InitApplyRenderBuffer(1);
             }
         }
 
@@ -101,7 +101,6 @@ namespace Kyub.Performance
             TryCreateClearTexture();
             texture = s_clearTexture;
             ApplyRenderBufferImmediate();
-            //InitApplyRenderBuffer(0);
         }
 
         protected override void OnDisable()
@@ -130,6 +129,8 @@ namespace Kyub.Performance
         {
             base.OnRectTransformDimensionsChange();
             RecalculateRectUV(m_uvBasedOnScreenRect);
+            if(IsActive())
+                InitApplyRenderBuffer(1);
         }
 
         #endregion
@@ -300,10 +301,17 @@ namespace Kyub.Performance
             }
         }
 
-        protected virtual void InitApplyRenderBuffer(int p_delayFramesCounter)
+        protected virtual void InitApplyRenderBuffer(int p_delayFramesCounter = 1)
         {
-            StopCoroutine("ApplyRenderBufferRoutine");
-            StartCoroutine("ApplyRenderBufferRoutine", p_delayFramesCounter);
+            if (IsActive())
+            {
+                StopCoroutine("ApplyRenderBufferRoutine");
+                StartCoroutine("ApplyRenderBufferRoutine", p_delayFramesCounter);
+            }
+            else
+            {
+                ApplyRenderBufferImmediate();
+            }
         }
 
         static Texture2D s_clearTexture = null;
@@ -360,12 +368,13 @@ namespace Kyub.Performance
         private void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> dict)
         {
             ApplyRenderBufferImmediate();
+            //InitApplyRenderBuffer();
         }
 
-        /*protected virtual void HandleOnAfterSetPerformance()
-        {
-            InitApplyRenderBuffer(0);
-        }*/
+        //protected virtual void HandleOnAfterSetPerformance()
+        //{
+            //InitApplyRenderBuffer();
+        //}
 
         #endregion
 

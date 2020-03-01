@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System.Linq;
+using MaterialUI.Extensions;
 
 namespace MaterialUI
 {
@@ -89,7 +90,7 @@ namespace MaterialUI
             if (frame == null)
                 return null;
 
-            var anchoredPosition = frame.transform is RectTransform? (frame.transform as RectTransform).anchoredPosition3D : frame.transform.localPosition;
+            var anchoredPosition = frame.transform is RectTransform ? (frame.transform as RectTransform).anchoredPosition3D : frame.transform.localPosition;
             var localScale = frame.transform.localScale;
             var localRotation = frame.transform.localRotation;
 
@@ -253,13 +254,13 @@ namespace MaterialUI
         void ShowFrame(System.Action callback)
         {
             if (m_Frame != null)
-                m_Frame.OnActivityBeginShow();
+                m_Frame.SendMessageToAll("OnActivityBeginShow");
 
             System.Action showAction = () =>
             {
                 callback.InvokeIfNotNull();
                 if (m_Frame != null)
-                    m_Frame.OnActivityEndShow();
+                    m_Frame.SendMessageToAll("OnActivityEndShow");
             };
 
             if (m_Frame)
@@ -279,13 +280,13 @@ namespace MaterialUI
         void HideFrame(System.Action callback)
         {
             if (m_Frame != null)
-                m_Frame.OnActivityBeginHide();
+                m_Frame.SendMessageToAll("OnActivityBeginHide");
 
             System.Action hideAction = () =>
             {
                 callback.InvokeIfNotNull();
                 if (m_Frame != null)
-                    m_Frame.OnActivityEndHide();
+                    m_Frame.SendMessageToAll("OnActivityEndHide");
             };
 
             var tweener = frame != null ? frame.GetComponent<AbstractTweenBehaviour>() : null;
