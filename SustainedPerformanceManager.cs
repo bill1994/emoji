@@ -473,11 +473,9 @@ namespace Kyub.Performance
                 s_invalidCullingMask = ~0;
                 _bufferIsDirty = true;
             }
-            if (_performanceIsDirty || _bufferIsDirty)
+            if (_routineSetHighPerformance == null && (_performanceIsDirty || _bufferIsDirty))
             {
-                _performanceIsDirty = false;
-                if (OnPerformanceUpdate())
-                    _bufferIsDirty = false;
+                OnPerformanceUpdate();
             }
         }
 
@@ -538,7 +536,8 @@ namespace Kyub.Performance
 
             ClearPendentInvalidTransforms();
 
-            _ignoreNextLayoutRebuild = true;
+            //if(!IsEndOfFrame)
+            //    _ignoreNextLayoutRebuild = true;
 
             CallOnAfterSetPerformance();
 
@@ -571,19 +570,19 @@ namespace Kyub.Performance
         protected virtual bool SetHighPerformanceDelayed(bool p_autoDisable = true, float p_waitTime = 0)
         {
             CancelSetLowPerformance();
-            if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
+            if (Application.isPlaying && enabled && gameObject.activeInHierarchy && _routineSetHighPerformance == null)
             {
-                if (_routineSetHighPerformance == null || _bufferIsDirty)
-                {
+                //if (_routineSetHighPerformance == null || _bufferIsDirty)
+                //{
                     CancelSetHighPerformance();
                     var bufferIsDirty = _bufferIsDirty;
                     _routineSetHighPerformance = StartCoroutine(SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, p_autoDisable, p_waitTime));
-                }
-                else
-                {
-                    _highPerformanceWaitTime = p_waitTime;
-                    _highPerformanceAutoDisable = p_autoDisable || _highPerformanceAutoDisable;
-                }
+                //}
+                //else
+                //{
+                //    _highPerformanceWaitTime = p_waitTime;
+                //    _highPerformanceAutoDisable = p_autoDisable || _highPerformanceAutoDisable;
+                //}
                 return true;
             }
             else
@@ -613,6 +612,7 @@ namespace Kyub.Performance
                 s_isEndOfFrame = true;
             }
 
+            _performanceIsDirty = false;
             _isHighPerformance = true;
 
             CallOnBeforeSetPerformance();
@@ -642,8 +642,9 @@ namespace Kyub.Performance
 
             ClearPendentInvalidTransforms();
 
-            _bufferIsDirty = false;
-            _ignoreNextLayoutRebuild = true;
+            _performanceIsDirty = false;
+            //if (!IsEndOfFrame)
+            //    _ignoreNextLayoutRebuild = true;
 
             CallOnAfterSetPerformance();
 
@@ -735,6 +736,8 @@ namespace Kyub.Performance
             s_isEndOfFrame = true;
             //}
             //s_isWaitingRenderBuffer = false;
+
+            _bufferIsDirty = false;
 
             if (OnAfterDrawBuffer != null)
                 OnAfterDrawBuffer(new Dictionary<int, RenderTexture>(s_renderBufferDict));
