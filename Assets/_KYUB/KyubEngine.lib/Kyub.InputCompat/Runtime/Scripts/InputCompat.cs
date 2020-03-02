@@ -1,4 +1,4 @@
-﻿#if UNITY_NEW_INPUT_SYSTEM && UNITY_INPUT_SYSTEM_0_1_OR_NEWER
+﻿#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER && UNITY_INPUT_SYSTEM_0_1_OR_NEWER
 #define NEW_INPUT_SYSTEM_ACTIVE
 #endif
 
@@ -539,62 +539,5 @@ namespace Kyub.EventSystems
 #endif
 
         #endregion
-
-        #region Unity Compiler
-
-#if UNITY_EDITOR
-
-        [UnityEditor.Callbacks.DidReloadScripts]
-        static void OnScriptsReloaded()
-        {
-#if UNITY_INPUT_SYSTEM_0_1_OR_NEWER
-            UnityEditor.SerializedProperty enableNativePlatformBackendsForNewInputSystem = null;
-            UnityEditor.SerializedProperty disableOldInputManagerSupport = null;
-            var allPlayerSettings = Resources.FindObjectsOfTypeAll<UnityEditor.PlayerSettings>();
-            if (allPlayerSettings.Length > 0)
-            {
-                var playerSettings = Resources.FindObjectsOfTypeAll<UnityEditor.PlayerSettings>()[0];
-                var so = new UnityEditor.SerializedObject(playerSettings);
-                enableNativePlatformBackendsForNewInputSystem = so.FindProperty("enableNativePlatformBackendsForNewInputSystem");
-                disableOldInputManagerSupport = so.FindProperty("disableOldInputManagerSupport");
-            }
-
-            var supportNewInputSystem = enableNativePlatformBackendsForNewInputSystem == null || enableNativePlatformBackendsForNewInputSystem.boolValue;
-            var supportOldInputSystem = !(disableOldInputManagerSupport == null || disableOldInputManagerSupport.boolValue);
-
-            if (supportNewInputSystem && !supportOldInputSystem)
-                AddDefineSymbols(new string[] { "UNITY_NEW_INPUT_SYSTEM" });
-            else
-                RemoveDefineSymbols(new string[] { "UNITY_NEW_INPUT_SYSTEM" });
-#else
-            RemoveDefineSymbols(new string[] { "UNITY_NEW_INPUT_SYSTEM" });
-#endif
-        }
-
-        static void AddDefineSymbols(string[] symbols)
-        {
-            string definesString = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup);
-            List<string> allDefines = definesString.Split(';').ToList();
-            allDefines.AddRange(symbols.Except(allDefines));
-            UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(
-                UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup,
-                string.Join(";", allDefines.ToArray()));
-        }
-
-        static void RemoveDefineSymbols(string[] symbols)
-        {
-            string definesString = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup);
-            List<string> allDefines = definesString.Split(';').ToList();
-            foreach (var symbol in symbols)
-            {
-                allDefines.Remove(symbol);
-            }
-            UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(
-                UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup,
-                string.Join(";", allDefines.ToArray()));
-        }
-#endif
-
-#endregion
-        }
+    }
 }

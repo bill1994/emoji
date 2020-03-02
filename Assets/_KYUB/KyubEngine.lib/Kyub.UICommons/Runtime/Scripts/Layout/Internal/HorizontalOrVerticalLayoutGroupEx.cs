@@ -15,7 +15,7 @@ namespace Kyub.UI
 
         [SerializeField, Tooltip("- Inflate will act exactly like old Horizontal/Vertical LayoutGroup changing child flexible size to 1.\n" +
             "- KeepSizeWhenChildControl will prevent change flexible size when controlled by child, but will expand spacement between elements. ")]
-        ForceExpandMode m_ForceExpandMode = ForceExpandMode.KeepSizeWhenChildControl;
+        ForceExpandMode m_ForceExpandMode = ForceExpandMode.Inflate;
         [SerializeField]
         bool m_ReverseOrder = false;
 
