@@ -1,4 +1,6 @@
-﻿#define FIX_NEW_INPUTSYSTEM_SUPPORT
+﻿#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+#define FIX_NEW_INPUTSYSTEM_SUPPORT
+#endif
 
 using System.Collections;
 using System.Collections.Generic;
