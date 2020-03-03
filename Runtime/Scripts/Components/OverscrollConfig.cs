@@ -306,7 +306,7 @@ namespace MaterialUI
         {
             base.OnRectTransformDimensionsChange();
 
-            if (_Started && Application.isPlaying)
+            if (isActiveAndEnabled && _Started && enabled && Application.isPlaying)
             {
                 CancelInvoke("UpdateOverScroll");
                 Invoke("UpdateOverScroll", 0);
@@ -344,6 +344,10 @@ namespace MaterialUI
 
             if (overScrollEnabled)
             {
+                //In some rare cases the overscroll was not created so we must do it here
+                if (RequireCreateInternal())
+                    UpdateOverScroll();
+
                 var indexes = GetValidIndexes(_ScrollPosition, isPressing ? null : (Vector2?)delta);
 
                 for (int i = 0; i < m_OverscrollObjects.Length; i++)
@@ -389,6 +393,17 @@ namespace MaterialUI
         #endregion
 
         #region Helper Functions
+
+        protected virtual bool RequireCreateInternal()
+        {
+            for (int i = 0; i < m_OverscrollObjects.Length; i++)
+            {
+                if (m_OverscrollObjects[i] != null)
+                    return false;
+            }
+
+            return true;
+        }
 
         protected virtual HashSet<int> GetValidIndexes(Vector2 normalizedValue, Vector2? delta)
         {
