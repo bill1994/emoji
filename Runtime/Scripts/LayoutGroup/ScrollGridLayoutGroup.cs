@@ -361,7 +361,7 @@ namespace Kyub.UI
                 float v_itemSize = GetCachedElementSize(p_indexReload);
                 if (v_rectTransform != null)
                 {
-                    var v_layout = v_rectTransform.GetComponent<LayoutElement>();
+                    //var v_layout = v_rectTransform.GetComponent<LayoutElement>();
                     v_rectTransform.pivot = Content.pivot;
                     if (IsVertical())
                     {
