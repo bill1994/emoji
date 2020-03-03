@@ -127,7 +127,6 @@ namespace Kyub.UI
             //Execure Delayed
             if (m_delayedReload && enabled && gameObject.activeInHierarchy)
             {
-                Debug.Log("Executed with Delay");
                 _reloadRoutine = StartCoroutine(v_routine);
             }
             else
