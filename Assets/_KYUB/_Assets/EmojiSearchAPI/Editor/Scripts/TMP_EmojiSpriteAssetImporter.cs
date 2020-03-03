@@ -116,7 +116,7 @@ namespace KyubEditor.EmojiSearch
             {
                 m_CreationFeedback = string.Empty;
 
-                var jsonFileText = m_JsonFile != null? m_JsonFile.text : string.Empty;
+                var jsonFileText = m_JsonFile != null ? m_JsonFile.text : string.Empty;
                 if (m_SpriteDataFormat == EmojiSpriteAssetImportFormats.EmojiDataJson)
                     jsonFileText = EmojiDataConversorUtility.ConvertToTexturePackerFormat(jsonFileText, m_gridSize, m_padding, m_spacing);
 
@@ -196,10 +196,20 @@ namespace KyubEditor.EmojiSearch
                 if (indexOfSeparator != -1)
                 {
                     string substring = sprite.name.Substring(0, indexOfSeparator);
+#if TMP_1_4_0_OR_NEWER
                     unicode = TMP_TextUtilities.StringHexToInt(substring);
+#else
+                    unicode = TMP_TextUtilities.StringToInt(substring);
+#endif
                 }
                 else
+                {
+#if TMP_1_4_0_OR_NEWER
                     unicode = TMP_TextUtilities.StringHexToInt(sprite.name);
+#else
+                    unicode = TMP_TextUtilities.StringToInt(sprite.name);
+#endif
+                }
 
                 sprite.unicode = unicode;
 
