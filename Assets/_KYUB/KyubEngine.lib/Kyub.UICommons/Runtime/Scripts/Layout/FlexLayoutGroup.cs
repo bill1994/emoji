@@ -195,7 +195,7 @@ namespace Kyub.UI
 
             float startPos = (axis == 0 ? padding.left : padding.top);
             float itemFlexibleMultiplier = 0;
-            float surplusSpace = size - GetTotalPreferredSize(axis);
+            //float surplusSpace = size - GetTotalPreferredSize(axis);
 
             float pos = startPos;
 

@@ -61,7 +61,7 @@ namespace MaterialUI
                     gameObject.SetActive(true);
 
                     isShow = show;
-                    var inverseTargetValue = show ? 0f : attenuation;
+                    //var inverseTargetValue = show ? 0f : attenuation;
                     var targetValue = show ? attenuation : 0f;
                     var currentValue = Mathf.Clamp01(rectTransform.localScale.y);
                     TweenManager.EndTween(tweenId);

@@ -99,6 +99,8 @@ namespace Kyub.UI
         {
             get
             {
+                if (_CurrentPreferredWidth < 0 && basePreferredWidth >= 0)
+                    _CurrentPreferredWidth = basePreferredWidth;
                 return _CurrentPreferredWidth;
             }
 
@@ -115,6 +117,8 @@ namespace Kyub.UI
         {
             get
             {
+                if (_CurrentPreferredHeight < 0 && basePreferredHeight >= 0)
+                    _CurrentPreferredHeight = basePreferredHeight;
                 return _CurrentPreferredHeight;
             }
 

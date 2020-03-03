@@ -392,6 +392,15 @@ namespace Kyub.UI
                 SetCachedElementsLayoutDirty();
         }
 
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            SetCachedElementsLayoutDirty(true);
+        }
+
+#endif
+
         #endregion
 
         #region Elements Change Function
@@ -886,7 +895,7 @@ namespace Kyub.UI
         {
             var range = m_minVisibleElements < 0 ? m_elements.Count - 1 : m_minVisibleElements;
             if (m_optimizeDeepHierarchy)
-                Mathf.Max(range, Math.Abs(_lastFrameVisibleElementIndexes.y + 1 - _lastFrameVisibleElementIndexes.x));
+                range = Mathf.Max(range, Math.Abs(_lastFrameVisibleElementIndexes.y + 1 - _lastFrameVisibleElementIndexes.x));
 
             return Mathf.Max(Math.Abs(currentVisibleElements.y + 1 - currentVisibleElements.x), range);
         }
@@ -904,7 +913,19 @@ namespace Kyub.UI
             {
                 var elementsBefore = cachedNewMinMaxIndex.x - Mathf.Max(0, _lastFrameVisibleElementIndexes.x);
                 var elementsAfter = Mathf.Max(0, _lastFrameVisibleElementIndexes.y) - cachedNewMinMaxIndex.y;
-                var elementsExtra = Mathf.Max(0, targetRange - (elementsAfter + elementsBefore + currentRange));
+
+                //Try prevent bugs when visible elements return a huge amount of elements
+                while (elementsBefore + elementsAfter + currentRange > targetRange)
+                {
+                    if (elementsBefore < elementsAfter)
+                        elementsAfter--;
+                    else
+                        elementsBefore--;
+                }
+
+                var elementsExtra = elementsBefore + elementsAfter + currentRange == targetRange ?
+                    0 :
+                    Mathf.Max(0, targetRange - (elementsAfter + elementsBefore + currentRange));
 
                 //Donate from extra elements to lowest one
                 while (elementsExtra > 0)
@@ -938,12 +959,13 @@ namespace Kyub.UI
 
                 if (cachedNewMinMaxIndex.x - elementsBefore < 0)
                     elementsAfter += elementsBefore - cachedNewMinMaxIndex.x;
-                else if (cachedNewMinMaxIndex.y + elementsBefore > m_elements.Count - 1)
+                else if (cachedNewMinMaxIndex.y + elementsAfter > m_elements.Count - 1)
                     elementsBefore += (cachedNewMinMaxIndex.y + elementsBefore) - (m_elements.Count - 1);
 
                 cachedNewMinMaxIndex.x = Mathf.Clamp(cachedNewMinMaxIndex.x - Mathf.Max(0, elementsBefore), 0, m_elements.Count - 1);
                 cachedNewMinMaxIndex.y = Mathf.Clamp(cachedNewMinMaxIndex.y + Mathf.Max(0, elementsAfter), 0, m_elements.Count - 1);
             }
+
             return cachedNewMinMaxIndex;
         }
 
