@@ -28,6 +28,7 @@ namespace MaterialUI
         //private SerializedProperty m_ForceStretchTabsOnLanscape;
         private SerializedProperty m_ForceSameTabSize;
         //private SerializedProperty m_LowerUnselectedTabAlpha;
+        private SerializedProperty m_UseLegacyControlMode;
         private SerializedProperty m_CanScrollBetweenTabs;
 
         private AnimBool m_PagesAnimBool;
@@ -49,6 +50,7 @@ namespace MaterialUI
             m_Indicator = serializedObject.FindProperty("m_Indicator");
             //m_ShrinkTabsToFitThreshold = serializedObject.FindProperty("m_ShrinkTabsToFitThreshold");
             //m_ForceStretchTabsOnLanscape = serializedObject.FindProperty("m_ForceStretchTabsOnLanscape");
+            m_UseLegacyControlMode = serializedObject.FindProperty("m_UseLegacyControlMode");
             m_ForceSameTabSize = serializedObject.FindProperty("m_ForceSameTabSize");
             //m_LowerUnselectedTabAlpha = serializedObject.FindProperty("m_LowerUnselectedTabAlpha");
             m_CanScrollBetweenTabs = serializedObject.FindProperty("m_CanScrollBetweenTabs");
@@ -108,7 +110,14 @@ namespace MaterialUI
 
             m_TabView.TrackPages();
 
-            EditorGUILayout.PropertyField(m_ForceSameTabSize);
+            EditorGUILayout.PropertyField(m_UseLegacyControlMode);
+            if (m_UseLegacyControlMode.boolValue)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(m_ForceSameTabSize);
+                EditorGUI.indentLevel--;
+                EditorGUILayout.Space();
+            }
             EditorGUILayout.PropertyField(m_AnimateTabs);
             //EditorGUILayout.PropertyField(m_ShrinkTabsToFitThreshold);
             //EditorGUILayout.PropertyField(m_ForceStretchTabsOnLanscape);
