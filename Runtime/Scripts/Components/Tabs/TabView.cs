@@ -35,6 +35,8 @@ namespace MaterialUI
         private bool m_PagesDirty;
 #endif
         [SerializeField]
+        bool m_UseLegacyControlMode = true;
+        [SerializeField]
         bool m_ForceSameTabSize = true;
         [Space]
         [SerializeField]
@@ -52,6 +54,22 @@ namespace MaterialUI
         #endregion
 
         #region Public Properties
+
+        public bool useLegacyControlMode
+        {
+            get
+            {
+                return m_UseLegacyControlMode;
+            }
+            set
+            {
+                if (m_UseLegacyControlMode == value)
+                    return;
+                m_UseLegacyControlMode = value;
+                if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
+                    InitializeTabsAndPagesDelayed();
+            }
+        }
 
         public override List<TabPage> pages
         {
@@ -129,7 +147,7 @@ namespace MaterialUI
 
             //Initialize TabContainer
             var layoutGroup = m_TabsContainer.GetComponent<HorizontalOrVerticalLayoutGroup>();
-            if (layoutGroup != null)
+            if (layoutGroup != null && m_UseLegacyControlMode)
             {
                 if (_cachedTabChildForceExpand == null)
                     _cachedTabChildForceExpand = layoutGroup.childForceExpandWidth;

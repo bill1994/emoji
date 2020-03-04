@@ -56,6 +56,28 @@ namespace MaterialUI
 
         #region Properties
 
+        public Vector2 safeScreenSize
+        {
+            get
+            {
+                var safeAreaComponent = GetComponent<CanvasSafeArea>();
+                Vector2 screenSize = safeAreaComponent != null && m_SupportSafeArea ? safeAreaComponent.GetConformSafeArea().size : new Vector2(Screen.width, Screen.height);
+
+                return screenSize;
+            }
+        }
+
+        public bool isWideScreen
+        {
+            get
+            {
+                var screenSize = safeScreenSize;
+                var isWideScreen = screenSize.x > screenSize.y;
+
+                return isWideScreen;
+            }
+        }
+
         public Canvas canvas
         {
             get
@@ -114,7 +136,7 @@ namespace MaterialUI
         {
             get
             {
-                return canvas != null? Display.displays[canvas.targetDisplay].renderingHeight : Screen.height;
+                return canvas != null ? Display.displays[canvas.targetDisplay].renderingHeight : Screen.height;
             }
         }
 
@@ -222,8 +244,7 @@ namespace MaterialUI
 
         protected override void HandleScaleWithScreenSize()
         {
-            var safeAreaComponent = GetComponent<CanvasSafeArea>();
-            Vector2 screenSize = safeAreaComponent != null && m_SupportSafeArea? safeAreaComponent.GetConformSafeArea().size : new Vector2(Screen.width, Screen.height);
+            Vector2 screenSize = safeScreenSize;
             // The log base doesn't have any influence on the results whatsoever, as long as the same base is used everywhere.
             float kLogBase = 2;
 
@@ -276,13 +297,10 @@ namespace MaterialUI
 
         protected new void SetScaleFactor(float scaleFactor)
         {
-            var isWideScreen = canvas.pixelRect.width > canvas.pixelRect.height;
-            
-            bool scaleChanged = scaleFactor != _PrevScaleFactor;
-            bool orientationChanged = isWideScreen == _PrevIsWideScreen;
+            var isWideScreen = this.isWideScreen;
 
-            if (scaleFactor == _PrevScaleFactor)
-                return;
+            bool scaleChanged = scaleFactor != _PrevScaleFactor;
+            bool orientationChanged = isWideScreen != _PrevIsWideScreen;
 
             if (scaleChanged)
             {
@@ -303,7 +321,7 @@ namespace MaterialUI
             if (referencePixelsPerUnit == _PrevReferencePixelsPerUnit)
                 return;
 
-            if(canvas != null)
+            if (canvas != null)
                 canvas.referencePixelsPerUnit = referencePixelsPerUnit;
             _PrevReferencePixelsPerUnit = referencePixelsPerUnit;
         }
