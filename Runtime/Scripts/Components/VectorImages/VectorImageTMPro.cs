@@ -351,6 +351,7 @@ namespace MaterialUI
 
         public new void CalculateLayoutInputHorizontal()
         {
+            CacheIgnorers();
             base.CalculateLayoutInputHorizontal();
             RefreshScale();
         }
@@ -367,9 +368,46 @@ namespace MaterialUI
         public override float preferredHeight { get { return size; } }
         public new float minHeight { get { return -1; } }
         public new float flexibleHeight { get { return -1; } }
-        public virtual bool ignoreLayout { get { return !m_IncludeInLayoutWhenEmpty && (m_VectorImageData == null || !m_VectorImageData.ContainsData()); } }
         public override bool raycastTarget { get { return ignoreLayout ? false : base.raycastTarget; } set { base.raycastTarget = value; } }
-        
+        public virtual bool ignoreLayout
+        {
+            get
+            {
+                if (_cachedIgnorers == null)
+                    CacheIgnorers();
+
+                var requireIgnoreLayout = !m_IncludeInLayoutWhenEmpty && (m_VectorImageData == null || !m_VectorImageData.ContainsData());
+
+                //Fix bug with LayoutGroup Implementation
+                if (!requireIgnoreLayout)
+                {
+                    var ignorer = _cachedIgnorers.Find(a => ((Component)a != null) && a.ignoreLayout);
+                    requireIgnoreLayout = ignorer != null;
+                }
+                return requireIgnoreLayout;
+            }
+        }
+
+        [System.NonSerialized]
+        List<ILayoutIgnorer> _cachedIgnorers = null;
+        protected virtual void CacheIgnorers()
+        {
+            //Cache ignorers in this GameObject
+            if (_cachedIgnorers == null)
+                _cachedIgnorers = new List<ILayoutIgnorer>();
+            else
+                _cachedIgnorers.Clear();
+
+            if (this != null)
+            {
+                GetComponents<ILayoutIgnorer>(_cachedIgnorers);
+                var index = _cachedIgnorers.IndexOf(this);
+                if (index >= 0)
+                    _cachedIgnorers.RemoveAt(index);
+            }
+        }
+
+
         #endregion
     }
 }
