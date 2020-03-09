@@ -144,12 +144,12 @@ namespace MaterialUI
         {
             get
             {
-                float currentDpi = 0;
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-                currentDpi = Mathf.Round(1.445f * float.Parse(Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE").OpenSubKey("Microsoft").OpenSubKey("Windows NT").OpenSubKey("CurrentVersion").OpenSubKey("FontDPI").GetValue("LogPixels").ToString()));
-#else
-                currentDpi = Screen.dpi;
-#endif
+                float currentDpi = Screen.dpi;
+                //#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                //                currentDpi = Mathf.Round(1.445f * float.Parse(Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE").OpenSubKey("Microsoft").OpenSubKey("Windows NT").OpenSubKey("CurrentVersion").OpenSubKey("FontDPI").GetValue("LogPixels").ToString()));
+                //#else
+                //                currentDpi = Screen.dpi;
+                //#endif
 
 #if UNITY_EDITOR
                 if (m_EditorForceDPI && m_EditorForceDPIValue > m_DefaultSpriteDPI / 50f)
