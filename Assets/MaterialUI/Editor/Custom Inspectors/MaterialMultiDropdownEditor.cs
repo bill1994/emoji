@@ -109,31 +109,34 @@ namespace MaterialUI
                     displayedOptions.Add(optionsArray.GetArrayElementAtIndex(i).FindPropertyRelative("m_Text").stringValue);
                 }
 
-                var newMaskValue = EditorGUILayout.MaskField(m_SelectedIndexes.displayName, maskValue, displayedOptions.ToArray());
-
-                //Convert newMaskValue to unity everything (-1) if needed
-                if (newMaskValue == everythingValue)
-                    newMaskValue = -1;
-
-                //Convert mask to int array
-                if (maskValue != newMaskValue)
+                if (displayedOptions.Count > 0)
                 {
-                    List<int> indexArray = new List<int>();
-                    for (int i = 0; i < Mathf.Max(optionsArray.arraySize, 32); i++)
+                    var newMaskValue = EditorGUILayout.MaskField(m_SelectedIndexes.displayName, maskValue, displayedOptions.ToArray());
+
+                    //Convert newMaskValue to unity everything (-1) if needed
+                    if (newMaskValue == everythingValue)
+                        newMaskValue = -1;
+
+                    //Convert mask to int array
+                    if (maskValue != newMaskValue)
                     {
-                        var currentCheckingBitmask = (int)Mathf.Pow(2, i);
-                        if ((newMaskValue & currentCheckingBitmask) == currentCheckingBitmask)
+                        List<int> indexArray = new List<int>();
+                        for (int i = 0; i < Mathf.Max(optionsArray.arraySize, 32); i++)
                         {
-                            indexArray.Add(i);
+                            var currentCheckingBitmask = (int)Mathf.Pow(2, i);
+                            if ((newMaskValue & currentCheckingBitmask) == currentCheckingBitmask)
+                            {
+                                indexArray.Add(i);
+                            }
                         }
-                    }
-                    //Recreate array with selected indexes
-                    m_SelectedIndexes.ClearArray();
-                    for (int i = 0; i < indexArray.Count; i++)
-                    {
-                        var selectedIndex = indexArray[i];
-                        m_SelectedIndexes.InsertArrayElementAtIndex(i);
-                        m_SelectedIndexes.GetArrayElementAtIndex(i).intValue = selectedIndex;
+                        //Recreate array with selected indexes
+                        m_SelectedIndexes.ClearArray();
+                        for (int i = 0; i < indexArray.Count; i++)
+                        {
+                            var selectedIndex = indexArray[i];
+                            m_SelectedIndexes.InsertArrayElementAtIndex(i);
+                            m_SelectedIndexes.GetArrayElementAtIndex(i).intValue = selectedIndex;
+                        }
                     }
                 }
             }

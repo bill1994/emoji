@@ -61,6 +61,9 @@ namespace Kyub
             //Join all string in one
             var v_pattern = String.Join("|", v_strKeys);
             var v_regex = new Regex(v_pattern);
+#if NET_STANDARD_2_0
+            var groupNames = v_regex.GetGroupNames();
+#endif
             string v_replaced = v_regex.Replace(p_stringSource,
                 m =>
                 {
@@ -71,12 +74,20 @@ namespace Kyub
 
                     //Try find main match group
                     Group v_mainGroup = null;
+#if NET_STANDARD_2_0
+                    int groupCounter = 0;
+#endif
                     foreach (Group v_group in m.Groups)
                     {
+#if NET_STANDARD_2_0
+                        var groupName = groupCounter < groupNames.Length? null : groupNames[groupCounter];
+#else
+                        var groupName = v_group.Name;
+#endif
                         //var v_alreadyFoundMainMatch = v_formattedValue != null;
                         if ((v_group.Success /*|| v_alreadyFoundMainMatch*/) &&
-                            v_group.Name != null && 
-                            v_groupNameToKeyIndex.TryGetValue(v_group.Name, out v_index) &&
+                            groupName != null &&
+                            v_groupNameToKeyIndex.TryGetValue(groupName, out v_index) &&
                             v_index >= 0 &&
                             v_index < v_strValues.Count)
                         {
@@ -92,6 +103,9 @@ namespace Kyub
                         {
                             v_params.Add(v_group.Success? v_group.Value : "");
                         }*/
+#if NET_STANDARD_2_0
+                        groupCounter++;
+#endif
                     }
 
                     //Now try find parameters in this main group (we can't search in same previous loop because collection doesn't preserve order)
@@ -114,7 +128,7 @@ namespace Kyub
                         v_formattedValue = m.ToString();
                     else if (v_params.Count > 0)
                         v_formattedValue = string.Format(v_formattedValue, v_params.ToArray());
-                    
+
                     return v_formattedValue;
                 });
 
