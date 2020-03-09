@@ -142,7 +142,8 @@ namespace MaterialUI
 
         public OptionData hintOption
         {
-            get {
+            get
+            {
                 if (m_HintOption == null)
                     m_HintOption = new OptionData();
                 return m_HintOption;
@@ -280,10 +281,10 @@ namespace MaterialUI
             }
 
             var prefabAddress = cachedPrefabAddress == null || cachedPrefabAddress.IsEmpty() || !cachedPrefabAddress.IsResources() ? PrefabManager.ResourcePrefabs.dialogCheckboxList : cachedPrefabAddress;
-            ShowFrameActivity(_CacheDialogList, prefabAddress, (dialog, isDialog) => 
+            ShowFrameActivity(_CacheDialogList, prefabAddress, (dialog, isDialog) =>
             {
                 _CacheDialogList = dialog;
-                if(isDialog)
+                if (isDialog)
                     dialog.Initialize(options.ToArray(), Select, "OK", hintOption.text, hintOption.imageData, HandleOnHide, "Cancel", selectedIndexes);
                 //Dont show title in Dropdown Mode
                 else
@@ -306,7 +307,7 @@ namespace MaterialUI
         public IList<OptionData> GetCurrentSelectedDatas()
         {
             List<OptionData> selectedData = new List<OptionData>();
-            for(int i=0; i < options.Count; i++)
+            for (int i = 0; i < options.Count; i++)
             {
                 if (options[i] != null && selectedIndexes.Contains(i))
                 {
@@ -433,12 +434,12 @@ namespace MaterialUI
                 textComponent.SetGraphicText(!string.IsNullOrEmpty(optionText) ? optionText : "\u200B");
 
             if (iconComponent != null)
-                iconComponent.SetImageData(options.Count > 1? (m_MixedOption != null ? m_MixedOption.imageData : null) : (options.Count > 0? options[0].imageData : null));
+                iconComponent.SetImageData(options.Count > 1 ? (m_MixedOption != null ? m_MixedOption.imageData : null) : (options.Count > 0 ? options[0].imageData : null));
 
             //Apply Hint Option
             var hintOption = options.Count == 0 || m_AlwaysDisplayHintOption ? m_HintOption : null;
             if (hintTextComponent != null && ((textComponent != hintTextComponent) || (hintOption != null && options.Count == 0)))
-                hintTextComponent.SetGraphicText(hintOption != null && !string.IsNullOrEmpty(hintOption.text)? hintOption.text : "\u200B");
+                hintTextComponent.SetGraphicText(hintOption != null && !string.IsNullOrEmpty(hintOption.text) ? hintOption.text : "\u200B");
 
             if (hintIconComponent != null && ((iconComponent != hintIconComponent) || (hintOption != null && options.Count == 0)))
                 hintIconComponent.SetImageData(hintOption != null ? hintOption.imageData : null);
