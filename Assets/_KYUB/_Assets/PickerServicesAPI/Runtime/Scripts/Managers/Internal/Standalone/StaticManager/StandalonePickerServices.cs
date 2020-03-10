@@ -2,6 +2,9 @@
 using System.Collections;
 using SFB;
 using System.Linq;
+#if UNITY_WEBGL && !UNITY_EDITOR
+using System.Runtime.InteropServices;
+#endif
 
 namespace Kyub.PickerServices
 {
@@ -72,9 +75,9 @@ namespace Kyub.PickerServices
                 new ExtensionFilter("All Files", "*" ),
             };
 
-            StandaloneFileBrowser.OpenFilePanelAsync("Open Image", "", extensions, false, (result) => 
+            StandaloneFileBrowser.OpenFilePanelAsync("Open Image", "", extensions, false, (result) =>
             {
-                var path = result != null && result.Length > 0? result.First() : "";
+                var path = result != null && result.Length > 0 ? result.First() : "";
                 if (Instance != null)
                     Instance.NativeImagePickedEnd(path);
             });
@@ -85,15 +88,15 @@ namespace Kyub.PickerServices
         {
             FixInstanceName();
             CrossPickerServices.CallPickerFinishEvent(null);
-            if(p_saveToGallery)
+            if (p_saveToGallery)
                 CrossPickerServices.CallImageSavedFailedEvent();
 
             Debug.Log("DeserializeCameraImage is Invalid on Standalone");
         }
 
-#endregion
+        #endregion
 
-#region Native Callbacks
+        #region Native Callbacks
 
         protected virtual void NativeImagePickedEnd(string p_path)
         {
@@ -101,9 +104,9 @@ namespace Kyub.PickerServices
             CrossPickerServices.CallPickerFinishEvent(p_path, v_texture);
         }
 
-#endregion
+        #endregion
 
-#region Internal Static Helper Functions
+        #region Internal Static Helper Functions
 
         protected static void FixInstanceName()
         {
@@ -111,6 +114,6 @@ namespace Kyub.PickerServices
                 Instance.name = "StandalonePickerServices";
         }
 
-#endregion
+        #endregion
     }
 }
