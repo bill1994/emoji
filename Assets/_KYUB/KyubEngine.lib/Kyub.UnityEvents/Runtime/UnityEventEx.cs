@@ -215,7 +215,7 @@ namespace UnityEngine.Events
                         if (type == typeof(Color32))
                             return new CachedInvokableCall<Color32>(targetObject, method, m_Arguments.colorArgument);
                         if (type != typeof(string))
-                            return GetSerializedDataCall(targetObject, method, m_Arguments.serializedDataArgument, type);
+                            return new UnknownCachedInvokableCall(target, method, m_Arguments.serializedDataArgument);
                         else
                             return new CachedInvokableCall<string>(targetObject, method, m_Arguments.stringArgument);
                     }
@@ -225,16 +225,6 @@ namespace UnityEngine.Events
                     return new InvokableCall(targetObject, method);
             }
             return null;
-        }
-
-        internal static BaseInvokableCall GetSerializedDataCall(UnityEngine.Object target, MethodInfo method, object data, Type type)
-        {
-            var generic = typeof(CachedInvokableCall<>);
-            var specific = generic.MakeGenericType(type);
-            var ci = specific.GetConstructor(new[] { typeof(UnityEngine.Object), typeof(MethodInfo), type });
-
-            // need to pass explicit null here!
-            return ci.Invoke(new object[] { target, method, data }) as BaseInvokableCall;
         }
     }
 
@@ -541,6 +531,59 @@ namespace UnityEngine.Events
 
             m_PersistentCalls.RegisterEventPersistentListener(index, targetObj as UnityEngine.Object, targetObjType, method.Name);
             DirtyPersistentCalls();
+        }
+    }
+
+    class UnknownCachedInvokableCall : BaseInvokableCall
+    {
+        private event UnityActionEx<object[]> Delegate;
+        private object[] _Args = null;
+        private Dictionary<MethodInfo, object> _registeredDelegatesPerTarget = new Dictionary<MethodInfo, object>();
+
+        public UnknownCachedInvokableCall(object target, MethodInfo theFunction, params object[] cachedArgs)
+            : base(target, theFunction)
+        {
+            _Args = cachedArgs;
+            if (theFunction != null)
+            {
+                UnityActionEx<object[]> unknownDelegate = (args) =>
+                {
+                    // UnityEngine object
+                    var canCall = target == null;
+                    var unityObj = target as UnityEngine.Object;
+                    if (!ReferenceEquals(unityObj, null))
+                        canCall = unityObj != null;
+
+                    if (canCall)
+                    {
+                        if (theFunction != null)
+                            theFunction.Invoke(target, args);
+                    }
+                };
+
+                _registeredDelegatesPerTarget[theFunction] = target;
+                Delegate += unknownDelegate;
+            }
+
+        }
+
+        public override void Invoke(object[] args)
+        {
+            Delegate(_Args);
+        }
+
+        public virtual void Invoke()
+        {
+            Delegate(_Args);
+        }
+
+        public override bool Find(object targetObj, MethodInfo method)
+        {
+            object registeredTarget = null;
+            if (_registeredDelegatesPerTarget.TryGetValue(method, out registeredTarget))
+                return registeredTarget == targetObj;
+
+            return false;
         }
     }
 
