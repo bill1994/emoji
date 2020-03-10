@@ -163,7 +163,7 @@ namespace MaterialUI
         private Vector3 _TargetRipplePos;
         private Vector3 _CurrentRipplePos;
 
-        private Vector3 _TempScreenPos;
+        private Vector3? _TempScreenPos;
         private Vector3 _SlideScreenPos;
 
         #endregion
@@ -498,26 +498,17 @@ namespace MaterialUI
             if (_IsTransitioning > 0)
             {
                 Kyub.Performance.SustainedPerformanceManager.Refresh(rectTransform);
-                //Skip first cycle (so we can wait until layout rebuild)
-                if (_TransitionCurrentTime < 0)
-                {
-                    _TransitionCurrentTime = 0;
-                    return;
-                }
-                //Setup
-                else if (_TransitionCurrentTime == 0)
-                {
-                    if (_IsTransitioning == 1)
-                        ConfigureAnimation(true);
-                    else if (_IsTransitioning == 2)
-                        ConfigureAnimation(false);
-                }
-                _TransitionCurrentTime += Time.smoothDeltaTime;
 
+                if (_TransitionCurrentTime < 0)
+                    _TransitionCurrentTime = 0;
+
+                _TransitionCurrentTime += Time.smoothDeltaTime;
                 if (transitionCurrentTime <= transitionDuration)
                 {
                     if (_IsTransitioning == 1)
                     {
+                        if (_TempScreenPos == null)
+                            ConfigureAnimation(true);
                         if (rippleIn)
                         {
                             Vector3 tempVector3 = _Ripple.position;
@@ -531,7 +522,7 @@ namespace MaterialUI
                             tempVector2.y = MaterialUI.Tween.Evaluate(rippleInTweenType, 0, _TempRippleSize.y, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
                             _Ripple.sizeDelta = tempVector2;
 
-                            rectTransform.position = _TempScreenPos;
+                            rectTransform.position = _TempScreenPos.Value;
 
                             rectTransform.localScale = new Vector3(_TempRippleScale.x / ripple.localScale.x, _TempRippleScale.y / ripple.localScale.y, _TempRippleScale.z / ripple.localScale.z);
                         }
@@ -552,17 +543,19 @@ namespace MaterialUI
                         if (slideIn)
                         {
                             Vector3 tempVector3 = rectTransform.position;
-                            tempVector3.x = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.x, _TempScreenPos.x, _TransitionCurrentTime,
+                            tempVector3.x = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.x, _TempScreenPos.Value.x, _TransitionCurrentTime,
                                 transitionDuration, slideInCustomCurve);
-                            tempVector3.y = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.y, _TempScreenPos.y, _TransitionCurrentTime,
+                            tempVector3.y = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.y, _TempScreenPos.Value.y, _TransitionCurrentTime,
                                 transitionDuration, slideInCustomCurve);
-                            tempVector3.z = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.z, _TempScreenPos.z, _TransitionCurrentTime,
+                            tempVector3.z = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.z, _TempScreenPos.Value.z, _TransitionCurrentTime,
                                 transitionDuration, slideInCustomCurve);
                             rectTransform.position = tempVector3;
                         }
                     }
                     else if (_IsTransitioning == 2)
                     {
+                        if (_TempScreenPos == null)
+                            ConfigureAnimation(false);
                         if (rippleOut)
                         {
                             Vector3 tempVector3 = _Ripple.position;
@@ -578,7 +571,7 @@ namespace MaterialUI
                                 _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
                             _Ripple.sizeDelta = tempVector2;
 
-                            rectTransform.position = _TempScreenPos;
+                            rectTransform.position = _TempScreenPos.Value;
 
                             rectTransform.localScale = new Vector3(_TempRippleScale.x / ripple.localScale.x, _TempRippleScale.y / ripple.localScale.y, _TempRippleScale.z / ripple.localScale.z);
                         }
@@ -599,11 +592,11 @@ namespace MaterialUI
                         if (slideOut)
                         {
                             Vector3 tempVector3 = rectTransform.position;
-                            tempVector3.x = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.x, _SlideScreenPos.x,
+                            tempVector3.x = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.x, _SlideScreenPos.x,
                                 _TransitionCurrentTime, transitionDuration, slideOutCustomCurve);
-                            tempVector3.y = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.y, _SlideScreenPos.y, _TransitionCurrentTime,
+                            tempVector3.y = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.y, _SlideScreenPos.y, _TransitionCurrentTime,
                                 transitionDuration, slideOutCustomCurve);
-                            tempVector3.z = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.z, _SlideScreenPos.z, _TransitionCurrentTime,
+                            tempVector3.z = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.z, _SlideScreenPos.z, _TransitionCurrentTime,
                                 transitionDuration, slideOutCustomCurve);
                             rectTransform.position = tempVector3;
                         }
@@ -646,6 +639,8 @@ namespace MaterialUI
             if (gameObject != null)
                 gameObject.SetActive(true);
 
+            if (_TempScreenPos == null && this.transform is RectTransform)
+                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
             _TempScreenPos = rectTransform.position;
             ConfigureAnimation(true);
 
@@ -663,15 +658,21 @@ namespace MaterialUI
             canvasGroup.interactable = false;
             //canvasGroup.blocksRaycasts = false;
 
+            if (_TempScreenPos == null && this.transform is RectTransform)
+                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
             _TempScreenPos = rectTransform.position;
             ConfigureAnimation(false);
+
             _IsTransitioning = 2;
             _TransitionCurrentTime = -1;
 
             if (!gameObject.activeInHierarchy)
                 InterruptAnimation();
             else
+            {
                 enabled = true;
+                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
+            }
         }
 
         public virtual void TransitionOutImmediate()
@@ -795,6 +796,8 @@ namespace MaterialUI
                             slideInAmount = Mathf.Abs(selfRect.xMax - parentRect.xMin);
                         else
                             slideInAmount = Mathf.Abs(selfRect.xMin - parentRect.xMax);
+
+                        slideInAmount *= m_SlideInPercent == 0 ? 0 : 100f / m_SlideInPercent;
                     }
 
                     var localRectPosition = rectTransform.localPosition;
@@ -864,6 +867,8 @@ namespace MaterialUI
                             slideOutAmount = Mathf.Abs(selfRect.xMax - parentRect.xMin);
                         else
                             slideOutAmount = Mathf.Abs(selfRect.xMin - parentRect.xMax);
+
+                        slideOutAmount *= m_SlideOutPercent == 0 ? 0 : 100f / m_SlideOutPercent;
                     }
 
                     var localRectPosition = rectTransform.localPosition;
@@ -947,7 +952,7 @@ namespace MaterialUI
                 {
                     if (gameObject != null && gameObject.activeInHierarchy)
                         rectTransform.SetParent(ripple.parent, true);
-                    rectTransform.position = _TempScreenPos;
+                    rectTransform.position = _TempScreenPos.Value;
 
                     _TempRippleAnchors.ToTransform(rectTransform);
                     //rectTransform.anchorMin = Vector2.zero;
@@ -966,7 +971,7 @@ namespace MaterialUI
                 }
                 if (slideIn)
                 {
-                    rectTransform.position = _TempScreenPos;
+                    rectTransform.position = _TempScreenPos.Value;
                 }
                 if (callEvent)
                     HandleOnShow();
@@ -977,7 +982,7 @@ namespace MaterialUI
                 {
                     if (gameObject != null && gameObject.activeInHierarchy)
                         rectTransform.SetParent(ripple.parent, true);
-                    rectTransform.position = _TempScreenPos;
+                    rectTransform.position = _TempScreenPos.Value;
 
                     _TempRippleAnchors.ToTransform(rectTransform);
                     //rectTransform.anchorMin = Vector2.zero;
@@ -996,7 +1001,7 @@ namespace MaterialUI
                 }
                 if (slideOut)
                 {
-                    rectTransform.position = _TempScreenPos;
+                    rectTransform.position = _TempScreenPos.Value;
                 }
                 if (callEvent)
                     HandleOnHide();
