@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Kyub.EventSystems;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -144,7 +145,7 @@ namespace MaterialUI
         {
             get
             {
-                float currentDpi = Screen.dpi;
+                float currentDpi = EventSystemCompat.GetScreenDPI();
                 //#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
                 //                currentDpi = Mathf.Round(1.445f * float.Parse(Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE").OpenSubKey("Microsoft").OpenSubKey("Windows NT").OpenSubKey("CurrentVersion").OpenSubKey("FontDPI").GetValue("LogPixels").ToString()));
                 //#else
@@ -205,7 +206,7 @@ namespace MaterialUI
 
         protected virtual void HandleLegacyConstantPhysicalSize()
         {
-            float currentDpi = Screen.dpi;
+            float currentDpi = EventSystemCompat.GetScreenDPI();
             float dpi = (currentDpi == 0 ? m_FallbackScreenDPI : currentDpi);
             float targetDPI = 1;
             switch (m_PhysicalUnit)
