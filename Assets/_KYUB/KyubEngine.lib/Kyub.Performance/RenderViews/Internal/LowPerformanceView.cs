@@ -15,6 +15,8 @@ namespace Kyub.Performance
         bool _isViewActive = false;
         Texture2D _frameBuffer = null;
         Camera _cachedCamera = null;
+        Material _frameBufferMaterial = null;
+        Shader _frameBufferShader = null;
 
         bool _bufferIsDirty = true;
 
@@ -46,12 +48,33 @@ namespace Kyub.Performance
         private void OnDestroy()
         {
             ClearFrameBuffer();
+            if (_frameBufferMaterial != null)
+                Material.Destroy(_frameBufferMaterial);
         }
 
         private void OnPostRender()
         {
-            if (_frameBuffer != null && _isViewActive)
-                Graphics.Blit(_frameBuffer, (RenderTexture)null);
+            //if (_frameBuffer != null && _isViewActive)
+            //    Graphics.Blit(_frameBuffer, (RenderTexture)null);
+
+            //Force draw a fullcreen texture to frame buffer
+            if (_isViewActive && _frameBuffer != null && _frameBufferMaterial != null)
+            {
+                GL.PushMatrix();
+                _frameBufferMaterial.SetPass(0);
+                GL.LoadOrtho();
+                GL.Begin(GL.QUADS);
+                GL.TexCoord2(0, 0);
+                GL.Vertex3(0, 0, 0);
+                GL.TexCoord2(0, 1);
+                GL.Vertex3(0, 1, 0);
+                GL.TexCoord2(1, 1);
+                GL.Vertex3(1, 1, 0);
+                GL.TexCoord2(1, 0);
+                GL.Vertex3(1, 0, 0);
+                GL.End();
+                GL.PopMatrix();
+            }
         }
 
         private void OnGUI()
@@ -119,6 +142,8 @@ namespace Kyub.Performance
                 //Copy FrameBuffer to a texture
                 _frameBuffer.ReadPixels(new Rect(0, 0, screenSize.x, screenSize.y), 0, 0, true);
                 _frameBuffer.Apply();
+                if (_frameBufferMaterial != null)
+                    _frameBufferMaterial.mainTexture = _frameBuffer;
             }
         }
 
@@ -126,13 +151,22 @@ namespace Kyub.Performance
         {
             if (_frameBuffer != null)
                 Texture2D.Destroy(_frameBuffer);
+            _frameBuffer = null;
+
+            if (_frameBufferMaterial != null)
+                _frameBufferMaterial.mainTexture = _frameBuffer;
         }
 
         internal void Configure()
         {
             if (Application.isPlaying)
             {
-                if(Application.isEditor)
+                if (_frameBufferShader == null)
+                    _frameBufferShader = Shader.Find("UI/Default");
+                if(_frameBufferMaterial == null && _frameBufferShader != null)
+                    _frameBufferMaterial = new Material(_frameBufferShader);
+
+                if (Application.isEditor)
                     gameObject.hideFlags = HideFlags.NotEditable;
                 if (_cachedCamera == null)
                 {

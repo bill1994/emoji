@@ -78,7 +78,7 @@ namespace Kyub.Performance
                     s_instance = GetInstanceFastSearch();
 
                 //Metal/Mobile require simulate frameBuffer
-                return (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal || Application.isMobilePlatform) ||
+                return (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal || Application.isMobilePlatform || Application.platform == RuntimePlatform.WebGLPlayer) ||
                     (s_instance != null && s_instance.m_forceSimulateFrameBuffer);
 #endif
             }
@@ -526,7 +526,10 @@ namespace Kyub.Performance
             if (m_canControlFps)
             {
                 QualitySettings.vSyncCount = 0;
-                Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.x);
+                var newValue = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.x);
+                if (Application.platform == RuntimePlatform.WebGLPlayer)
+                    newValue = newValue >= 30 ? -1 : newValue;
+                Application.targetFrameRate = newValue;
             }
             else
                 Application.targetFrameRate = -1;
@@ -573,9 +576,9 @@ namespace Kyub.Performance
             {
                 //if (_routineSetHighPerformance == null || _bufferIsDirty)
                 //{
-                    CancelSetHighPerformance();
-                    var bufferIsDirty = _bufferIsDirty;
-                    _routineSetHighPerformance = StartCoroutine(SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, p_autoDisable, p_waitTime));
+                CancelSetHighPerformance();
+                var bufferIsDirty = _bufferIsDirty;
+                _routineSetHighPerformance = StartCoroutine(SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, p_autoDisable, p_waitTime));
                 //}
                 //else
                 //{
@@ -619,7 +622,10 @@ namespace Kyub.Performance
             if (m_canControlFps)
             {
                 QualitySettings.vSyncCount = 0;
-                Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.y);
+                if (Application.platform == RuntimePlatform.WebGLPlayer)
+                    Application.targetFrameRate = -1;
+                else
+                    Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.y);
             }
             else
                 Application.targetFrameRate = -1;
@@ -967,8 +973,8 @@ namespace Kyub.Performance
 
                 if (!v_instance._isHighPerformance || !v_instance.m_safeRefreshMode)
                     v_instance._performanceIsDirty = true;
-                else
-                    v_instance.SetLowPerformanceDelayed(v_instance.m_autoDisableHighPerformanceTime);
+                //else
+                //    v_instance.SetLowPerformanceDelayed(v_instance.m_autoDisableHighPerformanceTime);
             }
         }
 
