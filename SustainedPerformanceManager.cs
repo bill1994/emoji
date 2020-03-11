@@ -43,6 +43,17 @@ namespace Kyub.Performance
             }
         }
 
+        //Used to scale down render buffer
+        static Dictionary<int, int> s_maxSizePerBufferIndex = new Dictionary<int, int>();
+        public static int GetRenderBufferMaxSize(int p_bufferIndex)
+        {
+            if (s_maxSizePerBufferIndex.ContainsKey(p_bufferIndex))
+                return s_maxSizePerBufferIndex[p_bufferIndex];
+
+            var instance = GetInstanceFastSearch();
+            return instance != null ? instance.m_maxRenderBufferSize : -1;
+        }
+
         protected static Dictionary<int, RenderTexture> s_renderBufferDict = new Dictionary<int, RenderTexture>();
         public static RenderTexture GetRenderBuffer(int p_bufferIndex)
         {
@@ -55,7 +66,7 @@ namespace Kyub.Performance
                 v_renderBuffer = s_renderBufferDict[p_bufferIndex];
                 if ((s_useRenderBuffer && v_renderBuffer == null) || (!s_useRenderBuffer && v_renderBuffer != null))
                 {
-                    CheckBufferTexture(ref v_renderBuffer);
+                    CheckBufferTexture(ref v_renderBuffer, GetRenderBufferMaxSize(p_bufferIndex));
 
                     if (v_renderBuffer != null)
                         s_renderBufferDict[p_bufferIndex] = v_renderBuffer;
@@ -184,6 +195,10 @@ namespace Kyub.Performance
         [SerializeField, Tooltip("Useful for debug purpose (will force invalidate every frame)")]
         bool m_forceAlwaysInvalidate = false;
         [Space]
+        [SerializeField, IntPopup(-1, "ScreenSize", 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)]
+        int m_maxRenderBufferSize = -1;
+
+        [Space]
         [SerializeField, Tooltip("Enable this to activate DynamicFps Controller")]
         bool m_canControlFps = true;
         [SerializeField, MinMaxSlider(5, 150)]
@@ -204,6 +219,21 @@ namespace Kyub.Performance
         #endregion
 
         #region Properties
+
+        public int MaxTextureSize
+        {
+            get
+            {
+                return m_maxRenderBufferSize;
+            }
+            set
+            {
+                if (m_maxRenderBufferSize == value)
+                    return;
+                m_maxRenderBufferSize = value;
+                Invalidate();
+            }
+        }
 
         public Vector2 PerformanceFpsRange
         {
@@ -1077,7 +1107,6 @@ namespace Kyub.Performance
 
         protected static bool CheckBufferTextures()
         {
-            var allCameras = Camera.allCameras;
             var v_sucess = false;
             //Fill all Used indexes of render buffer in scene
             HashSet<int> v_validBufferIndexes = new HashSet<int>();
@@ -1104,12 +1133,12 @@ namespace Kyub.Performance
                 if (!v_validBufferIndexes.Contains(v_bufferIndex))
                 {
                     s_renderBufferDict.Remove(v_bufferIndex);
-                    ReleaseRenderBuffer(ref v_renderBuffer, allCameras);
+                    ReleaseRenderBuffer(ref v_renderBuffer, v_sceneViews);
                 }
                 //Update Render Buffer Texture
                 else
                 {
-                    v_sucess = CheckBufferTexture(ref v_renderBuffer, allCameras) || v_sucess;
+                    v_sucess = CheckBufferTexture(ref v_renderBuffer, GetRenderBufferMaxSize(v_bufferIndex), v_sceneViews) || v_sucess;
                     s_renderBufferDict[v_bufferIndex] = v_renderBuffer;
                 }
             }
@@ -1119,37 +1148,37 @@ namespace Kyub.Performance
 
         protected static bool ReleaseRenderBuffers()
         {
-            var allCameras = Camera.allCameras;
+            var cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
             var v_sucess = false;
             var v_bufferIndexes = new HashSet<int>(s_renderBufferDict.Keys);
             foreach (var v_bufferIndex in v_bufferIndexes)
             {
                 var v_renderBuffer = s_renderBufferDict[v_bufferIndex];
-                v_sucess = ReleaseRenderBuffer(ref v_renderBuffer, allCameras) || v_sucess;
+                v_sucess = ReleaseRenderBuffer(ref v_renderBuffer, cameraViews) || v_sucess;
             }
             s_renderBufferDict.Clear();
 
             return v_sucess;
         }
 
-        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer, Camera[] p_cameras = null)
+        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer, int p_maxSize, ICollection<SustainedCameraView> p_cameraViews = null)
         {
-            return CheckBufferTexture(ref p_renderBuffer, s_useRenderBuffer, p_cameras);
+            return CheckBufferTexture(ref p_renderBuffer, s_useRenderBuffer, p_maxSize, p_cameraViews);
         }
 
-        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer, bool p_isActive, Camera[] p_cameras = null)
+        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer, bool p_isActive, int p_maxSize, ICollection<SustainedCameraView> p_cameraViews = null)
         {
             if (Application.isPlaying)
             {
                 if (p_isActive)
                 {
+                    var screenSize = GetScreenSizeClamped(p_maxSize);
                     if (p_renderBuffer == null || !p_renderBuffer.IsCreated() ||
-                        p_renderBuffer.width != Screen.width || p_renderBuffer.height != Screen.height)
+                        p_renderBuffer.width != screenSize.x || p_renderBuffer.height != screenSize.y)
                     {
-                        ReleaseRenderBuffer(ref p_renderBuffer, p_cameras);
+                        ReleaseRenderBuffer(ref p_renderBuffer, p_cameraViews);
 
-                        //s_renderBuffer = RenderTexture.GetTemporary(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
-                        p_renderBuffer = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+                        p_renderBuffer = new RenderTexture(screenSize.x, screenSize.y, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
                         p_renderBuffer.antiAliasing = Mathf.Max(1, QualitySettings.antiAliasing);
                         p_renderBuffer.name = "RenderBuffer (" + p_renderBuffer.GetInstanceID() + ")";
                         p_renderBuffer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
@@ -1160,24 +1189,24 @@ namespace Kyub.Performance
                     }
                 }
                 else
-                    ReleaseRenderBuffer(ref p_renderBuffer, p_cameras);
+                    ReleaseRenderBuffer(ref p_renderBuffer, p_cameraViews);
             }
             return false;
         }
 
-        protected static bool ReleaseRenderBuffer(ref RenderTexture p_renderBuffer, Camera[] p_cameras = null)
+        protected static bool ReleaseRenderBuffer(ref RenderTexture p_renderBuffer, ICollection<SustainedCameraView> p_cameraViews = null)
         {
             if (p_renderBuffer != null)
             {
                 if (p_renderBuffer == RenderTexture.active)
                     RenderTexture.active = null;
-                if (p_cameras == null)
-                    p_cameras = Camera.allCameras;//Resources.FindObjectsOfTypeAll<Camera>();
-                foreach (var v_camera in p_cameras)
+                if (p_cameraViews == null)
+                    p_cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
+                foreach (var v_camera in p_cameraViews)
                 {
-                    if (v_camera != null && v_camera.scene.IsValid() && v_camera.activeTexture == p_renderBuffer || v_camera.targetTexture == p_renderBuffer)
+                    if (v_camera != null && v_camera.Camera != null && v_camera.gameObject.scene.IsValid() && v_camera.Camera.activeTexture == p_renderBuffer || v_camera.Camera.targetTexture == p_renderBuffer)
                     {
-                        v_camera.targetTexture = null;
+                        v_camera.Camera.targetTexture = null;
                     }
                 }
 
@@ -1190,6 +1219,87 @@ namespace Kyub.Performance
                 return true;
             }
             return false;
+        }
+
+        protected static Vector2Int GetScreenSizeClamped(int p_maxSize)
+        {
+            var defaultScreenSize = new Vector2Int(Screen.width, Screen.height);
+            if (p_maxSize > 0)
+            {
+                p_maxSize = Mathf.Max(16, p_maxSize);
+                if (p_maxSize > defaultScreenSize.x || p_maxSize > defaultScreenSize.y)
+                {
+                   float defaultMaxSize = Mathf.Max(defaultScreenSize.x, defaultScreenSize.y);
+                   var multiplier = p_maxSize / defaultMaxSize;
+
+                    defaultScreenSize = new Vector2Int((int)(Screen.width * multiplier), (int)(Screen.height * multiplier)); ;
+                }
+            }
+
+            return defaultScreenSize;
+        }
+
+        protected static bool RecalculateMaxTextureSize(ICollection<SustainedCameraView> p_cameraViews = null)
+        {
+            var sucess = false;
+            var newMaxSizePerBufferIndex = new Dictionary<int, int>();
+            if (p_cameraViews == null)
+                p_cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
+
+            var instance = GetInstanceFastSearch();
+            var instanceMaxRenderTextureSize = instance != null ? instance.m_maxRenderBufferSize : -1;
+            foreach (var cameraView in p_cameraViews)
+            {
+                if (cameraView != null && cameraView.Camera != null && cameraView.UseRenderBuffer)
+                {
+                    //Get cached value
+                    var cachedMaxSizePerBufferIndex = -1;
+                    if (newMaxSizePerBufferIndex.ContainsKey(cameraView.RenderBufferIndex))
+                        cachedMaxSizePerBufferIndex = newMaxSizePerBufferIndex[cameraView.RenderBufferIndex] <= 0? -1 : newMaxSizePerBufferIndex[cameraView.RenderBufferIndex];
+
+                    //Clamp based in Global TextureSize
+                    if (instanceMaxRenderTextureSize > 0)
+                    {
+                        if (cachedMaxSizePerBufferIndex <= 0)
+                            cachedMaxSizePerBufferIndex = instanceMaxRenderTextureSize;
+                        else
+                            cachedMaxSizePerBufferIndex = Mathf.Min(cachedMaxSizePerBufferIndex, instanceMaxRenderTextureSize);
+                    }
+
+                    //Clamp based in MaxRenderBufferSize
+                    if (cameraView.MaxRenderBufferSize > 0)
+                    {
+                        if (cachedMaxSizePerBufferIndex <= 0)
+                            cachedMaxSizePerBufferIndex = cameraView.MaxRenderBufferSize;
+                        else
+                            cachedMaxSizePerBufferIndex = Mathf.Min(cachedMaxSizePerBufferIndex, cameraView.MaxRenderBufferSize);
+                    }
+
+                    if (cachedMaxSizePerBufferIndex > 0)
+                        cachedMaxSizePerBufferIndex = Mathf.Max(16, cachedMaxSizePerBufferIndex);
+                    newMaxSizePerBufferIndex[cameraView.RenderBufferIndex] = cachedMaxSizePerBufferIndex;
+                }
+            }
+
+            if (newMaxSizePerBufferIndex.Count != s_maxSizePerBufferIndex.Count)
+                sucess = true;
+            else
+            {
+                foreach (var pair in newMaxSizePerBufferIndex)
+                {
+                    var index = pair.Key;
+                    var maxSize = pair.Value;
+                    if (!s_maxSizePerBufferIndex.ContainsKey(index) || s_maxSizePerBufferIndex[index] != maxSize)
+                    {
+                        sucess = true;
+                        break;
+                    }
+                }
+            }
+            if(sucess)
+                s_maxSizePerBufferIndex = newMaxSizePerBufferIndex;
+
+            return sucess;
         }
 
         #endregion
@@ -1240,6 +1350,7 @@ namespace Kyub.Performance
             }
             s_minimumSupportedFps = Mathf.Clamp(s_minimumSupportedFps, (int)m_performanceFpsRange.x, (int)m_performanceFpsRange.y);
 
+            var textureSizeChanged = RecalculateMaxTextureSize();
             if (v_oldRequireConstantRepaint != s_requireConstantRepaint ||
                 v_oldRequireConstantBufferRepaint != s_requireConstantBufferRepaint ||
                 v_oldMinimumSupportedFps != s_minimumSupportedFps ||
@@ -1247,7 +1358,7 @@ namespace Kyub.Performance
                 v_oldDefaultCullingMask != _defaultInvalidCullingMask)
             {
                 if (s_useRenderBuffer)
-                    Invalidate(_defaultInvalidCullingMask);
+                    Invalidate(textureSizeChanged? ~0 : _defaultInvalidCullingMask);
                 else
                     Refresh();
             }
