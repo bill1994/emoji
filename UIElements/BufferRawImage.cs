@@ -211,8 +211,8 @@ namespace Kyub.Performance
                 return;
 
             _screenRect = ScreenRectUtils.GetScreenRect(this.rectTransform);
-            var v_textureSize = texture != null ? new Vector2(texture.width, texture.height) : new Vector2(0, 0);
-            if (v_textureSize.x == 0 || v_textureSize.y == 0)
+            var v_screenSize = texture != null ? new Vector2(Screen.width, Screen.height) : new Vector2(0, 0);
+            if (v_screenSize.x == 0 || v_screenSize.y == 0)
             {
                 var v_normalizedRect = new Rect(0, 0, 1, 1);
                 v_normalizedRect.position += m_offsetUV;
@@ -223,14 +223,14 @@ namespace Kyub.Performance
                 //Only supported in Non-Worldspace mode
                 if (p_basedOnScreenSize)
                 {
-                    var v_canvas = GetComponentInParent<Canvas>();
+                    var v_canvas = this.canvas;
                     if (v_canvas == null || v_canvas.renderMode == RenderMode.WorldSpace)
                         p_basedOnScreenSize = false;
                 }
 
                 if (p_basedOnScreenSize)
                 {
-                    var v_normalizedRect = new Rect(_screenRect.x / v_textureSize.x, _screenRect.y / v_textureSize.y, _screenRect.width / v_textureSize.x, _screenRect.height / v_textureSize.y);
+                    var v_normalizedRect = new Rect(_screenRect.x / v_screenSize.x, _screenRect.y / v_screenSize.y, _screenRect.width / v_screenSize.x, _screenRect.height / v_screenSize.y);
                     v_normalizedRect.position += m_offsetUV;
                     uvRect = v_normalizedRect;
                 }
@@ -244,18 +244,18 @@ namespace Kyub.Performance
 
                     if (v_localRect.width > 0 && v_localRect.height > 0)
                     {
-                        var v_textureProportion = v_textureSize.x / v_textureSize.y;
+                        var v_textureProportion = v_screenSize.x / v_screenSize.y;
                         var v_localRectProportion = v_localRect.width / v_localRect.height;
                         if (v_localRectProportion > v_textureProportion)
                         {
-                            var v_mult = v_localRect.width > 0 ? v_textureSize.x / v_localRect.width : 0;
-                            v_normalizedRect = new Rect(0, 0, 1, (v_localRect.height * v_mult) / v_textureSize.y);
+                            var v_mult = v_localRect.width > 0 ? v_screenSize.x / v_localRect.width : 0;
+                            v_normalizedRect = new Rect(0, 0, 1, (v_localRect.height * v_mult) / v_screenSize.y);
                             v_normalizedRect.y = Mathf.Max(0, (1 - v_normalizedRect.height) * pivot.y);
                         }
                         else if (v_localRectProportion < v_textureProportion)
                         {
-                            var v_mult = v_localRect.height > 0 ? v_textureSize.y / v_localRect.height : 0;
-                            v_normalizedRect = new Rect(0, 0, (v_localRect.width * v_mult) / v_textureSize.x, 1);
+                            var v_mult = v_localRect.height > 0 ? v_screenSize.y / v_localRect.height : 0;
+                            v_normalizedRect = new Rect(0, 0, (v_localRect.width * v_mult) / v_screenSize.x, 1);
                             v_normalizedRect.x = Mathf.Max(0, (1 - v_normalizedRect.width) * pivot.x);
                         }
                     }
