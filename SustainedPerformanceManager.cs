@@ -195,7 +195,7 @@ namespace Kyub.Performance
         [SerializeField, Tooltip("Useful for debug purpose (will force invalidate every frame)")]
         bool m_forceAlwaysInvalidate = false;
         [Space]
-        [SerializeField, IntPopup(-1, "ScreenSize", 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)]
+        [SerializeField, IntPopup(-1, "ScreenSize", 16, 32, 64, 128, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2560, 3072, 4096)]
         int m_maxRenderBufferSize = -1;
 
         [Space]
