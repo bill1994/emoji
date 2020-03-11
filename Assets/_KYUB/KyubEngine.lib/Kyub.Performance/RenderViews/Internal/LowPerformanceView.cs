@@ -58,7 +58,7 @@ namespace Kyub.Performance
             //    Graphics.Blit(_frameBuffer, (RenderTexture)null);
 
             //Force draw a fullcreen texture to frame buffer
-            if (_isViewActive && _frameBuffer != null && _frameBufferMaterial != null)
+            if (_isViewActive && _frameBuffer != null && _frameBufferMaterial != null && !SustainedPerformanceManager.IsHighPerformanceActive())
             {
                 GL.PushMatrix();
                 _frameBufferMaterial.SetPass(0);
@@ -130,7 +130,7 @@ namespace Kyub.Performance
         {
             _bufferIsDirty = false;
             Configure();
-            if (SustainedPerformanceManager.UseSimulatedFrameBuffer && _isViewActive)
+            if (SustainedPerformanceManager.UseSimulatedFrameBuffer && _isViewActive && !SustainedPerformanceManager.IsHighPerformanceActive())
             {
                 Vector2Int screenSize = new Vector2Int(Screen.width, Screen.height);
                 //Only recreate texture if size changed

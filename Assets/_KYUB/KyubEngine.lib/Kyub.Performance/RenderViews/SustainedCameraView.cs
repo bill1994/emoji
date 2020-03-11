@@ -14,6 +14,8 @@ namespace Kyub.Performance
         bool m_useRenderBuffer = false;
         [SerializeField]
         int m_renderBufferIndex = 0;
+        [SerializeField, IntPopup(-1, "ScreenSize", 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)]
+        int m_maxRenderBufferSize = -1;
 
         #endregion
 
@@ -24,6 +26,24 @@ namespace Kyub.Performance
         #endregion
 
         #region Public Properties
+
+        public int MaxRenderBufferSize
+        {
+            get
+            {
+                return m_maxRenderBufferSize;
+            }
+            set
+            {
+                if (m_maxRenderBufferSize == value)
+                    return;
+
+                m_maxRenderBufferSize = value;
+                if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
+                    RegisterEvents();
+                MarkDynamicElementDirty();
+            }
+        }
 
         Camera _cachedCamera = null;
         public virtual Camera Camera
@@ -50,7 +70,7 @@ namespace Kyub.Performance
                 m_useRenderBuffer = value;
                 if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
                     RegisterEvents();
-                SustainedPerformanceManager.MarkDynamicElementsDirty();
+                MarkDynamicElementDirty();
             }
         }
 
@@ -68,7 +88,7 @@ namespace Kyub.Performance
                 m_renderBufferIndex = value;
                 if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
                     RegisterEvents();
-                SustainedPerformanceManager.MarkDynamicElementsDirty();
+                MarkDynamicElementDirty();
             }
         }
 
@@ -89,7 +109,7 @@ namespace Kyub.Performance
                 if (_lastCullingMask != v_currentCullingMask)
                 {
                     _lastCullingMask = v_currentCullingMask;
-                    SustainedPerformanceManager.MarkDynamicElementsDirty();
+                    MarkDynamicElementDirty();
                 }
                 return v_currentCullingMask;
             }
@@ -131,7 +151,7 @@ namespace Kyub.Performance
         protected override void OnValidate()
         {
             if (Application.isPlaying && s_sceneRenderViews.Contains(this))
-                TryInitRenderBuffer();
+                MarkDynamicElementDirty();
             base.OnValidate();
         }
 #endif
