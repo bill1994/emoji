@@ -227,6 +227,8 @@ namespace Kyub.Performance
         {
             get
             {
+                if (Application.platform == RuntimePlatform.WebGLPlayer)
+                    return false;
                 return m_canControlFps;
             }
 
@@ -523,13 +525,10 @@ namespace Kyub.Performance
 
             CallOnBeforeSetPerformance();
 
-            if (m_canControlFps)
+            if (CanControlFps)
             {
                 QualitySettings.vSyncCount = 0;
-                var newValue = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.x);
-                if (Application.platform == RuntimePlatform.WebGLPlayer)
-                    newValue = newValue >= 30 ? -1 : newValue;
-                Application.targetFrameRate = newValue;
+                Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.x);
             }
             else
                 Application.targetFrameRate = -1;
@@ -619,13 +618,10 @@ namespace Kyub.Performance
 
             CallOnBeforeSetPerformance();
 
-            if (m_canControlFps)
+            if (CanControlFps)
             {
                 QualitySettings.vSyncCount = 0;
-                if (Application.platform == RuntimePlatform.WebGLPlayer)
-                    Application.targetFrameRate = -1;
-                else
-                    Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.y);
+                Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.y);
             }
             else
                 Application.targetFrameRate = -1;
