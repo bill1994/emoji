@@ -1,11 +1,38 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
+#if UNITY_WEBGL && !UNITY_EDITOR
+using System.Runtime.InteropServices;
+#endif
 
 namespace Kyub.EventSystems
 {
     public class EventSystemCompat : EventSystem
     {
+        #region Static Functions
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+
+        [DllImport("__Internal")]
+        private static extern float _JSGetScreenDPI();
+#endif
+
+        public static float GetScreenDPI(float defaultValue = 96)
+        {
+            float value = 0;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            value = _JSGetScreenDPI();
+#else
+            value = Screen.dpi;
+#endif
+            if (value <= 0)
+                value = defaultValue;
+
+            return value;
+        }
+
+        #endregion
+
         #region Private Variables
 
         [SerializeField] private int m_ReferenceDpi = 100;
@@ -70,9 +97,10 @@ namespace Kyub.EventSystems
 
         public void TryUpdatePixelDrag(bool force = false)
         {
-            if (_previousDPI != Screen.dpi || force)
+            var screenDpi = EventSystemCompat.GetScreenDPI();
+            if (_previousDPI != screenDpi || force)
             {
-                UpdatePixelDrag_Internal(Screen.dpi);
+                UpdatePixelDrag_Internal(screenDpi);
             }
         }
 
