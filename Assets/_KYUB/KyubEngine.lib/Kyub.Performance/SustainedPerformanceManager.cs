@@ -443,6 +443,7 @@ namespace Kyub.Performance
         protected virtual void OnValidate()
         {
             m_performanceFpsRange = new Vector2(Mathf.RoundToInt(m_performanceFpsRange.x), Mathf.RoundToInt(m_performanceFpsRange.y));
+            RecalculateMaxTextureSize();
             MarkToSetHighPerformance(true);
         }
 #endif
