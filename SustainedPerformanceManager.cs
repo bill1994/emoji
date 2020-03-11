@@ -1227,7 +1227,7 @@ namespace Kyub.Performance
             if (p_maxSize > 0)
             {
                 p_maxSize = Mathf.Max(16, p_maxSize);
-                if (p_maxSize > defaultScreenSize.x || p_maxSize > defaultScreenSize.y)
+                if (p_maxSize < defaultScreenSize.x || p_maxSize < defaultScreenSize.y)
                 {
                    float defaultMaxSize = Mathf.Max(defaultScreenSize.x, defaultScreenSize.y);
                    var multiplier = p_maxSize / defaultMaxSize;
