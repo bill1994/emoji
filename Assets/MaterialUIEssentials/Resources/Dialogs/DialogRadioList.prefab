@@ -3738,7 +3738,7 @@ MonoBehaviour:
   m_Padding:
     m_Left: 10
     m_Right: 10
-    m_Top: 0
+    m_Top: 5
     m_Bottom: 5
   m_ChildAlignment: 4
   m_Spacing: 0
@@ -4476,12 +4476,12 @@ PrefabInstance:
     - target: {fileID: 1510700236296278006, guid: a9a34641c8f7c3a4fa510e9ba1423874,
         type: 3}
       propertyPath: m_fontSize
-      value: 16
+      value: 56
       objectReference: {fileID: 0}
     - target: {fileID: 1510700236296278006, guid: a9a34641c8f7c3a4fa510e9ba1423874,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 16
+      value: 56
       objectReference: {fileID: 0}
     - target: {fileID: 1510700236296278006, guid: a9a34641c8f7c3a4fa510e9ba1423874,
         type: 3}

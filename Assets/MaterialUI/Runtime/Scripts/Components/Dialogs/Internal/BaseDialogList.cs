@@ -145,7 +145,6 @@ namespace MaterialUI
             if (m_TitleSection != null)
                 m_TitleSection.SetTitle(titleText, icon);
 
-
             _onDismissiveButtonClicked = onDismissiveButtonClicked;
 
             if (m_ButtonSection != null)
@@ -185,12 +184,18 @@ namespace MaterialUI
             UnregisterEvents();
             if (m_ScrollDataView != null)
                 m_ScrollDataView.OnReloadElement.AddListener(HandleOnReloadElement);
+
+            if (m_SearchInputField != null)
+                m_SearchInputField.onValueChanged.AddListener(HandleOnSeachValueChanged);
         }
 
         protected virtual void UnregisterEvents()
         {
             if (m_ScrollDataView != null)
                 m_ScrollDataView.OnReloadElement.RemoveListener(HandleOnReloadElement);
+
+            if (m_SearchInputField != null)
+                m_SearchInputField.onValueChanged.RemoveListener(HandleOnSeachValueChanged);
         }
 
         public void AffirmativeButtonClicked()
@@ -208,11 +213,40 @@ namespace MaterialUI
             Hide();
         }
 
+        public virtual int ConvertFromUnsafeDataIndex(int unsafeDataIndex)
+        {
+            var data = unsafeDataIndex >= 0 ? m_ScrollDataView.Data : null;
+            var convertedIndex = data != null ? unsafeDataIndex : -1;
+            if (convertedIndex >= 0 && options.Count != data.Count)
+            {
+                var optionData = unsafeDataIndex >= 0 && data.Count > unsafeDataIndex ? data[unsafeDataIndex] as OptionData : null;
+                convertedIndex = optionData != null ? options.IndexOf(optionData) : -1;
+            }
+
+            return convertedIndex;
+        }
+        
+        public virtual bool IsUnsafeDataIndexSelected(int dataIndex)
+        {
+            return IsDataIndexSelected(ConvertFromUnsafeDataIndex(dataIndex));
+        }
+
         public abstract bool IsDataIndexSelected(int dataIndex);
 
         #endregion
 
         #region Receivers
+
+        protected virtual void HandleOnSeachValueChanged(string value)
+        {
+            if (m_ScrollDataView != null)
+            {
+                m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
+                var filteredOption = options == null ? null : new List<OptionData>(options);
+                ApplyFilterInList(filteredOption, value);
+                m_ScrollDataView.Setup(filteredOption);
+            }
+        }
 
         protected abstract void HandleOnAffirmativeButtonClicked();
 
@@ -221,9 +255,14 @@ namespace MaterialUI
             var clickableOption = args.LayoutElement != null ? args.LayoutElement.GetComponent<DialogClickableOption>() : null;
             if (clickableOption != null)
             {
-                clickableOption.onItemClicked.RemoveListener(HandleOnItemClicked);
-                clickableOption.onItemClicked.AddListener(HandleOnItemClicked);
+                clickableOption.onItemClicked.RemoveListener(HandleUnsafeOnItemClicked);
+                clickableOption.onItemClicked.AddListener(HandleUnsafeOnItemClicked);
             }
+        }
+
+        protected void HandleUnsafeOnItemClicked(int unsafeDataIndex)
+        {
+            HandleOnItemClicked(ConvertFromUnsafeDataIndex(unsafeDataIndex));
         }
 
         protected abstract void HandleOnItemClicked(int dataIndex);
@@ -268,7 +307,6 @@ namespace MaterialUI
                 }
             }
         }
-
 
         protected static bool IsValidFilter(string key, string[] filters)
         {
