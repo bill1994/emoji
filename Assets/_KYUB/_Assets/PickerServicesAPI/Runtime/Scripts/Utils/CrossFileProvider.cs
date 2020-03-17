@@ -44,7 +44,7 @@ namespace Kyub.PickerServices
             filePath = filePath.Trim();
             bool requestDefaultOpenUrl = HasValidProtocol(filePath);
 
-            if(!requestDefaultOpenUrl)
+            if (!requestDefaultOpenUrl)
             {
 #if UNITY_IOS && !UNITY_EDITOR
                 if(!iOS_OpenFileUrl(filePath))
@@ -57,7 +57,13 @@ namespace Kyub.PickerServices
             }
 
             if (requestDefaultOpenUrl)
+            {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                JS_OpenFileUrl(filePath);
+#else
                 Application.OpenURL(filePath);
+#endif
+            }
         }
 
         public static bool FileExists(string p_filePath)
@@ -67,6 +73,8 @@ namespace Kyub.PickerServices
             if (v_info == null ||v_info.Exists == false)
                 return false;
             return true;
+#elif UNITY_WEBGL && !UNITY_EDITOR
+            return HasValidProtocol(filePath);
 #else
             return System.IO.File.Exists(p_filePath);
 #endif
@@ -216,6 +224,13 @@ namespace Kyub.PickerServices
 
         #endregion
 
+        #region WebGL Extern Functions
 
+#if UNITY_WEBGL
+        [DllImport("__Internal")]
+        private static extern bool JS_OpenFileUrl(string path);
+#endif
+
+        #endregion
     }
 }
