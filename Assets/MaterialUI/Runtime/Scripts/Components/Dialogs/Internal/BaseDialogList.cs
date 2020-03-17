@@ -21,6 +21,8 @@ namespace MaterialUI
         protected ScrollDataView m_ScrollDataView = null;
         [SerializeField]
         protected DialogClickableOption m_OptionTemplate = null;
+        [SerializeField]
+        protected MaterialInputField m_SearchInputField = null;
 
         protected IList<OptionData> _Options;
 
@@ -30,11 +32,26 @@ namespace MaterialUI
 
         #region Properties
 
+        public bool isSearchFilterActive
+        {
+            get
+            {
+                return m_SearchInputField != null && !string.IsNullOrEmpty(m_SearchInputField.text);
+            }
+        }
+
+        public MaterialInputField searchInputField
+        {
+            get { return m_SearchInputField; }
+            set { m_SearchInputField = value; }
+        }
+
         public DialogTitleSection titleSection
         {
             get { return m_TitleSection; }
             set { m_TitleSection = value; }
         }
+
         public DialogButtonSection buttonSection
         {
             get { return m_ButtonSection; }
@@ -78,7 +95,9 @@ namespace MaterialUI
                 if (m_ScrollDataView != null)
                 {
                     m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
-                    m_ScrollDataView.Setup(options is IList || options == null ? (IList)options : options.ToArray());
+                    var filteredOption = options == null? null : new List<OptionData>(options);
+                    ApplyFilterInList(filteredOption, m_SearchInputField != null ? m_SearchInputField.text : string.Empty);
+                    m_ScrollDataView.Setup(filteredOption);
                 }
             }
         }
@@ -120,7 +139,7 @@ namespace MaterialUI
             {
                 m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
                 m_ScrollDataView.OnReloadElement.AddListener(HandleOnReloadElement);
-                m_ScrollDataView.Setup(options is IList || options == null? (IList)options : options.ToArray());
+                m_ScrollDataView.Setup(options is IList || options == null ? (IList)options : options.ToArray());
             }
 
             if (m_TitleSection != null)
@@ -212,6 +231,7 @@ namespace MaterialUI
         #endregion
 
         #region Activity Functions
+
         public override void OnActivityEndShow()
         {
             var canvasGroup = this.GetAddComponent<CanvasGroup>();
@@ -227,6 +247,43 @@ namespace MaterialUI
             var canvasGroup = this.GetAddComponent<CanvasGroup>();
             canvasGroup.blocksRaycasts = false;
             base.OnActivityBeginHide();
+        }
+
+        #endregion
+
+        #region Static Helper Functions
+
+        protected static void ApplyFilterInList(IList<OptionData> list, string filterKeys)
+        {
+            if (string.IsNullOrEmpty(filterKeys) || list == null || list.Count == 0)
+                return;
+
+            var filters = !string.IsNullOrEmpty(filterKeys) ? filterKeys.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries) : null;
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] == null || !IsValidFilter(list[i].text, filters))
+                {
+                    list.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
+
+        protected static bool IsValidFilter(string key, string[] filters)
+        {
+            if (string.IsNullOrEmpty(key))
+                return false;
+
+            if (filters == null || filters.Length == 0)
+                return true;
+
+            foreach (var filter in filters)
+            {
+                if (filter != null && key.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) < 0)
+                    return false;
+            }
+            return true;
         }
 
         #endregion
