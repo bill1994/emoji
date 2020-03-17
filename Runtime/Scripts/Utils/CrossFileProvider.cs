@@ -66,17 +66,17 @@ namespace Kyub.PickerServices
             }
         }
 
-        public static bool FileExists(string p_filePath)
+        public static bool FileExists(string filePath)
         {
 #if UNITY_IOS
-            System.IO.FileInfo v_info = new System.IO.FileInfo(p_filePath);
+            System.IO.FileInfo v_info = new System.IO.FileInfo(filePath);
             if (v_info == null ||v_info.Exists == false)
                 return false;
             return true;
 #elif UNITY_WEBGL && !UNITY_EDITOR
             return HasValidProtocol(filePath);
 #else
-            return System.IO.File.Exists(p_filePath);
+            return System.IO.File.Exists(filePath);
 #endif
         }
 
