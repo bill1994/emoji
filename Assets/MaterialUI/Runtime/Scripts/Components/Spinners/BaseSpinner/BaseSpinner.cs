@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -8,30 +9,47 @@ namespace MaterialUI
 {
     public enum SpinnerMode { AutoDetect, Dialog, Dropdown }
 
+    [System.Flags]
+    public enum SpinnerUIEventTriggerMode { None = 0, OnPointerEnter = 1, OnPointerExit = 2, OnPointerDown = 4, OnPointerUp = 8, OnPointerClick = 16 }
+
     public interface IBaseSpinner
     {
         RectTransform rectTransform { get; }
         SpinnerMode spinnerMode { get; set; }
         Vector2 dropdownExpandPivot { get; set; }
+        Vector2 dropdownOffset { get; set; }
         Vector2 dropdownFramePivot { get; set; }
         Vector2 dropdownFramePreferredSize { get; set; }
 
         bool IsDestroyed();
     }
 
-    [DisallowMultipleComponent]
-    public abstract class BaseSpinner<T> : StyleElement<MaterialStylePanel.PanelStyleProperty>, IBaseSpinner where T : StyleProperty, new()
+    public abstract class BaseSpinner<T> : StyleElement<MaterialStylePanel.PanelStyleProperty>, 
+        IBaseSpinner, 
+        IPointerClickHandler, 
+        IPointerEnterHandler,
+        IPointerExitHandler,
+        IPointerDownHandler, 
+        IPointerUpHandler where T : StyleProperty, new()
     {
         #region Private Variables
 
         [SerializeField]
         protected SpinnerMode m_SpinnerMode = SpinnerMode.AutoDetect;
         [SerializeField]
+        protected bool m_OpenDialogAsync = true;
+        [SerializeField]
+        protected Vector2 m_DropdownOffset = new Vector2(0, 0);
+        [SerializeField]
         protected Vector2 m_DropdownExpandPivot = new Vector2(0, 0);
         [SerializeField]
         protected Vector2 m_DropdownFramePivot = new Vector2(0, 1);
         [SerializeField]
         protected Vector2 m_DropdownFramePreferredSize = new Vector2(-1, -1);
+        [SerializeField]
+        protected SpinnerUIEventTriggerMode m_UIShowTriggerMode = SpinnerUIEventTriggerMode.OnPointerClick;
+        [SerializeField]
+        protected SpinnerUIEventTriggerMode m_UIHideTriggerMode = SpinnerUIEventTriggerMode.None;
 
         #endregion
 
@@ -43,6 +61,48 @@ namespace MaterialUI
         #endregion
 
         #region Public Properties
+
+        public virtual bool OpenDialogAsync
+        {
+            get
+            {
+                return m_OpenDialogAsync;
+            }
+            set
+            {
+                if (m_OpenDialogAsync == value)
+                    return;
+                m_OpenDialogAsync = value;
+            }
+        }
+
+        public virtual SpinnerUIEventTriggerMode uiShowTriggerMode
+        {
+            get
+            {
+                return m_UIShowTriggerMode;
+            }
+            set
+            {
+                if (m_UIShowTriggerMode == value)
+                    return;
+                m_UIShowTriggerMode = value;
+            }
+        }
+
+        public virtual SpinnerUIEventTriggerMode uiHideTriggerMode
+        {
+            get
+            {
+                return m_UIHideTriggerMode;
+            }
+            set
+            {
+                if (m_UIHideTriggerMode == value)
+                    return;
+                m_UIHideTriggerMode = value;
+            }
+        }
 
         public SpinnerMode spinnerMode
         {
@@ -70,6 +130,19 @@ namespace MaterialUI
             }
         }
 
+        public Vector2 dropdownOffset
+        {
+            get
+            {
+                return m_DropdownOffset;
+            }
+
+            set
+            {
+                m_DropdownOffset = value;
+            }
+        }
+
         public Vector2 dropdownFramePivot
         {
             get
@@ -93,14 +166,6 @@ namespace MaterialUI
             set
             {
                 m_DropdownFramePreferredSize = value;
-            }
-        }
-
-        public virtual MaterialButton button
-        {
-            get
-            {
-                return GetComponent<MaterialButton>();
             }
         }
 
@@ -141,6 +206,51 @@ namespace MaterialUI
         }
 
 #endif
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            var isExpand = IsExpanded();
+            if (!isExpand && uiShowTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerClick))
+                Show();
+            if (isExpand && uiHideTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerClick))
+                Hide();
+
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            var isExpand = IsExpanded();
+            if (!isExpand && uiShowTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerEnter))
+                Show();
+            if (isExpand && uiHideTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerEnter))
+                Hide();
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            var isExpand = IsExpanded();
+            if (!isExpand && uiShowTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerExit))
+                Show();
+            if (isExpand && uiHideTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerExit))
+                Hide();
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            var isExpand = IsExpanded();
+            if (!isExpand && uiShowTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerDown))
+                Show();
+            if (isExpand && uiHideTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerDown))
+                Hide();
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            var isExpand = IsExpanded();
+            if (!isExpand && uiShowTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerUp))
+                Show();
+            if (isExpand && uiHideTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerUp))
+                Hide();
+        }
 
         #endregion
 
@@ -157,7 +267,7 @@ namespace MaterialUI
             SetStylePropertyColorsActive_Internal(p_canAnimate, 0);
         }
 
-        protected bool IsDialogMode()
+        protected virtual bool IsDialogMode()
         {
             return m_SpinnerMode == SpinnerMode.Dialog ||
 #if (UNITY_ANDROID || UNITY_IOS) && UNITY_EDITOR
@@ -167,7 +277,7 @@ namespace MaterialUI
 #endif
         }
 
-        protected void ShowFrameActivity<TFrame>(TFrame cachedFrame, string dialogPrefabPath, System.Action<TFrame, bool> initializeCallback) where TFrame : MaterialDialogFrame
+        protected virtual void ShowFrameActivity<TFrame>(TFrame cachedFrame, string dialogPrefabPath, System.Action<TFrame, bool> initializeCallback) where TFrame : MaterialDialogFrame
         {
             if (IsDialogMode())
             {
@@ -179,14 +289,16 @@ namespace MaterialUI
                         cachedFrame.activity.Hide();
                     }
 
-                    //DialogManager.ShowRadioListAsync(options.ToArray(), Select, "OK", hintOption.text, hintOption.imageData, HandleOnHide, "Cancel", selectedIndex, false,
-
-                    DialogManager.ShowCustomDialogAsync<TFrame>(dialogPrefabPath,
-                        (dialog) =>
-                        {
-                            if(initializeCallback != null)
-                                initializeCallback(dialog, true);
-                        });
+                    System.Action<TFrame> initDelegate = (dialog) =>
+                    {
+                        cachedFrame = dialog;
+                        if (initializeCallback != null)
+                            initializeCallback(dialog, true);
+                    };
+                    if (m_OpenDialogAsync)
+                        DialogManager.ShowCustomDialogAsync<TFrame>(dialogPrefabPath, initDelegate);
+                    else
+                        DialogManager.ShowCustomDialog<TFrame>(dialogPrefabPath, initDelegate);
                 }
                 else
                 {
@@ -221,12 +333,18 @@ namespace MaterialUI
             }
         }
 
-        protected MaterialSpinnerActivity CreateSpinnerActivity(MaterialFrame frame)
+        protected virtual MaterialSpinnerActivity CreateSpinnerActivity(MaterialFrame frame)
         {
             if (frame == null)
                 return null;
 
             MaterialSpinnerActivity activity = new GameObject(frame.name + " (SpinnerActivity)").AddComponent<MaterialSpinnerActivity>();
+
+            //Setup Has Background
+            MaterialDialogCompat dialogFrame = frame as MaterialDialogCompat;
+            if (dialogFrame != null)
+                activity.hasBackground = dialogFrame.hasBackground;
+
             if (DialogManager.rectTransform != null)
                 activity.Build(DialogManager.rectTransform);
             else
@@ -249,14 +367,10 @@ namespace MaterialUI
         protected virtual void RegisterEvents()
         {
             UnregisterEvents();
-            if (button != null)
-                button.onClick.AddListener(Show);
         }
 
         protected virtual void UnregisterEvents()
         {
-            if (button != null)
-                button.onClick.RemoveListener(Show);
         }
 
         #endregion

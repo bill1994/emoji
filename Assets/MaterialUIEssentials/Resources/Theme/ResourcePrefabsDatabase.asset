@@ -30,6 +30,11 @@ MonoBehaviour:
       type: 3}
     m_assetPath: Dialogs/DialogBanner
     m_keepLoaded: 0
+  - m_name: DialogTooltip
+    m_asset: {fileID: 489887906161439479, guid: e831c768ff0bf8c43a7a200f7c4d198f,
+      type: 3}
+    m_assetPath: Dialogs/DialogTooltip
+    m_keepLoaded: 0
   - m_name: DialogAlert
     m_asset: {fileID: 193894, guid: 668b7bfac0563492aa60fa0fa8348791, type: 3}
     m_assetPath: Dialogs/DialogAlert

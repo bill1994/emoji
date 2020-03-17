@@ -701,6 +701,39 @@ namespace MaterialUI
 
         #region Custom Dialog
 
+        public static T ShowCustomDialog<T>(string dialogPrefabPath, System.Action<T> initializeCallback) where T : MaterialDialogFrame
+        {
+            return ShowCustomDialog(dialogPrefabPath, initializeCallback, false);
+        }
+
+        public static T ShowModalCustomDialog<T>(string dialogPrefabPath, System.Action<T> initializeCallback) where T : MaterialDialogFrame
+        {
+            return ShowCustomDialog(dialogPrefabPath, initializeCallback, true);
+        }
+
+        protected static T ShowCustomDialog<T>(string dialogPrefabPath, System.Action<T> initializeCallback, bool m_isModal) where T : MaterialDialogFrame
+        {
+            System.Action<T> internalShowCallback = (dialog) =>
+            {
+                if (dialog != null)
+                {
+                    //Init
+                    if (initializeCallback != null)
+                        initializeCallback.Invoke(dialog);
+                    if (m_isModal)
+                        dialog.ShowModal();
+                    else
+                        dialog.Show();
+                }
+            };
+
+            var createdDialog = CreateCustomDialog<T>(dialogPrefabPath);
+            if (createdDialog != null)
+                internalShowCallback(createdDialog);
+
+            return createdDialog;
+        }
+
         public static void ShowCustomDialogAsync<T>(string dialogPrefabPath, System.Action<T> initializeCallback, DialogProgress progressIndicator = null) where T : MaterialDialogFrame
         {
             ShowCustomDialogAsync(dialogPrefabPath, initializeCallback, false, progressIndicator);
