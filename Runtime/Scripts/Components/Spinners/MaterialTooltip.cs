@@ -21,7 +21,7 @@ namespace MaterialUI
 
         #region Private Variables
 
-        [SerializeField]
+        [SerializeField, TextArea]
         string m_TipText = "";
         [SerializeField]
         VectorImageData m_TipImageData = null;
