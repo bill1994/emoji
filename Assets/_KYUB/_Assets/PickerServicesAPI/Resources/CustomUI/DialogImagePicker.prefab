@@ -72,6 +72,8 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+  m_ForceExpandMode: 0
+  m_ReverseOrder: 0
   m_IsVertical: 1
 --- !u!1 &1157834177274973477
 GameObject:
@@ -312,13 +314,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 32
-  m_ScaledSize: 32
   m_SizeMode: 0
   m_VectorImageData:
     m_Glyph:
       m_Name: camera_alt
       m_Unicode: \ue3b0
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &1158255143123366525
 GameObject:
   m_ObjectHideFlags: 0
@@ -433,8 +435,8 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 3
-  m_firstOverflowCharacterIndex: -1
+  m_overflowMode: 0
+  m_firstOverflowCharacterIndex: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_isTextTruncated: 0
@@ -609,15 +611,14 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 1261728200530772581}
   m_MaterialRipple: {fileID: 1261472561925745929}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 1384221828396596687}
   m_Icon: {fileID: 1261603541501028181}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 1261327530129985591}
   m_Text: {fileID: 1261663529328474451}
   m_Interactable: 1
   m_ContentPadding: {x: 32, y: 26}
-  m_ContentSize: {x: 48.78, y: 43.4}
-  m_Size: {x: 80.78, y: 69.4}
+  m_ContentSize: {x: 48.77, y: 43.4}
+  m_Size: {x: 80.770004, y: 69.4}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -765,6 +766,8 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+  m_ForceExpandMode: 0
+  m_ReverseOrder: 0
   m_IsVertical: 1
 --- !u!1 &4926871014378238581
 GameObject:
@@ -877,15 +880,14 @@ MonoBehaviour:
   m_ButtonObject: {fileID: 1679707208931045640}
   m_MaterialRipple: {fileID: 3267243269012183010}
   m_MaterialShadow: {fileID: 0}
-  m_CanvasGroup: {fileID: 647425500079968024}
   m_Icon: {fileID: 8632050883630111834}
   m_ShadowsCanvasGroup: {fileID: 0}
   m_BackgroundImage: {fileID: 520697674204541148}
   m_Text: {fileID: 4141205457687728852}
   m_Interactable: 1
   m_ContentPadding: {x: 32, y: 26}
-  m_ContentSize: {x: 43.73, y: 43.4}
-  m_Size: {x: 75.729996, y: 69.4}
+  m_ContentSize: {x: 43.72, y: 43.4}
+  m_Size: {x: 75.72, y: 69.4}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -1732,13 +1734,13 @@ MonoBehaviour:
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   m_Size: 32
-  m_ScaledSize: 32
   m_SizeMode: 0
   m_VectorImageData:
     m_Glyph:
       m_Name: image
       m_Unicode: \ue3f4
     m_Font: {fileID: 11400000, guid: ff83dcb59aa011740922d36a8007e654, type: 2}
+  m_IncludeInLayoutWhenEmpty: 1
 --- !u!1 &9084662273091216235
 GameObject:
   m_ObjectHideFlags: 0
@@ -1838,8 +1840,8 @@ MonoBehaviour:
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMin: 12
+  m_fontSizeMax: 14
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -1853,8 +1855,8 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 3
-  m_firstOverflowCharacterIndex: -1
+  m_overflowMode: 0
+  m_firstOverflowCharacterIndex: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_isTextTruncated: 0
