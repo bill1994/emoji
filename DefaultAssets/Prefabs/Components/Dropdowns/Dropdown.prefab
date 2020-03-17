@@ -21,6 +21,8 @@ MonoBehaviour:
   m_DropdownExpandPivot: {x: 0, y: 0}
   m_DropdownFramePivot: {x: 0, y: 1}
   m_DropdownFramePreferredSize: {x: -1, y: -1}
+  m_UIShowTriggerMode: 16
+  m_UIHideTriggerMode: 0
   OnCancelCallback:
     m_PersistentCalls:
       m_Calls: []

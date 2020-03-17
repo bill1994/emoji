@@ -15,7 +15,12 @@ namespace MaterialUI
     [CustomEditor(typeof(MaterialMultiDropdown))]
     public class MaterialMultiDropdownEditor : BaseStyleElementEditor
     {
+        private SerializedProperty m_UIShowTriggerMode;
+        private SerializedProperty m_UIHideTriggerMode;
+
         private SerializedProperty m_SpinnerMode;
+        private SerializedProperty m_OpenDialogAsync;
+        private SerializedProperty m_DropdownOffset;
         private SerializedProperty m_DropdownExpandPivot;
         private SerializedProperty m_DropdownFramePivot;
         private SerializedProperty m_DropdownFramePreferredSize;
@@ -45,7 +50,12 @@ namespace MaterialUI
             m_HintOption = serializedObject.FindProperty("m_HintOption");
             m_MixedOption = serializedObject.FindProperty("m_MixedOption");
 
+            m_UIShowTriggerMode = serializedObject.FindProperty("m_UIShowTriggerMode");
+            m_UIHideTriggerMode = serializedObject.FindProperty("m_UIHideTriggerMode");
+
             m_SpinnerMode = serializedObject.FindProperty("m_SpinnerMode");
+            m_OpenDialogAsync = serializedObject.FindProperty("m_OpenDialogAsync");
+            m_DropdownOffset = serializedObject.FindProperty("m_DropdownOffset");
             m_DropdownExpandPivot = serializedObject.FindProperty("m_DropdownExpandPivot");
             m_DropdownFramePivot = serializedObject.FindProperty("m_DropdownFramePivot");
             m_DropdownFramePreferredSize = serializedObject.FindProperty("m_DropdownFramePreferredSize");
@@ -72,6 +82,10 @@ namespace MaterialUI
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+
+            EditorGUILayout.PropertyField(m_UIShowTriggerMode);
+            EditorGUILayout.PropertyField(m_UIHideTriggerMode);
+            EditorGUILayout.Space();
 
             var optionsArray = m_OptionDataList.FindPropertyRelative("m_Options");
             var arraySize = optionsArray.arraySize;
@@ -144,14 +158,22 @@ namespace MaterialUI
             EditorGUILayout.PropertyField(m_CustomFramePrefabAddress, new GUIContent("Custom Address"));
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(m_SpinnerMode);
+
+            EditorGUI.indentLevel++;
             if (m_SpinnerMode.enumValueIndex != 1)
             {
-                EditorGUI.indentLevel++;
+                LayoutStyle_PropertyField(m_DropdownOffset);
                 LayoutStyle_PropertyField(m_DropdownExpandPivot);
                 LayoutStyle_PropertyField(m_DropdownFramePivot);
                 LayoutStyle_PropertyField(m_DropdownFramePreferredSize);
-                EditorGUI.indentLevel--;
+
             }
+            if (m_SpinnerMode.enumValueIndex != 2)
+            {
+                LayoutStyle_PropertyField(m_OpenDialogAsync);
+            }
+            EditorGUI.indentLevel--;
+
             EditorGUILayout.Space();
             DrawFoldoutComponents(ComponentsSection);
 

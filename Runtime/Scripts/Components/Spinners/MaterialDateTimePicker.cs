@@ -212,22 +212,10 @@ namespace MaterialUI
 
         #region Unity Functions
 
-        protected override void OnEnable()
-        {
-            RegisterEvents();
-            base.OnEnable();
-        }
-
         protected override void Start()
         {
             base.Start();
             Init();
-        }
-
-        protected override void OnDisable()
-        {
-            UnregisterEvents();
-            base.OnDisable();
         }
 
 #if UNITY_EDITOR

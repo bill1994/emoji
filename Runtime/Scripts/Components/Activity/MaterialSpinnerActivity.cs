@@ -13,6 +13,8 @@ namespace MaterialUI
         [SerializeField]
         MaterialFrame m_Frame = null;
         [Space]
+        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_AutoCreateBackground")]
+        bool m_HasBackground = true;
         [SerializeField]
         MaterialActivityBackground m_Background = null;
 
@@ -40,6 +42,18 @@ namespace MaterialUI
                 UnregisterBackgroundEvents();
                 m_Background = value;
                 RegisterBackgroundEvents();
+                ApplyBackgroundVisibility();
+            }
+        }
+
+        public bool hasBackground
+        {
+            get { return m_HasBackground; }
+            set
+            {
+                if (m_HasBackground == value)
+                    return;
+                m_HasBackground = value;
                 ApplyBackgroundVisibility();
             }
         }
@@ -116,7 +130,10 @@ namespace MaterialUI
 
         public virtual void RecalculatePosition(IBaseSpinner spinner)
         {
-            var frameAnchoredPosition = spinner != null && !spinner.IsDestroyed() && spinner.rectTransform != null ? spinner.rectTransform.TransformPoint(Rect.NormalizedToPoint(spinner.rectTransform.rect, spinner.dropdownExpandPivot)) : Vector3.zero;
+            var frameAnchoredPosition = spinner != null && !spinner.IsDestroyed() && spinner.rectTransform != null ? 
+                spinner.rectTransform.TransformPoint(Rect.NormalizedToPoint(spinner.rectTransform.rect, spinner.dropdownExpandPivot) + spinner.dropdownOffset) : 
+                Vector3.zero;
+
             var spinnerMinSize = spinner.rectTransform != null ? spinner.rectTransform.GetProperSize() : Vector2.zero;
             var spinnerPreferredSize = spinner.rectTransform != null ? spinner.dropdownFramePreferredSize : Vector2.zero;
             RecalculatePosition(frameAnchoredPosition, spinner.dropdownFramePivot, spinnerMinSize, spinnerPreferredSize);
@@ -360,39 +377,42 @@ namespace MaterialUI
             if (this == null)
                 return;
 
-            if (m_Background == null)
+            if (m_HasBackground)
             {
-                m_Background = new GameObject("Background").AddComponent<MaterialActivityBackground>();
-                var bgImage = m_Background.gameObject.AddComponent<Image>();
-                bgImage.color = new Color(0, 0, 0, 0);
-                m_Background.targetGraphic = bgImage;
-
-                m_Background.transform.SetParent(this.rectTransform);
-                Inflate(m_Background.transform as RectTransform, true);
-                m_Background.transform.SetAsFirstSibling();
-                m_Background.transition = Selectable.Transition.None;
-
-                var frameAnimator = m_Background.gameObject.AddComponent<EasyFrameAnimator>();
-                frameAnimator.fadeIn = true;
-                frameAnimator.fadeOut = true;
-            }
-            //Object from another scene or this is not hierarchy child (template object?)
-            else if (m_Background.gameObject.scene != this.gameObject.scene ||
-              (m_Background.transform.parent != this.transform && m_Background.transform != this.transform))
-            {
-                var oldBackground = m_Background;
-                UnregisterBackgroundEvents();
-                m_Background = GameObject.Instantiate(m_Background, this.rectTransform);
-                Inflate(m_Background.transform as RectTransform, true);
-                m_Background.transform.SetAsFirstSibling();
-                m_Background.transition = Selectable.Transition.None;
-                oldBackground.gameObject.SetActive(false);
-
-                if (m_Background.tweener == null)
+                if (m_Background == null)
                 {
-                    var frameAnimator = m_Background.gameObject.GetAddComponent<EasyFrameAnimator>();
+                    m_Background = new GameObject("Background").AddComponent<MaterialActivityBackground>();
+                    var bgImage = m_Background.gameObject.AddComponent<Image>();
+                    bgImage.color = new Color(0, 0, 0, 0);
+                    m_Background.targetGraphic = bgImage;
+
+                    m_Background.transform.SetParent(this.rectTransform);
+                    Inflate(m_Background.transform as RectTransform, true);
+                    m_Background.transform.SetAsFirstSibling();
+                    m_Background.transition = Selectable.Transition.None;
+
+                    var frameAnimator = m_Background.gameObject.AddComponent<EasyFrameAnimator>();
                     frameAnimator.fadeIn = true;
                     frameAnimator.fadeOut = true;
+                }
+                //Object from another scene or this is not hierarchy child (template object?)
+                else if (m_Background.gameObject.scene != this.gameObject.scene ||
+                  (m_Background.transform.parent != this.transform && m_Background.transform != this.transform))
+                {
+                    var oldBackground = m_Background;
+                    UnregisterBackgroundEvents();
+                    m_Background = GameObject.Instantiate(m_Background, this.rectTransform);
+                    Inflate(m_Background.transform as RectTransform, true);
+                    m_Background.transform.SetAsFirstSibling();
+                    m_Background.transition = Selectable.Transition.None;
+                    oldBackground.gameObject.SetActive(false);
+
+                    if (m_Background.tweener == null)
+                    {
+                        var frameAnimator = m_Background.gameObject.GetAddComponent<EasyFrameAnimator>();
+                        frameAnimator.fadeIn = true;
+                        frameAnimator.fadeOut = true;
+                    }
                 }
             }
 
@@ -407,12 +427,15 @@ namespace MaterialUI
                 //Same as Activity
                 if (m_Background.transform == this.transform)
                 {
-                    RegisterBackgroundEvents();
+                    if (m_HasBackground)
+                        RegisterBackgroundEvents();
+                    else
+                        UnregisterBackgroundEvents();
                 }
                 else
                 {
                     RegisterBackgroundEvents();
-                    m_Background.gameObject.SetActive(true);
+                    m_Background.gameObject.SetActive(m_HasBackground);
                 }
             }
             else if (m_Background != null)

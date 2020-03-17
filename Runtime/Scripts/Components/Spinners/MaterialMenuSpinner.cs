@@ -73,7 +73,6 @@ namespace MaterialUI
             base.OnValidate();
             ClearCache(false);
         }
-
 #endif
 
         #endregion

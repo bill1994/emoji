@@ -69,7 +69,6 @@ namespace MaterialUI
             }
         }
 
-
         #endregion
 
         #region Unity Functions
