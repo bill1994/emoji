@@ -18,7 +18,7 @@ namespace MaterialUI.Extensions
             if (objectToCheck != null)
             {
                 Type type = objectToCheck.GetType();
-                MethodInfo methodInfo = MaterialPortableReflection.GetDeclaredMethod(type, methodName);
+                MethodInfo methodInfo = MaterialPortableReflection.GetFamilyMethod(type, methodName);
                 if (methodInfo != null)
                 {
                     methodInfo.Invoke(objectToCheck, parameters);
