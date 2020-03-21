@@ -1000,8 +1000,14 @@ namespace Kyub.Performance
 
                 if (!v_instance._isHighPerformance || !v_instance.m_safeRefreshMode)
                     v_instance._performanceIsDirty = true;
-                //else
-                //    v_instance.SetLowPerformanceDelayed(v_instance.m_autoDisableHighPerformanceTime);
+                else if (v_instance._isHighPerformance && v_instance._routineSetHighPerformance == null)
+                {
+                    var autoDisableTime = Mathf.Max(0.1f, v_instance.m_autoDisableHighPerformanceTime);
+                    if (v_instance._lowPerformanceWaitTime <= 0 || v_instance._routineSetLowPerformance == null)
+                        v_instance.SetLowPerformanceDelayed(autoDisableTime);
+                    else
+                        v_instance._lowPerformanceWaitTime = autoDisableTime;
+                }
             }
         }
 
