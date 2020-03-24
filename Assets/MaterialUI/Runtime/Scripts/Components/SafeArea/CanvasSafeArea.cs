@@ -108,7 +108,7 @@ namespace MaterialUI
         {
             base.OnDestroy();
             CancelInvoke();
-            s_cachedStatusBarHeight = -1;
+            ClearCachedInteropInfos();
 #if UNITY_EDITOR
             EditorSafeAreaSimulator.UnregisterSafeAreaComponent(this);
 #endif
@@ -117,7 +117,10 @@ namespace MaterialUI
         protected override void OnCanvasHierarchyChanged()
         {
             if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
+            {
+                ClearCachedInteropInfos();
                 Refresh();
+            }
         }
 
 #if UNITY_EDITOR
@@ -134,6 +137,7 @@ namespace MaterialUI
         {
             if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
             {
+                ClearCachedInteropInfos();
                 if (HasNotch() &&
                     ((m_UnsafeContent == null && m_AutoCreateUnsafeContent) ||
                     ((m_AutoReparentDirectChildren && m_Content == null) ||
@@ -170,6 +174,7 @@ namespace MaterialUI
         bool _isExecutingRefreshContentChildren = false;
         protected virtual void RefreshContentChildren()
         {
+            ClearCachedInteropInfos();
             CancelInvoke("RefreshContentChildren");
 
             _isExecutingRefreshContentChildren = true;
@@ -557,18 +562,23 @@ namespace MaterialUI
         static extern float _GetStatusBarHeight();
 #endif
 
-        public static bool IsStatusBarActiveWithLayoutStable()
+        static bool? s_cachedIsStatusBarActive = null;
+        public static bool IsStatusBarActiveWithLayoutStable(bool force = false)
         {
+            if (s_cachedIsStatusBarActive == null || force)
+            {
 #if UNITY_IPHONE && !UNITY_EDITOR
-		    return _IsIOSStatusBarActive();
+		        s_cachedIsStatusBarActive = _IsIOSStatusBarActive();
 #elif UNITY_ANDROID && !UNITY_EDITOR
-            var activity = AndroidThemeNativeUtils.GetActivity();
-            var window = AndroidThemeNativeUtils.GetWindow(activity);
+                var activity = AndroidThemeNativeUtils.GetActivity();
+                var window = AndroidThemeNativeUtils.GetWindow(activity);
 
-            return !Screen.fullScreen && AndroidThemeNativeUtils.IsStatusBarActive(window) && AndroidThemeNativeUtils.IsViewBehindBars(window);
+                s_cachedIsStatusBarActive  = !Screen.fullScreen && AndroidThemeNativeUtils.IsStatusBarActive(window) && AndroidThemeNativeUtils.IsViewBehindBars(window);
 #else
-            return false;
+                s_cachedIsStatusBarActive = false;
 #endif
+            }
+            return s_cachedIsStatusBarActive != null ? s_cachedIsStatusBarActive.Value : false;
         }
 
         static float s_cachedStatusBarHeight = -1;
@@ -586,6 +596,12 @@ namespace MaterialUI
 #endif
             }
             return s_cachedStatusBarHeight;
+        }
+
+        public static void ClearCachedInteropInfos()
+        {
+            s_cachedStatusBarHeight = -1;
+            s_cachedIsStatusBarActive = null;
         }
 
         #endregion
