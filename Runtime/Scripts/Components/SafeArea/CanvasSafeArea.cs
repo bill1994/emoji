@@ -249,6 +249,7 @@ namespace MaterialUI
             if (safeArea != _LastSafeArea || force)
             {
                 Theme.ApplyStatusBarTheme();
+                ClearCachedInteropInfos();
                 safeArea = GetSafeArea(); //useful when Theme change safe area size (when statusbar is hidden, for example)
                 ApplySafeArea(safeArea);
             }
@@ -598,7 +599,7 @@ namespace MaterialUI
             return s_cachedStatusBarHeight;
         }
 
-        public static void ClearCachedInteropInfos()
+        protected static void ClearCachedInteropInfos()
         {
             s_cachedStatusBarHeight = -1;
             s_cachedIsStatusBarActive = null;
