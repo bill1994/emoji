@@ -108,7 +108,7 @@ namespace MaterialUI
         {
             base.OnDestroy();
             CancelInvoke();
-
+            s_cachedStatusBarHeight = -1;
 #if UNITY_EDITOR
             EditorSafeAreaSimulator.UnregisterSafeAreaComponent(this);
 #endif
@@ -134,8 +134,8 @@ namespace MaterialUI
         {
             if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
             {
-                if (HasNotch() && 
-                    ((m_UnsafeContent == null && m_AutoCreateUnsafeContent) || 
+                if (HasNotch() &&
+                    ((m_UnsafeContent == null && m_AutoCreateUnsafeContent) ||
                     ((m_AutoReparentDirectChildren && m_Content == null) ||
                      (m_Content != null && !m_Content.gameObject.scene.IsValid()) ||
                      (m_Content != null && !m_Content.IsChildOf(this.transform)))
@@ -282,7 +282,6 @@ namespace MaterialUI
             Rect nsa = new Rect(0, 0, Screen.width, Screen.height);
             if (!IsRootSafeArea())
             {
-                Debug.Log("IsRootSafeArea: " + name);
                 return nsa;
             }
             else
@@ -297,7 +296,7 @@ namespace MaterialUI
                 }
                 else if (IsStatusBarActiveWithLayoutStable() && Screen.safeArea == nsa)
                 {
-                    //This is the size of statusbar in IOS without notch
+                    //This is the size of statusbar in IOS/Android without notch
                     safeArea.height = Mathf.Max(0, safeArea.height - GetStatusBarHeight());
                 }
 
@@ -572,16 +571,21 @@ namespace MaterialUI
 #endif
         }
 
-        public static float GetStatusBarHeight()
+        static float s_cachedStatusBarHeight = -1;
+        public static float GetStatusBarHeight(bool force = false)
         {
+            if (s_cachedStatusBarHeight < 0 || force)
+            {
 #if UNITY_IPHONE && !UNITY_EDITOR
-		    return _GetStatusBarHeight();
+		        s_cachedStatusBarHeight = _GetStatusBarHeight();
 #elif UNITY_ANDROID && UNITY_2019_1_OR_NEWER && !UNITY_EDITOR
-            var activity = AndroidThemeNativeUtils.GetActivity();
-            return AndroidThemeNativeUtils.GetStatusBarHeight(activity);
+                var activity = AndroidThemeNativeUtils.GetActivity();
+                s_cachedStatusBarHeight = AndroidThemeNativeUtils.GetStatusBarHeight(activity);
 #else
-            return 0;
+                s_cachedStatusBarHeight = 0;
 #endif
+            }
+            return s_cachedStatusBarHeight;
         }
 
         #endregion
