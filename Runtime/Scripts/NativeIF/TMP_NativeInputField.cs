@@ -61,8 +61,27 @@ namespace Kyub.UI
         {
             base.OnEnable();
             CheckAsteriskChar();
-            MobileInputBehaviour v_nativeBox = GetComponent<MobileInputBehaviour>();
 
+            var webglInput = GetComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
+            if (Application.platform == RuntimePlatform.WebGLPlayer && !TouchScreenKeyboard.isSupported)
+            {
+                if (webglInput == null && Application.isPlaying)
+                    webglInput = gameObject.AddComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
+            }
+            //Not Supported Platform for WebGLInput
+            else
+            {
+                if (Application.isPlaying)
+                {
+                    if (webglInput != null)
+                    {
+                        Debug.LogWarning("[TMP_NativeInputField] WebglInput Not Supported Platform (sender " + name + ")");
+                        GameObject.Destroy(webglInput);
+                    }
+                }
+            }
+
+            MobileInputBehaviour v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (MobileInputBehaviour.IsSupported())
             {
                 if (v_nativeBox == null && Application.isPlaying)
@@ -114,9 +133,15 @@ namespace Kyub.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
+
+            var webglInput = GetComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
+            if (webglInput != null)
+                webglInput.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
+
             var v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (v_nativeBox != null)
                 v_nativeBox.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
+
             UnregisterEvents();
         }
 
