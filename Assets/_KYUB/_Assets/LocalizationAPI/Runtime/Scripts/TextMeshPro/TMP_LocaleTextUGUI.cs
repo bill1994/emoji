@@ -272,7 +272,15 @@ namespace Kyub.Localization.UI
             return base.GetTextInfo(text);
         }
 
-#if TMP_2_1_0_PREVIEW_3_OR_NEWER
+#if TMP_2_1_0_PREVIEW_8_OR_NEWER
+        protected override Vector2 CalculatePreferredValues(ref float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing, bool isWordWrappingEnabled)
+        {
+            if (_localeParsingRequired)
+                ParseInputTextAndLocalizeTags();
+
+            return base.CalculatePreferredValues(ref defaultFontSize, marginSize, ignoreTextAutoSizing, isWordWrappingEnabled);
+        }
+#elif TMP_2_1_0_PREVIEW_3_OR_NEWER
         protected override Vector2 CalculatePreferredValues(float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing, bool isWordWrappingEnabled)
         {
             if (_localeParsingRequired)
