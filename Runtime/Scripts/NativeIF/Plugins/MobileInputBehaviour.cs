@@ -39,6 +39,7 @@ namespace MobileInputNativePlugin
         void RecreateKeyboard();
         void ActivateInputField();
         void DeactivateInputField();
+        void ProcessEvent(Event e);
         bool IsDestroyed();
     }
 

@@ -523,18 +523,6 @@ namespace Kyub.UI
             }
         }
 
-        protected void SendOnValueChangedAndUpdateLabel()
-        {
-            UpdateLabel();
-            SendOnValueChanged();
-        }
-
-        protected void SendOnValueChanged()
-        {
-            if (onValueChanged != null)
-                onValueChanged.Invoke(text);
-        }
-
         protected void MarkGeometryAsDirty()
         {
 #if UNITY_EDITOR
@@ -594,21 +582,8 @@ namespace Kyub.UI
 
             return count;
         }
-
-        protected bool InPlaceEditing()
-        {
-            if (TouchKeyboardAllowsInPlaceEditing || (TouchScreenKeyboard.isSupported && (Application.platform == RuntimePlatform.WSAPlayerX86 || Application.platform == RuntimePlatform.WSAPlayerX64 || Application.platform == RuntimePlatform.WSAPlayerARM)))
-                return true;
-
-            if (TouchScreenKeyboard.isSupported && shouldHideSoftKeyboard)
-                return true;
-
-            if (TouchScreenKeyboard.isSupported && shouldHideSoftKeyboard == false && shouldHideMobileInput == false)
-                return false;
-
-            return true;
-        }
 #endif
+
         #endregion
 
         #region Internal Compat Fields
@@ -861,25 +836,6 @@ namespace Kyub.UI
                     m_PointerDownClickStartTimeInfo = typeof(TMPro.TMP_InputField).GetField("m_PointerDownClickStartTime", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
                 if (m_PointerDownClickStartTimeInfo != null)
                     m_PointerDownClickStartTimeInfo.SetValue(this, value);
-            }
-        }
-
-        System.Reflection.FieldInfo m_TouchKeyboardAllowsInPlaceEditingInfo = null;
-        protected bool TouchKeyboardAllowsInPlaceEditing
-        {
-            get
-            {
-                if (m_TouchKeyboardAllowsInPlaceEditingInfo == null)
-                    m_TouchKeyboardAllowsInPlaceEditingInfo = typeof(TMPro.TMP_InputField).GetField("m_TouchKeyboardAllowsInPlaceEditing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_TouchKeyboardAllowsInPlaceEditingInfo.GetValue(this);
-                return value is bool ? (bool)value : false;
-            }
-            set
-            {
-                if (m_TouchKeyboardAllowsInPlaceEditingInfo == null)
-                    m_TouchKeyboardAllowsInPlaceEditingInfo = typeof(TMPro.TMP_InputField).GetField("m_TouchKeyboardAllowsInPlaceEditing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                if (m_TouchKeyboardAllowsInPlaceEditingInfo != null)
-                    m_TouchKeyboardAllowsInPlaceEditingInfo.SetValue(this, value);
             }
         }
 #endif
