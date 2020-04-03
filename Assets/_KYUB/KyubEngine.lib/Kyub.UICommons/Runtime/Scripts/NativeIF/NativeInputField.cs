@@ -77,8 +77,27 @@ namespace Kyub.UI
         {
             base.OnEnable();
             CheckAsteriskChar();
-            MobileInputBehaviour v_nativeBox = GetComponent<MobileInputBehaviour>();
 
+            var webglInput = GetComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
+            if (Application.platform == RuntimePlatform.WebGLPlayer && !TouchScreenKeyboard.isSupported)
+            {
+                if (webglInput == null && Application.isPlaying)
+                    webglInput = gameObject.AddComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
+            }
+            //Not Supported Platform for WebGLInput
+            else
+            {
+                if (Application.isPlaying)
+                {
+                    if (webglInput != null)
+                    {
+                        Debug.LogWarning("[NativeInputField] WebglInput Not Supported Platform (sender " + name + ")");
+                        GameObject.Destroy(webglInput);
+                    }
+                }
+            }
+
+            MobileInputBehaviour v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (MobileInputBehaviour.IsSupported())
             {
                 if (v_nativeBox == null && Application.isPlaying)
@@ -111,9 +130,15 @@ namespace Kyub.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
+
+            var webglInput = GetComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
+            if (webglInput != null)
+                webglInput.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
+
             var v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (v_nativeBox != null)
                 v_nativeBox.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
+
             UnregisterEvents();
         }
 
@@ -193,9 +218,9 @@ namespace Kyub.UI
             CheckAsteriskChar();
         }
 
-        #endregion
+#endregion
 
-        #region Helper Functions
+#region Helper Functions
 
         /// <summary>
         /// Force update text in Native Keyboard
@@ -224,9 +249,9 @@ namespace Kyub.UI
                 v_nativeBox.RecreateNativeEdit();
         }
 
-        #endregion
+#endregion
 
-        #region Receivers
+#region Receivers
 
         protected virtual void HandleOnReturnPressed()
         {
@@ -234,9 +259,9 @@ namespace Kyub.UI
                 OnReturnPressed.Invoke();
         }
 
-        #endregion
+#endregion
 
-        #region Internal Helper Functions
+#region Internal Helper Functions
 
         protected virtual void CheckAsteriskChar()
         {
@@ -301,9 +326,9 @@ namespace Kyub.UI
             return v_isSupported;
         }
 
-        #endregion
+#endregion
 
-        #region Internal Rebuild Geometry Funtions
+#region Internal Rebuild Geometry Funtions
 
         public override void Rebuild(CanvasUpdate update)
         {
@@ -375,9 +400,9 @@ namespace Kyub.UI
             }
         }
 
-        #endregion
+#endregion
 
-        #region Caret Important Functions
+#region Caret Important Functions
 
         protected void GenerateCaret(VertexHelper vbo, Vector2 roundingOffset)
         {
@@ -443,9 +468,9 @@ namespace Kyub.UI
             return generator.lineCount - 1;
         }
 
-        #endregion
+#endregion
 
-        #region Internal Important Functions
+#region Internal Important Functions
 
         // Change the button to the correct state
         System.Reflection.MethodInfo m_EvaluateAndTransitionToSelectionStateInfo = null;
@@ -529,9 +554,9 @@ namespace Kyub.UI
                 m_SetCaretVisibleInfo.Invoke(this, null);
         }
 
-        #endregion
+#endregion
 
-        #region Internal Important Fields
+#region Internal Important Fields
 
         protected BaseInput input
         {
@@ -694,9 +719,9 @@ namespace Kyub.UI
             }
         }
 
-        #endregion
+#endregion
 
-        #region INativeInputField Extra Implementations
+#region INativeInputField Extra Implementations
 
         UnityEvent<string> INativeInputField.onValueChanged
         {
@@ -730,6 +755,6 @@ namespace Kyub.UI
             }
         }
 
-        #endregion
+#endregion
     }
 }
