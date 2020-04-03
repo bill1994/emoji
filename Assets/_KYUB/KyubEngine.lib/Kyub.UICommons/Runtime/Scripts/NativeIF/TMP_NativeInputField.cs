@@ -62,25 +62,6 @@ namespace Kyub.UI
             base.OnEnable();
             CheckAsteriskChar();
 
-            var webglInput = GetComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
-            if (Application.platform == RuntimePlatform.WebGLPlayer && !TouchScreenKeyboard.isSupported)
-            {
-                if (webglInput == null && Application.isPlaying)
-                    webglInput = gameObject.AddComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
-            }
-            //Not Supported Platform for WebGLInput
-            else
-            {
-                if (Application.isPlaying)
-                {
-                    if (webglInput != null)
-                    {
-                        Debug.LogWarning("[TMP_NativeInputField] WebglInput Not Supported Platform (sender " + name + ")");
-                        GameObject.Destroy(webglInput);
-                    }
-                }
-            }
-
             MobileInputBehaviour v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (MobileInputBehaviour.IsSupported())
             {
@@ -133,10 +114,6 @@ namespace Kyub.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-
-            var webglInput = GetComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
-            if (webglInput != null)
-                webglInput.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
 
             var v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (v_nativeBox != null)
@@ -268,6 +245,180 @@ namespace Kyub.UI
         {
             if (OnReturnPressed != null)
                 OnReturnPressed.Invoke();
+        }
+
+        #endregion
+
+        #region Clipboard Overriden Functions
+
+        public new virtual void ProcessEvent(Event e)
+        {
+            KeyPressed(e);
+        }
+
+        protected new virtual EditState KeyPressed(Event evt)
+        {
+            // We must override base event for clipboard actions
+            var currentEventModifiers = evt.modifiers;
+            bool ctrl = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ? (currentEventModifiers & EventModifiers.Command) != 0 : (currentEventModifiers & EventModifiers.Control) != 0;
+            bool shift = (currentEventModifiers & EventModifiers.Shift) != 0;
+            bool alt = (currentEventModifiers & EventModifiers.Alt) != 0;
+            bool ctrlOnly = ctrl && !alt && !shift;
+
+            switch (evt.keyCode)
+            {
+                // Copy
+                case KeyCode.C:
+                    {
+                        if (ctrlOnly)
+                        {
+                            if (inputType != InputType.Password)
+                                clipboard = GetSelectedString();
+                            else
+                                clipboard = "";
+                            return EditState.Continue;
+                        }
+                        break;
+                    }
+
+                // Paste
+                case KeyCode.V:
+                    {
+                        if (ctrlOnly)
+                        {
+                            Append(clipboard);
+                            return EditState.Continue;
+                        }
+                        break;
+                    }
+
+                // Cut
+                case KeyCode.X:
+                    {
+                        if (ctrlOnly)
+                        {
+                            if (inputType != InputType.Password)
+                                clipboard = GetSelectedString();
+                            else
+                                clipboard = "";
+                            Delete();
+                            UpdateTouchKeyboardFromEditChanges();
+                            SendOnValueChangedAndUpdateLabel();
+                            return EditState.Continue;
+                        }
+                        break;
+                    }
+            }
+
+            return base.KeyPressed(evt);
+        }
+
+        protected virtual string GetSelectedString()
+        {
+            if (!HasSelection)
+                return "";
+
+            int startPos = stringPositionInternal;
+            int endPos = stringSelectPositionInternal;
+
+            // Ensure pos is always less then selPos to make the code simpler
+            if (startPos > endPos)
+            {
+                int temp = startPos;
+                startPos = endPos;
+                endPos = temp;
+            }
+
+            return text.Substring(startPos, endPos - startPos);
+        }
+
+        protected virtual void UpdateTouchKeyboardFromEditChanges()
+        {
+            // Update the TouchKeyboard's text from edit changes
+            // if in-place editing is allowed
+            if (m_SoftKeyboard != null && InPlaceEditing())
+            {
+                m_SoftKeyboard.text = m_Text;
+            }
+        }
+
+        protected virtual bool InPlaceEditing()
+        {
+            if (TouchKeyboardAllowsInPlaceEditing || (TouchScreenKeyboard.isSupported && (Application.platform == RuntimePlatform.WSAPlayerX86 || Application.platform == RuntimePlatform.WSAPlayerX64 || Application.platform == RuntimePlatform.WSAPlayerARM)))
+                return true;
+
+            if (TouchScreenKeyboard.isSupported && shouldHideSoftKeyboard)
+                return true;
+
+            if (TouchScreenKeyboard.isSupported && shouldHideSoftKeyboard == false && shouldHideMobileInput == false)
+                return false;
+
+            return true;
+        }
+
+        protected virtual void Delete()
+        {
+            if (readOnly)
+                return;
+
+            if (m_StringPosition == m_StringSelectPosition)
+                return;
+
+            if (m_isRichTextEditingAllowed || m_isSelectAll)
+            {
+                // Handling of Delete when Rich Text is allowed.
+                if (m_StringPosition < m_StringSelectPosition)
+                {
+                    m_Text = text.Remove(m_StringPosition, m_StringSelectPosition - m_StringPosition);
+                    m_StringSelectPosition = m_StringPosition;
+                }
+                else
+                {
+                    m_Text = text.Remove(m_StringSelectPosition, m_StringPosition - m_StringSelectPosition);
+                    m_StringPosition = m_StringSelectPosition;
+                }
+
+                m_isSelectAll = false;
+            }
+            else
+            {
+                if (m_CaretPosition < m_CaretSelectPosition)
+                {
+                    m_StringPosition = m_TextComponent.textInfo.characterInfo[m_CaretPosition].index;
+                    m_StringSelectPosition = m_TextComponent.textInfo.characterInfo[m_CaretSelectPosition - 1].index + m_TextComponent.textInfo.characterInfo[m_CaretSelectPosition - 1].stringLength;
+
+                    m_Text = text.Remove(m_StringPosition, m_StringSelectPosition - m_StringPosition);
+
+                    m_StringSelectPosition = m_StringPosition;
+                    m_CaretSelectPosition = m_CaretPosition;
+                }
+                else
+                {
+                    m_StringPosition = m_TextComponent.textInfo.characterInfo[m_CaretPosition - 1].index + m_TextComponent.textInfo.characterInfo[m_CaretPosition - 1].stringLength;
+                    m_StringSelectPosition = m_TextComponent.textInfo.characterInfo[m_CaretSelectPosition].index;
+
+                    m_Text = text.Remove(m_StringSelectPosition, m_StringPosition - m_StringSelectPosition);
+
+                    m_StringPosition = m_StringSelectPosition;
+                    m_CaretPosition = m_CaretSelectPosition;
+                }
+            }
+
+#if TMP_DEBUG_MODE
+                Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
+#endif
+        }
+
+        protected virtual void SendOnValueChangedAndUpdateLabel()
+        {
+            UpdateLabel();
+            SendOnValueChanged();
+        }
+
+        protected virtual void SendOnValueChanged()
+        {
+            if (onValueChanged != null)
+                onValueChanged.Invoke(text);
         }
 
         #endregion
@@ -466,6 +617,37 @@ namespace Kyub.UI
         #endregion
 
         #region Internal Important Fields
+
+        protected static string clipboard
+        {
+            get
+            {
+                return Kyub.UI.ClipboardUtility.GetText();
+            }
+            set
+            {
+                Kyub.UI.ClipboardUtility.SetText(value);
+            }
+        }
+
+        System.Reflection.FieldInfo m_TouchKeyboardAllowsInPlaceEditingInfo = null;
+        protected bool TouchKeyboardAllowsInPlaceEditing
+        {
+            get
+            {
+                if (m_TouchKeyboardAllowsInPlaceEditingInfo == null)
+                    m_TouchKeyboardAllowsInPlaceEditingInfo = typeof(TMPro.TMP_InputField).GetField("m_TouchKeyboardAllowsInPlaceEditing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var value = m_TouchKeyboardAllowsInPlaceEditingInfo.GetValue(this);
+                return value is bool ? (bool)value : false;
+            }
+            set
+            {
+                if (m_TouchKeyboardAllowsInPlaceEditingInfo == null)
+                    m_TouchKeyboardAllowsInPlaceEditingInfo = typeof(TMPro.TMP_InputField).GetField("m_TouchKeyboardAllowsInPlaceEditing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                if (m_TouchKeyboardAllowsInPlaceEditingInfo != null)
+                    m_TouchKeyboardAllowsInPlaceEditingInfo.SetValue(this, value);
+            }
+        }
 
         System.Reflection.FieldInfo m_BlinkCoroutineInfo = null;
         protected Coroutine BlinkCoroutine

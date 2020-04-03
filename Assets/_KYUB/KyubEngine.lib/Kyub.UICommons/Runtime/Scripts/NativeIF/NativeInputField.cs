@@ -78,25 +78,6 @@ namespace Kyub.UI
             base.OnEnable();
             CheckAsteriskChar();
 
-            var webglInput = GetComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
-            if (Application.platform == RuntimePlatform.WebGLPlayer && !TouchScreenKeyboard.isSupported)
-            {
-                if (webglInput == null && Application.isPlaying)
-                    webglInput = gameObject.AddComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
-            }
-            //Not Supported Platform for WebGLInput
-            else
-            {
-                if (Application.isPlaying)
-                {
-                    if (webglInput != null)
-                    {
-                        Debug.LogWarning("[NativeInputField] WebglInput Not Supported Platform (sender " + name + ")");
-                        GameObject.Destroy(webglInput);
-                    }
-                }
-            }
-
             MobileInputBehaviour v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (MobileInputBehaviour.IsSupported())
             {
@@ -130,10 +111,6 @@ namespace Kyub.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-
-            var webglInput = GetComponent<MobileInputNativePlugin.WebGL.WebGLInput>();
-            if (webglInput != null)
-                webglInput.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
 
             var v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (v_nativeBox != null)
@@ -218,9 +195,9 @@ namespace Kyub.UI
             CheckAsteriskChar();
         }
 
-#endregion
+        #endregion
 
-#region Helper Functions
+        #region Helper Functions
 
         /// <summary>
         /// Force update text in Native Keyboard
@@ -249,9 +226,9 @@ namespace Kyub.UI
                 v_nativeBox.RecreateNativeEdit();
         }
 
-#endregion
+        #endregion
 
-#region Receivers
+        #region Receivers
 
         protected virtual void HandleOnReturnPressed()
         {
@@ -259,9 +236,143 @@ namespace Kyub.UI
                 OnReturnPressed.Invoke();
         }
 
-#endregion
+        #endregion
 
-#region Internal Helper Functions
+        #region Clipboard Overriden Functions
+
+        public new virtual void ProcessEvent(Event e)
+        {
+            KeyPressed(e);
+        }
+
+        protected new virtual EditState KeyPressed(Event evt)
+        {
+            var currentEventModifiers = evt.modifiers;
+            bool ctrl = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ? (currentEventModifiers & EventModifiers.Command) != 0 : (currentEventModifiers & EventModifiers.Control) != 0;
+            bool shift = (currentEventModifiers & EventModifiers.Shift) != 0;
+            bool alt = (currentEventModifiers & EventModifiers.Alt) != 0;
+            bool ctrlOnly = ctrl && !alt && !shift;
+
+            switch (evt.keyCode)
+            {
+                // Copy
+                case KeyCode.C:
+                    {
+                        if (ctrlOnly)
+                        {
+                            if (inputType != InputType.Password)
+                                clipboard = GetSelectedString();
+                            else
+                                clipboard = "";
+                            return EditState.Continue;
+                        }
+                        break;
+                    }
+
+                // Paste
+                case KeyCode.V:
+                    {
+                        if (ctrlOnly)
+                        {
+                            Append(clipboard);
+                            UpdateLabel();
+                            return EditState.Continue;
+                        }
+                        break;
+                    }
+
+                // Cut
+                case KeyCode.X:
+                    {
+                        if (ctrlOnly)
+                        {
+                            if (inputType != InputType.Password)
+                                clipboard = GetSelectedString();
+                            else
+                                clipboard = "";
+
+                            Delete();
+                            UpdateTouchKeyboardFromEditChanges();
+                            SendOnValueChangedAndUpdateLabel();
+                            return EditState.Continue;
+                        }
+                        break;
+                    }
+            }
+
+            return base.KeyPressed(evt);
+        }
+
+        protected virtual string GetSelectedString()
+        {
+            if (!HasSelection)
+                return "";
+
+            int startPos = caretPositionInternal;
+            int endPos = caretSelectPositionInternal;
+
+            // Ensure startPos is always less then endPos to make the code simpler
+            if (startPos > endPos)
+            {
+                int temp = startPos;
+                startPos = endPos;
+                endPos = temp;
+            }
+
+            return text.Substring(startPos, endPos - startPos);
+        }
+
+        protected virtual void UpdateTouchKeyboardFromEditChanges()
+        {
+            // Update the TouchKeyboard's text from edit changes
+            // if in-place editing is allowed
+            if (m_Keyboard != null && InPlaceEditing())
+            {
+                m_Keyboard.text = m_Text;
+            }
+        }
+
+        protected virtual bool InPlaceEditing()
+        {
+            return !TouchScreenKeyboard.isSupported || TouchKeyboardAllowsInPlaceEditing;
+        }
+
+        protected virtual void Delete()
+        {
+            if (readOnly)
+                return;
+
+            if (caretPositionInternal == caretSelectPositionInternal)
+                return;
+
+            if (caretPositionInternal < caretSelectPositionInternal)
+            {
+                m_Text = text.Substring(0, caretPositionInternal) + text.Substring(caretSelectPositionInternal, text.Length - caretSelectPositionInternal);
+                caretSelectPositionInternal = caretPositionInternal;
+            }
+            else
+            {
+                m_Text = text.Substring(0, caretSelectPositionInternal) + text.Substring(caretPositionInternal, text.Length - caretPositionInternal);
+                caretPositionInternal = caretSelectPositionInternal;
+            }
+        }
+
+        protected virtual void SendOnValueChangedAndUpdateLabel()
+        {
+            UpdateLabel();
+            SendOnValueChanged();
+        }
+
+        protected virtual void SendOnValueChanged()
+        {
+            UISystemProfilerApi.AddMarker("InputField.value", this);
+            if (onValueChanged != null)
+                onValueChanged.Invoke(text);
+        }
+
+        #endregion
+
+        #region Internal Helper Functions
 
         protected virtual void CheckAsteriskChar()
         {
@@ -326,9 +437,9 @@ namespace Kyub.UI
             return v_isSupported;
         }
 
-#endregion
+        #endregion
 
-#region Internal Rebuild Geometry Funtions
+        #region Internal Rebuild Geometry Funtions
 
         public override void Rebuild(CanvasUpdate update)
         {
@@ -400,9 +511,9 @@ namespace Kyub.UI
             }
         }
 
-#endregion
+        #endregion
 
-#region Caret Important Functions
+        #region Caret Important Functions
 
         protected void GenerateCaret(VertexHelper vbo, Vector2 roundingOffset)
         {
@@ -468,9 +579,9 @@ namespace Kyub.UI
             return generator.lineCount - 1;
         }
 
-#endregion
+        #endregion
 
-#region Internal Important Functions
+        #region Internal Important Functions
 
         // Change the button to the correct state
         System.Reflection.MethodInfo m_EvaluateAndTransitionToSelectionStateInfo = null;
@@ -554,9 +665,40 @@ namespace Kyub.UI
                 m_SetCaretVisibleInfo.Invoke(this, null);
         }
 
-#endregion
+        #endregion
 
-#region Internal Important Fields
+        #region Internal Important Fields
+
+        protected static string clipboard
+        {
+            get
+            {
+                return Kyub.UI.ClipboardUtility.GetText();
+            }
+            set
+            {
+                Kyub.UI.ClipboardUtility.SetText(value);
+            }
+        }
+
+        System.Reflection.FieldInfo m_TouchKeyboardAllowsInPlaceEditingInfo = null;
+        protected bool TouchKeyboardAllowsInPlaceEditing
+        {
+            get
+            {
+                if (m_TouchKeyboardAllowsInPlaceEditingInfo == null)
+                    m_TouchKeyboardAllowsInPlaceEditingInfo = typeof(TMPro.TMP_InputField).GetField("m_TouchKeyboardAllowsInPlaceEditing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var value = m_TouchKeyboardAllowsInPlaceEditingInfo.GetValue(this);
+                return value is bool ? (bool)value : false;
+            }
+            set
+            {
+                if (m_TouchKeyboardAllowsInPlaceEditingInfo == null)
+                    m_TouchKeyboardAllowsInPlaceEditingInfo = typeof(TMPro.TMP_InputField).GetField("m_TouchKeyboardAllowsInPlaceEditing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                if (m_TouchKeyboardAllowsInPlaceEditingInfo != null)
+                    m_TouchKeyboardAllowsInPlaceEditingInfo.SetValue(this, value);
+            }
+        }
 
         protected BaseInput input
         {
@@ -719,9 +861,9 @@ namespace Kyub.UI
             }
         }
 
-#endregion
+        #endregion
 
-#region INativeInputField Extra Implementations
+        #region INativeInputField Extra Implementations
 
         UnityEvent<string> INativeInputField.onValueChanged
         {
@@ -755,6 +897,6 @@ namespace Kyub.UI
             }
         }
 
-#endregion
+        #endregion
     }
 }
