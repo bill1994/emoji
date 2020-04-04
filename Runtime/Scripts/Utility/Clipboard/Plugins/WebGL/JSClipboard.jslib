@@ -1,13 +1,16 @@
 var JSClipper = {
 
+	$ClipboardData: "",
+
     _JSSetToClipboard: function(textPtr) {
         var text = Pointer_stringify(textPtr);
-
+		
 		if (navigator.clipboard)
 		{
+			ClipboardData = text;
 			navigator.clipboard.writeText(text)
 			  .then(function ()
-				{ 
+				{
 					//Sucess!
 				})
 			  .catch(function (err)
@@ -16,16 +19,16 @@ var JSClipper = {
 			  });
 		}
     },
-	
-	_JSGetFromClipboard: function() {
-	
-		var returnStr = '';
+
+	_JSGetFromClipboard : function() 
+	{
+		var returnStr = ClipboardData;
 		if (navigator.clipboard)
 		{
 			navigator.clipboard.readText()
 				.then(function (text)
-				{ 
-					returnStr = text; 
+				{
+					ClipboardData = text;
 				})
 				.catch(function (err) 
 				{
@@ -36,7 +39,8 @@ var JSClipper = {
 		var buffer = _malloc(bufferSize);
         stringToUTF8(returnStr, buffer, bufferSize);
 		return buffer;
-    }
+	}
 };
 
+autoAddDeps(JSClipper, '$ClipboardData');
 mergeInto(LibraryManager.library, JSClipper);
