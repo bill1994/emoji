@@ -274,8 +274,17 @@ namespace Kyub.UI
                     {
                         if (ctrlOnly)
                         {
-                            Append(clipboard);
-                            UpdateLabel();
+                            if (enabled && gameObject.activeInHierarchy && Application.platform == RuntimePlatform.WebGLPlayer)
+                            {
+                                //Request clipboard (in WebGL this request is async)
+                                Kyub.UI.ClipboardUtility.GetText();
+
+                                //Set clipboard after delay
+                                if (!IsInvoking("AppendClipboard"))
+                                    Invoke("AppendClipboard", 0);
+                            }
+                            else
+                                AppendClipboard();
                             return EditState.Continue;
                         }
                         break;
@@ -301,6 +310,14 @@ namespace Kyub.UI
             }
 
             return base.KeyPressed(evt);
+        }
+
+        protected virtual void AppendClipboard()
+        {
+            Append(clipboard);
+            UpdateLabel();
+
+            CancelInvoke("AppendClipboard");
         }
 
         protected virtual string GetSelectedString()
