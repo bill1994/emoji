@@ -281,7 +281,7 @@ namespace Kyub.UI
 
                                 //Set clipboard after delay
                                 if (!IsInvoking("AppendClipboard"))
-                                    Invoke("AppendClipboard", 0.2f);
+                                    Invoke("AppendClipboard", 0.1f);
                             }
                             else
                                 AppendClipboard();
