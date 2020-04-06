@@ -184,6 +184,15 @@ namespace MaterialUI
             base.Hide();
         }
 
+        public override void ShowModal()
+        {
+            m_IsModal = true;
+            MaterialDialogActivity materialActivity = activity as MaterialDialogActivity;
+            if (materialActivity != null)
+                materialActivity.isModal = true;
+            Show();
+        }
+
         public override void Show()
         {
             if (activity == null && m_LegacyActivityCompatibility)
