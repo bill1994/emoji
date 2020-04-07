@@ -93,7 +93,9 @@ namespace Kyub.UI
         }
 
         public string GetText(){
-            return _JSGetFromClipboard();
+            var str = _JSGetFromClipboard();
+            GUIUtility.systemCopyBuffer = str;
+            return str;
         }
     }
 #endif
@@ -113,7 +115,9 @@ namespace Kyub.UI
         }
 
         public string GetText(){
-            return GetText_();
+            var str = GetText_();
+            GUIUtility.systemCopyBuffer = str;
+            return str;
         }
     }
 #endif
@@ -129,7 +133,9 @@ namespace Kyub.UI
         }
 
         public string GetText(){
-            return cb.CallStatic<string> ("getText");
+            var str = cb.CallStatic<string> ("getText");
+            GUIUtility.systemCopyBuffer = str;
+            return str;
         }
     }
 #endif

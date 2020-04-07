@@ -627,7 +627,7 @@ namespace Kyub.UI
                 if (v_nativeBox != null)
                 {
                     v_nativeBox.Text = m_Text;
-                    v_nativeBox.SetVisibleAndFocus(true);
+                    v_nativeBox.Show();
                 }
                 ShouldActivateNextUpdate = false;
                 AllowInput = true;
@@ -657,7 +657,7 @@ namespace Kyub.UI
                 if (v_nativeBox != null)
                 {
                     v_nativeBox.Text = m_Text;
-                    v_nativeBox.SetVisibleAndFocus(true);
+                    v_nativeBox.Show();
                 }
             }
             else
