@@ -268,7 +268,7 @@ namespace MobileInputNativePlugin
             {
                 return;
             }
-            this.SetVisibleAndFocus(hasFocus && _inputObject != null && _inputObject.isFocused);
+            this.SetVisibleAndFocus_Internal(hasFocus && _inputObject != null && _inputObject.isFocused);
         }
 
         protected virtual void Update()
@@ -352,7 +352,7 @@ namespace MobileInputNativePlugin
             this.CreateNativeEdit ();
             this.SetTextNative (this._inputObject.text);
 #endif
-            SetVisibleAndFocus(isVisible);
+            SetVisibleAndFocus_Internal(isVisible);
             _needRecreate = false;
         }
 
@@ -396,7 +396,7 @@ namespace MobileInputNativePlugin
             return result;
         }
 
-        private void PrepareNativeEdit()
+        protected void PrepareNativeEdit()
         {
             if (_inputObject != null && !_inputObject.IsDestroyed())
             {
@@ -410,15 +410,13 @@ namespace MobileInputNativePlugin
                 _config.Placeholder = placeHolder is Text ? ((Text)placeHolder).text : (placeHolder is TMP_Text ? ((TMP_Text)placeHolder).text : "");
                 _config.PlaceholderColor = placeHolder != null ? placeHolder.color : Color.white;
                 _config.CharacterLimit = _inputObject.characterLimit;
-                Rect rect = GetScreenRectFromRectTransform(this._inputObjectText.rectTransform);
-                float ratio = rect.height / _inputObjectText.rectTransform.rect.height;
                 _config.Font = v_textObject != null && v_textObject.font.fontNames.Length > 0 ? v_textObject.font.fontNames[0] :
 #if UNITY_2018_3_OR_NEWER
                     v_tmpTextObject != null && v_tmpTextObject.font.faceInfo.familyName.Length > 0 ? v_tmpTextObject.font.faceInfo.familyName : "";
 #else
                     v_tmpTextObject != null && v_tmpTextObject.font.fontInfo.Name.Length > 0 ? v_tmpTextObject.font.fontInfo.Name : "";
 #endif
-                _config.FontSize = (v_textObject != null ? ((float)v_textObject.fontSize) : (v_tmpTextObject != null ? v_tmpTextObject.fontSize : 0)) * ratio;
+                _config.FontSize = GetNativeFontSize();
                 _config.TextColor = _inputObjectText.color;
                 _config.Align = GetGraphicTextAnchor(_inputObjectText).ToString();
                 _config.ContentType = v_inputField != null ? v_inputField.contentType.ToString() :
@@ -432,6 +430,16 @@ namespace MobileInputNativePlugin
 
                 _isVisibleOnCreate = false;
             }
+        }
+
+        protected virtual float GetNativeFontSize()
+        {
+            var v_textObject = _inputObjectText as Text;
+            var v_tmpTextObject = _inputObjectText as TMP_Text;
+            Rect rect = GetScreenRectFromRectTransform(this._inputObjectText.rectTransform);
+            float ratio = rect.height / _inputObjectText.rectTransform.rect.height;
+            var fontSize = (v_textObject != null ? ((float)v_textObject.fontSize) : (v_tmpTextObject != null ? v_tmpTextObject.fontSize : 0)) * ratio;
+            return fontSize;
         }
 
         #region Receivers
@@ -485,7 +493,7 @@ namespace MobileInputNativePlugin
         /// </summary>
         public override void Hide()
         {
-            this.SetVisibleAndFocus(false);
+            this.SetVisibleAndFocus_Internal(false);
         }
 
         /// <summary>
@@ -520,7 +528,7 @@ namespace MobileInputNativePlugin
                     if (OnReturnPressed != null)
                         OnReturnPressed();
 
-                    SetVisibleAndFocus(false);
+                    SetVisibleAndFocus_Internal(false);
 
                     if (OnReturnPressedEvent != null)
                         OnReturnPressedEvent.Invoke();
@@ -707,7 +715,16 @@ namespace MobileInputNativePlugin
 
         }
 
-        public void SetVisibleAndFocus(bool isVisible)
+        public void Show()
+        {
+            var isVisible = true;
+            if (_isMobileInputCreated && !Mathf.Approximately(GetNativeFontSize(), _config.FontSize))
+                RecreateNativeEdit(isVisible);
+            else
+                SetVisibleAndFocus_Internal(isVisible);
+        }
+
+        protected void SetVisibleAndFocus_Internal(bool isVisible)
         {
             SetVisible(isVisible);
             if (enabled && gameObject.activeInHierarchy)
