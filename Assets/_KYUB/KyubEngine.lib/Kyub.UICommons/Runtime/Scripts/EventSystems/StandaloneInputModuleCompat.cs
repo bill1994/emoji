@@ -122,10 +122,17 @@ namespace Kyub.EventSystems
 
                 float time = Time.unscaledTime;
 
-                if (newPressed == pointerEvent.lastPress || (Application.isMobilePlatform && InputCompat.touchCount == 1))
+                var cachedPointerEvent = Application.isMobilePlatform && InputCompat.touchCount == 1 && newPressed != pointerEvent.lastPress ? InputPointerEvent : null;
+                if (newPressed == pointerEvent.lastPress ||
+                    (cachedPointerEvent != null && (newPressed == cachedPointerEvent.selectedObject || newPressed == cachedPointerEvent.lastPress)))
                 {
+                    if (cachedPointerEvent != null && newPressed != pointerEvent.lastPress)
+                    {
+                        pointerEvent.clickTime = cachedPointerEvent.clickTime;
+                        pointerEvent.clickCount = cachedPointerEvent.clickCount;
+                    }
                     var diffTime = time - pointerEvent.clickTime;
-                    if (diffTime < repeatDelay)
+                    if (diffTime < 0.3f)
                         ++pointerEvent.clickCount;
                     else
                         pointerEvent.clickCount = 1;
@@ -154,10 +161,7 @@ namespace Kyub.EventSystems
             // PointerUp notification
             if (released)
             {
-                // Debug.Log("Executing pressup on: " + pointer.pointerPress);
                 ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent, ExecuteEvents.pointerUpHandler);
-
-                // Debug.Log("KeyCode: " + pointer.eventData.keyCode);
 
                 // see if we mouse up on the same element that we clicked on...
                 var pointerUpHandler = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
