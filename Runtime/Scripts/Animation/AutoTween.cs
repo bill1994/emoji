@@ -54,6 +54,14 @@ namespace MaterialUI
         /// <summary> Should the tween factor in Time.timeScale when running? </summary>
         protected bool m_ScaledTime;
 
+        public virtual float currentNormalizedDeltaTime
+        {
+            get
+            {
+                return m_Duration <= 0 ? 0 : m_DeltaTime / m_Duration;
+            }
+        }
+
         /// <summary> The generated AnimationCurves to use to tween the variable. The number of curves should match the number of elements in the variable. </summary>
         private AnimationCurve[] m_AnimationCurves;
 
