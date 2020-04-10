@@ -73,14 +73,6 @@ namespace MaterialUI
             }
         }
 
-        public int nextTweenId
-        {
-            get
-            {
-                return m_NextTweenId;
-            }
-        }
-
         #endregion
 
         #region Private Variables
@@ -88,7 +80,6 @@ namespace MaterialUI
         [SerializeField]
         private Dictionary<int, AutoTween> m_ActiveTweens = new Dictionary<int, AutoTween>();
 
-        private int m_NextTweenId = 1;
         private bool m_FirstFrame = true;
 
         #endregion
@@ -206,21 +197,21 @@ namespace MaterialUI
 
         #region Generic
 
-        protected static int GetNextTweenId(bool force = false)
+        static System.Random s_random = new System.Random();
+        protected static int GetUniqueTweenId(int maxIterations = 50)
         {
+            maxIterations = Mathf.Max(1, maxIterations);
             if (!Application.isPlaying || Instance == null)
                 return -1;
 
-            var tweenId = force ? -1 : Instance.m_NextTweenId;
+            var tweenId = -1;
             //Max amount of iterations
-            var skipCounter = 50;
-            while (skipCounter > 0 && (tweenId < 0 || Instance.m_ActiveTweens.ContainsKey(tweenId)))
+            while (maxIterations > 0 && (tweenId < 0 || Instance.m_ActiveTweens.ContainsKey(tweenId)))
             {
-                tweenId = UnityEngine.Random.Range(1, int.MaxValue);
-                skipCounter--;
+                tweenId = s_random.Next(1, int.MaxValue);
+                maxIterations--;
             }
-            Instance.m_NextTweenId = tweenId;
-            return Instance.m_NextTweenId;
+            return tweenId;
         }
 
         /// <summary>
@@ -465,7 +456,7 @@ namespace MaterialUI
 
             AutoTweenFloat tween = Instance.m_TweenFloatQueue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, tweenType, callback, null, scaledTime, id);
 
@@ -529,7 +520,7 @@ namespace MaterialUI
 
             AutoTweenFloat tween = Instance.m_TweenFloatQueue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, Tween.TweenType.Custom, callback, animationCurve, scaledTime, id);
 
@@ -603,7 +594,7 @@ namespace MaterialUI
 
             AutoTweenInt tween = Instance.m_TweenIntQueue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, tweenType, callback, null, scaledTime, id);
 
@@ -667,7 +658,7 @@ namespace MaterialUI
 
             AutoTweenInt tween = Instance.m_TweenIntQueue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, Tween.TweenType.Custom, callback, animationCurve, scaledTime, id);
 
@@ -741,7 +732,7 @@ namespace MaterialUI
 
             AutoTweenVector2 tween = Instance.m_TweenVector2Queue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, tweenType, callback, null, scaledTime, id);
 
@@ -805,7 +796,7 @@ namespace MaterialUI
 
             AutoTweenVector2 tween = Instance.m_TweenVector2Queue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, Tween.TweenType.Custom, callback, animationCurve, scaledTime, id);
 
@@ -879,7 +870,7 @@ namespace MaterialUI
 
             AutoTweenVector3 tween = Instance.m_TweenVector3Queue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, tweenType, callback, null, scaledTime, id);
 
@@ -943,7 +934,7 @@ namespace MaterialUI
 
             AutoTweenVector3 tween = Instance.m_TweenVector3Queue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, Tween.TweenType.Custom, callback, animationCurve, scaledTime, id);
 
@@ -1017,7 +1008,7 @@ namespace MaterialUI
 
             AutoTweenVector4 tween = Instance.m_TweenVector4Queue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, tweenType, callback, null, scaledTime, id);
 
@@ -1081,7 +1072,7 @@ namespace MaterialUI
 
             AutoTweenVector4 tween = Instance.m_TweenVector4Queue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, Tween.TweenType.Custom, callback, animationCurve, scaledTime, id);
 
@@ -1155,7 +1146,7 @@ namespace MaterialUI
 
             AutoTweenQuaternion tween = Instance.m_TweenQuaternionQueue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, tweenType, callback, null, scaledTime, id);
 
@@ -1219,7 +1210,7 @@ namespace MaterialUI
 
             AutoTweenQuaternion tween = Instance.m_TweenQuaternionQueue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, Tween.TweenType.Custom, callback, animationCurve, scaledTime, id);
 
@@ -1293,7 +1284,7 @@ namespace MaterialUI
 
             AutoTweenColor tween = Instance.m_TweenColorQueue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, tweenType, callback, null, scaledTime, id);
 
@@ -1357,7 +1348,7 @@ namespace MaterialUI
 
             AutoTweenColor tween = Instance.m_TweenColorQueue.GetTween();
 
-            int id = GetNextTweenId();
+            int id = GetUniqueTweenId();
 
             tween.Initialize(updateValue, startValue, targetValue, duration, delay, Tween.TweenType.Custom, callback, animationCurve, scaledTime, id);
 
