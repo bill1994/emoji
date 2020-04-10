@@ -23,7 +23,6 @@ namespace MaterialUI
 			EditorGUILayout.LabelField("Total Tweens", m_TweenManager.totalTweenCount.ToString());
 			EditorGUILayout.LabelField("Active Tweens", m_TweenManager.activeTweenCount.ToString());
 			EditorGUILayout.LabelField("Dormant Tweens", m_TweenManager.dormantTweenCount.ToString());
-            EditorGUILayout.LabelField("Next TweenId", m_TweenManager.nextTweenId.ToString());
         }
     }
 }
