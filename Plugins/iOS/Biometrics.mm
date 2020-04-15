@@ -53,7 +53,7 @@ extern void UnitySendMessage(const char*, const char*, const char*);
 @end
 
 // Helpers
-NSString *CreateNSString (const char* string) {
+NSString *BiometricsCreateNSString (const char* string) {
     if (string) {
         return [NSString stringWithUTF8String:string];
     }else {
@@ -61,7 +61,7 @@ NSString *CreateNSString (const char* string) {
     }
 }
 
-char* MakeStringCopy (const char* string) {
+char* BiometricsMakeStringCopy (const char* string) {
     if (string == NULL)
         return NULL;
     
@@ -75,21 +75,21 @@ extern "C" {
     void _StartBiometricsAuth(const char* objectName, const char* authenticationReason)
     {
         if (biometrics == nil) {
-            biometrics = [[Biometrics alloc] initWithUnityObjectName:CreateNSString(objectName) withAuthReason:CreateNSString(authenticationReason)];
+            biometrics = [[Biometrics alloc] initWithUnityObjectName:BiometricsCreateNSString(objectName) withAuthReason:BiometricsCreateNSString(authenticationReason)];
         }
         
         [biometrics authenticate];
     }
     
     const char* _GetAuthenticationReason() {
-        return MakeStringCopy([[biometrics getCurrentAuthReason] UTF8String]);
+        return BiometricsMakeStringCopy([[biometrics getCurrentAuthReason] UTF8String]);
     }
     
     int _SetAuthenticationReason(const char* reason) {
         if (biometrics == nil)
             return 0;
         
-        [biometrics setCurrentAuthReason:CreateNSString(reason)];
+        [biometrics setCurrentAuthReason:BiometricsCreateNSString(reason)];
         return 1;
     }
     
