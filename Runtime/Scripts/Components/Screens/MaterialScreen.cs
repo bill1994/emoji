@@ -618,6 +618,14 @@ namespace MaterialUI
             }
         }
 
+        public virtual void Interrupt(bool canDestroy = false)
+        {
+            SetupFrameAnimator();
+            var processedTransition = frameAnimator != null ? frameAnimator.InterruptAnimation() : -1;
+
+            ProcessInterruption(processedTransition, canDestroy && m_DestroyOnHide);
+        }
+
         #endregion
 
         #region Internal Helper Functions
@@ -703,7 +711,7 @@ namespace MaterialUI
                 frameAnimator.onInterruptAnimation.RemoveListener(HandleOnInterrupt);
         }
 
-        protected internal void TransitionIn()
+        protected internal virtual void TransitionIn()
         {
             if (frameAnimator != null)
             {
@@ -713,7 +721,7 @@ namespace MaterialUI
             }
         }
 
-        protected internal void TransitionOut()
+        protected internal virtual void TransitionOut()
         {
             if (frameAnimator != null)
             {
@@ -723,7 +731,7 @@ namespace MaterialUI
             }
         }
 
-        protected internal void TransitionOutImmediate()
+        protected internal virtual void TransitionOutImmediate()
         {
             if (frameAnimator != null)
             {
@@ -732,7 +740,7 @@ namespace MaterialUI
             }
         }
 
-        protected internal int InterruptAnimation()
+        protected internal virtual int InterruptAnimation()
         {
             if (frameAnimator != null)
             {
@@ -744,15 +752,7 @@ namespace MaterialUI
             return -1;
         }
 
-        protected internal void Interrupt(bool canDestroy = false)
-        {
-            SetupFrameAnimator();
-            var processedTransition = frameAnimator != null ? frameAnimator.InterruptAnimation() : -1;
-
-            ProcessInterruption(processedTransition, canDestroy && m_DestroyOnHide);
-        }
-
-        protected internal void ProcessInterruption(int processedTransition, bool canDestroy)
+        protected internal virtual void ProcessInterruption(int processedTransition, bool canDestroy)
         {
             if (processedTransition > 1)
             {
