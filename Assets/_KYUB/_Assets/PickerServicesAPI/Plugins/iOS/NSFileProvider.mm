@@ -48,10 +48,10 @@
 
 @end
 
-static NSFileProvider* docHandler = nil;
+static NSFileProvider* nsFileProviderDocHandler = nil;
  
  // Converts C style string to NSString
-NSString* CreateNSString (const char* string)
+NSString* NSFileProviderCreateNSString (const char* string)
 {
     if (string)
         return [NSString stringWithUTF8String: string];
@@ -65,16 +65,16 @@ extern "C" {
     bool iOS_OpenFileUrl (const char* path)
     {
         // Convert path to URL
-        NSString * stringPath = CreateNSString(path);
+        NSString * stringPath = NSFileProviderCreateNSString(path);
         
         NSURL *unityURL = [NSURL fileURLWithPath:stringPath];
         
-        if (docHandler == nil)
-            docHandler = [[NSFileProvider alloc] initWithURL:unityURL];
+        if (nsFileProviderDocHandler == nil)
+            nsFileProviderDocHandler = [[NSFileProvider alloc] initWithURL:unityURL];
         else
-            [docHandler UpdateURL:unityURL];
+            [nsFileProviderDocHandler UpdateURL:unityURL];
              
-        [docHandler OpenDocument];
+        [nsFileProviderDocHandler OpenDocument];
          
         return true;
     }
