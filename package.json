@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.pickerservices",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "displayName": "Kyub PickerServices API",
   "description": "Cross Picker Services API",
   "unity": "2019.1",
