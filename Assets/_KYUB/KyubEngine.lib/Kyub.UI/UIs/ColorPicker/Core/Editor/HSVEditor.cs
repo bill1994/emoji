@@ -2,8 +2,9 @@
 
 using UnityEngine;
 using UnityEditor;
+using Kyub.UI;
 
-namespace uCPf
+namespace KyubEditor.UI
 {
 	[CustomPropertyDrawer(typeof(HSV))]
 	public sealed class HSVEditor : PropertyDrawer

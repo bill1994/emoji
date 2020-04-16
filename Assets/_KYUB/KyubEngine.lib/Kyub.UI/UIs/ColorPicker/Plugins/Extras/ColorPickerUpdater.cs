@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace uCPf
+namespace Kyub.UI
 {
     public class ColorPickerUpdater : MonoBehaviour
     {
@@ -32,7 +32,7 @@ namespace uCPf
 
         protected virtual void UpdateColorPicker()
         {
-            var v_picker = GetComponent<uCPf.ColorPicker>();
+            var v_picker = GetComponent<Kyub.UI.ColorPicker>();
             if (v_picker != null)
             {
                 v_picker.UpdateUI();
