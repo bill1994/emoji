@@ -138,7 +138,7 @@ namespace MaterialUI
 
         public override void InitializeTabs()
         {
-            if (this == null || m_TabsContainer == null || m_Tabs == null || !Application.isPlaying)
+            if (this == null || m_TabsContainer == null || !Application.isPlaying)
                 return;
 
             var contentSizeFitter = m_TabsContainer.GetComponent<ContentSizeFitter>();
@@ -203,6 +203,8 @@ namespace MaterialUI
         {
             if (this == null || m_TabItemTemplate == null || m_Tabs == null || !Application.isPlaying)
             {
+                if (m_TabItemTemplate != null)
+                    m_TabItemTemplate.gameObject.SetActive(false);
                 m_TabWidth = -1;
                 return;
             }

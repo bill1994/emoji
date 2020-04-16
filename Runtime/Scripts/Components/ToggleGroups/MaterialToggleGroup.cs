@@ -589,7 +589,7 @@ namespace MaterialUI
 
         protected void SortRegisteredMembers(bool keepSameToggle)
         {
-            CancelInvoke("CallOnSelectedIndexChangedEvent");
+            //CancelInvoke("CallOnSelectedIndexChangedEvent");
             var toggle = GetCurrentSelectedToggle(false);
 
             _Toggles.Sort((a, b) =>
