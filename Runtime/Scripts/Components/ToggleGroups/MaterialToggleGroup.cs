@@ -142,22 +142,23 @@ namespace MaterialUI
         {
             _HasStarted = true;
 
+            //CallOnISelectedIndexChangedEvent();
+            if (ensureStateMode == EnsureStateModeEnum.Start || ensureStateMode == EnsureStateModeEnum.Both)
+            {
+                SortRegisteredMembers(false);
+                EnsureValidState();
+            }
+            else
+            {
+                TryApplyIndexDirty();
+            }
+
             if (!_indexIsDirty)
             {
                 if (GetCurrentSelectedToggle(false) != null)
                     SetToggleValue(selectedIndexInternal, true, true);
                 else if (!m_AllowSwitchOff)
                     SetToggleValue(ActiveToggles().FirstOrDefault(), true, true);
-            }
-
-            //CallOnISelectedIndexChangedEvent();
-            if (ensureStateMode == EnsureStateModeEnum.Start || ensureStateMode == EnsureStateModeEnum.Both)
-            {
-                EnsureValidState();
-            }
-            else
-            {
-                TryApplyIndexDirty();
             }
 
             base.Start();
