@@ -681,9 +681,13 @@ MonoBehaviour:
   m_disabledFieldStyles: []
   m_extraStyleProperties: []
   m_SpinnerMode: 2
+  m_OpenDialogAsync: 1
+  m_DropdownOffset: {x: 0, y: 0}
   m_DropdownExpandPivot: {x: 0.5, y: 1}
   m_DropdownFramePivot: {x: 0.5, y: 1}
   m_DropdownFramePreferredSize: {x: -1, y: -1}
+  m_UIShowTriggerMode: 16
+  m_UIHideTriggerMode: 0
   OnCancelCallback:
     m_PersistentCalls:
       m_Calls: []
@@ -786,8 +790,8 @@ MonoBehaviour:
   m_Text: {fileID: 594060737}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 80.64545, y: 16}
-  m_Size: {x: 110.64545, y: 34}
+  m_ContentSize: {x: 79.61854, y: 16}
+  m_Size: {x: 109.61854, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -1873,9 +1877,13 @@ MonoBehaviour:
   m_disabledFieldStyles: []
   m_extraStyleProperties: []
   m_SpinnerMode: 1
+  m_OpenDialogAsync: 1
+  m_DropdownOffset: {x: 0, y: 0}
   m_DropdownExpandPivot: {x: 0.5, y: 1}
   m_DropdownFramePivot: {x: 0.5, y: 1}
   m_DropdownFramePreferredSize: {x: -1, y: -1}
+  m_UIShowTriggerMode: 16
+  m_UIHideTriggerMode: 0
   OnCancelCallback:
     m_PersistentCalls:
       m_Calls: []
@@ -1978,8 +1986,8 @@ MonoBehaviour:
   m_Text: {fileID: 1266905432}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 57.490593, y: 16}
-  m_Size: {x: 87.49059, y: 34}
+  m_ContentSize: {x: 56.80214, y: 16}
+  m_Size: {x: 86.80214, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -2210,9 +2218,13 @@ MonoBehaviour:
   m_disabledFieldStyles: []
   m_extraStyleProperties: []
   m_SpinnerMode: 1
+  m_OpenDialogAsync: 1
+  m_DropdownOffset: {x: 0, y: 0}
   m_DropdownExpandPivot: {x: 0.5, y: 1}
   m_DropdownFramePivot: {x: 0.5, y: 1}
   m_DropdownFramePreferredSize: {x: -1, y: -1}
+  m_UIShowTriggerMode: 16
+  m_UIHideTriggerMode: 0
   OnCancelCallback:
     m_PersistentCalls:
       m_Calls: []
@@ -2530,7 +2542,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
