@@ -2,6 +2,7 @@
 //  Please see license file for terms and conditions of use, and more information.
 
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,10 @@ namespace MaterialUI
         protected override void OnEnable()
         {
             OnBaseEnable();
+
+            var properties = new List<string>(_excludingProperties);
+            properties.AddRange(new string[] { "m_CurrentProgress", "m_BaseObjectOverride", "m_CircleRectTransform", "m_StartsIndeterminate", "m_StartsHidden" });
+            _excludingProperties = properties.ToArray();
 
             m_CurrentProgress = serializedObject.FindProperty("m_CurrentProgress");
             m_BaseObjectOverride = serializedObject.FindProperty("m_BaseObjectOverride");
@@ -43,7 +48,7 @@ namespace MaterialUI
 
             DrawFoldoutExternalProperties(ExternalPropertiesSection);
             DrawFoldoutComponents(ComponentSection);
-            DrawPropertiesExcluding(serializedObject, new string[] { "m_CurrentProgress", "m_BaseObjectOverride", "m_CircleRectTransform", "m_StartsIndeterminate", "m_StartsHidden" });
+            DrawPropertiesExcluding(serializedObject, _excludingProperties);
 
             DrawStyleGUIFolder();
 
