@@ -142,7 +142,9 @@ namespace Kyub.EmojiSearch.UI
                 //We must revert the original text because we dont want to permanently change the text
                 m_text = v_oldText;
 
+#if !TMP_2_1_0_PREVIEW_10_OR_NEWER
                 m_isCalculateSizeRequired = true;
+#endif
 
                 return v_parsedEmoji;
             }
