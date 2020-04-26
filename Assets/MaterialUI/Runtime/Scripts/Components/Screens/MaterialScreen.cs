@@ -512,7 +512,7 @@ namespace MaterialUI
             if (screenView != null)
             {
                 var v_index = screenIndex;
-                if (screenView.materialScreen.Count > v_index)
+                if (v_index >= 0 && screenView.materialScreen.Count > v_index)
                     screenView.materialScreen[v_index] = null;
                 screenView.RemoveInvalidScreens();
             }
