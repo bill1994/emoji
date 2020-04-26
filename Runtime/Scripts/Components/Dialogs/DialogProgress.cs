@@ -103,6 +103,18 @@ namespace MaterialUI
             }
         }
 
+        public virtual void SetProgress(float value, bool animated)
+        {
+            if (m_ProgressIndicator != null)
+                m_ProgressIndicator.SetProgress(value, animated);
+        }
+
+        public virtual void SetStateIndeterminated()
+        {
+            if (m_ProgressIndicator != null)
+                m_ProgressIndicator.StartIndeterminate();
+        }
+
         #endregion
     }
 }

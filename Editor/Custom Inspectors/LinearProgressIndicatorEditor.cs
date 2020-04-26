@@ -1,14 +1,17 @@
 ﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
 //  Please see license file for terms and conditions of use, and more information.
 
+using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 namespace MaterialUI
 {
     [CustomEditor(typeof(LinearProgressIndicator))]
-    public class LinearProgressIndicatorEditor : MaterialBaseEditor
+    public class LinearProgressIndicatorEditor : BaseStyleElementEditor
     {
         private SerializedProperty m_CurrentProgress;
         private SerializedProperty m_BaseObjectOverride;
@@ -17,9 +20,13 @@ namespace MaterialUI
         private SerializedProperty m_StartsIndeterminate;
         private SerializedProperty m_StartsHidden;
 
-        void OnEnable()
+        protected override void OnEnable()
         {
             OnBaseEnable();
+
+            var properties = new List<string>(_excludingProperties);
+            properties.AddRange(new string[] { "m_CurrentProgress", "m_BaseObjectOverride", "m_CircleRectTransform", "m_StartsIndeterminate", "m_StartsHidden" });
+            _excludingProperties = properties.ToArray();
 
             m_CurrentProgress = serializedObject.FindProperty("m_CurrentProgress");
             m_BaseObjectOverride = serializedObject.FindProperty("m_BaseObjectOverride");
@@ -29,7 +36,7 @@ namespace MaterialUI
             m_StartsHidden = serializedObject.FindProperty("m_StartsHidden");
         }
 
-        void OnDisable()
+        protected override void OnDisable()
         {
             OnBaseDisable();
         }
@@ -44,6 +51,8 @@ namespace MaterialUI
 
             DrawFoldoutExternalProperties(ExternalPropertiesSection);
             DrawFoldoutComponents(ComponentSection);
+
+            DrawStyleGUIFolder();
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -62,7 +71,7 @@ namespace MaterialUI
             Image backgroundImage = m_BackgroundImage.objectReferenceValue as Image;
             if (backgroundImage != null)
             {
-                if(InspectorFields.GraphicColorField("Background", backgroundImage))
+                if (InspectorFields.GraphicColorField("Background", backgroundImage))
                     result = true;
             }
 
