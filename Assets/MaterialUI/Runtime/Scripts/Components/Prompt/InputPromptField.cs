@@ -315,7 +315,11 @@ namespace MaterialUI
             if (m_TextComponent != null)
             {
                 UpdateLabel();
-                m_TextComponent.RegisterDirtyVerticesCallback(UpdateLabel);
+                if (Application.isPlaying)
+                {
+                    m_TextComponent.UnregisterDirtyVerticesCallback(UpdateLabel);
+                    m_TextComponent.RegisterDirtyVerticesCallback(UpdateLabel);
+                }
             }
         }
 
