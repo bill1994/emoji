@@ -163,8 +163,8 @@ namespace MaterialUI
             {
                 frameLayoutElement.minWidth = Mathf.Max(frameLayoutElement.minWidth, minSize.x, preferredSize.x);
                 frameLayoutElement.minHeight = Mathf.Max(frameLayoutElement.minHeight, minSize.y, preferredSize.y);
-                frameLayoutElement.preferredWidth = preferredSize.x < 0 ? frameLayoutElement.preferredWidth : preferredSize.x;
-                frameLayoutElement.preferredHeight = preferredSize.y < 0 ? frameLayoutElement.preferredHeight : preferredSize.y;
+                frameLayoutElement.preferredWidth = preferredSize.x < 0 && preferredSize.x >= -1 ? frameLayoutElement.preferredWidth : (preferredSize.x == 0? -1 : Mathf.Max(-1, preferredSize.x));
+                frameLayoutElement.preferredHeight = preferredSize.y < 0 && preferredSize.y >= -1 ? frameLayoutElement.preferredHeight : (preferredSize.y == 0 ? -1 : Mathf.Max(-1, preferredSize.y));
             }
             frameRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, preferredSize.x < 0 ? minSize.x : preferredSize.x);
             frameRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredSize.y < 0 ? minSize.y : preferredSize.y);

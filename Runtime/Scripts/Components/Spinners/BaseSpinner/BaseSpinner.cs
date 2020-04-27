@@ -44,8 +44,8 @@ namespace MaterialUI
         protected Vector2 m_DropdownExpandPivot = new Vector2(0, 0);
         [SerializeField]
         protected Vector2 m_DropdownFramePivot = new Vector2(0, 1);
-        [SerializeField]
-        protected Vector2 m_DropdownFramePreferredSize = new Vector2(-1, -1);
+        [SerializeField, Tooltip("* <VALUE> == -1 will force use preferred size defined in panel.\n* <VALUE> == 0 or <VALUE> < -1 will override preferred size in panel to -1.\n* <VALUE> > 0 will override preferred size in panel to <VALUE>")]
+        protected Vector2 m_DropdownFramePreferredSize = new Vector2(-1, -1); // 0 or < -1 will override the preferred value to -1. 
         [SerializeField]
         protected SpinnerUIEventTriggerMode m_UIShowTriggerMode = SpinnerUIEventTriggerMode.OnPointerClick;
         [SerializeField]
