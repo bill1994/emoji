@@ -135,6 +135,9 @@ namespace MaterialUI
 
         protected override void OnRectTransformDimensionsChange()
         {
+            if (this == null || !gameObject.activeInHierarchy)
+                return;
+
             if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
             {
                 ClearCachedInteropInfos();
