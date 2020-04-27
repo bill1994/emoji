@@ -790,8 +790,8 @@ MonoBehaviour:
   m_Text: {fileID: 594060737}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 79.61854, y: 16}
-  m_Size: {x: 109.61854, y: 34}
+  m_ContentSize: {x: 80.66667, y: 16}
+  m_Size: {x: 110.66667, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
@@ -1986,8 +1986,8 @@ MonoBehaviour:
   m_Text: {fileID: 1266905432}
   m_Interactable: 1
   m_ContentPadding: {x: 30, y: 18}
-  m_ContentSize: {x: 56.80214, y: 16}
-  m_Size: {x: 86.80214, y: 34}
+  m_ContentSize: {x: 56.666664, y: 16}
+  m_Size: {x: 86.666664, y: 34}
   m_FitWidthToContent: 1
   m_FitHeightToContent: 1
   m_ResetRippleOnDisable: 1
