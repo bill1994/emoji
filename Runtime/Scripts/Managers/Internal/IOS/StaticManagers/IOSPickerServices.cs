@@ -103,7 +103,7 @@ namespace Kyub.PickerServices
 
             if (p_saveToGallery && v_texture != null)
                 CrossPickerServices.SerializeDataToAlbum(v_texture, System.IO.Path.GetFileNameWithoutExtension(p_path));
-            var v_temporarySavePath = CrossPickerServices.GetTemporarySavePath(CrossPickerServices.GetUniqueImgFileName(CrossPickerServices.EncodeOption)); //CrossPickerServices.SaveTextureToTemporaryPath(v_texture);
+            var v_temporarySavePath = CrossPickerServices.SaveTextureToTemporaryPath(v_texture); //CrossPickerServices.GetTemporarySavePath(CrossPickerServices.GetUniqueImgFileName(CrossPickerServices.EncodeOption));
             CrossPickerServices.CallPickerFinishEvent(v_temporarySavePath, v_texture);
         }
 
