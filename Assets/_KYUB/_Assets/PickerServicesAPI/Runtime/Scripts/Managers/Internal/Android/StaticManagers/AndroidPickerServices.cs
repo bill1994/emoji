@@ -97,9 +97,11 @@ namespace Kyub.PickerServices
         protected virtual void NativeCameraPickedEnd(string p_path, bool p_saveToGallery)
         {
             var v_texture = !string.IsNullOrEmpty(p_path) ? NativeGallery.LoadImageAtPath(p_path, CrossPickerServices.MaxImageLoadSize, false, false) : null;
+
             if (p_saveToGallery && v_texture != null)
                 CrossPickerServices.SerializeDataToAlbum(v_texture, System.IO.Path.GetFileNameWithoutExtension(p_path));
-            CrossPickerServices.CallPickerFinishEvent(p_path, v_texture);
+            var v_temporarySavePath = CrossPickerServices.GetTemporarySavePath(CrossPickerServices.GetUniqueImgFileName(CrossPickerServices.EncodeOption)); //CrossPickerServices.SaveTextureToTemporaryPath(v_texture);
+            CrossPickerServices.CallPickerFinishEvent(v_temporarySavePath, v_texture);
         }
 
         protected virtual void NativeImagePickedEnd(string p_path)
