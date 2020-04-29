@@ -318,12 +318,12 @@ namespace Kyub.PickerServices
             return SaveTextureToPath_Internal(p_bytes, Application.temporaryCachePath, p_fileName);
         }
 
-        protected static string GetUniqueImgFileName(CrossPickerServices.TextureEncoderEnum p_encodeOption)
+        public static string GetUniqueImgFileName(CrossPickerServices.TextureEncoderEnum p_encodeOption)
         {
             return GetUniqueImgFileName("", p_encodeOption);
         }
 
-        protected static string GetUniqueImgFileName(string p_pattern, CrossPickerServices.TextureEncoderEnum p_encodeOption)
+        public static string GetUniqueImgFileName(string p_pattern, CrossPickerServices.TextureEncoderEnum p_encodeOption)
         {
             if (string.IsNullOrEmpty(p_pattern))
                 p_pattern = "TempImg";
