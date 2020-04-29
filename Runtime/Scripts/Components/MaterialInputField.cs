@@ -1438,6 +1438,8 @@ namespace MaterialUI
             AnimateActiveLineDeselect();
             AnimateHintTextDeselect();
             RefreshVisualStyles();
+
+            ValidateText();
         }
 
         #endregion
