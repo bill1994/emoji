@@ -148,8 +148,8 @@ namespace Kyub.PickerServices
 
         protected internal static void CallPickerFinishEvent(string p_key, Texture2D p_textureReturned)
         {
-            //if (p_textureReturned != null && MaxImageLoadSize > 0)
-            //    Kyub.ImagePicker.Extensions.CrossPickerTexture2DExtensions.ClampSize(p_textureReturned, 4, MaxImageLoadSize);
+            if (p_textureReturned != null && MaxImageLoadSize > 0)
+                Kyub.PickerServices.Extensions.CrossPickerTexture2DExtensions.ClampSize(p_textureReturned, 4, MaxImageLoadSize);
             Sprite v_sprite = p_textureReturned != null ? Sprite.Create(p_textureReturned, new Rect(0, 0, p_textureReturned.width, p_textureReturned.height), new Vector2(0.5f, 0.5f)) : null;
             CallPickerFinishEvent(p_key, v_sprite);
         }
