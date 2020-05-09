@@ -51,7 +51,7 @@ namespace MaterialUI
         float m_CurrentWaitTime = -1;
 
         protected bool m_MoveFab;
-        protected MaterialMovableFab m_MaterialMovableFab;
+        //protected MaterialMovableFab m_MaterialMovableFab;
         protected RectTransform m_FabRectTransform;
         protected float m_FabStartPos;
 
@@ -272,10 +272,17 @@ namespace MaterialUI
 
         public void Show(Toast toast, Canvas canvasHierarchy, System.Func<Toast, ToastAnimator, bool> onToastComplete = null)
         {
-            Show(toast, canvasHierarchy != null ? canvasHierarchy.transform as RectTransform : null, onToastComplete);
+            Transform targetTransform = null;
+            if (canvasHierarchy != null)
+            {
+                CanvasSafeArea safeArea = canvasHierarchy.GetComponent<CanvasSafeArea>();
+                targetTransform = safeArea != null && safeArea.Content != null ? safeArea.Content : canvasHierarchy.transform;
+            }
+
+            Show(toast, targetTransform as RectTransform, onToastComplete);
         }
 
-        public void Show(Toast toast, RectTransform targetTransform = null, System.Func<Toast, ToastAnimator, bool> onToastComplete = null)
+        public virtual void Show(Toast toast, RectTransform targetTransform = null, System.Func<Toast, ToastAnimator, bool> onToastComplete = null)
         {
             _toast = toast;
             _onToastCompleteCallback = onToastComplete;

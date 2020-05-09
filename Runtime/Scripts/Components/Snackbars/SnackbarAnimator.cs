@@ -22,27 +22,29 @@ namespace MaterialUI
 
         #region Public Properties
 
-        public void Show(Snackbar snackbar)
+        public override void Show(Toast toast, RectTransform targetTransform = null, System.Func<Toast, ToastAnimator, bool> onToastComplete = null)
         {
-            m_OnActionButtonClicked = snackbar.onActionButtonClicked;
-
-            if (m_ActionButton != null)
+            var snackbar = toast as Snackbar;
+            if (snackbar != null)
             {
-                m_ActionButton.gameObject.SetActive(!string.IsNullOrEmpty(snackbar.actionName));
+                m_OnActionButtonClicked = snackbar.onActionButtonClicked;
 
-				if (!string.IsNullOrEmpty(snackbar.actionName))
-				{
-                    m_ActionButton.textText = snackbar.actionName.ToUpper();
+                if (m_ActionButton != null)
+                {
+                    m_ActionButton.gameObject.SetActive(!string.IsNullOrEmpty(snackbar.actionName));
+
+                    if (!string.IsNullOrEmpty(snackbar.actionName))
+                    {
+                        m_ActionButton.textText = snackbar.actionName.ToUpper();
+                    }
+
+                    m_ActionButton.onClick.RemoveListener(OnActionButtonClicked);
+                    m_ActionButton.onClick.AddListener(OnActionButtonClicked);
                 }
-
-                m_ActionButton.onClick.RemoveListener(OnActionButtonClicked);
-                m_ActionButton.onClick.AddListener(OnActionButtonClicked);
             }
 
-
-
-            base.Show(snackbar);
-            StartCoroutine(Setup());
+            base.Show(toast, targetTransform, onToastComplete);
+            //StartCoroutine(Setup());
         }
 
         #endregion
@@ -61,7 +63,7 @@ namespace MaterialUI
             m_AnimStartTime = Time.realtimeSinceStartup;
         }
 
-        private IEnumerator Setup()
+        /*private IEnumerator Setup()
         {
             yield return new WaitForEndOfFrame();
 
@@ -111,7 +113,7 @@ namespace MaterialUI
             GetComponent<CanvasGroup>().alpha = 1f;
             m_InPos.y = 0f;
             m_OutAlpha = 1f;
-        }
+        }*/
 
         #endregion
     }

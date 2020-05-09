@@ -116,7 +116,7 @@ namespace MaterialUI
                     if (m_CurrentToast != null && m_CurrentToast.IsCustomToast())
                         _AnimatorsCache.Remove(cacheKey);
 
-                    currentAnimator.Show(pair.Key, pair.Value, OnToastCompleted);
+                    currentAnimator.Show(pair.Key, parent as RectTransform, OnToastCompleted);
                 }
                 else
                     m_CurrentToast = null;
