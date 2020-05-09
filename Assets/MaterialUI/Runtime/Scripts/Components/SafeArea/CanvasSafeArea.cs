@@ -421,10 +421,12 @@ namespace MaterialUI
             }
 
             TryInstantiateUnsafeContent();
+#if UNITY_EDITOR
+            EditorSafeAreaSimulator.RegisterSafeAreaComponent(this);
+#endif
             if (m_UnsafeContent != null)
             {
 #if UNITY_EDITOR
-                EditorSafeAreaSimulator.RegisterSafeAreaComponent(this);
                 SetupSimulatorMaskContent();
 #endif
 
