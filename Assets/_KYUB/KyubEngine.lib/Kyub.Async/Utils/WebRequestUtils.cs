@@ -149,12 +149,12 @@ namespace Kyub.Async
     {
         #region Private Variables
 
-        Dictionary<string, string> m_header = new Dictionary<string, string>() { { "Content-Type", "application/json" } };
-        Dictionary<string, object> m_paramsData = new Dictionary<string, object>();
-        Dictionary<string, object> m_bodyData = new Dictionary<string, object>();
+        protected Dictionary<string, string> m_header = new Dictionary<string, string>() { { "Content-Type", "application/json" } };
+        protected Dictionary<string, object> m_paramsData = new Dictionary<string, object>();
+        protected Dictionary<string, object> m_bodyData = new Dictionary<string, object>();
 
-        byte[] _bodyDataBytes = null;
-        string _bodyDataJson = null;
+        protected byte[] _bodyDataBytes = null;
+        protected string _bodyDataJson = null;
 
         #endregion
 
@@ -220,6 +220,28 @@ namespace Kyub.Async
         #endregion
 
         #region Helper Functions
+
+        public void ReplaceBodyData<T>(T bodyData)
+        {
+            _bodyDataBytes = null;
+            _bodyDataJson = bodyData == null ? "" : Kyub.SerializationUtils.ToJson<T>(bodyData);
+            m_bodyData.Clear();
+            if (bodyData is Dictionary<string, object>)
+            {
+                m_bodyData = new Dictionary<string, object>(bodyData as Dictionary<string, object>);
+            }
+        }
+
+        public void ReplaceBodyData(object bodyData)
+        {
+            _bodyDataBytes = null;
+            _bodyDataJson = bodyData == null ? "" : Kyub.SerializationUtils.ToJson(bodyData);
+            m_bodyData.Clear();
+            if (bodyData is Dictionary<string, object>)
+            {
+                m_bodyData = new Dictionary<string, object>(bodyData as Dictionary<string, object>);
+            }
+        }
 
         public void AddBodyField(string p_key, object p_value)
         {
