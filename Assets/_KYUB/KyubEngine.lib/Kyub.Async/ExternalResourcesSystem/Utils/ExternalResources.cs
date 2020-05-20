@@ -42,17 +42,47 @@ namespace Kyub.Async
                 new KVPair<string, CustomImgUrlDownloader>(REGEX_TEMP_PATH_ASSETS_PATH, (path, callback) =>
                 {
                     var temporaryCachePath = path.Replace("TemporaryCache://", Application.temporaryCachePath + "/");
-                    return TextureSerializer.DeserializeFromWeb(temporaryCachePath, callback);
+                    System.Action<ExternImgFile> internalCallback = (externImgParam) =>
+                    {
+                        if(externImgParam != null)
+                            externImgParam.Url = path;
+                        if(callback != null)
+                            callback(externImgParam);
+                    };
+                    var externalImg = TextureSerializer.DeserializeFromWeb(temporaryCachePath, callback);
+                    if(externalImg != null)
+                        externalImg.Url = path;
+                    return externalImg;
                 }),
                 new KVPair<string, CustomImgUrlDownloader>(REGEX_PERSISTENT_ASSETS_PATH, (path, callback) => 
                 {
                     var persistentDataPath = path.Replace("PersistentData://", Application.persistentDataPath + "/");
-                    return TextureSerializer.DeserializeFromWeb(persistentDataPath, callback);
+                    System.Action<ExternImgFile> internalCallback = (externImgParam) =>
+                    {
+                        if(externImgParam != null)
+                            externImgParam.Url = path;
+                        if(callback != null)
+                            callback(externImgParam);
+                    };
+                    var externalImg = TextureSerializer.DeserializeFromWeb(persistentDataPath, callback);
+                    if(externalImg != null)
+                        externalImg.Url = path;
+                    return externalImg;
                 }),
                 new KVPair<string, CustomImgUrlDownloader>(REGEX_STREAMING_ASSETS_PATH, (path, callback) =>
                 {
                     var streamingAssetsPath = path.Replace("StreamingAssets://", Application.streamingAssetsPath + "/");
-                    return TextureSerializer.DeserializeFromWeb(streamingAssetsPath, callback);
+                    System.Action<ExternImgFile> internalCallback = (externImgParam) =>
+                    {
+                        if(externImgParam != null)
+                            externImgParam.Url = path;
+                        if(callback != null)
+                            callback(externImgParam);
+                    };
+                    var externalImg = TextureSerializer.DeserializeFromWeb(streamingAssetsPath, callback);
+                    if(externalImg != null)
+                        externalImg.Url = path;
+                    return externalImg;
                 }),
                 new KVPair<string, CustomImgUrlDownloader>(REGEX_RESOURCES_PATH, 
                     (path, callback) =>
@@ -78,9 +108,8 @@ namespace Kyub.Async
 
                                     externalImg.Texture = texture;
                                     externalImg.Sprite = sprite;
-
-                                    if(texture == null)
-                                        externalImg.Error = "Invalid resources file path.";
+                                    externalImg.Status = AsyncStatusEnum.Done;
+                                    externalImg.Error = texture == null? "Invalid resources file path." : null;
 
                                     if(callback != null)
                                         callback.Invoke(externalImg);
@@ -92,6 +121,7 @@ namespace Kyub.Async
                                 externalImg.Texture = sprite.texture;
                                 externalImg.Sprite = sprite;
                                 externalImg.Status = AsyncStatusEnum.Done;
+                                externalImg.Error = null;
 
                                 if(callback != null)
                                     callback.Invoke(externalImg);
