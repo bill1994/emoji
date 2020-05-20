@@ -92,40 +92,31 @@ namespace Kyub.Async
                         externalImg.Url = path;
                         externalImg.Status = AsyncStatusEnum.Processing;
 
-                        var spriteLoadOperation = Resources.LoadAsync<Sprite>(resourcesPath);
-                        spriteLoadOperation.completed += (op1) =>
+                        //Request as Texture
+                        var textureLoadOperation  = Resources.LoadAsync<Texture2D>(resourcesPath);
+                        textureLoadOperation.completed += (op2) =>
                         {
-                            var sprite = spriteLoadOperation.asset as Sprite;
-                            if(sprite == null)
+                            Sprite sprite = null;
+                            var texture = textureLoadOperation.asset as Texture2D;
+                            if(texture != null)
                             {
-                                //Request as Texture
-                                var textureLoadOperation  = Resources.LoadAsync<Texture2D>(resourcesPath);
-                                textureLoadOperation.completed += (op2) =>
-                                {
-                                    var texture = textureLoadOperation.asset as Texture2D;
-                                    if(texture != null)
-                                        sprite = Sprite.Create(texture, new Rect(0,0,texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                                var originalTexture = texture;
+                                texture = new Texture2D(originalTexture.width, originalTexture.height);
+                                texture.LoadRawTextureData(originalTexture.GetRawTextureData());
+                                sprite = Sprite.Create(texture, new Rect(0,0,texture.width, texture.height), new Vector2(0.5f, 0.5f));
 
-                                    externalImg.Texture = texture;
-                                    externalImg.Sprite = sprite;
-                                    externalImg.Status = AsyncStatusEnum.Done;
-                                    externalImg.Error = texture == null? "Invalid resources file path." : null;
-
-                                    if(callback != null)
-                                        callback.Invoke(externalImg);
-                                };
+                                //Now we must unload original Asset (DestroyImmediate cant handle resources asset)
+                                Resources.UnloadAsset(originalTexture);
                             }
-                            //Sucess
-                            else
-                            {
-                                externalImg.Texture = sprite.texture;
-                                externalImg.Sprite = sprite;
-                                externalImg.Status = AsyncStatusEnum.Done;
-                                externalImg.Error = null;
 
-                                if(callback != null)
-                                    callback.Invoke(externalImg);
-                            }
+                            externalImg.Texture = texture;
+                            externalImg.Sprite = sprite;
+                            externalImg.Url = path;
+                            externalImg.Status = AsyncStatusEnum.Done;
+                            externalImg.Error = texture == null? "Invalid resources file path." : null;
+
+                            if(callback != null)
+                                callback.Invoke(externalImg);
                         };
 
                         return externalImg;
