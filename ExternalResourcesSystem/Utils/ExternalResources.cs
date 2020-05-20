@@ -26,7 +26,11 @@ namespace Kyub.Async
         #region Properties
 
         public const string REGEX_FILE_PATH = @"(file:\/\/\/).+";
-
+        public const string REGEX_TEMP_PATH_ASSETS_PATH = @"(TemporaryCache:\/\/).+";
+        public const string REGEX_PERSISTENT_ASSETS_PATH = @"(PersistentData:\/\/).+";
+        public const string REGEX_STREAMING_ASSETS_PATH = @"(StreamingAssets:\/\/).+";
+        public const string REGEX_RESOURCES_PATH = @"(Resources:\/\/).+";
+        
         static ArrayDict<string, CustomImgUrlDownloader> s_customImgDownloaderPatterns = new ArrayDict<string, CustomImgUrlDownloader>()
         {
             Buffer = new List<KVPair<string, CustomImgUrlDownloader>>()
@@ -35,6 +39,67 @@ namespace Kyub.Async
                 new KVPair<string, CustomImgUrlDownloader>(StringExtensions.REGEX_STRING_URL1, TextureSerializer.DeserializeFromWeb),
                 new KVPair<string, CustomImgUrlDownloader>(StringExtensions.REGEX_STRING_URL2, TextureSerializer.DeserializeFromWeb),
                 new KVPair<string, CustomImgUrlDownloader>(REGEX_FILE_PATH, TextureSerializer.DeserializeFromWeb),
+                new KVPair<string, CustomImgUrlDownloader>(REGEX_TEMP_PATH_ASSETS_PATH, (path, callback) =>
+                {
+                    var temporaryCachePath = path.Replace("TemporaryCache://", Application.temporaryCachePath + "/");
+                    return TextureSerializer.DeserializeFromWeb(temporaryCachePath, callback);
+                }),
+                new KVPair<string, CustomImgUrlDownloader>(REGEX_PERSISTENT_ASSETS_PATH, (path, callback) => 
+                {
+                    var persistentDataPath = path.Replace("PersistentData://", Application.persistentDataPath + "/");
+                    return TextureSerializer.DeserializeFromWeb(persistentDataPath, callback);
+                }),
+                new KVPair<string, CustomImgUrlDownloader>(REGEX_STREAMING_ASSETS_PATH, (path, callback) =>
+                {
+                    var streamingAssetsPath = path.Replace("StreamingAssets://", Application.streamingAssetsPath + "/");
+                    return TextureSerializer.DeserializeFromWeb(streamingAssetsPath, callback);
+                }),
+                new KVPair<string, CustomImgUrlDownloader>(REGEX_RESOURCES_PATH, 
+                    (path, callback) =>
+                    {
+                        var resourcesPath = path.Replace("Resources://", string.Empty);
+                        ExternImgFile externalImg = new ExternImgFile();
+                        externalImg.Url = path;
+                        externalImg.Status = AsyncStatusEnum.Processing;
+
+                        var spriteLoadOperation = Resources.LoadAsync<Sprite>(resourcesPath);
+                        spriteLoadOperation.completed += (op1) =>
+                        {
+                            var sprite = spriteLoadOperation.asset as Sprite;
+                            if(sprite == null)
+                            {
+                                //Request as Texture
+                                var textureLoadOperation  = Resources.LoadAsync<Texture2D>(resourcesPath);
+                                textureLoadOperation.completed += (op2) =>
+                                {
+                                    var texture = textureLoadOperation.asset as Texture2D;
+                                    if(texture != null)
+                                        sprite = Sprite.Create(texture, new Rect(0,0,texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+                                    externalImg.Texture = texture;
+                                    externalImg.Sprite = sprite;
+
+                                    if(texture == null)
+                                        externalImg.Error = "Invalid resources file path.";
+
+                                    if(callback != null)
+                                        callback.Invoke(externalImg);
+                                };
+                            }
+                            //Sucess
+                            else
+                            {
+                                externalImg.Texture = sprite.texture;
+                                externalImg.Sprite = sprite;
+                                externalImg.Status = AsyncStatusEnum.Done;
+
+                                if(callback != null)
+                                    callback.Invoke(externalImg);
+                            }
+                        };
+
+                        return externalImg;
+                    })
             }
         };
 
