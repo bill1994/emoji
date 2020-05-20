@@ -1044,15 +1044,15 @@ namespace Kyub.Async
             //Clone original texture using default RawTextureData (only in Read/Write Texture)
             if (source != null)
             {
-                if (source.isReadable)
-                {
-                    readableText = new Texture2D(source.width, source.height, source.format, source.mipmapCount > 1);
-                    readableText.LoadRawTextureData(source.GetRawTextureData());
-                    readableText.Apply();
-                }
+                //if (source.isReadable)
+                //{
+                //    readableText = new Texture2D(source.width, source.height, source.format, source.mipmapCount > 1);
+                //    readableText.LoadRawTextureData(source.GetRawTextureData());
+                //    readableText.Apply();
+                //}
                 //Try other Aprouchs
-                else
-                {
+                //else
+                //{
                     RenderTexture renderTex = RenderTexture.GetTemporary(
                         source.width,
                         source.height,
@@ -1069,7 +1069,7 @@ namespace Kyub.Async
                     RenderTexture.active = previous;
                     RenderTexture.ReleaseTemporary(renderTex);
                     return readableText;
-                }
+                //}
             }
             return readableText;
         }
