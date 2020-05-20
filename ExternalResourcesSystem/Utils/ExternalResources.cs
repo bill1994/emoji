@@ -101,9 +101,9 @@ namespace Kyub.Async
                             if(texture != null)
                             {
                                 var originalTexture = texture;
-                                texture = new Texture2D(originalTexture.width, originalTexture.height);
-                                texture.LoadRawTextureData(originalTexture.GetRawTextureData());
-                                sprite = Sprite.Create(texture, new Rect(0,0,texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                                texture = CreateTextureClone(originalTexture);
+                                if(texture != null)
+                                    sprite = Sprite.Create(texture, new Rect(0,0,texture.width, texture.height), new Vector2(0.5f, 0.5f));
 
                                 //Now we must unload original Asset (DestroyImmediate cant handle resources asset)
                                 Resources.UnloadAsset(originalTexture);
@@ -1037,6 +1037,42 @@ namespace Kyub.Async
         #endregion
 
         #region Public Helper Functions
+
+        public static Texture2D CreateTextureClone(Texture2D source)
+        {
+            Texture2D readableText = null;
+            //Clone original texture using default RawTextureData (only in Read/Write Texture)
+            if (source != null)
+            {
+                if (source.isReadable)
+                {
+                    readableText = new Texture2D(source.width, source.height, source.format, source.mipmapCount > 1);
+                    readableText.LoadRawTextureData(source.GetRawTextureData());
+                    readableText.Apply();
+                }
+                //Try other Aprouchs
+                else
+                {
+                    RenderTexture renderTex = RenderTexture.GetTemporary(
+                        source.width,
+                        source.height,
+                        0,
+                        RenderTextureFormat.Default,
+                        RenderTextureReadWrite.Default);
+
+                    Graphics.Blit(source, renderTex);
+                    RenderTexture previous = RenderTexture.active;
+                    RenderTexture.active = renderTex;
+                    readableText = new Texture2D(source.width, source.height);
+                    readableText.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+                    readableText.Apply();
+                    RenderTexture.active = previous;
+                    RenderTexture.ReleaseTemporary(renderTex);
+                    return readableText;
+                }
+            }
+            return readableText;
+        }
 
         public static bool IsLoaded(string p_key)
         {
