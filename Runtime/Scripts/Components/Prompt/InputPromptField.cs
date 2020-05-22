@@ -418,7 +418,12 @@ namespace MaterialUI
                             {
                                 if (this != null)
                                 {
+                                    value = string.IsNullOrEmpty(value) ? string.Empty : value;
+                                    var willChange = m_Text != value;
+
                                     this.text = value;
+                                    if (willChange && onEndEdit != null)
+                                        onEndEdit.Invoke(m_Text);
                                     if (OnReturnPressed != null)
                                         OnReturnPressed.Invoke();
                                 }
