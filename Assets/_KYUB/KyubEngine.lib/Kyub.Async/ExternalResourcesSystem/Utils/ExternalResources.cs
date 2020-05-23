@@ -1041,25 +1041,42 @@ namespace Kyub.Async
         public static Texture2D CreateTextureClone(Texture2D source)
         {
             Texture2D readableText = null;
-            //Clone original texture using default RawTextureData (only in Read/Write Texture)
+            
             if (source != null)
             {
-                RenderTexture renderTex = RenderTexture.GetTemporary(
-                    source.width,
-                    source.height,
-                    0,
-                    RenderTextureFormat.Default,
-                    RenderTextureReadWrite.Default);
+                //Try efficient method
+                if (!Application.isEditor && SystemInfo.copyTextureSupport != UnityEngine.Rendering.CopyTextureSupport.None)
+                {
+                    readableText = new Texture2D(source.width, source.height, source.format, source.mipmapCount > 1);
+                    Graphics.CopyTexture(source, readableText);
+                }
+                //Clone original texture using default RawTextureData (only in Read/Write Texture)
+                else if (!Application.isEditor && source.isReadable)
+                {
+                    readableText = new Texture2D(source.width, source.height, source.format, source.mipmapCount > 1);
+                    var bytes = source.GetRawTextureData();
+                    readableText.LoadRawTextureData(bytes);
+                }
+                //Fallback to Graphics.Blit Method
+                else
+                {
+                    RenderTexture renderTex = RenderTexture.GetTemporary(
+                        source.width,
+                        source.height,
+                        0,
+                        RenderTextureFormat.Default,
+                        RenderTextureReadWrite.Default);
 
-                Graphics.Blit(source, renderTex);
-                RenderTexture previous = RenderTexture.active;
-                RenderTexture.active = renderTex;
-                readableText = new Texture2D(source.width, source.height);
-                readableText.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
-                readableText.Apply();
-                RenderTexture.active = previous;
-                RenderTexture.ReleaseTemporary(renderTex);
-                return readableText;
+                    Graphics.Blit(source, renderTex);
+                    RenderTexture previous = RenderTexture.active;
+                    RenderTexture.active = renderTex;
+
+                    readableText = new Texture2D(source.width, source.height);
+                    readableText.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+                    readableText.Apply();
+                    RenderTexture.active = previous;
+                    RenderTexture.ReleaseTemporary(renderTex);
+                }
             }
             return readableText;
         }
