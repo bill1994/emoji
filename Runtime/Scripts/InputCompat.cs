@@ -23,6 +23,18 @@ namespace Kyub.EventSystems
     {
         #region Static Properties
 
+        public static string inputString
+        {
+            get
+            {
+#if NEW_INPUT_SYSTEM_ACTIVE
+                return string.Empty;
+#else
+                return Input.inputString;
+#endif
+            }
+        }
+
         public static string compositionString
         {
             get
@@ -392,6 +404,20 @@ namespace Kyub.EventSystems
 #endif
         }
 
+        public static bool GetKeyDown(string keyName)
+        {
+#if NEW_INPUT_SYSTEM_ACTIVE
+            if (Keyboard.current != null)
+            {
+                Key keyWithName = ConvertKeyFromName(keyName);
+                return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].wasPressedThisFrame : false;
+            }
+            return false;
+#else
+            return Input.GetKeyDown(keyName);
+#endif
+        }
+
         public static bool GetKeyUp(KeyCode key)
         {
 #if NEW_INPUT_SYSTEM_ACTIVE
@@ -406,6 +432,20 @@ namespace Kyub.EventSystems
 #endif
         }
 
+        public static bool GetKeyUp(string keyName)
+        {
+#if NEW_INPUT_SYSTEM_ACTIVE
+            if (Keyboard.current != null)
+            {
+                Key keyWithName = ConvertKeyFromName(keyName);
+                return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].wasReleasedThisFrame : false;
+            }
+            return false;
+#else
+            return Input.GetKeyUp(keyName);
+#endif
+        }
+
         public static bool GetKey(KeyCode key)
         {
 #if NEW_INPUT_SYSTEM_ACTIVE
@@ -417,6 +457,20 @@ namespace Kyub.EventSystems
             return false;
 #else
             return Input.GetKey(key);
+#endif
+        }
+
+        public static bool GetKey(string keyName)
+        {
+#if NEW_INPUT_SYSTEM_ACTIVE
+            if (Keyboard.current != null)
+            {
+                Key keyWithName = ConvertKeyFromName(keyName);
+                return keyWithName != Key.None && Keyboard.current[keyWithName] != null ? Keyboard.current[keyWithName].isPressed : false;
+            }
+            return false;
+#else
+            return Input.GetKey(keyName);
 #endif
         }
 
