@@ -22,11 +22,12 @@ namespace MaterialUI
         private Graphic m_LabelText = null;
         [SerializeField]
         bool m_CanAnimateSize = true;
-
+		[SerializeField]
+        private float m_AnimScaleDuration = 0.65f;
+		
+        private const float m_AnimDuration = 0.65f;
         private Image m_CircleImage;
         private Graphic m_CircleIcon;
-
-        private const float animDuration = 0.65f;
 
         private int m_AnimCircle;
         private float m_AnimCircleStartTime;
@@ -184,10 +185,10 @@ namespace MaterialUI
             {
                 float animDeltaTime = Time.realtimeSinceStartup - m_AnimCircleStartTime;
 
-                if (animDeltaTime < animDuration)
+                if (animDeltaTime < m_AnimDuration)
                 {
                     circleImage.fillAmount = Tween.CubeInOut(m_AnimCircleCurrentFillAmount, 0.75f, animDeltaTime,
-                                                                            animDuration);
+                                                                            m_AnimDuration);
                 }
                 else
                 {
@@ -208,10 +209,10 @@ namespace MaterialUI
             {
                 float animDeltaTime = Time.realtimeSinceStartup - m_AnimCircleStartTime;
 
-                if (animDeltaTime < animDuration)
+                if (animDeltaTime < m_AnimDuration)
                 {
                     circleImage.fillAmount = Tween.CubeInOut(m_AnimCircleCurrentFillAmount, 0.1f, animDeltaTime,
-                                                                            animDuration);
+                                                                            m_AnimDuration);
                 }
                 else
                 {
@@ -232,12 +233,12 @@ namespace MaterialUI
             {
                 float animDeltaTime = Time.realtimeSinceStartup - m_AnimCircleStartTime;
 
-                if (animDeltaTime < animDuration)
+                if (animDeltaTime < m_AnimDuration)
                 {
                     circleImage.fillAmount = Tween.CubeInOut(m_AnimCircleCurrentFillAmount, m_CurrentProgress, animDeltaTime,
-                                                                            animDuration);
+                                                                            m_AnimDuration);
                     Vector3 tempVector3 = m_CircleRectTransform.localEulerAngles;
-                    tempVector3.z = Tween.CubeInOut(m_AnimCircleCurrentRotation, 0f, animDeltaTime, animDuration);
+                    tempVector3.z = Tween.CubeInOut(m_AnimCircleCurrentRotation, 0f, animDeltaTime, m_AnimDuration);
                     m_CircleRectTransform.localEulerAngles = tempVector3;
                 }
                 else
@@ -258,10 +259,10 @@ namespace MaterialUI
 
             float animDeltaTime = Time.realtimeSinceStartup - m_AnimColorStartTime;
 
-            if (animDeltaTime < animDuration)
+            if (animDeltaTime < m_AnimDuration)
             {
                 circleIcon.color = Tween.CubeInOut(m_AnimColorCurrentColor, m_AnimColorTargetColor, animDeltaTime,
-                                                                animDuration);
+                                                                m_AnimDuration);
             }
             else
             {
@@ -280,10 +281,10 @@ namespace MaterialUI
 
             float animDeltaTime = Time.realtimeSinceStartup - m_AnimSizeStartTime;
 
-            if (animDeltaTime < animDuration)
+            if (animDeltaTime < m_AnimScaleDuration)
             {
                 Vector3 tempVector3 = scaledRectTransform.localScale;
-                tempVector3.x = Tween.CubeInOut(m_AnimSizeCurrentSize, m_AnimSizeTargetSize, animDeltaTime, animDuration);
+                tempVector3.x = Tween.CubeInOut(m_AnimSizeCurrentSize, m_AnimSizeTargetSize, animDeltaTime, m_AnimScaleDuration);
                 tempVector3.y = tempVector3.x;
                 tempVector3.z = tempVector3.x;
                 scaledRectTransform.localScale = tempVector3;
