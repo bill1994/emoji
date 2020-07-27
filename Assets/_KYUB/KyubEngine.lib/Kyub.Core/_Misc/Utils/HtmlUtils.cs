@@ -57,6 +57,9 @@ namespace Kyub
                 { @"<[\/]code>", "</i></indent>\n" },
                 { @"⦁", "•" }, //Convert 'notation spot' (U+2981) to 'bullet' (U+2022)
                 { @"<font.*?(face=[""'](\S*?)[""'][>]?).*?>", "<font=\"{2}\">" }, //Group 2 is the font name
+                { @"<o:p.*?>(.*?)<[\/]o:p>", "" },
+                { @"<p class.*?>", "" },
+                { @"<!--(.*?)-->", "" }, //HTML Comments
         };
 
         #endregion

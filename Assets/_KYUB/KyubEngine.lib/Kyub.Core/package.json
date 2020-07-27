@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "displayName": "Kyub Core",
   "description": "Core Kyub API",
   "unity": "2019.1",
