@@ -31,13 +31,13 @@ namespace MaterialUI
 
         #region Custom Screen
 
-        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, Transform parent, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true) where T : MaterialScreen
+        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, Transform parent, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true, float delay = 0.5f) where T : MaterialScreen
         {
             var screenView = parent != null ? parent.GetComponentInParent<ScreenView>() : null;
-            ShowCustomScreenAsync(screenPrefabPath, screenView, initializeCallback, progressIndicator, p_searchForScreensWithSameName);
+            ShowCustomScreenAsync(screenPrefabPath, screenView, initializeCallback, progressIndicator, p_searchForScreensWithSameName, delay);
         }
 
-        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, ScreenView screenView, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true) where T : MaterialScreen
+        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, ScreenView screenView, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true, float delay = 0.5f) where T : MaterialScreen
         {
             T screenWithSameName = null;
             if (screenView != null)
@@ -77,7 +77,12 @@ namespace MaterialUI
             //Show Pre-Loaded Screen
             if (screenWithSameName != null)
             {
-                internalShowCallback(screenWithSameName);
+                //Prevent immediate execution
+                System.Action callbackDelayed = () =>
+                {
+                    internalShowCallback(screenWithSameName);
+                };
+                Kyub.DelayedFunctionUtils.CallFunction(callbackDelayed, 0.01f);
             }
 
             //Load and show Screen
@@ -99,7 +104,7 @@ namespace MaterialUI
                         //Hide Progress Indicator
                         currentProgress.Hide();
                     };
-                    Kyub.DelayedFunctionUtils.CallFunction(callbackDelayed, 0.5f);
+                    Kyub.DelayedFunctionUtils.CallFunction(callbackDelayed, delay);
                 };
 
                 if (currentProgress == null)
