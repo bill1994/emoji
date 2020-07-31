@@ -6,7 +6,7 @@ namespace MaterialUI
 {
     public class AndroidThemeNativeUtils
     {
-        #region Consts
+#region Consts
 
         public const int SDK_ANDROID_LOLLIPOP = 21;
         public const int SDK_ANDROID_M = 23;
@@ -25,6 +25,10 @@ namespace MaterialUI
         public const int SYSTEM_UI_FLAG_IMMERSIVE = 2048;
         public const int SYSTEM_UI_FLAG_IMMERSIVE_STICKY = 4096;
 
+        public const int FLAG_LAYOUT_ATTACHED_IN_DECOR = 1073741824;
+        public const int FLAG_LAYOUT_IN_OVERSCAN = 33554432;
+        public const int FLAG_LAYOUT_INSET_DECOR = 65536;
+        public const int FLAG_LAYOUT_IN_SCREEN = 256;
         public const int FLAG_LAYOUT_NO_LIMITS = 512;
         public const int FLAG_FULLSCREEN = 1024;
         public const int FLAG_FORCE_NOT_FULLSCREEN = 2048;
@@ -34,9 +38,9 @@ namespace MaterialUI
 
         public const int ID_ANDROID_CONTENT = 16908290;
 
-        #endregion
+#endregion
 
-        #region Main Objects
+#region Main Objects
 
         public static AndroidJavaObject GetActivity()
         {
@@ -79,9 +83,9 @@ namespace MaterialUI
             return window.Call<AndroidJavaObject>("getDecorView");
         }
 
-        #endregion
+#endregion
 
-        #region Display Metrics
+#region Display Metrics
 
         public static AndroidJavaObject GetResources(AndroidJavaObject applicationContext)
         {
@@ -107,9 +111,9 @@ namespace MaterialUI
             return displayMetrics.Get<float>("density");
         }
 
-        #endregion
+#endregion
 
-        #region Task Description Functions
+#region Task Description Functions
 
         public static string GetPackageName(AndroidJavaObject activity)
         {
@@ -141,9 +145,9 @@ namespace MaterialUI
             activity.Call("setTaskDescription", taskDescription);
         }
 
-        #endregion
+#endregion
 
-        #region System UI Visibility Functions
+#region System UI Visibility Functions
 
         public static void ClearSystemUiVisibilityFlags(AndroidJavaObject decorView, int flags)
         {
@@ -181,9 +185,9 @@ namespace MaterialUI
             return decorView.Call<int>("getSystemUiVisibility");
         }
 
-        #endregion
+#endregion
 
-        #region Window Functions
+#region Window Functions
 
         public static int GetWindowFlagConstValue(string flagName)
         {
@@ -194,7 +198,7 @@ namespace MaterialUI
             return layoutParamsClass.GetStatic<int>(flagName);
         }
 
-        protected static int GetWindowFlags(AndroidJavaObject window)
+        public static int GetWindowFlags(AndroidJavaObject window)
         {
             if (Application.isEditor || window == null)
                 return -1;
@@ -202,7 +206,7 @@ namespace MaterialUI
             return window.Call<AndroidJavaObject>("getAttributes").Get<int>("flags");
         }
 
-        protected static void AddWindowFlags(AndroidJavaObject window, int flags)
+        public static void AddWindowFlags(AndroidJavaObject window, int flags)
         {
             if (Application.isEditor || window == null)
                 return;
@@ -210,7 +214,7 @@ namespace MaterialUI
             window.Call("addFlags", flags);
         }
 
-        protected static void ClearWindowFlags(AndroidJavaObject window, int flags)
+        public static void ClearWindowFlags(AndroidJavaObject window, int flags)
         {
             if (Application.isEditor || window == null)
                 return;
@@ -218,9 +222,9 @@ namespace MaterialUI
             window.Call("clearFlags", flags);
         }
 
-        #endregion
+#endregion
 
-        #region Activity Functions
+#region Activity Functions
 
         public static void RunOnUIThread(AndroidJavaObject activity, System.Action action)
         {
@@ -234,9 +238,9 @@ namespace MaterialUI
             }));
         }
 
-        #endregion
+#endregion
 
-        #region Native Bars Functions
+#region Native Bars Functions
 
         static bool IsStatusBarVisible_Internal(AndroidJavaObject decorView)
         {
@@ -486,9 +490,9 @@ namespace MaterialUI
             }
         }
 
-        #endregion
+#endregion
 
-        #region Other Functions
+#region Other Functions
 
         public static int GetSdkVersion()
         {
@@ -520,7 +524,7 @@ namespace MaterialUI
             return color;
         }
 
-        #endregion
+#endregion
     }
 }
 
