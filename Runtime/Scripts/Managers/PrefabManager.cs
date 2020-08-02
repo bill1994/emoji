@@ -98,9 +98,9 @@ namespace MaterialUI
 
                     var addressAsset = ResourcePrefabs.GetPrefabAddressWithName(nameWithPath);
                     if (addressAsset != null && !addressAsset.IsEmpty())
-                        ResourcesLoader.LoadAsync(addressAsset, internalCallback);
+                        InternalResourcesLoader.LoadAsync(addressAsset, internalCallback);
                     else
-                        ResourcesLoader.LoadAsync<GameObject>(nameWithPath, internalCallback);
+                        InternalResourcesLoader.LoadAsync<GameObject>(nameWithPath, internalCallback);
                 }
             }
             else
@@ -113,33 +113,17 @@ namespace MaterialUI
         /// <param name="nameWithPath">The name of the prefab, including the path.</param>
         /// <param name="parent">The transform to set the parent of the instantiated GameObject.</param>
         /// <returns>The instantiated GameObject that matches the path, if found. If no GameObject is found, returns null.</returns>
-        public static GameObject InstantiateGameObject(string nameWithPath, Transform parent)
+        public static GameObject InstantiateGameObject(string nameWithPath, Transform parent, bool? active = null)
         {
-            GameObject go = GetGameObject(nameWithPath);
+            GameObject asset = GetGameObject(nameWithPath);
 
-            if (go == null)
-            {
-                return null;
-            }
-
-            go = GameObject.Instantiate(go);
-
-            if (parent == null)
-            {
-                return go;
-            }
-
-            go.transform.SetParent(parent);
-            go.transform.localScale = Vector3.one;
-            go.transform.localEulerAngles = Vector3.zero;
-            go.transform.localPosition = Vector3.zero;
-
-            return go;
+            var instance = InstantiateInternal(asset, parent, active);
+            return instance;
         }
 
-        public static GameObject InstantiateGameObject(PrefabAddress addressAsset, Transform parent)
+        public static GameObject InstantiateGameObject(PrefabAddress addressAsset, Transform parent, bool? active = null)
         {
-            return InstantiateGameObject(addressAsset != null ? addressAsset.Name : "", parent);
+            return InstantiateGameObject(addressAsset != null ? addressAsset.Name : "", parent, active);
         }
 
         /// <summary>
@@ -148,77 +132,67 @@ namespace MaterialUI
         /// <param name="nameWithPath">The name of the prefab, including the path.</param>
         /// <param name="parent">The transform to set the parent of the instantiated GameObject.</param>
         /// <returns>The instantiated GameObject that matches the path, if found. If no GameObject is found, returns null.</returns>
-        public static void InstantiateGameObjectAsync(string nameWithPath, Transform parent, System.Action<string, GameObject> callback)
+        public static void InstantiateGameObjectAsync(string nameWithPath, Transform parent, System.Action<string, GameObject> callback, bool? active = null)
         {
             System.Action<string, GameObject> internalCallback = (path, asset) =>
             {
-                var go = asset != null ? GameObject.Instantiate(asset, parent) : null;
-                if (go != null && parent != null)
-                {
-                    go.transform.localScale = Vector3.one;
-                    go.transform.localEulerAngles = Vector3.zero;
-                    go.transform.localPosition = Vector3.zero;
-                }
+                var instance = InstantiateInternal(asset, parent, active);
                 if (callback != null)
-                    callback(path, go);
+                    callback(path, instance);
             };
             GetGameObjectAsync(nameWithPath, internalCallback);
         }
 
-        public static void InstantiateGameObjectAsync(PrefabAddress addressAsset, Transform parent, System.Action<string, GameObject> callback)
+        public static void InstantiateGameObjectAsync(PrefabAddress addressAsset, Transform parent, System.Action<string, GameObject> callback, bool? active = null)
         {
-            InstantiateGameObjectAsync(addressAsset != null ? addressAsset.Name : "", parent, callback);
+            InstantiateGameObjectAsync(addressAsset != null ? addressAsset.Name : "", parent, callback, active);
         }
 
-        class ResourcesLoader : MonoBehaviour
+        static GameObject InstantiateInternal(GameObject asset, Transform parent, bool? active = null)
         {
-            public void Awake()
+            var cachedActiveSelf = asset != null ? asset.activeSelf : true;
+            var targetActiveSelf = active != null ? active.Value : cachedActiveSelf;
+
+            //Change active state, if needed
+            if (asset != null && cachedActiveSelf != targetActiveSelf)
+                asset.SetActive(targetActiveSelf);
+
+            var instance = asset != null ? GameObject.Instantiate(asset, parent) : null;
+
+            //Revert to old active state (in prefab)
+            if (asset != null && asset.activeSelf != cachedActiveSelf)
+                asset.SetActive(cachedActiveSelf);
+
+            if (instance != null && parent != null)
             {
-                DontDestroyOnLoad(this);
+                instance.transform.localScale = Vector3.one;
+                instance.transform.localEulerAngles = Vector3.zero;
+                instance.transform.localPosition = Vector3.zero;
+            }
+
+            return instance;
+        }
+
+        class InternalResourcesLoader
+        {
+            public static void LoadAsync<T>(GenericAssetAddress<T> assetAddress, System.Action<string, T> callback) where T : UnityEngine.Object
+            {
+                var request = assetAddress.LoadAssetAsync();
+                request.onComplete += (result) =>
+                {
+                    if (callback != null)
+                        callback(assetAddress.Name, request.asset as T);
+                };
             }
 
             public static void LoadAsync<T>(string path, System.Action<string, T> callback) where T : UnityEngine.Object
             {
-                var loader = new GameObject().AddComponent<ResourcesLoader>();
-                loader.StartCoroutine(loader.LoadAsyncRoutine<T>(path, callback));
-            }
-
-            public static void LoadAsync<T>(GenericAssetAddress<T> assetAddress, System.Action<string, T> callback) where T : UnityEngine.Object
-            {
-                var loader = new GameObject().AddComponent<ResourcesLoader>();
-                loader.StartCoroutine(loader.LoadAsyncRoutine<T>(assetAddress, callback));
-            }
-
-            IEnumerator LoadAsyncRoutine<T>(GenericAssetAddress<T> assetAddress, System.Action<string, T> callback) where T : UnityEngine.Object
-            {
-                var v_request = assetAddress.LoadAssetAsync();
-                while (!v_request.isDone)
+                var request = Resources.LoadAsync<T>(path);
+                request.completed += (operation) =>
                 {
-                    yield return null;
-                }
-                if (callback != null)
-                    callback(assetAddress.Name, v_request.asset as T);
-
-                if (Application.isPlaying)
-                    GameObject.Destroy(gameObject);
-                else
-                    GameObject.DestroyImmediate(gameObject);
-            }
-
-            IEnumerator LoadAsyncRoutine<T>(string path, System.Action<string, T> callback) where T : UnityEngine.Object
-            {
-                var v_request = Resources.LoadAsync<T>(path);
-                while (!v_request.isDone)
-                {
-                    yield return null;
-                }
-                if (callback != null)
-                    callback(path, v_request.asset as T);
-
-                if (Application.isPlaying)
-                    GameObject.Destroy(gameObject);
-                else
-                    GameObject.DestroyImmediate(gameObject);
+                    if (callback != null)
+                        callback(path, request.asset as T);
+                };
             }
         }
     }

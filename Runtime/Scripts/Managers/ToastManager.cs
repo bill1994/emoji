@@ -65,9 +65,9 @@ namespace MaterialUI
             _AnimatorsCache.TryGetValue(assetPath, out currentAnimator);
             if (currentAnimator == null)
             {
-                var Instance = PrefabManager.InstantiateGameObject(assetPath, transform);
+                var Instance = PrefabManager.InstantiateGameObject(assetPath, transform ,false);
                 if (Instance == null)
-                    Instance = PrefabManager.InstantiateGameObject(defaultAdress != null ? defaultAdress.Name : null, transform);
+                    Instance = PrefabManager.InstantiateGameObject(defaultAdress != null ? defaultAdress.Name : null, transform, false);
 
                 currentAnimator = Instance.GetComponent<ToastAnimator>();
 

@@ -82,7 +82,7 @@ namespace MaterialUI
                 {
                     internalShowCallback(screenWithSameName);
                 };
-                Kyub.DelayedFunctionUtils.CallFunction(callbackDelayed, 0.01f);
+                Kyub.RuntimeContext.RunOnMainThread(callbackDelayed, 0.01f);
             }
 
             //Load and show Screen
@@ -93,8 +93,8 @@ namespace MaterialUI
                 System.Action<string, T> internalLoadCallback = (path, dialog) =>
                 {
                     //_dialogGenericDialog = dialog;
-                    if (dialog != null)
-                        dialog.gameObject.SetActive(false);
+                    //if (dialog != null)
+                    //    dialog.gameObject.SetActive(false);
                     System.Action callbackDelayed = () =>
                     {
                         //Show
@@ -104,7 +104,7 @@ namespace MaterialUI
                         //Hide Progress Indicator
                         currentProgress.Hide();
                     };
-                    Kyub.DelayedFunctionUtils.CallFunction(callbackDelayed, delay);
+                    Kyub.RuntimeContext.RunOnMainThread(callbackDelayed, delay);
                 };
 
                 if (currentProgress == null)
@@ -123,7 +123,7 @@ namespace MaterialUI
 
         public static T CreateCustomScreen<T>(string screenPrefabPath, ScreenView screenView) where T : MaterialScreen
         {
-            T screen = PrefabManager.InstantiateGameObject(screenPrefabPath, screenView != null ? screenView.transform : Instance.transform).GetComponent<T>();
+            T screen = PrefabManager.InstantiateGameObject(screenPrefabPath, screenView != null ? screenView.transform : Instance.transform, false).GetComponent<T>();
             if (screen != null)
                 screen.name = screenPrefabPath;
 
@@ -143,7 +143,7 @@ namespace MaterialUI
                 if (screen != null)
                 {
                     screen.name = screenPrefabPath;
-                    screen.gameObject.SetActive(false);
+                    //screen.gameObject.SetActive(false);
                 }
 
                 T assetComponent = null;
@@ -151,7 +151,7 @@ namespace MaterialUI
                     assetComponent = screen.GetComponent<T>();
                 callback(path, assetComponent);
             };
-            PrefabManager.InstantiateGameObjectAsync(screenPrefabPath, screenView != null ? screenView.transform : Instance.transform, internalCallback);
+            PrefabManager.InstantiateGameObjectAsync(screenPrefabPath, screenView != null ? screenView.transform : Instance.transform, internalCallback, false);
         }
 
         #endregion
