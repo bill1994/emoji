@@ -7,12 +7,16 @@ using System.Threading;
 using System;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Kyub
 {
     /// <summary>
     /// Context to Execute Code Delayed or in MainThread
     /// </summary>
-    public class RuntimeContext
+    public class ApplicationContext
     {
         #region Events
 
@@ -22,14 +26,14 @@ namespace Kyub
 
         #region Unity Initialization
 
-        static RuntimeContextBehaviour _instance;
+        static InternalContextBehaviour _instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {
             if (_instance == null)
             {
-                _instance = new GameObject("RuntimeContext").AddComponent<RuntimeContextBehaviour>();
+                _instance = new GameObject("RuntimeContext").AddComponent<InternalContextBehaviour>();
                 _instance.gameObject.hideFlags = HideFlags.HideInHierarchy;
                 GameObject.DontDestroyOnLoad(_instance.gameObject);
             }
@@ -41,20 +45,20 @@ namespace Kyub
 
         public static void CancelAll()
         {
-            lock (RuntimeContextBehaviour._cancelationBackLog)
+            lock (InternalContextBehaviour._cancelationBackLog)
             {
-                RuntimeContextBehaviour._cancelationBackLog.Clear();
-                RuntimeContextBehaviour._cancelAll = true;
-                RuntimeContextBehaviour._queued = true;
+                InternalContextBehaviour._cancelationBackLog.Clear();
+                InternalContextBehaviour._cancelAll = true;
+                InternalContextBehaviour._queued = true;
             }
         }
 
         public static void Cancel(int guid)
         {
-            lock (RuntimeContextBehaviour._cancelationBackLog)
+            lock (InternalContextBehaviour._cancelationBackLog)
             {
-                RuntimeContextBehaviour._cancelationBackLog.Add(guid);
-                RuntimeContextBehaviour._queued = true;
+                InternalContextBehaviour._cancelationBackLog.Add(guid);
+                InternalContextBehaviour._queued = true;
             }
         }
 
@@ -76,7 +80,7 @@ namespace Kyub
 
         public static void RunAsync(int guid, Action action, float delay)
         {
-            if(action != null)
+            if (action != null)
                 RunOnMainThread(guid, () => { RunAsync(action); }, delay);
         }
 
@@ -115,22 +119,23 @@ namespace Kyub
 
         public static void RunOnMainThread(int guid, Action action, float delay)
         {
-            if(action != null)
-                RunOnMainThreadInternal(new ActionInfo(action, delay) { Guid = guid });
+            if (action != null)
+                RunOnMainThreadInternal(new MainThreadActionInfo(action, delay) { Guid = guid });
         }
 
         #endregion
 
         #region Internal Helper Functions
 
-        static void RunOnMainThreadInternal(ActionInfo actionInfo)
+        static void RunOnMainThreadInternal(MainThreadActionInfo actionInfo)
         {
             if (actionInfo != null && actionInfo.Action != null)
             {
-                lock (RuntimeContextBehaviour._backlog)
+                lock (InternalContextBehaviour._backlog)
                 {
-                    RuntimeContextBehaviour._backlog.Add(actionInfo);
-                    RuntimeContextBehaviour._queued = true;
+                    actionInfo.ScheduledWhenPlaying = InternalContextBehaviour._isPlaying;
+                    InternalContextBehaviour._backlog.Add(actionInfo);
+                    InternalContextBehaviour._queued = true;
                 }
             }
         }
@@ -139,13 +144,40 @@ namespace Kyub
 
         #region Helper Classes
 
-        class RuntimeContextBehaviour : MonoBehaviour
+        class InternalContextBehaviour : MonoBehaviour
         {
+            #region Editor Functions
+#if UNITY_EDITOR
+            [InitializeOnLoadMethod]
+            private static void EditorInitialize()
+            {
+                _isPlaying = Application.isPlaying;
+                EditorApplication.update -= EditorUpdate;
+                EditorApplication.update += EditorUpdate;
+
+                EditorApplication.playModeStateChanged -= EditorStateChanged;
+                EditorApplication.playModeStateChanged += EditorStateChanged;
+            }
+
+            private static void EditorStateChanged(PlayModeStateChange state)
+            {
+                _isPlaying = state == PlayModeStateChange.EnteredPlayMode || state == PlayModeStateChange.ExitingPlayMode;
+            }
+
+            private static void EditorUpdate()
+            {
+                if (!_isPlaying)
+                    CallUpdate();
+            }
+#endif
+            #endregion
+
             #region Private Variables
 
+            internal static bool _isPlaying = true;
             internal static volatile bool _queued = false;
-            internal static List<ActionInfo> _backlog = new List<ActionInfo>(8);
-            internal static List<ActionInfo> _actions = new List<ActionInfo>(8);
+            internal static List<MainThreadActionInfo> _backlog = new List<MainThreadActionInfo>(8);
+            internal static List<MainThreadActionInfo> _actions = new List<MainThreadActionInfo>(8);
 
             internal static volatile bool _cancelAll = false;
             internal static HashSet<int> _cancelationBackLog = new HashSet<int>();
@@ -157,8 +189,18 @@ namespace Kyub
 
             private void Update()
             {
-                if (RuntimeContext.OnUpdate != null)
-                    RuntimeContext.OnUpdate.Invoke();
+                _isPlaying = true;
+                CallUpdate();
+            }
+
+            #endregion
+
+            #region Static Functions
+
+            private static void CallUpdate()
+            {
+                if (ApplicationContext.OnUpdate != null)
+                    ApplicationContext.OnUpdate.Invoke();
 
                 if (_queued)
                 {
@@ -191,7 +233,7 @@ namespace Kyub
                             var actionInfo = _actions[i];
                             if (actionInfo == null ||
                                 (actionInfo.Guid != null && _cancelActions.Contains(actionInfo.Guid.Value)) ||
-                                actionInfo.TryExecute(deltaTime))
+                                actionInfo.TryExecute(deltaTime, _isPlaying))
                             {
                                 _actions.RemoveAt(i);
                             }
@@ -202,7 +244,7 @@ namespace Kyub
                         }
                     }
 
-                    if(_cancelActions.Count > 0)
+                    if (_cancelActions.Count > 0)
                         _cancelActions.Clear();
 
                     // Schedule to nex thread
@@ -221,13 +263,14 @@ namespace Kyub
             #endregion
         }
 
-        class ActionInfo
+        class MainThreadActionInfo
         {
             #region Private Variables
 
             int? m_guid = 0;
             volatile float m_remainingTime = 0;
             Action m_action = null;
+            bool m_scheduledWhenPlaying = false;
 
             #endregion
 
@@ -275,17 +318,31 @@ namespace Kyub
                 }
             }
 
+            public bool ScheduledWhenPlaying
+            {
+                get
+                {
+                    return m_scheduledWhenPlaying;
+                }
+                set
+                {
+                    if (m_scheduledWhenPlaying == value)
+                        return;
+                    m_scheduledWhenPlaying = value;
+                }
+            }
+
             #endregion
 
             #region Contructors
 
-            public ActionInfo() { }
+            public MainThreadActionInfo() { }
 
-            public ActionInfo(Action action) : this(action, 0)
+            public MainThreadActionInfo(Action action) : this(action, 0)
             {
             }
 
-            public ActionInfo(Action action, float remainingTime)
+            public MainThreadActionInfo(Action action, float remainingTime)
             {
                 m_action = action;
                 m_remainingTime = remainingTime;
@@ -295,8 +352,13 @@ namespace Kyub
 
             #region Public Methods
 
-            public bool TryExecute(float deltaTime)
+            public bool TryExecute(float deltaTime, bool isPlaying)
             {
+#if UNITY_EDITOR
+                //Cancel Action
+                if (m_scheduledWhenPlaying != isPlaying)
+                    m_remainingTime = 1;
+#endif
                 if (m_remainingTime <= 0)
                 {
                     if (m_remainingTime == 0 && m_action != null)
