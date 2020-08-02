@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Kyub;
 using System;
+using System.Reflection;
+using Kyub.Reflection;
 
 namespace Kyub.Async
 {
@@ -254,5 +256,158 @@ namespace Kyub.Async
 		#endregion
 	}
 
-	#endregion
+    [System.Serializable]
+    public class FunctionAndParams
+    {
+        #region Private Variables
+
+        [SerializeField]
+        object m_target = null;
+        [SerializeField]
+        System.Type m_functionType = null;
+        [SerializeField]
+        string m_stringFunctionName = "";
+        [SerializeField]
+        System.Delegate m_delegatePointer = null;
+        [SerializeField]
+        List<object> m_params = new List<object>();
+
+        #endregion
+
+        #region Public Properties
+
+        public object Target
+        {
+            get
+            {
+                return m_target;
+            }
+            set
+            {
+                if (m_target == value)
+                    return;
+                m_target = value;
+            }
+        }
+
+        public System.Type FunctionType
+        {
+            get
+            {
+                return m_functionType;
+            }
+            set
+            {
+                if (m_functionType == value)
+                    return;
+                m_functionType = value;
+            }
+        }
+
+        public string StringFunctionName
+        {
+            get
+            {
+                return m_stringFunctionName;
+            }
+            set
+            {
+                if (m_stringFunctionName == value)
+                    return;
+                m_stringFunctionName = value;
+            }
+        }
+
+        public System.Delegate DelegatePointer
+        {
+            get
+            {
+                return m_delegatePointer;
+            }
+            set
+            {
+                if (m_delegatePointer == value)
+                    return;
+                m_delegatePointer = value;
+            }
+        }
+
+        public List<object> Params
+        {
+            get
+            {
+                if (m_params == null)
+                    m_params = new List<object>();
+                return m_params;
+            }
+            set
+            {
+                if (m_params == value)
+                    return;
+                m_params = value;
+            }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        public bool CallFunction()
+        {
+            if (m_delegatePointer != null)
+            {
+                return CallDelegateFunction();
+            }
+            if (string.IsNullOrEmpty(m_stringFunctionName))
+            {
+                if (m_target != null)
+                    return FunctionUtils.CallFunction(m_target, FunctionType, m_stringFunctionName, Params);
+                else
+                    return FunctionUtils.CallStaticFunction(FunctionType, m_stringFunctionName, Params);
+            }
+            return false;
+        }
+
+        protected bool CallDelegateFunction()
+        {
+            try
+            {
+                System.Delegate v_tempFunctionPointer = DelegatePointer;
+                object[] v_params = Params.ToArray();
+                if (v_tempFunctionPointer != null)
+                {
+                    if (Params.Count == 0)
+                        v_tempFunctionPointer.DynamicInvoke(null);
+                    else
+                        v_tempFunctionPointer.DynamicInvoke(v_params);
+                    return true;
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        public System.Type[] GetFunctionParameterTypes()
+        {
+            List<System.Type> v_parameters = new List<System.Type>();
+            if (DelegatePointer != null)
+            {
+                MethodInfo v_invoke = DelegatePointer.GetType().GetMethod("Invoke");
+                if (v_invoke != null)
+                {
+                    ParameterInfo[] v_params = v_invoke.GetParameters();
+                    foreach (ParameterInfo v_param in v_params)
+                    {
+                        if (v_params != null)
+                            v_parameters.Add(v_param.ParameterType);
+                    }
+                }
+            }
+            return v_parameters.ToArray();
+        }
+
+        #endregion
+    }
+
+    #endregion
 }

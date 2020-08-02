@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.async",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "displayName": "Kyub Async",
   "description": "Useful methods to manage web files",
   "unity": "2019.1",

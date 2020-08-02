@@ -547,7 +547,7 @@ namespace Kyub.Async
             if (!_isUloadingAssets)
             {
                 _isUloadingAssets = true;
-                DelayedFunctionUtils.CallFunction(new System.Action(UnloadUnusedAssetsImmediate), 0.1f);
+                RuntimeContext.RunOnMainThread(UnloadUnusedAssetsImmediate, 0.1f);
             }
         }
 
