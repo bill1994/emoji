@@ -144,7 +144,7 @@ namespace Kyub.UI
             }
             else
             {
-                RuntimeContext.RunOnMainThread(() => {
+                ApplicationContext.RunOnMainThread(() => {
                     if (this != null)
                         CheckFocus(p_panelState); 
                 }, 0.1f);

@@ -547,7 +547,7 @@ namespace Kyub.Async
             if (!_isUloadingAssets)
             {
                 _isUloadingAssets = true;
-                RuntimeContext.RunOnMainThread(UnloadUnusedAssetsImmediate, 0.1f);
+                ApplicationContext.RunOnMainThread(UnloadUnusedAssetsImmediate, 0.1f);
             }
         }
 

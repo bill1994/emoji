@@ -37,7 +37,7 @@ namespace Kyub.UI
             {
                 if (p_time > 0)
                 {
-                    RuntimeContext.RunOnMainThread(() =>
+                    ApplicationContext.RunOnMainThread(() =>
                     {
                        SetContainerVisibility(p_object, p_action);
                     }, p_time);
@@ -55,7 +55,7 @@ namespace Kyub.UI
             {
                 if (p_time > 0)
                 {
-                    RuntimeContext.RunOnMainThread(() =>
+                    ApplicationContext.RunOnMainThread(() =>
                     {
                         SetContainerVisibility(p_panel, p_action);
                     }, p_time);

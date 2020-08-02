@@ -251,7 +251,7 @@ namespace Kyub.UI
                 {
                     if (Application.isPlaying)
                     {
-                        RuntimeContext.RunOnMainThread(() =>
+                        ApplicationContext.RunOnMainThread(() =>
                         {
                             if (this != null)
                                 CheckNeedActivate();

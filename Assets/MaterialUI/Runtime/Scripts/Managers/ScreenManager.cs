@@ -82,7 +82,7 @@ namespace MaterialUI
                 {
                     internalShowCallback(screenWithSameName);
                 };
-                Kyub.RuntimeContext.RunOnMainThread(callbackDelayed, 0.01f);
+                Kyub.ApplicationContext.RunOnMainThread(callbackDelayed, 0.01f);
             }
 
             //Load and show Screen
@@ -104,7 +104,7 @@ namespace MaterialUI
                         //Hide Progress Indicator
                         currentProgress.Hide();
                     };
-                    Kyub.RuntimeContext.RunOnMainThread(callbackDelayed, delay);
+                    Kyub.ApplicationContext.RunOnMainThread(callbackDelayed, delay);
                 };
 
                 if (currentProgress == null)
