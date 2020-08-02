@@ -9,25 +9,25 @@ namespace Kyub
     {
         #region Function Caller
 
-        public static bool StaticFunctionExists(string p_typeName, string p_functionName)
+        public static bool StaticFunctionExists(string typeName, string functionName)
         {
             try
             {
-                return StaticFunctionExists(System.Type.GetType(p_typeName), p_functionName);
+                return StaticFunctionExists(System.Type.GetType(typeName), functionName);
             }
             catch { }
             return false;
         }
 
-        public static bool StaticFunctionExists(System.Type p_type, string p_functionName)
+        public static bool StaticFunctionExists(System.Type type, string functionName)
         {
-            if (p_type != null)
+            if (type != null)
             {
                 try
                 {
-                    System.Reflection.MethodInfo v_info = p_type.GetMethod(p_functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                    System.Reflection.MethodInfo info = type.GetMethod(functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
-                    if (v_info != null)
+                    if (info != null)
                     {
                         return true;
                     }
@@ -37,25 +37,25 @@ namespace Kyub
             return false;
         }
 
-        public static bool FunctionExists(string p_typeName, string p_functionName)
+        public static bool FunctionExists(string typeName, string functionName)
         {
             try
             {
-                return FunctionExists(System.Type.GetType(p_typeName), p_functionName);
+                return FunctionExists(System.Type.GetType(typeName), functionName);
             }
             catch { }
             return false;
         }
 
-        public static bool FunctionExists(System.Type p_type, string p_functionName)
+        public static bool FunctionExists(System.Type type, string functionName)
         {
-            if (p_type != null)
+            if (type != null)
             {
                 try
                 {
-                    System.Reflection.MethodInfo v_info = p_type.GetMethod(p_functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    System.Reflection.MethodInfo info = type.GetMethod(functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                    if (v_info != null)
+                    if (info != null)
                     {
                         return true;
                     }
@@ -65,27 +65,27 @@ namespace Kyub
             return false;
         }
 
-        public static bool CallStaticFunction(string p_typeName, string p_functionName, params object[] p_param)
+        public static bool CallStaticFunction(string typeName, string functionName, params object[] param)
         {
             try
             {
-                return CallStaticFunction(System.Type.GetType(p_typeName), p_functionName, p_param);
+                return CallStaticFunction(System.Type.GetType(typeName), functionName, param);
             }
             catch { }
             return false;
         }
 
-        public static bool CallStaticFunction(System.Type p_type, string p_functionName, params object[] p_param)
+        public static bool CallStaticFunction(System.Type type, string functionName, params object[] param)
         {
-            if (p_type != null)
+            if (type != null)
             {
                 try
                 {
-                    System.Reflection.MethodInfo v_info = p_type.GetMethod(p_functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                    System.Reflection.MethodInfo info = type.GetMethod(functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
-                    if (v_info != null)
+                    if (info != null)
                     {
-                        v_info.Invoke(null, p_param);
+                        info.Invoke(null, param);
                         return true;
                     }
                 }
@@ -94,73 +94,71 @@ namespace Kyub
             return false;
         }
 
-        public static T CallStaticFunctionWithReturn<T>(string p_typeName, string p_functionName, params object[] p_param)
+        public static T CallStaticFunctionWithReturn<T>(string typeName, string functionName, params object[] param)
         {
-            return CallStaticFunctionWithReturn<T>(System.Type.GetType(p_typeName), p_functionName, p_param);
+            return CallStaticFunctionWithReturn<T>(System.Type.GetType(typeName), functionName, param);
         }
 
-        public static T CallStaticFunctionWithReturn<T>(System.Type p_type, string p_functionName, params object[] p_param)
+        public static T CallStaticFunctionWithReturn<T>(System.Type type, string functionName, params object[] param)
         {
-            bool p_sucess = false;
-            T v_return = TryCallStaticFunctionWithReturn<T>(p_type, p_functionName, out p_sucess, p_param);
-            return v_return;
+            bool sucess = false;
+            T result = TryCallStaticFunctionWithReturn<T>(type, functionName, out sucess, param);
+            return result;
         }
 
-        public static T TryCallStaticFunctionWithReturn<T>(System.Type p_type, string p_functionName, out bool p_sucess, params object[] p_param)
+        public static T TryCallStaticFunctionWithReturn<T>(System.Type type, string functionName, out bool sucess, params object[] param)
         {
-            T v_return = default(T);
-            p_sucess = false;
-            System.Type v_type = p_type;
-            if (v_type != null)
+            T result = default(T);
+            sucess = false;
+            if (type != null)
             {
                 try
                 {
-                    System.Reflection.MethodInfo v_info = v_type.GetMethod(p_functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                    System.Reflection.MethodInfo info = type.GetMethod(functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
-                    if (v_info != null)
+                    if (info != null)
                     {
-                        v_return = (T)v_info.Invoke(null, p_param);
-                        p_sucess = true;
+                        result = (T)info.Invoke(null, param);
+                        sucess = true;
                     }
                 }
                 catch { }
             }
-            return v_return;
+            return result;
         }
 
-        public static bool CallFunction(object p_instance, string p_functionName, params object[] p_param)
+        public static bool CallFunction(object instance, string functionName, params object[] param)
         {
-            if (p_instance != null)
+            if (instance != null)
             {
-                System.Type v_type = p_instance.GetType();
-                return CallFunction(p_instance, v_type, p_functionName, p_param);
+                System.Type type = instance.GetType();
+                return CallFunction(instance, type, functionName, param);
             }
             return false;
         }
 
-        public static bool CallFunction(object p_instance, string p_typeName, string p_functionName, params object[] p_param)
+        public static bool CallFunction(object instance, string typeName, string functionName, params object[] param)
         {
-            if (p_instance != null)
+            if (instance != null)
             {
-                System.Type v_type = System.Type.GetType(p_typeName);
-                return CallFunction(p_instance, v_type, p_functionName, p_param);
+                System.Type type = System.Type.GetType(typeName);
+                return CallFunction(instance, type, functionName, param);
             }
             return false;
         }
 
-        public static bool CallFunction(object p_instance, System.Type p_type, string p_functionName, params object[] p_param)
+        public static bool CallFunction(object instance, System.Type type, string functionName, params object[] param)
         {
-            if (p_instance != null)
+            if (instance != null)
             {
-                System.Type v_type = p_type;
-                if (v_type != null)
+                if (type != null)
                 {
                     try
                     {
-                        System.Reflection.MethodInfo v_info = v_type.GetMethod(p_functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                        if (v_info != null)
+                        System.Reflection.MethodInfo info = type.GetMethod(functionName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        if (info != null)
                         {
-                            v_info.Invoke(p_instance, p_param);
+                            info.Invoke(instance, param);
                             return true;
                         }
                     }
@@ -170,41 +168,41 @@ namespace Kyub
             return false;
         }
 
-        public static bool CallEditorStaticFunction(string p_typeName, string p_functionName, params object[] p_param)
+        public static bool CallEditorStaticFunction(string typeName, string functionName, params object[] param)
         {
 #if UNITY_EDITOR
-            System.Reflection.Assembly v_editorAssembly = AssemblyUtils.GetEditorAssembly();
-            if (v_editorAssembly != null)
+            System.Reflection.Assembly editorAssembly = AssemblyUtils.GetEditorAssembly();
+            if (editorAssembly != null)
             {
-                p_typeName = string.IsNullOrEmpty(p_typeName) ? "" : p_typeName;
-                string v_fullTypeNameWithAssembly = p_typeName.Contains(v_editorAssembly.FullName) ? p_typeName : p_typeName + ", " + v_editorAssembly.FullName;
-                System.Type v_type = System.Type.GetType(v_fullTypeNameWithAssembly);
-                return CallStaticFunction(v_type, p_functionName, p_param);
+                typeName = string.IsNullOrEmpty(typeName) ? "" : typeName;
+                string fullTypeNameWithAssembly = typeName.Contains(editorAssembly.FullName) ? typeName : typeName + ", " + editorAssembly.FullName;
+                System.Type type = System.Type.GetType(fullTypeNameWithAssembly);
+                return CallStaticFunction(type, functionName, param);
             }
 #endif
             return false;
         }
 
-        public static T CallEditorStaticFunctionWithReturn<T>(string p_typeName, string p_functionName, params object[] p_param)
+        public static T CallEditorStaticFunctionWithReturn<T>(string typeName, string functionName, params object[] param)
         {
-            bool p_sucess = false;
-            T v_return = TryCallEditorStaticFunctionWithReturn<T>(p_typeName, p_functionName, out p_sucess, p_param);
-            return v_return;
+            bool sucess = false;
+            T result = TryCallEditorStaticFunctionWithReturn<T>(typeName, functionName, out sucess, param);
+            return result;
         }
 
-        public static T TryCallEditorStaticFunctionWithReturn<T>(string p_typeName, string p_functionName, out bool p_sucess, params object[] p_param)
+        public static T TryCallEditorStaticFunctionWithReturn<T>(string typeName, string functionName, out bool sucess, params object[] param)
         {
-            p_sucess = false;
-            T v_return = default(T);
+            sucess = false;
+            T result = default(T);
 #if UNITY_EDITOR
-            System.Reflection.Assembly v_editorAssembly = AssemblyUtils.GetEditorAssembly();
-            if (v_editorAssembly != null)
+            System.Reflection.Assembly editorAssembly = AssemblyUtils.GetEditorAssembly();
+            if (editorAssembly != null)
             {
-                System.Type v_type = System.Type.GetType(p_typeName + ", " + v_editorAssembly.FullName);
-                v_return = TryCallStaticFunctionWithReturn<T>(v_type, p_functionName, out p_sucess, p_param);
+                System.Type type = System.Type.GetType(typeName + ", " + editorAssembly.FullName);
+                result = TryCallStaticFunctionWithReturn<T>(type, functionName, out sucess, param);
             }
 #endif
-            return v_return;
+            return result;
         }
 
         #endregion
