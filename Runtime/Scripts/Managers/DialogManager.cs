@@ -776,7 +776,7 @@ namespace MaterialUI
                     //Hide Progress Indicator
                     currentProgress.Hide();
                 };
-                Kyub.RuntimeContext.RunOnMainThread(callbackDelayed, 0.5f);
+                Kyub.ApplicationContext.RunOnMainThread(callbackDelayed, 0.5f);
             };
 
             if (currentProgress == null)
