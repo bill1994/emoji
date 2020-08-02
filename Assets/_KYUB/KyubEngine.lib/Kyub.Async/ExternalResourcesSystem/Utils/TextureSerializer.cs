@@ -50,7 +50,7 @@ namespace Kyub.Async
             //Register new Callback
             if (p_callback != null || (p_target != null && !string.IsNullOrEmpty(p_callBackFunctionName)))
             {
-                var v_function = new Kyub.FunctionAndParams();
+                var v_function = new FunctionAndParams();
                 v_function.DelegatePointer = p_callback;
                 v_function.Target = p_target;
                 v_function.StringFunctionName = p_callBackFunctionName;

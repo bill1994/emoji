@@ -144,9 +144,10 @@ namespace Kyub.UI
             }
             else
             {
-                List<object> v_parameters = new List<object>();
-                v_parameters.Add(p_panelState);
-                Kyub.DelayedFunctionUtils.CallFunction(new System.Action<PanelStateEnum>(CheckFocus), v_parameters.ToArray(), 0.1f);
+                RuntimeContext.RunOnMainThread(() => {
+                    if (this != null)
+                        CheckFocus(p_panelState); 
+                }, 0.1f);
             }
         }
 

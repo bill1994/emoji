@@ -37,10 +37,10 @@ namespace Kyub.UI
             {
                 if (p_time > 0)
                 {
-                    List<object> v_params = new List<object>();
-                    v_params.Add(p_object);
-                    v_params.Add(p_action);
-                    Kyub.DelayedFunctionUtils.CallFunction(new System.Action<GameObject, ShowObjectActionEnum>(SetContainerVisibility), v_params.ToArray(), p_time);
+                    RuntimeContext.RunOnMainThread(() =>
+                    {
+                       SetContainerVisibility(p_object, p_action);
+                    }, p_time);
                 }
                 else
                 {
@@ -55,10 +55,10 @@ namespace Kyub.UI
             {
                 if (p_time > 0)
                 {
-                    List<object> v_params = new List<object>();
-                    v_params.Add(p_panel);
-                    v_params.Add(p_action);
-                    Kyub.DelayedFunctionUtils.CallFunction(new System.Action<TweenContainer, ShowObjectActionEnum>(SetContainerVisibility), v_params.ToArray(), p_time);
+                    RuntimeContext.RunOnMainThread(() =>
+                    {
+                        SetContainerVisibility(p_panel, p_action);
+                    }, p_time);
                 }
                 else
                 {

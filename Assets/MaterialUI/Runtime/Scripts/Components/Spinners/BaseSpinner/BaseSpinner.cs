@@ -317,7 +317,7 @@ namespace MaterialUI
                         cachedFrame.activity.Hide();
                     }
 
-                    cachedFrame = PrefabManager.InstantiateGameObject(dialogPrefabPath, null).GetComponent<TFrame>();
+                    cachedFrame = PrefabManager.InstantiateGameObject(dialogPrefabPath, null, false).GetComponent<TFrame>();
                     CreateSpinnerActivity(cachedFrame);
                 }
 

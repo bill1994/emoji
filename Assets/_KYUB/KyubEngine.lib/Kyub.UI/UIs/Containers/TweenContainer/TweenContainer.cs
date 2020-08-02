@@ -250,7 +250,13 @@ namespace Kyub.UI
                 if (!gameObject.activeSelf)
                 {
                     if (Application.isPlaying)
-                        Kyub.DelayedFunctionUtils.CallFunction(new System.Action(CheckNeedActivate), 0.01f);
+                    {
+                        RuntimeContext.RunOnMainThread(() =>
+                        {
+                            if (this != null)
+                                CheckNeedActivate();
+                        }, 0.01f);
+                    }
                 }
             }
             if (!Application.isPlaying)
