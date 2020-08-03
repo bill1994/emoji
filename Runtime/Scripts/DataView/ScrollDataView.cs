@@ -9,7 +9,7 @@ namespace Kyub.UI
 {
     public interface IReloadableDataViewElement
     {
-        void Reload(ScrollDataView.ReloadEventArgs p_args);
+        void Reload(ScrollDataView.ReloadEventArgs args);
 
         bool enabled
         {
@@ -119,15 +119,15 @@ namespace Kyub.UI
         {
             get
             {
-                var v_list = new List<object>();
+                var list = new List<object>();
                 if (m_data != null)
                 {
-                    foreach (var v_data in m_data)
+                    foreach (var data in m_data)
                     {
-                        v_list.Add(v_data);
+                        list.Add(data);
                     }
                 }
-                return v_list.AsReadOnly();
+                return list.AsReadOnly();
             }
         }
 
@@ -191,48 +191,48 @@ namespace Kyub.UI
             ScrollLayoutGroup.TryRecalculateLayout();
         }
 
-        public void Setup(IList p_data, IList<GameObject> p_customTemplatePerIndexList)
+        public void Setup(IList data, IList<GameObject> customTemplatePerIndexList)
         {
-            Setup(p_data, null, p_customTemplatePerIndexList);
+            Setup(data, null, customTemplatePerIndexList);
         }
 
-        public void Setup(IList p_data, Dictionary<int, GameObject> p_customTemplatePerIndex)
+        public void Setup(IList data, Dictionary<int, GameObject> customTemplatePerIndex)
         {
-            Setup(p_data, null, p_customTemplatePerIndex);
+            Setup(data, null, customTemplatePerIndex);
         }
 
-        public void Setup(IList p_data, Dictionary<System.Type, GameObject> p_customTemplatePerDataType, IList<GameObject> p_customTemplatePerIndexList)
+        public void Setup(IList data, Dictionary<System.Type, GameObject> customTemplatePerDataType, IList<GameObject> customTemplatePerIndexList)
         {
-            Dictionary<int, GameObject> v_customTemplateDict = new Dictionary<int, GameObject>();
-            if (p_customTemplatePerIndexList != null)
+            Dictionary<int, GameObject> customTemplateDict = new Dictionary<int, GameObject>();
+            if (customTemplatePerIndexList != null)
             {
-                for (int i = 0; i < p_customTemplatePerIndexList.Count; i++)
+                for (int i = 0; i < customTemplatePerIndexList.Count; i++)
                 {
-                    var v_template = p_customTemplatePerIndexList[i];
-                    if (v_template != null && v_template != m_defaultTemplate)
-                        v_customTemplateDict[i] = v_template;
+                    var template = customTemplatePerIndexList[i];
+                    if (template != null && template != m_defaultTemplate)
+                        customTemplateDict[i] = template;
                 }
             }
-            Setup(p_data, p_customTemplatePerDataType, v_customTemplateDict);
+            Setup(data, customTemplatePerDataType, customTemplateDict);
         }
 
         bool _setupOnEnable = false;
         protected Dictionary<System.Type, GameObject> _typePerPrefabTemplate = new Dictionary<System.Type, GameObject>();
         protected Dictionary<int, GameObject> _indexPerPrefabTemplate= new Dictionary<int, GameObject>();
-        public virtual void Setup(IList p_data, Dictionary<System.Type, GameObject> p_customTemplatePerDataType = null, Dictionary<int, GameObject> p_customTemplatePerIndex = null)
+        public virtual void Setup(IList data, Dictionary<System.Type, GameObject> customTemplatePerDataType = null, Dictionary<int, GameObject> customTemplatePerIndex = null)
         {
 
             //Set new Prefab per Type
-            _typePerPrefabTemplate = p_customTemplatePerDataType;
+            _typePerPrefabTemplate = customTemplatePerDataType;
             if (_typePerPrefabTemplate == null)
                 _typePerPrefabTemplate = new Dictionary<System.Type, GameObject>();
 
             //Set new Prefab per Index
-            _indexPerPrefabTemplate = p_customTemplatePerIndex;
+            _indexPerPrefabTemplate = customTemplatePerIndex;
             if (_indexPerPrefabTemplate == null)
                 _indexPerPrefabTemplate = new Dictionary<int, GameObject>();
 
-            m_data = p_data;
+            m_data = data;
             if (m_data == null)
                 m_data = new object[0];
 
@@ -271,100 +271,103 @@ namespace Kyub.UI
 
         #region Other Public Functions
 
-        public GameObject GetTemplateFromDataType(System.Type p_dataType)
+        public GameObject GetTemplateFromDataType(System.Type dataType)
         {
-            GameObject v_template = m_defaultTemplate;
-            //Try find for each type and subclass type
-            while (p_dataType != null)
+            GameObject template = m_defaultTemplate;
+            if (_typePerPrefabTemplate.Count > 0)
             {
-                if (_typePerPrefabTemplate.TryGetValue(p_dataType, out v_template))
-                    break;
-                p_dataType = p_dataType.BaseType;
+                //Try find for each type and subclass type
+                while (dataType != null)
+                {
+                    if (_typePerPrefabTemplate.TryGetValue(dataType, out template))
+                        break;
+                    dataType = dataType.BaseType;
+                }
+                if (template == null)
+                    template = m_defaultTemplate;
             }
-            if (v_template == null)
-                v_template = m_defaultTemplate;
-            return v_template;
+            return template;
         }
 
-        public void SetTemplateFromDataIndex(System.Type p_dataType, GameObject p_template)
+        public void SetTemplateFromDataIndex(System.Type dataType, GameObject template)
         {
-            if (p_dataType != null)
+            if (dataType != null)
             {
-                GameObject v_oldTemplate = null;
-                var v_sucess = _typePerPrefabTemplate.TryGetValue(p_dataType, out v_oldTemplate);
+                GameObject oldTemplate = null;
+                var sucess = _typePerPrefabTemplate.TryGetValue(dataType, out oldTemplate);
 
-                if (v_sucess && (p_template == null || p_template == m_defaultTemplate))
-                    _typePerPrefabTemplate.Remove(p_dataType);
-                else if (v_oldTemplate != p_template && p_template != null)
-                    _typePerPrefabTemplate[p_dataType] = p_template;
+                if (sucess && (template == null || template == m_defaultTemplate))
+                    _typePerPrefabTemplate.Remove(dataType);
+                else if (oldTemplate != template && template != null)
+                    _typePerPrefabTemplate[dataType] = template;
 
-                if (v_oldTemplate != p_template)
+                if (oldTemplate != template)
                     MarkToRemapIndexes();
             }
         }
 
-        public GameObject GetTemplateFromDataIndex(int p_dataIndex)
+        public GameObject GetTemplateFromDataIndex(int dataIndex)
         {
-            GameObject v_template = null;
-            if (!_indexPerPrefabTemplate.TryGetValue(p_dataIndex, out v_template))
+            GameObject template = null;
+            if (!_indexPerPrefabTemplate.TryGetValue(dataIndex, out template) && _typePerPrefabTemplate.Count > 0)
             {
-                var v_data = m_data != null && m_data.Count > p_dataIndex && p_dataIndex >= 0 ? m_data[p_dataIndex] : null;
-                if (v_data != null)
-                    v_template = GetTemplateFromDataType(v_data.GetType());
+                var data = m_data != null && m_data.Count > dataIndex && dataIndex >= 0 ? m_data[dataIndex] : null;
+                if (data != null)
+                    template = GetTemplateFromDataType(data.GetType());
             }
             //Prevent return default template
-            if (v_template == null)
-                v_template = m_defaultTemplate;
-            return v_template;
+            if (template == null)
+                template = m_defaultTemplate;
+            return template;
         }
 
-        public void SetTemplateFromDataIndex(int p_dataIndex, GameObject p_template)
+        public void SetTemplateFromDataIndex(int dataIndex, GameObject template)
         {
-            GameObject v_oldTemplate = null;
-            var v_sucess = _indexPerPrefabTemplate.TryGetValue(p_dataIndex, out v_oldTemplate);
+            GameObject oldTemplate = null;
+            var sucess = _indexPerPrefabTemplate.TryGetValue(dataIndex, out oldTemplate);
 
-            if (v_sucess && (p_template == null || p_template == m_defaultTemplate))
-                _indexPerPrefabTemplate.Remove(p_dataIndex);
-            else if(v_oldTemplate != p_template && p_template != null)
-                _indexPerPrefabTemplate[p_dataIndex] = p_template;
+            if (sucess && (template == null || template == m_defaultTemplate))
+                _indexPerPrefabTemplate.Remove(dataIndex);
+            else if(oldTemplate != template && template != null)
+                _indexPerPrefabTemplate[dataIndex] = template;
 
-            if (v_oldTemplate != p_template)
+            if (oldTemplate != template)
                 ScrollLayoutGroup.SetCachedElementsLayoutDirty();
         }
 
-        public GameObject GetElementAtDataIndex(int p_dataIndex)
+        public GameObject GetElementAtDataIndex(int dataIndex)
         {
-            int v_layoutIndex = ConvertDataIndexToLayoutIndex(p_dataIndex);
-            if(ScrollLayoutGroup != null && v_layoutIndex >= 0 && v_layoutIndex < m_scrollRectLayout.ElementsCount)
+            int layoutIndex = ConvertDataIndexToLayoutIndex(dataIndex);
+            if(ScrollLayoutGroup != null && layoutIndex >= 0 && layoutIndex < m_scrollRectLayout.ElementsCount)
             {
-                return m_scrollRectLayout[v_layoutIndex];
+                return m_scrollRectLayout[layoutIndex];
             }
             return null;
         }
 
-        public int ConvertDataIndexToLayoutIndex(int p_dataIndex)
+        public int ConvertDataIndexToLayoutIndex(int dataIndex)
         {
-            var v_layoutIndex = -1;
-            if (!_dataIndexToLayoutIndex.TryGetValue(p_dataIndex, out v_layoutIndex))
-                v_layoutIndex = -1;
-            return v_layoutIndex;
+            var layoutIndex = -1;
+            if (!_dataIndexToLayoutIndex.TryGetValue(dataIndex, out layoutIndex))
+                layoutIndex = -1;
+            return layoutIndex;
         }
 
 
-        public int ConvertLayoutIndexToDataIndex(int p_layoutIndex)
+        public int ConvertLayoutIndexToDataIndex(int layoutIndex)
         {
-            var v_dataIndex = -1;
-            if (!_layoutIndexToDataIndex.TryGetValue(p_layoutIndex, out v_dataIndex))
-                v_dataIndex = -1;
-            return v_dataIndex;
+            var dataIndex = -1;
+            if (!_layoutIndexToDataIndex.TryGetValue(layoutIndex, out dataIndex))
+                dataIndex = -1;
+            return dataIndex;
         }
 
         protected int _initialIndex = 0;
         protected Dictionary<int, int> _dataIndexToLayoutIndex = new Dictionary<int, int>();
         protected Dictionary<int, int> _layoutIndexToDataIndex = new Dictionary<int, int>();
-        public virtual void TryRemapIndexes(bool p_force = false)
+        public virtual void TryRemapIndexes(bool force = false)
         {
-            if (_indexesDirty || p_force)
+            if (_indexesDirty || force)
             {
                 _indexesDirty = false;
                 RemapIndexes();
@@ -409,9 +412,9 @@ namespace Kyub.UI
         {
             /*if (_indexPerPrefabTemplate != null)
             {
-                foreach (var v_pair in _indexPerPrefabTemplate)
+                foreach (var pair in _indexPerPrefabTemplate)
                 {
-                    var template = v_pair.Value;
+                    var template = pair.Value;
                     if (template != null && template.scene.IsValid())
                     {
                         template.name = "IndexTemplate";
@@ -422,12 +425,12 @@ namespace Kyub.UI
             }*/
             if (_typePerPrefabTemplate != null)
             {
-                foreach (var v_pair in _typePerPrefabTemplate)
+                foreach (var pair in _typePerPrefabTemplate)
                 {
-                    var template = v_pair.Value;
+                    var template = pair.Value;
                     if (template != null && template.scene.IsValid())
                     {
-                        template.name = "Template (Type: " + v_pair.Key.ToString() + ")";
+                        template.name = "Template (Type: " + pair.Key.ToString() + ")";
                         //if (template.activeSelf)
                         //    template.SetActive(false);
                     }
@@ -464,32 +467,32 @@ namespace Kyub.UI
             }
         }
 
-        protected virtual void RemapIndexes(bool p_resetAllObjects = false)
+        protected virtual void RemapIndexes(bool resetAllObjects = false)
         {
-            Dictionary<int, float> v_replacementDataLayoutSize = new Dictionary<int, float>();
+            Dictionary<int, float> replacementDataLayoutSize = new Dictionary<int, float>();
 
             _layoutIndexToDataIndex.Clear();
             _dataIndexToLayoutIndex.Clear();
             if (m_data != null && ScrollLayoutGroup != null)
             {
-                bool v_needReapplyElements = false;
-                var v_elements = new List<GameObject>();
+                bool needReapplyElements = false;
+                var elements = new List<GameObject>();
                 _initialIndex =  Mathf.Clamp((m_defaultSetupInitialIndex < 0 ? ScrollLayoutGroup.ElementsCount - 1 : m_defaultSetupInitialIndex), 0, ScrollLayoutGroup.ElementsCount);
-                var v_lastIndexMember = -1;
-                var v_currentDataIndex = 0;
+                var lastIndexMember = -1;
+                var currentDataIndex = 0;
                 for (int i = 0; i < ScrollLayoutGroup.ElementsCount; i++)
                 {
-                    var v_object = ScrollLayoutGroup[i];
-                    var v_isTemplate = IsDataViewTemplate(v_object);
-                    if (i >= _initialIndex && !v_isTemplate && (v_object == null || IsDataViewObject(v_object)))
+                    var go = ScrollLayoutGroup[i];
+                    var isTemplate = IsDataViewTemplate(go);
+                    if (i >= _initialIndex && !isTemplate && (go == null || IsDataViewObject(go)))
                     {
                         //We dont want extra elements related to data in ScrollLayoutGroup
-                        if (v_currentDataIndex >= m_data.Count)
+                        if (currentDataIndex >= m_data.Count)
                         {
-                            v_needReapplyElements = true;
-                            if (v_object != null)
+                            needReapplyElements = true;
+                            if (go != null)
                             {
-                                ReturnToPool(v_object);
+                                ReturnToPool(go);
                                 continue;
                             }
                         }
@@ -497,95 +500,95 @@ namespace Kyub.UI
                         else
                         {
                             //Check if element if valid for this current data index
-                            var v_isValidObjectForData = !p_resetAllObjects && IsDataViewObject(v_object, v_currentDataIndex);
+                            var isValidObjectForData = !resetAllObjects && IsDataViewObject(go, currentDataIndex);
 
                             //Add element only if is valid and not a template
-                            v_elements.Add(v_isTemplate || !v_isValidObjectForData ? null : v_object);
+                            elements.Add(isTemplate || !isValidObjectForData ? null : go);
 
                             //Update Index Mappers
-                            v_lastIndexMember = v_elements.Count - 1;
-                            _layoutIndexToDataIndex[v_lastIndexMember] = v_currentDataIndex;
-                            _dataIndexToLayoutIndex[v_currentDataIndex] = v_lastIndexMember;
+                            lastIndexMember = elements.Count - 1;
+                            _layoutIndexToDataIndex[lastIndexMember] = currentDataIndex;
+                            _dataIndexToLayoutIndex[currentDataIndex] = lastIndexMember;
                             
                             //Return to pool if is invalid
-                            if (!v_isValidObjectForData)
+                            if (!isValidObjectForData)
                             {
-                                v_replacementDataLayoutSize[v_lastIndexMember] = StipulateElementSize(v_currentDataIndex);
-                                v_needReapplyElements = true;
+                                replacementDataLayoutSize[lastIndexMember] = StipulateElementSize(currentDataIndex);
+                                needReapplyElements = true;
 
-                                if (v_object != null)
-                                    ReturnToPool(v_object);
+                                if (go != null)
+                                    ReturnToPool(go);
                             }
 
                             //Increment to next DataIndex
-                            v_currentDataIndex++;
+                            currentDataIndex++;
                         }
                     }
-                    else if(v_object != null && !v_isTemplate)
-                        v_elements.Add(v_object);
+                    else if(go != null && !isTemplate)
+                        elements.Add(go);
                     //Disable Templates
-                    if (v_isTemplate)
-                        v_object.SetActive(false);
+                    if (isTemplate)
+                        go.SetActive(false);
                 }
                 
                 //Try add elements not included in layout
-                while (v_currentDataIndex < m_data.Count)
+                while (currentDataIndex < m_data.Count)
                 {
-                    v_lastIndexMember = v_lastIndexMember < 0 ? _initialIndex : v_lastIndexMember + 1;
-                    v_elements.Insert(v_lastIndexMember, null);
-                    _layoutIndexToDataIndex[v_lastIndexMember] = v_currentDataIndex;
-                    _dataIndexToLayoutIndex[v_currentDataIndex] = v_lastIndexMember;
+                    lastIndexMember = lastIndexMember < 0 ? _initialIndex : lastIndexMember + 1;
+                    elements.Insert(lastIndexMember, null);
+                    _layoutIndexToDataIndex[lastIndexMember] = currentDataIndex;
+                    _dataIndexToLayoutIndex[currentDataIndex] = lastIndexMember;
                     //Stipulate Size of layout for the first Recalc
-                    v_replacementDataLayoutSize[v_lastIndexMember] = StipulateElementSize(v_currentDataIndex);
+                    replacementDataLayoutSize[lastIndexMember] = StipulateElementSize(currentDataIndex);
                     
-                    v_currentDataIndex++;
-                    v_needReapplyElements = true;
+                    currentDataIndex++;
+                    needReapplyElements = true;
                 }
-                if (v_needReapplyElements || ScrollLayoutGroup.ElementsCount != v_elements.Count)
+                if (needReapplyElements || ScrollLayoutGroup.ElementsCount != elements.Count)
                 {
-                    ScrollLayoutGroup.ReplaceElements(v_elements);
+                    ScrollLayoutGroup.ReplaceElements(elements);
                     //Force Change Layout Size
-                    foreach (var v_pair in v_replacementDataLayoutSize)
+                    foreach (var pair in replacementDataLayoutSize)
                     {
-                        ScrollLayoutGroup.SetCachedElementSize(v_pair.Key, v_pair.Value);
+                        ScrollLayoutGroup.SetCachedElementSize(pair.Key, pair.Value);
                     }
                 }
             }
         }
 
-        protected float StipulateElementSize(int p_dataIndex)
+        protected float StipulateElementSize(int dataIndex)
         {
-            var v_data = m_data != null && m_data.Count > p_dataIndex && p_dataIndex >= 0 ? m_data[p_dataIndex] : null;
-            var v_template = GetTemplateFromDataType(v_data != null? v_data.GetType() : null);
-            return ScrollLayoutGroup.CalculateElementSize(v_template != null? v_template.transform : null, ScrollLayoutGroup != null ? ScrollLayoutGroup.IsVertical() : true);
+            var data = m_data != null && m_data.Count > dataIndex && dataIndex >= 0 ? m_data[dataIndex] : null;
+            var template = GetTemplateFromDataType(data != null? data.GetType() : null);
+            return ScrollLayoutGroup.CalculateElementSize(template != null? template.transform : null, ScrollLayoutGroup != null ? ScrollLayoutGroup.IsVertical() : true);
         }
 
-        protected bool IsDataViewObject(GameObject p_object)
+        protected bool IsDataViewObject(GameObject go)
         {
-            if (p_object != null)
+            if (go != null)
             {
-                if (IsCreatedByPool(p_object))
+                if (IsCreatedByPool(go))
                     return true;
             }
             return false;
         }
 
-        protected bool IsDataViewObject(GameObject p_object, int p_dataIndex)
+        protected bool IsDataViewObject(GameObject go, int dataIndex)
         {
-            if (p_object != null)
+            if (go != null)
             {
-                var v_objTemplate = GetTemplateFromObject(p_object);
-                var v_dataTemplate = GetTemplateFromDataIndex(p_dataIndex);
-                return v_objTemplate != null && v_objTemplate == v_dataTemplate;
+                var objTemplate = GetTemplateFromObject(go);
+                var dataTemplate = GetTemplateFromDataIndex(dataIndex);
+                return objTemplate != null && objTemplate == dataTemplate;
             }
             return false;
         }
 
-        protected bool IsDataViewTemplate(GameObject p_object)
+        protected bool IsDataViewTemplate(GameObject go)
         {
-            if (p_object != null)
+            if (go != null)
             {
-                if ((p_object == m_defaultTemplate || _templatePerCreatedObjects.ContainsKey(p_object)))
+                if ((go == m_defaultTemplate || _templatePerCreatedObjects.ContainsKey(go)))
                     return true;
             }
             return false;
@@ -595,95 +598,95 @@ namespace Kyub.UI
 
         #region Receivers
 
-        protected virtual void HandleOnElementBecameVisible(GameObject p_elementObj, int p_layoutIndex)
+        protected virtual void HandleOnElementBecameVisible(GameObject elementObj, int layoutIndex)
         {
-            if (p_elementObj != null)
+            if (elementObj != null)
             {
-                var v_dataIndex = ConvertLayoutIndexToDataIndex(p_layoutIndex);
-                if (v_dataIndex >= 0)
+                var dataIndex = ConvertLayoutIndexToDataIndex(layoutIndex);
+                if (dataIndex >= 0)
                 {
-                    var v_elements = p_elementObj.GetComponents<IReloadableDataViewElement>();
+                    var elements = elementObj.GetComponents<IReloadableDataViewElement>();
 
-                    if (v_elements.Length > 0)
+                    if (elements.Length > 0)
                     {
-                        ReloadEventArgs v_arg = new ReloadEventArgs();
-                        v_arg.Data = m_data.Count > v_dataIndex ? m_data[v_dataIndex] : null;
-                        v_arg.DataIndex = v_dataIndex;
-                        v_arg.LayoutElement = p_elementObj;
-                        v_arg.LayoutElementIndex = p_layoutIndex;
-                        v_arg.Sender = this;
+                        ReloadEventArgs arg = new ReloadEventArgs();
+                        arg.Data = m_data.Count > dataIndex ? m_data[dataIndex] : null;
+                        arg.DataIndex = dataIndex;
+                        arg.LayoutElement = elementObj;
+                        arg.LayoutElementIndex = layoutIndex;
+                        arg.Sender = this;
 
-                        //Force reload all IReloadableElement in target gameobject
-                        foreach (var v_element in v_elements)
+                        //Force reload all IReloadableElement in target gamego
+                        foreach (var element in elements)
                         {
-                            if (v_element != null && !v_element.IsDestroyed() && v_element.enabled)
-                                v_element.Reload(v_arg);
+                            if (element != null && !element.IsDestroyed() && element.enabled)
+                                element.Reload(arg);
                         }
 
                         if (OnReloadElement != null)
-                            OnReloadElement.Invoke(v_arg);
+                            OnReloadElement.Invoke(arg);
                     }
                 }
             }
         }
 
-        protected virtual void HandleOnAddElements(int[] p_sortedAddedIndexes)
+        protected virtual void HandleOnAddElements(int[] sortedAddedIndexes)
         {
-            if (p_sortedAddedIndexes != null && m_data != null && _initialIndex >= 0)
+            if (sortedAddedIndexes != null && m_data != null && _initialIndex >= 0)
             {
-                bool v_needRemapIndexes = false;
-                foreach (var v_index in p_sortedAddedIndexes)
+                bool needRemapIndexes = false;
+                foreach (var index in sortedAddedIndexes)
                 {
                     //Element added in initialIndex position, we must change the initial position
-                    if (v_index == _initialIndex)
+                    if (index == _initialIndex)
                     {
-                        v_needRemapIndexes = true;
+                        needRemapIndexes = true;
                         _initialIndex++;
                     }
-                    else if (!v_needRemapIndexes)
-                        v_needRemapIndexes = v_index >= _initialIndex && v_index < _initialIndex + m_data.Count;
+                    else if (!needRemapIndexes)
+                        needRemapIndexes = index >= _initialIndex && index < _initialIndex + m_data.Count;
                 }
-                if (v_needRemapIndexes)
+                if (needRemapIndexes)
                     MarkToRemapIndexes();
             }
         }
 
-        protected virtual void HandleOnRemoveElements(int[] p_sortedRemovedIndexes)
+        protected virtual void HandleOnRemoveElements(int[] sortedRemovedIndexes)
         {
-            if (p_sortedRemovedIndexes != null && m_data != null && _initialIndex >= 0)
+            if (sortedRemovedIndexes != null && m_data != null && _initialIndex >= 0)
             {
-                bool v_needRemapIndexes = false;
-                foreach (var v_index in p_sortedRemovedIndexes)
+                bool needRemapIndexes = false;
+                foreach (var index in sortedRemovedIndexes)
                 {
-                    if (!v_needRemapIndexes)
+                    if (!needRemapIndexes)
                     {
-                        v_needRemapIndexes = v_index >= _initialIndex && v_index < _initialIndex + m_data.Count;
+                        needRemapIndexes = index >= _initialIndex && index < _initialIndex + m_data.Count;
                         break;
                     }
                 }
-                if (v_needRemapIndexes)
+                if (needRemapIndexes)
                     MarkToRemapIndexes();
             }
         }
 
-        protected virtual void HandleOnBeforeChangeVisibleElements(Vector2Int p_oldVisibleIndexRange)
+        protected virtual void HandleOnBeforeChangeVisibleElements(Vector2Int oldVisibleIndexRange)
         {
             if (m_data != null && m_data.Count > 0)
             {
                 Dictionary<GameObject, Stack<GameObject>> templatedPerObjectToReturn = new Dictionary<GameObject, Stack<GameObject>>();
-                var v_currentVisibleIndexRange = ScrollLayoutGroup.VisibleElementsIndexRange;
-                for (int i = p_oldVisibleIndexRange.x; i <= p_oldVisibleIndexRange.y; i++)
+                var currentVisibleIndexRange = ScrollLayoutGroup.VisibleElementsIndexRange;
+                for (int i = oldVisibleIndexRange.x; i <= oldVisibleIndexRange.y; i++)
                 {
                     //We want to pick elements out of new range to reuse in pool
-                    if (i >= 0 && i < ScrollLayoutGroup.ElementsCount && (i < v_currentVisibleIndexRange.x || i > v_currentVisibleIndexRange.y))
+                    if (i >= 0 && i < ScrollLayoutGroup.ElementsCount && (i < currentVisibleIndexRange.x || i > currentVisibleIndexRange.y))
                     {
-                        var v_element = ScrollLayoutGroup[i];
-                        var v_dataIndex = ConvertLayoutIndexToDataIndex(i);
+                        var element = ScrollLayoutGroup[i];
+                        var dataIndex = ConvertLayoutIndexToDataIndex(i);
                         //Is a DataView Object
-                        if (v_element != null && v_dataIndex >= 0)
+                        if (element != null && dataIndex >= 0)
                         {
-                            var template = GetTemplateFromDataIndex(v_dataIndex);
-                            //Add in template list (we will try recycle this objects first)
+                            var template = GetTemplateFromDataIndex(dataIndex);
+                            //Add in template list (we will try recycle this gos first)
                             if (template != null)
                             {
                                 Stack<GameObject> templateObjects = null;
@@ -692,29 +695,29 @@ namespace Kyub.UI
                                     templateObjects = new Stack<GameObject>();
                                     templatedPerObjectToReturn[template] = templateObjects;
                                 }
-                                templateObjects.Push(v_element);
+                                templateObjects.Push(element);
                             }
                             
-                            //ReturnToPool(v_dataIndex, v_element);
+                            //ReturnToPool(dataIndex, element);
                             ScrollLayoutGroup[i] = null;
                         }
                     }
                 }
 
-                bool v_needApplyTemplateNames = false;
-                //Change other pool objects
-                for (int i = v_currentVisibleIndexRange.x; i <= v_currentVisibleIndexRange.y; i++)
+                bool needApplyTemplateNames = false;
+                //Change other pool gos
+                for (int i = currentVisibleIndexRange.x; i <= currentVisibleIndexRange.y; i++)
                 {
                     //We want to pick elements out of old range
-                    var v_element = ScrollLayoutGroup.ElementsCount > i && i >= 0? ScrollLayoutGroup[i] : null;
-                    if (i >= 0 && i < ScrollLayoutGroup.ElementsCount && (v_element == null || IsDataViewTemplate(v_element)))
+                    var element = ScrollLayoutGroup.ElementsCount > i && i >= 0? ScrollLayoutGroup[i] : null;
+                    if (i >= 0 && i < ScrollLayoutGroup.ElementsCount && (element == null || IsDataViewTemplate(element)))
                     {
                         
-                        var v_dataIndex = ConvertLayoutIndexToDataIndex(i);
+                        var dataIndex = ConvertLayoutIndexToDataIndex(i);
                         //Is a DataView Object
-                        if (v_dataIndex >= 0)
+                        if (dataIndex >= 0)
                         {
-                            var template = GetTemplateFromDataIndex(v_dataIndex);
+                            var template = GetTemplateFromDataIndex(dataIndex);
                             GameObject poolObject = null;
                             Stack<GameObject> stack = null;
                             if (template != null)
@@ -729,18 +732,18 @@ namespace Kyub.UI
                             if(poolObject == null)
                                 poolObject = CreateOrPopFromPool(template);
 
-                            var v_oldElement = ScrollLayoutGroup[i];
+                            var oldElement = ScrollLayoutGroup[i];
                             ScrollLayoutGroup[i] = poolObject != null ? poolObject.gameObject : null;
-                            if (v_oldElement != null)
+                            if (oldElement != null)
                             {
-                                v_oldElement.gameObject.SetActive(false);
-                                v_needApplyTemplateNames = true;
+                                oldElement.gameObject.SetActive(false);
+                                needApplyTemplateNames = true;
                             }
                         }
                     }
                 }
 
-                //Return unused objects deactivate this cycle too pool
+                //Return unused gos deactivate this cycle too pool
                 foreach (var pair in templatedPerObjectToReturn)
                 {
                     var elementsToReturn = pair.Value;
@@ -751,7 +754,7 @@ namespace Kyub.UI
                 }
                 templatedPerObjectToReturn.Clear();
 
-                if (v_needApplyTemplateNames)
+                if (needApplyTemplateNames)
                     InitTemplates();
             }
         }
@@ -768,11 +771,11 @@ namespace Kyub.UI
 
         protected virtual void DestroyUselessTemplates()
         {
-            var v_templates = new List<GameObject>(_templatePerCreatedObjects.Keys);
-            foreach (var v_template in v_templates)
+            var templates = new List<GameObject>(_templatePerCreatedObjects.Keys);
+            foreach (var template in templates)
             {
-                if(m_defaultTemplate != v_template && !_typePerPrefabTemplate.ContainsValue(v_template) && !_indexPerPrefabTemplate.ContainsValue(v_template))
-                    DestroyAllPoolCreatedObjectsFromTemplate(v_template, false);
+                if(m_defaultTemplate != template && !_typePerPrefabTemplate.ContainsValue(template) && !_indexPerPrefabTemplate.ContainsValue(template))
+                    DestroyAllPoolCreatedObjectsFromTemplate(template, false);
             }
         }
 
@@ -790,61 +793,61 @@ namespace Kyub.UI
 
         protected virtual void DestroyAllPoolCreatedObjects()
         {
-            var v_templates = new List<GameObject>( _templatePerCreatedObjects.Keys);
-            foreach (var v_template in v_templates)
+            var templates = new List<GameObject>( _templatePerCreatedObjects.Keys);
+            foreach (var template in templates)
             {
-                DestroyAllPoolCreatedObjectsFromTemplate(v_template, false);
+                DestroyAllPoolCreatedObjectsFromTemplate(template, false);
             }
             _templatePerCreatedObjects.Clear();
             _templatePerPoolObjects.Clear();
         }
 
-        protected virtual void DestroyAllPoolCreatedObjectsFromTemplate(GameObject p_template, bool p_safeTemplate = true)
+        protected virtual void DestroyAllPoolCreatedObjectsFromTemplate(GameObject template, bool safeTemplate = true)
         {
-            if (p_safeTemplate)
-                p_template = GetTemplateFromObject(p_template);
-            if (p_template != null)
+            if (safeTemplate)
+                template = GetTemplateFromObject(template);
+            if (template != null)
             {
-                HashSet<GameObject> v_poolOfType = null;
-                _templatePerCreatedObjects.TryGetValue(p_template, out v_poolOfType);
-                if (v_poolOfType != null)
+                HashSet<GameObject> poolOfType = null;
+                _templatePerCreatedObjects.TryGetValue(template, out poolOfType);
+                if (poolOfType != null)
                 {
-                    foreach (var v_object in v_poolOfType)
+                    foreach (var go in poolOfType)
                     {
-                        if (v_object != null)
+                        if (go != null)
                         {
                             if (Application.isPlaying)
-                                GameObject.Destroy(v_object.gameObject);
+                                GameObject.Destroy(go.gameObject);
                             else
-                                GameObject.DestroyImmediate(v_object.gameObject);
+                                GameObject.DestroyImmediate(go.gameObject);
                         }
                     }
-                    v_poolOfType.Clear();
-                    _templatePerCreatedObjects.Remove(p_template);
-                    _templatePerPoolObjects.Remove(p_template);
+                    poolOfType.Clear();
+                    _templatePerCreatedObjects.Remove(template);
+                    _templatePerPoolObjects.Remove(template);
                 }
             }
         }
 
         protected virtual void SetupPool()
         {
-            var v_templates = new HashSet<GameObject>(_typePerPrefabTemplate.Values);
-            if(!v_templates.Contains(m_defaultTemplate))
-                v_templates.Add(m_defaultTemplate);
-            foreach (var v_pair in _indexPerPrefabTemplate)
+            var templates = new HashSet<GameObject>(_typePerPrefabTemplate.Values);
+            if(!templates.Contains(m_defaultTemplate))
+                templates.Add(m_defaultTemplate);
+            foreach (var pair in _indexPerPrefabTemplate)
             {
-                if (v_pair.Value != null && !v_templates.Contains(v_pair.Value))
-                    v_templates.Add(v_pair.Value);
+                if (pair.Value != null && !templates.Contains(pair.Value))
+                    templates.Add(pair.Value);
             }
 
-            foreach (var v_template in v_templates)
+            foreach (var template in templates)
             {
-                if (v_template != null)
+                if (template != null)
                 {
-                    if (!_templatePerPoolObjects.ContainsKey(v_template))
-                        _templatePerPoolObjects.Add(v_template, new HashSet<GameObject>());
-                    if (!_templatePerCreatedObjects.ContainsKey(v_template))
-                        _templatePerCreatedObjects.Add(v_template, new HashSet<GameObject>());
+                    if (!_templatePerPoolObjects.ContainsKey(template))
+                        _templatePerPoolObjects.Add(template, new HashSet<GameObject>());
+                    if (!_templatePerCreatedObjects.ContainsKey(template))
+                        _templatePerCreatedObjects.Add(template, new HashSet<GameObject>());
                 }
             }
             DestroyUselessTemplates();
@@ -855,42 +858,42 @@ namespace Kyub.UI
         {
             if (_poolContent == null && Application.isPlaying)
             {
-                var v_poolContentObj = new GameObject("[AUTO_GEN] Pool Content");
-                v_poolContentObj.transform.SetParent(this.transform);
-                v_poolContentObj.transform.localPosition = Vector3.zero;
-                v_poolContentObj.transform.localScale = Vector3.one;
-                v_poolContentObj.transform.localRotation = Quaternion.identity;
-                var v_canvas = v_poolContentObj.GetComponent<Canvas>();
-                if (v_canvas == null)
-                    v_canvas = v_poolContentObj.AddComponent<Canvas>();
-                v_canvas.enabled = false;
+                var poolContentObj = new GameObject("[AUTO_GEN] Pool Content");
+                poolContentObj.transform.SetParent(this.transform);
+                poolContentObj.transform.localPosition = Vector3.zero;
+                poolContentObj.transform.localScale = Vector3.one;
+                poolContentObj.transform.localRotation = Quaternion.identity;
+                var canvas = poolContentObj.GetComponent<Canvas>();
+                if (canvas == null)
+                    canvas = poolContentObj.AddComponent<Canvas>();
+                canvas.enabled = false;
 
-                var v_layoutElement = v_poolContentObj.GetComponent<LayoutElement>();
-                if (v_layoutElement == null)
-                    v_layoutElement = v_poolContentObj.AddComponent<LayoutElement>();
-                v_layoutElement.ignoreLayout = true;
+                var layoutElement = poolContentObj.GetComponent<LayoutElement>();
+                if (layoutElement == null)
+                    layoutElement = poolContentObj.AddComponent<LayoutElement>();
+                layoutElement.ignoreLayout = true;
 
-                _poolContent = v_poolContentObj.transform as RectTransform;
+                _poolContent = poolContentObj.transform as RectTransform;
                 if (_poolContent == null)
-                    _poolContent = v_poolContentObj.AddComponent<RectTransform>();
+                    _poolContent = poolContentObj.AddComponent<RectTransform>();
             }
             if(_poolContent != null && !m_disableElementsInPool != _poolContent.gameObject.activeSelf)
                 _poolContent.gameObject.SetActive(!m_disableElementsInPool);
         }
 
-        protected virtual bool IsCreatedByPool(GameObject p_object)
+        protected virtual bool IsCreatedByPool(GameObject go)
         {
-            if (p_object != null)
+            if (go != null)
             {
                 //Is the template
-                if (_templatePerCreatedObjects.ContainsKey(p_object))
+                if (_templatePerCreatedObjects.ContainsKey(go))
                     return true;
                 else
                 {
-                    foreach (var v_pair in _templatePerCreatedObjects)
+                    foreach (var pair in _templatePerCreatedObjects)
                     {
-                        var v_template = v_pair.Key;
-                        if (v_pair.Value.Contains(p_object))
+                        var template = pair.Key;
+                        if (pair.Value.Contains(go))
                             return true;
                     }
                 }
@@ -899,20 +902,20 @@ namespace Kyub.UI
             return false;
         }
 
-        protected virtual GameObject GetTemplateFromObject(GameObject p_object)
+        protected virtual GameObject GetTemplateFromObject(GameObject go)
         {
-            if (p_object != null)
+            if (go != null)
             {
                 //Is the template
-                if (_templatePerCreatedObjects.ContainsKey(p_object))
-                    return p_object;
+                if (_templatePerCreatedObjects.ContainsKey(go))
+                    return go;
                 else
                 {
-                    foreach (var v_pair in _templatePerCreatedObjects)
+                    foreach (var pair in _templatePerCreatedObjects)
                     {
-                        var v_template = v_pair.Key;
-                        if (v_pair.Value.Contains(p_object))
-                            return v_template;
+                        var template = pair.Key;
+                        if (pair.Value.Contains(go))
+                            return template;
                     }
                 }
 
@@ -920,139 +923,139 @@ namespace Kyub.UI
             return null;
         }
 
-        protected GameObject CreateOrPopFromPool(int p_dataIndex)
+        protected GameObject CreateOrPopFromPool(int dataIndex)
         {
-            var v_template = GetTemplateFromDataIndex(p_dataIndex);
-            return CreateOrPopFromPool(v_template, false);
+            var template = GetTemplateFromDataIndex(dataIndex);
+            return CreateOrPopFromPool(template, false);
         }
 
-        protected GameObject CreateOrPopFromPool(System.Type p_dataType)
+        protected GameObject CreateOrPopFromPool(System.Type dataType)
         {
-            var v_template = GetTemplateFromDataType(p_dataType);
-            return CreateOrPopFromPool(v_template, false);
+            var template = GetTemplateFromDataType(dataType);
+            return CreateOrPopFromPool(template, false);
         }
 
-        protected GameObject CreateOrPopFromPool(GameObject p_template, bool p_safeTemplate = false)
+        protected GameObject CreateOrPopFromPool(GameObject template, bool safeTemplate = false)
         {
             TrySetupPoolContent();
-            if (p_safeTemplate)
-                p_template = GetTemplateFromObject(p_template);  
-            if (p_template != null)
+            if (safeTemplate)
+                template = GetTemplateFromObject(template);  
+            if (template != null)
             {
                 //Disable Scene Templates
-                if (p_template.gameObject.scene.IsValid())
-                    p_template.gameObject.SetActive(false);
-                var v_object = PopFromPool(p_template);
-                if (v_object == null)
+                if (template.gameObject.scene.IsValid())
+                    template.gameObject.SetActive(false);
+                var go = PopFromPool(template);
+                if (go == null)
                 {
-                    v_object = GameObject.Instantiate(p_template);
-                    v_object.transform.SetParent(_poolContent, false);
-                    v_object.transform.localScale = Vector3.one;
-                    v_object.transform.localPosition = Vector3.zero;
-                    v_object.transform.localRotation = Quaternion.identity;
+                    go = GameObject.Instantiate(template);
+                    go.transform.SetParent(_poolContent, false);
+                    go.transform.localScale = Vector3.one;
+                    go.transform.localPosition = Vector3.zero;
+                    go.transform.localRotation = Quaternion.identity;
 
-                    HashSet<GameObject> v_createdObjectsList = null;
-                    if (!_templatePerCreatedObjects.TryGetValue(p_template, out v_createdObjectsList))
+                    HashSet<GameObject> createdObjectsList = null;
+                    if (!_templatePerCreatedObjects.TryGetValue(template, out createdObjectsList))
                     {
-                        v_createdObjectsList = new HashSet<GameObject>();
-                        _templatePerCreatedObjects[p_template] = v_createdObjectsList;
+                        createdObjectsList = new HashSet<GameObject>();
+                        _templatePerCreatedObjects[template] = createdObjectsList;
                     }
-                    if(v_createdObjectsList != null)
-                        v_createdObjectsList.Add(v_object);
-                    v_object.gameObject.SetActive(true);
+                    if(createdObjectsList != null)
+                        createdObjectsList.Add(go);
+                    go.gameObject.SetActive(true);
                 }
-                return v_object;
+                return go;
             }
             Debug.LogWarning("No DefaultTemplate or TypePerTemplate setted in DataView: " + name);
             return null;
         }
 
-        protected GameObject PopFromPool(System.Type p_dataType)
+        protected GameObject PopFromPool(System.Type dataType)
         {
-            return PopFromPool(GetTemplateFromDataType(p_dataType), false);
+            return PopFromPool(GetTemplateFromDataType(dataType), false);
         }
 
-        protected GameObject PopFromPool(GameObject p_template, bool p_safeTemplate = true)
+        protected GameObject PopFromPool(GameObject template, bool safeTemplate = true)
         {
-            if(p_safeTemplate)
-                p_template = GetTemplateFromObject(p_template);
-            GameObject v_poolObject = null;
+            if(safeTemplate)
+                template = GetTemplateFromObject(template);
+            GameObject poolObject = null;
             if (Application.isPlaying)
             {
-                HashSet<GameObject> v_poolOfType = null;
-                if (p_template != null)
-                    _templatePerPoolObjects.TryGetValue(p_template, out v_poolOfType);
+                HashSet<GameObject> poolOfType = null;
+                if (template != null)
+                    _templatePerPoolObjects.TryGetValue(template, out poolOfType);
 
-                if (v_poolOfType != null)
+                if (poolOfType != null)
                 {
-                    foreach (var v_object in v_poolOfType)
+                    foreach (var go in poolOfType)
                     {
-                        if (v_object != null)
+                        if (go != null)
                         {
-                            v_poolObject = v_object;
+                            poolObject = go;
                             break;
                         }
                     }
                 }
-                if (v_poolObject != null)
+                if (poolObject != null)
                 {
-                    v_poolOfType.Remove(v_poolObject);
+                    poolOfType.Remove(poolObject);
                     
-                    v_poolObject.gameObject.hideFlags = HideFlags.None;
-                    v_poolObject.gameObject.SetActive(true);
+                    poolObject.gameObject.hideFlags = HideFlags.None;
+                    poolObject.gameObject.SetActive(true);
 
-                    //We Poped the object, so we must cancel the pool Recalc Function
-                    _objectsToSendToPoolParent.Remove(v_poolObject);
+                    //We Poped the go, so we must cancel the pool Recalc Function
+                    _gosToSendToPoolParent.Remove(poolObject);
 
-                    //if(_objectsToSendToPoolParent.Count == 0)
+                    //if(_gosToSendToPoolParent.Count == 0)
                     //    CancelInvoke("SendObjectsToPoolParent");
                 }
             }
-            return v_poolObject;
+            return poolObject;
         }
 
-        HashSet<GameObject> _objectsToSendToPoolParent = new HashSet<GameObject>();
+        HashSet<GameObject> _gosToSendToPoolParent = new HashSet<GameObject>();
         protected virtual void TrySendObjectsToPoolParent()
         {
             if (_poolContent != null)
             {
-                foreach (var v_object in _objectsToSendToPoolParent)
+                foreach (var go in _gosToSendToPoolParent)
                 {
-                    if(v_object != null)
-                        v_object.transform.SetParent(_poolContent, false);
+                    if(go != null)
+                        go.transform.SetParent(_poolContent, false);
                 }
             }
-            _objectsToSendToPoolParent.Clear();
+            _gosToSendToPoolParent.Clear();
         }
 
-        protected bool ReturnToPool(GameObject p_object)
+        protected bool ReturnToPool(GameObject go)
         {
-            return ReturnToPool(GetTemplateFromObject(p_object), p_object, false);
+            return ReturnToPool(GetTemplateFromObject(go), go, false);
         }
 
-        protected bool ReturnToPool(GameObject p_template, GameObject p_object, bool p_safeTemplate = false)
+        protected bool ReturnToPool(GameObject template, GameObject go, bool safeTemplate = false)
         {
-            if (p_object != null)
+            if (go != null)
             {
-                if (p_safeTemplate)
-                    p_template = GetTemplateFromObject(p_template);
-                if (p_object != p_template)
+                if (safeTemplate)
+                    template = GetTemplateFromObject(template);
+                if (go != template)
                 {
-                    HashSet<GameObject> v_poolOfType = null;
-                    if (p_template != null)
+                    HashSet<GameObject> poolOfType = null;
+                    if (template != null)
                     {
-                        _templatePerPoolObjects.TryGetValue(p_template, out v_poolOfType);
-                        if (v_poolOfType == null)
+                        _templatePerPoolObjects.TryGetValue(template, out poolOfType);
+                        if (poolOfType == null)
                         {
-                            v_poolOfType = new HashSet<GameObject>();
-                            _templatePerPoolObjects[p_template] = v_poolOfType;
+                            poolOfType = new HashSet<GameObject>();
+                            _templatePerPoolObjects[template] = poolOfType;
                         }
                     }
-                    if (v_poolOfType != null && !v_poolOfType.Contains(p_object))
+                    if (poolOfType != null && !poolOfType.Contains(go))
                     {
-                        v_poolOfType.Add(p_object);
-                        //p_object.transform.SetParent(_poolContent, false);
-                        _objectsToSendToPoolParent.Add(p_object);
+                        poolOfType.Add(go);
+                        //go.transform.SetParent(_poolContent, false);
+                        _gosToSendToPoolParent.Add(go);
                         //CancelInvoke("SendObjectsToPoolParent");
                         //Invoke("SendObjectsToPoolParent", 0.1f);
                         return true;
@@ -1062,16 +1065,16 @@ namespace Kyub.UI
             return false;
         }
 
-        protected bool ReturnToPool(int p_dataIndex, GameObject p_object)
+        protected bool ReturnToPool(int dataIndex, GameObject go)
         {
-            var v_template = GetTemplateFromDataIndex(p_dataIndex);
-            return ReturnToPool(v_template, p_object, false);
+            var template = GetTemplateFromDataIndex(dataIndex);
+            return ReturnToPool(template, go, false);
         }
 
-        protected bool ReturnToPool(System.Type p_dataType, GameObject p_object)
+        protected bool ReturnToPool(System.Type dataType, GameObject go)
         {
-            var v_template = GetTemplateFromDataType(p_dataType);
-            return ReturnToPool(v_template, p_object, false);
+            var template = GetTemplateFromDataType(dataType);
+            return ReturnToPool(template, go, false);
         }
     
         #endregion
