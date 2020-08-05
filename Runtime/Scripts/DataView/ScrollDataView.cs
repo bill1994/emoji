@@ -53,7 +53,7 @@ namespace Kyub.UI
         [SerializeField]
         protected GameObject m_defaultTemplate = null;
         [SerializeField]
-        protected GameObject m_emptyDataObject= null;
+        protected GameObject m_emptyDataObject = null;
         [SerializeField]
         protected ScrollLayoutGroup m_scrollRectLayout = null;
 
@@ -138,7 +138,7 @@ namespace Kyub.UI
                 if (m_scrollRectLayout == null)
                 {
                     m_scrollRectLayout = GetComponentInChildren<ScrollLayoutGroup>(true);
-                    if(m_scrollRectLayout != null && enabled && gameObject.activeInHierarchy)
+                    if (m_scrollRectLayout != null && enabled && gameObject.activeInHierarchy)
                         RegisterScrollLayoutEvents();
                 }
                 return m_scrollRectLayout;
@@ -218,7 +218,7 @@ namespace Kyub.UI
 
         bool _setupOnEnable = false;
         protected Dictionary<System.Type, GameObject> _typePerPrefabTemplate = new Dictionary<System.Type, GameObject>();
-        protected Dictionary<int, GameObject> _indexPerPrefabTemplate= new Dictionary<int, GameObject>();
+        protected Dictionary<int, GameObject> _indexPerPrefabTemplate = new Dictionary<int, GameObject>();
         public virtual void Setup(IList data, Dictionary<System.Type, GameObject> customTemplatePerDataType = null, Dictionary<int, GameObject> customTemplatePerIndex = null)
         {
 
@@ -232,6 +232,7 @@ namespace Kyub.UI
             if (_indexPerPrefabTemplate == null)
                 _indexPerPrefabTemplate = new Dictionary<int, GameObject>();
 
+            var previousData = m_data;
             m_data = data;
             if (m_data == null)
                 m_data = new object[0];
@@ -243,7 +244,7 @@ namespace Kyub.UI
                 if (ScrollLayoutGroup != null)
                     ScrollLayoutGroup.ForceInitialize();
                 SetupPool();
-                RemapIndexes();
+                RemapIndexes(false, previousData);
                 if (ScrollLayoutGroup != null)
                     ScrollLayoutGroup.SetCachedElementsLayoutDirty(true);
                 InitTemplates();
@@ -263,7 +264,7 @@ namespace Kyub.UI
 
         protected void TrySetupOnEnable()
         {
-            if(_setupOnEnable)
+            if (_setupOnEnable)
                 Setup(m_data, _typePerPrefabTemplate, _indexPerPrefabTemplate);
         }
 
@@ -328,7 +329,7 @@ namespace Kyub.UI
 
             if (sucess && (template == null || template == m_defaultTemplate))
                 _indexPerPrefabTemplate.Remove(dataIndex);
-            else if(oldTemplate != template && template != null)
+            else if (oldTemplate != template && template != null)
                 _indexPerPrefabTemplate[dataIndex] = template;
 
             if (oldTemplate != template)
@@ -338,7 +339,7 @@ namespace Kyub.UI
         public GameObject GetElementAtDataIndex(int dataIndex)
         {
             int layoutIndex = ConvertDataIndexToLayoutIndex(dataIndex);
-            if(ScrollLayoutGroup != null && layoutIndex >= 0 && layoutIndex < m_scrollRectLayout.ElementsCount)
+            if (ScrollLayoutGroup != null && layoutIndex >= 0 && layoutIndex < m_scrollRectLayout.ElementsCount)
             {
                 return m_scrollRectLayout[layoutIndex];
             }
@@ -467,7 +468,7 @@ namespace Kyub.UI
             }
         }
 
-        protected virtual void RemapIndexes(bool resetAllObjects = false)
+        protected virtual void RemapIndexes(bool resetAllObjects = false, IList previousData = null)
         {
             Dictionary<int, float> replacementDataLayoutSize = new Dictionary<int, float>();
 
@@ -477,7 +478,7 @@ namespace Kyub.UI
             {
                 bool needReapplyElements = false;
                 var elements = new List<GameObject>();
-                _initialIndex =  Mathf.Clamp((m_defaultSetupInitialIndex < 0 ? ScrollLayoutGroup.ElementsCount - 1 : m_defaultSetupInitialIndex), 0, ScrollLayoutGroup.ElementsCount);
+                _initialIndex = Mathf.Clamp((m_defaultSetupInitialIndex < 0 ? ScrollLayoutGroup.ElementsCount - 1 : m_defaultSetupInitialIndex), 0, ScrollLayoutGroup.ElementsCount);
                 var lastIndexMember = -1;
                 var currentDataIndex = 0;
                 for (int i = 0; i < ScrollLayoutGroup.ElementsCount; i++)
@@ -509,28 +510,41 @@ namespace Kyub.UI
                             lastIndexMember = elements.Count - 1;
                             _layoutIndexToDataIndex[lastIndexMember] = currentDataIndex;
                             _dataIndexToLayoutIndex[currentDataIndex] = lastIndexMember;
-                            
+
                             //Return to pool if is invalid
                             if (!isValidObjectForData)
                             {
-                                replacementDataLayoutSize[lastIndexMember] = StipulateElementSize(currentDataIndex);
-                                needReapplyElements = true;
+                                var forceRecalcElementSize = true;
+                                if (previousData != null && go == null && i < ScrollLayoutGroup.ElementsCount)
+                                {
+                                    var previousDataType = currentDataIndex < previousData.Count && previousData[currentDataIndex] != null ?
+                                        previousData[currentDataIndex].GetType() : null;
+                                    var dataType = currentDataIndex < m_data.Count && m_data[currentDataIndex] != null ?
+                                        m_data[currentDataIndex].GetType() : null;
+                                    if (previousDataType == dataType)
+                                        forceRecalcElementSize = false;
+                                }
+                                if (forceRecalcElementSize)
+                                {
+                                    replacementDataLayoutSize[lastIndexMember] = StipulateElementSize(currentDataIndex);
+                                    needReapplyElements = true;
 
-                                if (go != null)
-                                    ReturnToPool(go);
+                                    if (go != null)
+                                        ReturnToPool(go);
+                                }
                             }
 
                             //Increment to next DataIndex
                             currentDataIndex++;
                         }
                     }
-                    else if(go != null && !isTemplate)
+                    else if (go != null && !isTemplate)
                         elements.Add(go);
                     //Disable Templates
                     if (isTemplate)
                         go.SetActive(false);
                 }
-                
+
                 //Try add elements not included in layout
                 while (currentDataIndex < m_data.Count)
                 {
@@ -540,7 +554,7 @@ namespace Kyub.UI
                     _dataIndexToLayoutIndex[currentDataIndex] = lastIndexMember;
                     //Stipulate Size of layout for the first Recalc
                     replacementDataLayoutSize[lastIndexMember] = StipulateElementSize(currentDataIndex);
-                    
+
                     currentDataIndex++;
                     needReapplyElements = true;
                 }
@@ -559,8 +573,8 @@ namespace Kyub.UI
         protected float StipulateElementSize(int dataIndex)
         {
             var data = m_data != null && m_data.Count > dataIndex && dataIndex >= 0 ? m_data[dataIndex] : null;
-            var template = GetTemplateFromDataType(data != null? data.GetType() : null);
-            return ScrollLayoutGroup.CalculateElementSize(template != null? template.transform : null, ScrollLayoutGroup != null ? ScrollLayoutGroup.IsVertical() : true);
+            var template = GetTemplateFromDataType(data != null ? data.GetType() : null);
+            return ScrollLayoutGroup.CalculateElementSize(template != null ? template.transform : null, ScrollLayoutGroup != null ? ScrollLayoutGroup.IsVertical() : true);
         }
 
         protected bool IsDataViewObject(GameObject go)
@@ -697,7 +711,7 @@ namespace Kyub.UI
                                 }
                                 templateObjects.Push(element);
                             }
-                            
+
                             //ReturnToPool(dataIndex, element);
                             ScrollLayoutGroup[i] = null;
                         }
@@ -709,10 +723,10 @@ namespace Kyub.UI
                 for (int i = currentVisibleIndexRange.x; i <= currentVisibleIndexRange.y; i++)
                 {
                     //We want to pick elements out of old range
-                    var element = ScrollLayoutGroup.ElementsCount > i && i >= 0? ScrollLayoutGroup[i] : null;
+                    var element = ScrollLayoutGroup.ElementsCount > i && i >= 0 ? ScrollLayoutGroup[i] : null;
                     if (i >= 0 && i < ScrollLayoutGroup.ElementsCount && (element == null || IsDataViewTemplate(element)))
                     {
-                        
+
                         var dataIndex = ConvertLayoutIndexToDataIndex(i);
                         //Is a DataView Object
                         if (dataIndex >= 0)
@@ -722,14 +736,14 @@ namespace Kyub.UI
                             Stack<GameObject> stack = null;
                             if (template != null)
                             {
-                                if(templatedPerObjectToReturn.TryGetValue(template, out stack) && stack != null)
+                                if (templatedPerObjectToReturn.TryGetValue(template, out stack) && stack != null)
                                     poolObject = stack.Pop();
                                 //We dont need this stack anymore
                                 if (stack == null || stack.Count == 0)
                                     templatedPerObjectToReturn.Remove(template);
                             }
                             //Pick from Default pool if we cant recycle previous deactivated templates
-                            if(poolObject == null)
+                            if (poolObject == null)
                                 poolObject = CreateOrPopFromPool(template);
 
                             var oldElement = ScrollLayoutGroup[i];
@@ -747,7 +761,7 @@ namespace Kyub.UI
                 foreach (var pair in templatedPerObjectToReturn)
                 {
                     var elementsToReturn = pair.Value;
-                    foreach(var elementToReturn in elementsToReturn)
+                    foreach (var elementToReturn in elementsToReturn)
                     {
                         ReturnToPool(pair.Key, elementToReturn);
                     }
@@ -774,7 +788,7 @@ namespace Kyub.UI
             var templates = new List<GameObject>(_templatePerCreatedObjects.Keys);
             foreach (var template in templates)
             {
-                if(m_defaultTemplate != template && !_typePerPrefabTemplate.ContainsValue(template) && !_indexPerPrefabTemplate.ContainsValue(template))
+                if (m_defaultTemplate != template && !_typePerPrefabTemplate.ContainsValue(template) && !_indexPerPrefabTemplate.ContainsValue(template))
                     DestroyAllPoolCreatedObjectsFromTemplate(template, false);
             }
         }
@@ -793,7 +807,7 @@ namespace Kyub.UI
 
         protected virtual void DestroyAllPoolCreatedObjects()
         {
-            var templates = new List<GameObject>( _templatePerCreatedObjects.Keys);
+            var templates = new List<GameObject>(_templatePerCreatedObjects.Keys);
             foreach (var template in templates)
             {
                 DestroyAllPoolCreatedObjectsFromTemplate(template, false);
@@ -832,7 +846,7 @@ namespace Kyub.UI
         protected virtual void SetupPool()
         {
             var templates = new HashSet<GameObject>(_typePerPrefabTemplate.Values);
-            if(!templates.Contains(m_defaultTemplate))
+            if (!templates.Contains(m_defaultTemplate))
                 templates.Add(m_defaultTemplate);
             foreach (var pair in _indexPerPrefabTemplate)
             {
@@ -877,7 +891,7 @@ namespace Kyub.UI
                 if (_poolContent == null)
                     _poolContent = poolContentObj.AddComponent<RectTransform>();
             }
-            if(_poolContent != null && !m_disableElementsInPool != _poolContent.gameObject.activeSelf)
+            if (_poolContent != null && !m_disableElementsInPool != _poolContent.gameObject.activeSelf)
                 _poolContent.gameObject.SetActive(!m_disableElementsInPool);
         }
 
@@ -939,7 +953,7 @@ namespace Kyub.UI
         {
             TrySetupPoolContent();
             if (safeTemplate)
-                template = GetTemplateFromObject(template);  
+                template = GetTemplateFromObject(template);
             if (template != null)
             {
                 //Disable Scene Templates
@@ -960,7 +974,7 @@ namespace Kyub.UI
                         createdObjectsList = new HashSet<GameObject>();
                         _templatePerCreatedObjects[template] = createdObjectsList;
                     }
-                    if(createdObjectsList != null)
+                    if (createdObjectsList != null)
                         createdObjectsList.Add(go);
                     go.gameObject.SetActive(true);
                 }
@@ -977,7 +991,7 @@ namespace Kyub.UI
 
         protected GameObject PopFromPool(GameObject template, bool safeTemplate = true)
         {
-            if(safeTemplate)
+            if (safeTemplate)
                 template = GetTemplateFromObject(template);
             GameObject poolObject = null;
             if (Application.isPlaying)
@@ -1000,7 +1014,7 @@ namespace Kyub.UI
                 if (poolObject != null)
                 {
                     poolOfType.Remove(poolObject);
-                    
+
                     poolObject.gameObject.hideFlags = HideFlags.None;
                     poolObject.gameObject.SetActive(true);
 
@@ -1021,7 +1035,7 @@ namespace Kyub.UI
             {
                 foreach (var go in _gosToSendToPoolParent)
                 {
-                    if(go != null)
+                    if (go != null)
                         go.transform.SetParent(_poolContent, false);
                 }
             }
@@ -1076,7 +1090,7 @@ namespace Kyub.UI
             var template = GetTemplateFromDataType(dataType);
             return ReturnToPool(template, go, false);
         }
-    
+
         #endregion
     }
 }
