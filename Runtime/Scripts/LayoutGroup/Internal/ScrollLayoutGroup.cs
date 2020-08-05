@@ -1356,22 +1356,26 @@ namespace Kyub.UI
 
         public static float CalculateElementSize(Component p_object, bool p_isVerticalLayout)
         {
-            var v_elementTransform = p_object != null ? p_object.transform as RectTransform : null;
-            var ignoreLayouts = v_elementTransform != null ? v_elementTransform.GetComponents<ILayoutIgnorer>() : null;
+            var elementTransform = p_object != null ? p_object.transform as RectTransform : null;
+            var ignoreLayouts = elementTransform != null ? elementTransform.GetComponents<ILayoutIgnorer>() : null;
             if (ignoreLayouts != null)
             {
                 foreach (var ignoreLayout in ignoreLayouts)
                 {
                     if (ignoreLayout.ignoreLayout)
                     {
-                        float v_elementSize = v_elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(v_elementTransform) : GetLocalWidth(v_elementTransform)) : 100;
-                        return v_elementSize;
+                        float elementSize = elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(elementTransform) : GetLocalWidth(elementTransform)) : 100;
+                        return elementSize;
                     }
                 }
             }
 
-            float preferredSize = LayoutUtilityEx.GetPreferredSize(v_elementTransform, p_isVerticalLayout ? 1 : 0);
-            //v_elementSize = Mathf.Max(preferredSize, v_elementSize);
+            float preferredSize = LayoutUtilityEx.GetPreferredSize(elementTransform, p_isVerticalLayout ? 1 : 0, -1);
+            if (preferredSize < 0)
+            {
+                var elementSize = elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(elementTransform) : GetLocalWidth(elementTransform)) : 100;
+                return elementSize;
+            }
 
             return preferredSize;
         }
