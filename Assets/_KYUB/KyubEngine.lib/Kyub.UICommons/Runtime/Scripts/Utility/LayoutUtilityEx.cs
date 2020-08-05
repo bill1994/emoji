@@ -16,11 +16,11 @@ namespace Kyub.UI
         /// <param name="rect">The RectTransform of the layout element to query.</param>
         /// <param name="axis">The axis to query. This can be 0 or 1.</param>
         /// <remarks>All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.</remarks>
-        public static float GetMinSize(RectTransform rect, int axis)
+        public static float GetMinSize(RectTransform rect, int axis, int defaultValue = 0)
         {
             if (axis == 0)
-                return GetMinWidth(rect);
-            return GetMinHeight(rect);
+                return GetMinWidth(rect, defaultValue);
+            return GetMinHeight(rect, defaultValue);
         }
 
         /// <summary>
@@ -31,11 +31,11 @@ namespace Kyub.UI
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
         /// </remarks>
-        public static float GetPreferredSize(RectTransform rect, int axis)
+        public static float GetPreferredSize(RectTransform rect, int axis, int defaultValue = 0)
         {
             if (axis == 0)
-                return GetPreferredWidth(rect);
-            return GetPreferredHeight(rect);
+                return GetPreferredWidth(rect, defaultValue);
+            return GetPreferredHeight(rect, defaultValue);
         }
 
         /// <summary>
@@ -46,11 +46,11 @@ namespace Kyub.UI
         /// </remarks>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
         /// <param name="axis">The axis to query. This can be 0 or 1.</param>
-        public static float GetFlexibleSize(RectTransform rect, int axis)
+        public static float GetFlexibleSize(RectTransform rect, int axis, int defaultValue = 0)
         {
             if (axis == 0)
-                return GetFlexibleWidth(rect);
-            return GetFlexibleHeight(rect);
+                return GetFlexibleWidth(rect, defaultValue);
+            return GetFlexibleHeight(rect, defaultValue);
         }
 
         /// <summary>
@@ -60,9 +60,9 @@ namespace Kyub.UI
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
         /// </remarks>
-        public static float GetMinWidth(RectTransform rect)
+        public static float GetMinWidth(RectTransform rect, int defaultValue = 0)
         {
-            return GetLayoutProperty(rect, e => e.minWidth, 0);
+            return GetLayoutProperty(rect, e => e.minWidth, defaultValue);
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace Kyub.UI
         /// <returns>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
         /// </returns>
-        public static float GetPreferredWidth(RectTransform rect)
+        public static float GetPreferredWidth(RectTransform rect, int defaultValue = 0)
         {
-            return Mathf.Max(GetLayoutProperty(rect, e => e.minWidth, 0), GetLayoutProperty(rect, e => e.preferredWidth, 0));
+            return Mathf.Max(GetLayoutProperty(rect, e => e.minWidth, defaultValue), GetLayoutProperty(rect, e => e.preferredWidth, defaultValue));
         }
 
         /// <summary>
@@ -84,9 +84,9 @@ namespace Kyub.UI
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used
         /// </remarks>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
-        public static float GetFlexibleWidth(RectTransform rect)
+        public static float GetFlexibleWidth(RectTransform rect, int defaultValue = 0)
         {
-            return GetLayoutProperty(rect, e => e.flexibleWidth, 0);
+            return GetLayoutProperty(rect, e => e.flexibleWidth, defaultValue);
         }
 
         /// <summary>
@@ -96,9 +96,9 @@ namespace Kyub.UI
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
         /// </remarks>
-        public static float GetMinHeight(RectTransform rect)
+        public static float GetMinHeight(RectTransform rect, int defaultValue = 0)
         {
-            return GetLayoutProperty(rect, e => e.minHeight, 0);
+            return GetLayoutProperty(rect, e => e.minHeight, defaultValue);
         }
 
         /// <summary>
@@ -108,9 +108,9 @@ namespace Kyub.UI
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
         /// </remarks>
-        public static float GetPreferredHeight(RectTransform rect)
+        public static float GetPreferredHeight(RectTransform rect, int defaultValue = 0)
         {
-            return Mathf.Max(GetLayoutProperty(rect, e => e.minHeight, 0), GetLayoutProperty(rect, e => e.preferredHeight, 0));
+            return Mathf.Max(GetLayoutProperty(rect, e => e.minHeight, defaultValue), GetLayoutProperty(rect, e => e.preferredHeight, defaultValue));
         }
 
         /// <summary>
@@ -120,9 +120,9 @@ namespace Kyub.UI
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
         /// </remarks>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
-        public static float GetFlexibleHeight(RectTransform rect)
+        public static float GetFlexibleHeight(RectTransform rect, int defaultValue = 0)
         {
-            return GetLayoutProperty(rect, e => e.flexibleHeight, 0);
+            return GetLayoutProperty(rect, e => e.flexibleHeight, defaultValue);
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace Kyub.UI
         {
             source = null;
             if (rect == null)
-                return 0;
+                return defaultValue;
             float min = defaultValue;
             int maxPriority = System.Int32.MinValue;
             var components = ListPool<Component>.Get();
