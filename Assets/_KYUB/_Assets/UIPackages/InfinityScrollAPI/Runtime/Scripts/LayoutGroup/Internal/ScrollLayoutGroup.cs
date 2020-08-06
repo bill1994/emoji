@@ -14,6 +14,7 @@ namespace Kyub.UI
     public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement/*, ILayoutGroup*/
     {
         #region Helper Classes
+
         [System.Serializable]
         public class ScrollUnityEvent : UnityEvent<Vector2> { }
         [System.Serializable]
@@ -41,6 +42,43 @@ namespace Kyub.UI
             InverseScrollDirection,
         }
 
+        [System.Serializable]
+        public struct ExtraElementsAmount
+        {
+            [SerializeField]
+            private int m_before;
+            [SerializeField]
+            private int m_after;
+
+            public int Before
+            {
+                get
+                {
+                    return m_before;
+                }
+                set
+                {
+                    if (m_before == value)
+                        return;
+                    m_before = value;
+                }
+            }
+
+            public int After
+            {
+                get
+                {
+                    return m_after;
+                }
+                set
+                {
+                    if (m_after == value)
+                        return;
+                    m_after = value;
+                }
+            }
+        }
+
         #endregion
 
         #region Private Variables
@@ -55,6 +93,8 @@ namespace Kyub.UI
         protected int m_minVisibleElements = 0;
         [SerializeField, Tooltip("Amount of elements to awake when scroll reach the end of current visible area")]
         protected int m_elementsToAwakePerStep = 1;
+        [SerializeField, Tooltip("Define extra visible elements range. This is useful to set elements After of Before screen range")]
+        ExtraElementsAmount m_extraVisibleElementsCount = new ExtraElementsAmount();
         [SerializeField, Tooltip("In deep hierarchys SetParent contains a huge impact in performance. This property will try prevent recalculate amount of visible element, avoiding SetParent and SetSiblingIndex")]
         protected bool m_optimizeDeepHierarchy = true;
         [Space]
@@ -295,6 +335,22 @@ namespace Kyub.UI
                 if (m_elementsToAwakePerStep == value)
                     return;
                 m_elementsToAwakePerStep = value;
+            }
+        }
+
+
+        public ExtraElementsAmount ExtraVisibleElementsCount
+        {
+            get
+            {
+                return m_extraVisibleElementsCount;
+            }
+            set
+            {
+                if (m_extraVisibleElementsCount.Before == value.Before &&
+                    m_extraVisibleElementsCount.After == value.After)
+                    return;
+                m_extraVisibleElementsCount = value;
             }
         }
 
@@ -903,7 +959,9 @@ namespace Kyub.UI
         protected virtual Vector2Int CalculateSafeCachedMinMax()
         {
             var current = GetCurrentIndex();
-            var cachedNewMinMaxIndex = new Vector2Int(current, GetLastIndex(current));
+            var cachedNewMinMaxIndex = new Vector2Int(
+                Mathf.Clamp(current - m_extraVisibleElementsCount.Before, 0, m_elements.Count - 1),
+                Mathf.Clamp(GetLastIndex(current) + m_extraVisibleElementsCount.After, 0, m_elements.Count - 1));
 
             var currentRange = Math.Abs(cachedNewMinMaxIndex.y + 1 - cachedNewMinMaxIndex.x);
             var targetRange = CalculateVisibleElementsCountThisFrame(cachedNewMinMaxIndex);
