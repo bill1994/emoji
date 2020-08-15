@@ -247,8 +247,15 @@ namespace MaterialUI
 
         #region Initialize Methods
 
+        public void InitializeTabsDelayed()
+        {
+            if (!IsInvoking("InitializeTabs"))
+                Invoke("InitializeTabs", 0f);
+        }
+
         public virtual void InitializeTabs()
         {
+            CancelInvoke("InitializeTabs");
             if (this == null || m_TabsContainer == null || !Application.isPlaying)
                 return;
 
@@ -280,12 +287,13 @@ namespace MaterialUI
 
         public void InitializeIndicatorDelayed()
         {
-            CancelInvoke("InitializeIndicator");
-            Invoke("InitializeIndicator", 0f);
+            if(!IsInvoking("InitializeIndicator"))
+                Invoke("InitializeIndicator", 0f);
         }
 
         public virtual void InitializeIndicator()
         {
+            CancelInvoke("InitializeIndicator");
             if (this == null || m_Indicator == null || !Application.isPlaying)
                 return;
 
@@ -419,12 +427,13 @@ namespace MaterialUI
 
         public void InitializeTabsAndPagesDelayed()
         {
-            CancelInvoke("InitializeTabsAndPages");
-            Invoke("InitializeTabsAndPages", 0);
+            if (!IsInvoking("InitializeTabsAndPages"))
+                Invoke("InitializeTabsAndPages", 0);
         }
 
         public virtual void InitializeTabsAndPages()
         {
+            CancelInvoke("InitializeTabsAndPages");
             if (this == null || !Application.isPlaying)
                 return;
 
