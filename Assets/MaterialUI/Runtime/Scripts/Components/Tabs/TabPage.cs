@@ -59,7 +59,7 @@ namespace MaterialUI
                     return;
                 m_TabName = value;
                 if (Application.isPlaying)
-                    tabView.InitializeTabsAndPagesDelayed();
+                    tabView.InitializeTabsDelayed();
             }
         }
 
@@ -72,7 +72,7 @@ namespace MaterialUI
                     return;
                 m_TabIcon = value;
                 if (Application.isPlaying)
-                    tabView.InitializeTabsAndPagesDelayed();
+                    tabView.InitializeTabsDelayed();
             }
         }
 
