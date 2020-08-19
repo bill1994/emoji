@@ -276,8 +276,19 @@ namespace Kyub.UI.Experimental
                     Object.Destroy(this);
                 else
                 {
-                    Debug.Log("[FastLayoutFeedback] Removing feedback component. No parent groups found.");
-                    Object.DestroyImmediate(this);
+#if UNITY_EDITOR
+                    //Prevent UnityEditor Crash while Copy/Paste
+                    UnityEditor.EditorApplication.CallbackFunction removeDelayed = null;
+                    removeDelayed = () =>
+                    {
+                        UnityEditor.EditorApplication.update -= removeDelayed;
+                        if (this == null)
+                            return;
+                        Debug.Log("[FastLayoutFeedback] Removing feedback component. No parent groups found.");
+                        Object.DestroyImmediate(this);
+                    };
+                    UnityEditor.EditorApplication.update += removeDelayed;
+#endif
                 }
             }
         }

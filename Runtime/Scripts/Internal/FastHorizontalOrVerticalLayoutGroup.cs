@@ -307,9 +307,9 @@ namespace Kyub.UI.Experimental
             //Prevent expand when child control size
             if (childForceExpand && (m_ForceExpandMode == ForceExpandMode.Inflate || !controlSize))
                 flexible = Mathf.Max(flexible, 1);
-
             //Prevent negative values on return
-            flexible = Mathf.Max(flexible, 0);
+            else
+                flexible = Mathf.Max(flexible, 0);
         }
 
         #endregion
