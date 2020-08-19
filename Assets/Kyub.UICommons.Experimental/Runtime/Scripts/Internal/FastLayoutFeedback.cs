@@ -9,32 +9,32 @@ namespace Kyub.UI.Experimental
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
     [ExecuteAlways]
-    public class FastLayoutFeedback: UIBehaviour, IFastLayoutFeedback
+    internal sealed class FastLayoutFeedback: UIBehaviour, IFastLayoutFeedback
     {
         #region Private Variables
 
-        protected float _cachedMinWidth = -1;
-        protected float _cachedMinHeight = -1;
-        protected float _cachedPreferredWidth = -1;
-        protected float _cachedPreferredHeight = -1;
-        protected float _cachedFlexibleWidth = -1;
-        protected float _cachedFlexibleHeight = -1;
+        internal float _cachedMinWidth = -1;
+        internal float _cachedMinHeight = -1;
+        internal float _cachedPreferredWidth = -1;
+        internal float _cachedPreferredHeight = -1;
+        internal float _cachedFlexibleWidth = -1;
+        internal float _cachedFlexibleHeight = -1;
 
-        protected float _cachedRectHeight = -1;
-        protected float _cachedRectWidth = -1;
+        internal float _cachedRectHeight = -1;
+        internal float _cachedRectWidth = -1;
 
-        protected bool _cachedLayoutIgnore = false;
+        internal bool _cachedLayoutIgnore = false;
 
-        [System.NonSerialized] protected RectTransform _rect;
-        [System.NonSerialized] protected IFastLayoutGroup _group;
+        [System.NonSerialized] internal RectTransform _rect;
+        [System.NonSerialized] internal IFastLayoutGroup _group;
 
-        [System.NonSerialized] protected int m_CachedRectTransformHash = 0;
+        [System.NonSerialized] internal int m_CachedRectTransformHash = 0;
 
         #endregion
 
         #region Properties
 
-        public virtual IFastLayoutGroup group
+        public IFastLayoutGroup group
         {
             get
             {
@@ -45,13 +45,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual float cachedMinWidth
+        public float cachedMinWidth
         {
             get
             {
                 return _cachedMinWidth;
             }
-            protected set
+            internal set
             {
                 if (_cachedMinWidth == value)
                     return;
@@ -60,13 +60,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual float cachedMinHeight
+        public float cachedMinHeight
         {
             get
             {
                 return _cachedMinHeight;
             }
-            protected set
+            internal set
             {
                 if (_cachedMinHeight == value)
                     return;
@@ -75,13 +75,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual float cachedPreferredWidth
+        public float cachedPreferredWidth
         {
             get
             {
                 return _cachedPreferredWidth;
             }
-            protected set
+            internal set
             {
                 if (_cachedPreferredWidth == value)
                     return;
@@ -90,13 +90,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual float cachedPreferredHeight
+        public float cachedPreferredHeight
         {
             get
             {
                 return _cachedPreferredHeight;
             }
-            protected set
+            internal set
             {
                 if (_cachedPreferredHeight == value)
                     return;
@@ -105,13 +105,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual float cachedFlexibleWidth
+        public float cachedFlexibleWidth
         {
             get
             {
                 return _cachedFlexibleWidth;
             }
-            protected set
+            internal set
             {
                 if (_cachedFlexibleWidth == value)
                     return;
@@ -120,13 +120,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual float cachedFlexibleHeight
+        public float cachedFlexibleHeight
         {
             get
             {
                 return _cachedFlexibleHeight;
             }
-            protected set
+            internal set
             {
                 if (_cachedFlexibleHeight == value)
                     return;
@@ -135,13 +135,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual bool cachedLayoutIgnore
+        public bool cachedLayoutIgnore
         {
             get
             {
                 return _cachedLayoutIgnore;
             }
-            protected set
+            internal set
             {
                 if (_cachedLayoutIgnore == value)
                     return;
@@ -150,13 +150,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual float cachedRectWidth
+        public float cachedRectWidth
         {
             get
             {
                 return _cachedRectWidth;
             }
-            protected set
+            internal set
             {
                 if (_cachedRectWidth == value)
                     return;
@@ -165,13 +165,13 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual float cachedRectHeight
+        public float cachedRectHeight
         {
             get
             {
                 return _cachedRectHeight;
             }
-            protected set
+            internal set
             {
                 if (_cachedRectHeight == value)
                     return;
@@ -180,7 +180,7 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        public virtual RectTransform rectTransform
+        public RectTransform rectTransform
         {
             get
             {
@@ -197,19 +197,19 @@ namespace Kyub.UI.Experimental
 
         #region ILayout Properties
 
-        public virtual float minWidth { get { return -1; } set { } }
-        public virtual float minHeight { get { return -1; } set { } }
-        public virtual float preferredWidth { get { return -1; } set { } }
-        public virtual float preferredHeight { get { return -1; } set { } }
-        public virtual float flexibleWidth { get { return -1; } set { } }
-        public virtual float flexibleHeight { get { return -1; } set { } }
-        public virtual int layoutPriority { get { return -1; } set { } }
+        public float minWidth { get { return -1; } set { } }
+        public float minHeight { get { return -1; } set { } }
+        public float preferredWidth { get { return -1; } set { } }
+        public float preferredHeight { get { return -1; } set { } }
+        public float flexibleWidth { get { return -1; } set { } }
+        public float flexibleHeight { get { return -1; } set { } }
+        public int layoutPriority { get { return -1; } set { } }
 
         #endregion
 
         #region Constructors
 
-        protected FastLayoutFeedback()
+        internal FastLayoutFeedback()
         { }
 
         #endregion
@@ -264,7 +264,7 @@ namespace Kyub.UI.Experimental
 
         #region Helper Functions
 
-        protected virtual void CheckAutoDestroy()
+        internal void CheckAutoDestroy()
         {
 #if UNITY_EDITOR
             CancelInvoke("CheckAutoDestroy");
@@ -284,7 +284,7 @@ namespace Kyub.UI.Experimental
                         UnityEditor.EditorApplication.update -= removeDelayed;
                         if (this == null)
                             return;
-                        Debug.Log("[FastLayoutFeedback] Removing feedback component. No parent groups found.");
+                        //Debug.Log("[FastLayoutFeedback] Removing feedback component. No parent groups found.");
                         Object.DestroyImmediate(this);
                     };
                     UnityEditor.EditorApplication.update += removeDelayed;
@@ -294,17 +294,17 @@ namespace Kyub.UI.Experimental
         }
 
         DrivenAxis _dirtyAxis = DrivenAxis.None;
-        protected void SetAxisDirty(DrivenAxis dirtyAxis)
+        internal void SetAxisDirty(DrivenAxis dirtyAxis)
         {
             _dirtyAxis |= dirtyAxis;
         }
 
-        protected void SetDirty()
+        internal void SetDirty()
         {
             SetAxisDirty(DrivenAxis.Horizontal| DrivenAxis.Vertical| DrivenAxis.Ignore);
         }
 
-        public virtual void SendFeedback()
+        public void SendFeedback()
         {
             if (group != null && group.rectTransform != null && (_dirtyAxis.HasFlag(DrivenAxis.Ignore) || (group.childrenControlledAxis & _dirtyAxis) != 0))
             {
@@ -313,7 +313,7 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        protected virtual void CalculateLayoutIgnore()
+        internal void CalculateLayoutIgnore()
         {
             var toIgnoreList = ListPool<Component>.Get();
             rectTransform.GetComponents(typeof(ILayoutIgnorer), toIgnoreList);
@@ -334,7 +334,7 @@ namespace Kyub.UI.Experimental
             cachedLayoutIgnore = !canAdd;
         }
 
-        protected virtual void CalculateRectTransformDimensions(bool canDirtyInLayoutRebuild = false)
+        internal void CalculateRectTransformDimensions(bool canDirtyInLayoutRebuild = false)
         {
             cachedRectWidth = rectTransform.sizeDelta.x;
             cachedRectHeight = rectTransform.sizeDelta.y;
@@ -358,7 +358,7 @@ namespace Kyub.UI.Experimental
 
         #region ILayoutController Functions
 
-        public virtual void CalculateLayoutInputHorizontal()
+        public void CalculateLayoutInputHorizontal()
         {
             cachedMinWidth = LayoutUtility.GetMinWidth(this.rectTransform);
             cachedPreferredWidth = LayoutUtility.GetPreferredWidth(this.rectTransform);
@@ -366,7 +366,7 @@ namespace Kyub.UI.Experimental
             CalculateLayoutIgnore();
         }
 
-        public virtual void CalculateLayoutInputVertical()
+        public void CalculateLayoutInputVertical()
         {
             cachedMinHeight = LayoutUtility.GetMinHeight(this.rectTransform);
             cachedPreferredHeight = LayoutUtility.GetPreferredHeight(this.rectTransform);
