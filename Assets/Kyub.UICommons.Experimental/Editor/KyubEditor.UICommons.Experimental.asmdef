@@ -1,0 +1,17 @@
+{
+    "name": "KyubEditor.UICommons.Experimental",
+    "references": [
+        "GUID:36e9a76be74c1c24da6a459835635e6b",
+        "GUID:6c3c606e2cc9ef342aea649931b4d217",
+        "GUID:0f58c067a5870e34eadeb4a2055fb4ce"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
