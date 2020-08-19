@@ -76,6 +76,26 @@ namespace Kyub.UI.Experimental
 
         #region Overriden Properties
 
+        protected override void CalcRectTransformChanged(bool isVertical)
+        {
+            CalculateRectTransformDimensions();
+
+            var isDirty = _dirtyAxis != DrivenAxis.None;
+
+            //Remove dirty when dirty axis was not controlled by children or by layout
+            var childrenControlledAxis = this.childrenControlledAxis;
+            if (isDirty &&
+                (!isVertical && _dirtyAxis.HasFlag(DrivenAxis.Vertical) && !_dirtyAxis.HasFlag(DrivenAxis.Horizontal) && !childrenControlledAxis.HasFlag(DrivenAxis.Vertical)) ||
+                (isVertical && !_dirtyAxis.HasFlag(DrivenAxis.Vertical) && _dirtyAxis.HasFlag(DrivenAxis.Horizontal) && !childrenControlledAxis.HasFlag(DrivenAxis.Horizontal)))
+                isDirty = false;
+
+            //Prevent change size while calculating feedback
+            if (isDirty)
+                SetDirty();
+            else
+                _dirtyAxis &= ~(DrivenAxis.Horizontal | DrivenAxis.Vertical);
+        }
+
         public override void SetElementDirty(IFastLayoutFeedback driven, DrivenAxis dirtyAxis)
         {
             if (driven != null && (dirtyAxis.HasFlag(DrivenAxis.Ignore) || (dirtyAxis & childrenControlledAxis) != 0))
