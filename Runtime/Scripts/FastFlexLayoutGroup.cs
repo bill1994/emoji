@@ -225,9 +225,9 @@ namespace Kyub.UI.Experimental
 
         public override void CalculateLayoutInputHorizontal()
         {
-            _Groups = BuildChildrenGroups(isVertical);
-
             base.CalculateLayoutInputHorizontal();
+
+            _Groups = BuildChildrenGroups(isVertical);
             CalcAlongAxis(0, m_IsVertical);
         }
 
