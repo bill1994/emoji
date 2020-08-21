@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../BiometricsAuth.iml" filepath="$PROJECT_DIR$/../BiometricsAuth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bzbiometricsauthlibrary.iml" filepath="$PROJECT_DIR$/bzbiometricsauthlibrary.iml" />
+    </modules>
+  </component>
+</project>

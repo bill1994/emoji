@@ -41,10 +41,10 @@ namespace Kyub.Credentials
         string m_dialogDefaultCancelText = "Cancel";
         [Space]
         [SerializeField, Tooltip("Legacy Mode will force use internal Unity Popup instead native  (SDK < 28)")]
-        bool m_useLegacyMode = false;
+        bool m_useLegacyMode = true;
 
         string _processingStoredKey = null;
-        Kyub.Credentials.UI.DialogFingerprint _activeFingerprintDialog = null;
+        UI.DialogFingerprint _activeFingerprintDialog = null;
 
         #endregion
 
@@ -345,9 +345,9 @@ namespace Kyub.Credentials
 #endif
         }
 
-#endregion
+        #endregion
 
-#region Receivers
+        #region Receivers
 
         //this functions is used to reduce amount of remaining chances in callback
         protected internal void OnAuthenticationReturn(string p_error)
@@ -408,9 +408,9 @@ namespace Kyub.Credentials
             _processingStoredKey = null;
         }
 
-#endregion
+        #endregion
 
-#region Public Functions (Static)
+        #region Public Functions (Static)
 
         public static bool IsBiometricHardwareAvailable()
         {
@@ -497,14 +497,14 @@ namespace Kyub.Credentials
             CredentialsKeyStore.DeleteAll();
         }
 
-#endregion
+        #endregion
 
-#region Helper Classes
+        #region Helper Classes
 
         [System.Serializable]
         public class AuthResponse
         {
-#region Private Variables
+            #region Private Variables
 
             [SerializeField]
             string m_requestedKey = "";
@@ -513,9 +513,9 @@ namespace Kyub.Credentials
             [SerializeField]
             string m_data = null;
 
-#endregion
+            #endregion
 
-#region Public Properties
+            #region Public Properties
 
             public string Key
             {
@@ -556,9 +556,9 @@ namespace Kyub.Credentials
                 }
             }
 
-#endregion
+            #endregion
 
-#region Constructors
+            #region Constructors
 
             public AuthResponse(string p_key, string p_data, string p_error)
             {
@@ -567,9 +567,9 @@ namespace Kyub.Credentials
                 m_error = p_error;
             }
 
-#endregion
+            #endregion
 
-#region Helper Functions
+            #region Helper Functions
 
             public T GetCastedData<T>()
             {
@@ -586,9 +586,9 @@ namespace Kyub.Credentials
                 return !string.IsNullOrEmpty(m_data) && !string.IsNullOrEmpty(m_requestedKey) && string.IsNullOrEmpty(m_error);
             }
 
-#endregion
+            #endregion
         }
 
-#endregion
+        #endregion
     }
 }
