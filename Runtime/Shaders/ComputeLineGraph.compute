@@ -1,0 +1,225 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it with cs.SetTexture
+RWTexture2D<float4> Result;
+float4 color;
+uint isAreaShading;
+uint isFill;
+uint isHorizontal;
+uint texSize;
+uint numPointsPerSeries;
+float shadingAxisVal;
+float maxVal;
+float minVal;
+StructuredBuffer<float> xVals;
+StructuredBuffer<float> yVals;
+StructuredBuffer<uint> pixelIndexToPointIndexMap;
+
+// line properties
+uint drawLines;
+float halfLineWidth;
+float4 lineColor;
+uint numSeries;
+uint useMultiColors;
+StructuredBuffer<float> multiSeriesLineColors;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	Result[id.xy] = float4(0, 0, 0, 0);
+	
+	uint idx = (isHorizontal ? id.y : id.x);
+	uint idy = (isHorizontal ? id.x : id.y);
+	
+	uint i = pixelIndexToPointIndexMap[idx];
+	
+	if (i == 0) return;
+	
+	bool setAreaShading = false;
+	float newAlpha = 0;
+	uint frontSeries = 0;
+
+	for (uint j = 0; j < numSeries; j++) {
+		bool drawRect = (!isnan(xVals[i + j * numPointsPerSeries]) && !isnan(xVals[i-1 + j * numPointsPerSeries]));
+		
+		uint px = (uint)round(xVals[i + j * numPointsPerSeries] * texSize);
+		uint py = (uint)round(yVals[i + j * numPointsPerSeries] * texSize);
+		uint ppx = (uint)round(xVals[i-1 + j * numPointsPerSeries] * texSize);
+		uint ppy = (uint)round(yVals[i-1 + j * numPointsPerSeries] * texSize);
+
+		if (drawRect && isAreaShading && numSeries == 1) {
+			float slope = (yVals[i] - yVals[i-1]) / (xVals[i] - xVals[i-1]);
+			uint valFromSlope = (uint)round(slope * (idx - ppx) + ppy);
+			uint shadingAxisValScaled = (uint)round(shadingAxisVal * texSize);
+			
+			if (valFromSlope >= shadingAxisValScaled) { // shading is below the line
+				if (idx >= ppx && idx <= px && idy <= valFromSlope && idy >= shadingAxisValScaled) {
+					float alphaScale = isFill ? 1 : (((float)idy / (float)texSize) - shadingAxisVal) / (maxVal - shadingAxisVal);
+					setAreaShading = true;
+					Result[id.xy] = float4(color.x, color.y, color.z, alphaScale * color.w);
+				}
+			}
+			else { // shading is above the line
+				if (idx >= ppx && idx <= px && idy >= valFromSlope && idy <= shadingAxisValScaled) {
+					float alphaScale = isFill ? 1 : -(((float)idy / (float)texSize) - shadingAxisVal) / (shadingAxisVal - minVal);
+					setAreaShading = true;
+					Result[id.xy] = float4(color.x, color.y, color.z, alphaScale * color.w);
+				}
+			}
+		}
+
+		if (drawLines && halfLineWidth > 0) {
+			// the point being tested
+			float mx = (float)idx;
+			float my = (float)idy;
+			
+			// let rectangle ABC with AB and BC perpendicular define the rectangle
+			float ax = (float)ppx;
+			float ay = (float)ppy;
+			float bx = (float)px;
+			float by = (float)py;
+			
+			float slopeABperp = (ax - bx) / (by - ay); // inverse reciprocal of ab slope
+			if ((by - ay) == 0) slopeABperp = 1000; // deal with infinity slope issue
+			float perpLineLength = sqrt(1 + slopeABperp * slopeABperp); // length of vector (1, slopeABperp)
+
+			float cx = bx + halfLineWidth * (1 / perpLineLength);
+			float cy = by + halfLineWidth * (slopeABperp / perpLineLength);
+
+			float origBx = bx;
+			float origBy = by;
+
+			bx = bx - halfLineWidth * (1 / perpLineLength);
+			by = by - halfLineWidth * (slopeABperp / perpLineLength);
+
+			ax = ax - halfLineWidth * (1 / perpLineLength);
+			ay = ay - halfLineWidth * (slopeABperp / perpLineLength);
+			
+			float2 ab = float2(bx - ax, by - ay);
+			float2 bc = float2(cx - bx, cy - by);
+			float2 am = float2(mx - ax, my - ay);
+			float2 bm = float2(mx - bx, my - by);
+			
+			if (drawRect) {
+				if (0 <= dot(ab, am) && dot(ab, am) <= dot(ab, ab) && 0 <= dot(bc, bm) && dot(bc, bm) <= dot(bc, bc)) { // point inside rectangle
+					float pointIntercept = my + 1 / slopeABperp * mx;
+					float startIntercept = origBy + 1 / slopeABperp * origBx;
+					float endIntercept = cy + 1 / slopeABperp * cx;
+					float percentageDist = abs((pointIntercept - startIntercept) / (endIntercept - startIntercept));
+					
+					newAlpha = max(newAlpha, (1 - percentageDist));
+					frontSeries = max(frontSeries, j);
+				}
+				
+				// draw circle caps on ends of rectangle
+				float dist = sqrt(((float)ppx - mx) * ((float)ppx - mx) + ((float)ppy - my) * ((float)ppy - my));
+				if (dist < halfLineWidth) {
+					newAlpha = max(newAlpha, (1 - (dist / halfLineWidth)));
+					frontSeries = max(frontSeries, j);
+				}
+				dist = sqrt(((float)px - mx) * ((float)px - mx) + ((float)py - my) * ((float)py - my));
+				if (dist < halfLineWidth) {
+					newAlpha = max(newAlpha, (1 - (dist / halfLineWidth)));
+					frontSeries = max(frontSeries, j);
+				}
+			}
+			// draw part of rectangle for next rectangle
+			if ((i % numPointsPerSeries) < numPointsPerSeries - 1) {
+				drawRect = (!isnan(xVals[i + j * numPointsPerSeries]) && !isnan(xVals[i+1 + j * numPointsPerSeries]));
+				if (drawRect) {
+					uint apx = (uint)round(xVals[i+1 + j * numPointsPerSeries] * texSize);
+					uint apy = (uint)round(yVals[i+1 + j * numPointsPerSeries] * texSize);
+					
+					// let rectangle ABC with AB and BC perpendicular define the rectangle
+					ax = (float)px;
+					ay = (float)py;
+					bx = (float)apx;
+					by = (float)apy;
+					
+					slopeABperp = (ax - bx) / (by - ay); // inverse reciprocal of ab slope
+					if ((by - ay) == 0) slopeABperp = 1000; // deal with infinity slope issue
+					perpLineLength = sqrt(1 + slopeABperp * slopeABperp); // length of vector (1, slopeABperp)
+
+					cx = bx + halfLineWidth * (1 / perpLineLength);
+					cy = by + halfLineWidth * (slopeABperp / perpLineLength);
+
+					origBx = bx;
+					origBy = by;
+
+					bx = bx - halfLineWidth * (1 / perpLineLength);
+					by = by - halfLineWidth * (slopeABperp / perpLineLength);
+
+					ax = ax - halfLineWidth * (1 / perpLineLength);
+					ay = ay - halfLineWidth * (slopeABperp / perpLineLength);
+					
+					ab = float2(bx - ax, by - ay);
+					bc = float2(cx - bx, cy - by);
+					am = float2(mx - ax, my - ay);
+					bm = float2(mx - bx, my - by);
+					
+					if (0 <= dot(ab, am) && dot(ab, am) <= dot(ab, ab) && 0 <= dot(bc, bm) && dot(bc, bm) <= dot(bc, bc)) { // point inside rectangle
+						float pointIntercept = my + 1 / slopeABperp * mx;
+						float startIntercept = origBy + 1 / slopeABperp * origBx;
+						float endIntercept = cy + 1 / slopeABperp * cx;
+						float percentageDist = abs((pointIntercept - startIntercept) / (endIntercept - startIntercept));
+						
+						newAlpha = max(newAlpha, (1 - percentageDist));
+						frontSeries = max(frontSeries, j);
+					}
+				}
+			}
+			// draw part of rectangle for previous rectangle
+			if ((i % numPointsPerSeries) > 1) {
+				drawRect = (!isnan(xVals[i-2 + j * numPointsPerSeries]) && !isnan(xVals[i-1 + j * numPointsPerSeries]));
+				if (drawRect) {
+					uint apx = (uint)round(xVals[i-2 + j * numPointsPerSeries] * texSize);
+					uint apy = (uint)round(yVals[i-2 + j * numPointsPerSeries] * texSize);
+					
+					// let rectangle ABC with AB and BC perpendicular define the rectangle
+					ax = (float)apx;
+					ay = (float)apy;
+					bx = (float)ppx;
+					by = (float)ppy;
+					
+					slopeABperp = (ax - bx) / (by - ay); // inverse reciprocal of ab slope
+					if ((by - ay) == 0) slopeABperp = 1000; // deal with infinity slope issue
+					perpLineLength = sqrt(1 + slopeABperp * slopeABperp); // length of vector (1, slopeABperp)
+
+					cx = bx + halfLineWidth * (1 / perpLineLength);
+					cy = by + halfLineWidth * (slopeABperp / perpLineLength);
+
+					origBx = bx;
+					origBy = by;
+
+					bx = bx - halfLineWidth * (1 / perpLineLength);
+					by = by - halfLineWidth * (slopeABperp / perpLineLength);
+
+					ax = ax - halfLineWidth * (1 / perpLineLength);
+					ay = ay - halfLineWidth * (slopeABperp / perpLineLength);
+					
+					ab = float2(bx - ax, by - ay);
+					bc = float2(cx - bx, cy - by);
+					am = float2(mx - ax, my - ay);
+					bm = float2(mx - bx, my - by);
+					
+					if (0 <= dot(ab, am) && dot(ab, am) <= dot(ab, ab) && 0 <= dot(bc, bm) && dot(bc, bm) <= dot(bc, bc)) { // point inside rectangle
+						float pointIntercept = my + 1 / slopeABperp * mx;
+						float startIntercept = origBy + 1 / slopeABperp * origBx;
+						float endIntercept = cy + 1 / slopeABperp * cx;
+						float percentageDist = abs((pointIntercept - startIntercept) / (endIntercept - startIntercept));
+						
+						newAlpha = max(newAlpha, (1 - percentageDist));
+						frontSeries = max(frontSeries, j);
+					}
+				}
+			}
+		}
+	}
+	if (newAlpha == 0 && setAreaShading) return; // already set color for area shading, dont overwrite
+	if (useMultiColors == 0) {
+		Result[id.xy] = float4(lineColor.x, lineColor.y, lineColor.z, lineColor.w * newAlpha);
+	} else {
+		Result[id.xy] = float4(multiSeriesLineColors[frontSeries * 4], multiSeriesLineColors[frontSeries * 4 + 1], multiSeriesLineColors[frontSeries * 4 + 2], multiSeriesLineColors[frontSeries * 4 + 3] * newAlpha);
+	}
+}

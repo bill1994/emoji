@@ -1,0 +1,24 @@
+{
+    "name": "Kyub.GraphMaker.Test",
+    "references": [
+        "GUID:2303d53392bc74d41a4e18f9c6e41473",
+        "GUID:ac20dc905f9b79946a57e64ae7147c07"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "",
+            "define": "TMP_PRESENT"
+        }
+    ],
+    "noEngineReferences": false
+}
