@@ -1,0 +1,18 @@
+{
+  "name": "com.kyub.graphmaker",
+  "version": "1.5.9",
+  "displayName": "Kyub GraphMaker",
+  "description": "Better Graph_Maker for TMP",
+  "unity": "2019.1",
+  "dependencies": {},
+  "keywords": [
+    "GraphMaker"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}
