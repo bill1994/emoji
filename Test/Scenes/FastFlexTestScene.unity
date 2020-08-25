@@ -355,33 +355,6 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_IsVertical: 0
   m_SpacingBetween: 5
-  _Groups:
-  - m_Size: {x: 300.28442, y: 40}
-    m_Position: {x: 5, y: 5}
-    m_Children:
-    - id: 0
-    - id: 0
-    m_TotalMinSize: {x: 5, y: 0}
-    m_TotalPreferredSize: {x: 240.27081, y: 40}
-    m_TotalFlexibleSize: {x: 0, y: 0}
-  - m_Size: {x: 300.28442, y: 40}
-    m_Position: {x: 5, y: 50}
-    m_Children:
-    - id: 0
-    m_TotalMinSize: {x: 0, y: 0}
-    m_TotalPreferredSize: {x: 250, y: 40}
-    m_TotalFlexibleSize: {x: 0, y: 0}
-  - m_Size: {x: 300.28442, y: 40}
-    m_Position: {x: 5, y: 95}
-    m_Children:
-    - id: 0
-    m_TotalMinSize: {x: 400, y: 0}
-    m_TotalPreferredSize: {x: 400, y: 40}
-    m_TotalFlexibleSize: {x: 0, y: 0}
-  references:
-    version: 1
-    00000000:
-      type: {class: , ns: , asm: }
 --- !u!114 &399464109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -597,29 +570,6 @@ MonoBehaviour:
   m_ReverseOrder: 0
   m_IsVertical: 0
   m_SpacingBetween: 5
-  _Groups:
-  - m_Size: {x: 297.65775, y: 40}
-    m_Position: {x: 5, y: 5}
-    m_RectChildren:
-    - {fileID: 982411740}
-    - {fileID: 300987615}
-    m_TotalMinSize: {x: 5, y: 0}
-    m_TotalPreferredSize: {x: 201.38046, y: 40}
-    m_TotalFlexibleSize: {x: 0, y: 0}
-  - m_Size: {x: 297.65775, y: 40}
-    m_Position: {x: 5, y: 50}
-    m_RectChildren:
-    - {fileID: 1870197055}
-    m_TotalMinSize: {x: 0, y: 0}
-    m_TotalPreferredSize: {x: 250, y: 40}
-    m_TotalFlexibleSize: {x: 0, y: 0}
-  - m_Size: {x: 297.65775, y: 40}
-    m_Position: {x: 5, y: 95}
-    m_RectChildren:
-    - {fileID: 1021151957}
-    m_TotalMinSize: {x: 400, y: 0}
-    m_TotalPreferredSize: {x: 400, y: 40}
-    m_TotalFlexibleSize: {x: 0, y: 0}
 --- !u!114 &932613837
 MonoBehaviour:
   m_ObjectHideFlags: 0
