@@ -115,7 +115,7 @@ namespace Kyub.GraphMaker
 
 		void Update()
 		{
-			if (Input.GetKeyDown(KeyCode.A))
+			if (EventSystems.InputCompat.GetKeyDown(KeyCode.A))
 			{
 				List<float> randomList = WMG_Util.GenRandomList(200, 0, 100);
 				for (int i = 0; i < randomList.Count; i++)
@@ -124,7 +124,7 @@ namespace Kyub.GraphMaker
 					series1.pointValues[xIndex] = new Vector2(series1.pointValues[xIndex].x, randomList[i]);
 				}
 			}
-			if (Input.GetKeyDown(KeyCode.B))
+			if (EventSystems.InputCompat.GetKeyDown(KeyCode.B))
 			{
 				List<float> randomList = WMG_Util.GenRandomList(1, 0, 100);
 				for (int i = 0; i < randomList.Count; i++)

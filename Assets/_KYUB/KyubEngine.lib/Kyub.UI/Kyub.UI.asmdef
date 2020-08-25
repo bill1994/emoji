@@ -1,7 +1,8 @@
 {
     "name": "Kyub.UI",
     "references": [
-        "GUID:af50b871d983fd2498bf363097906a11"
+        "GUID:af50b871d983fd2498bf363097906a11",
+        "GUID:41175c1412c601548a1d1cc8d9a7e266"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

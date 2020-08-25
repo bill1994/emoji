@@ -202,15 +202,15 @@ namespace Kyub.UI
 			Vector2 localPoint;
 			if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
 			{
-				RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Input.mousePosition, null, out localPoint);
+				RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Kyub.EventSystems.InputCompat.mousePosition, null, out localPoint);
 			}
 			else if (canvas.worldCamera != null)
 			{
-				RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Input.mousePosition, canvas.worldCamera, out localPoint);
+				RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Kyub.EventSystems.InputCompat.mousePosition, canvas.worldCamera, out localPoint);
 			}
 			else
 			{
-				RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Input.mousePosition, Camera.main, out localPoint);
+				RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Kyub.EventSystems.InputCompat.mousePosition, Camera.main, out localPoint);
 			}
 			localPoint.x += rect.rect.width * rect.pivot.x;
 			localPoint.y += rect.rect.height * rect.pivot.y;

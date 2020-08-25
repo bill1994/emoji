@@ -23,7 +23,7 @@ namespace Kyub.UI
 
         public virtual void CheckInput(bool p_force = false)
         {
-            if ((p_force || Input.GetKeyDown(KeyCode.Tab)) && FocusGroup.IsUnderFocus(this.gameObject))
+            if ((p_force || Kyub.EventSystems.InputCompat.GetKeyDown(KeyCode.Tab)) && FocusGroup.IsUnderFocus(this.gameObject))
             {
                 StartCoroutine(ChangeInput());
             }
@@ -38,7 +38,7 @@ namespace Kyub.UI
                 EventSystem v_eventSystem = EventSystem.current;
                 if (v_eventSystem != null)
                 {
-                    bool v_moveBack = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+                    bool v_moveBack = Kyub.EventSystems.InputCompat.GetKey(KeyCode.LeftShift) || Kyub.EventSystems.InputCompat.GetKey(KeyCode.RightShift);
                     GameObject v_currentSelectedGameObject = v_eventSystem.currentSelectedGameObject;
                     Selectable v_currentSelectedComponent = v_currentSelectedGameObject != null ? v_currentSelectedGameObject.GetComponent<Selectable>() : null;
 

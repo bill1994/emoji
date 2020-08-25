@@ -200,7 +200,7 @@ namespace Kyub.UI
         {
             CheckIfTextChanged();
             if (_pointerEnterCamera != null)
-                OnPointerOver(Input.mousePosition);
+                OnPointerOver(Kyub.EventSystems.InputCompat.mousePosition);
         }
 
         protected override void OnPopulateMesh(VertexHelper toFill)
@@ -393,7 +393,7 @@ namespace Kyub.UI
             foreach (var v_href in m_HrefInfos)
             {
                 var v_newEvent = v_href != v_hrefInfoMouseOver ? HrefMouseEvent.None : p_mouseEventType;
-                if (v_newEvent == HrefMouseEvent.Hover && Input.GetMouseButton(0))
+                if (v_newEvent == HrefMouseEvent.Hover && Kyub.EventSystems.InputCompat.GetMouseButton(0))
                     v_newEvent = HrefMouseEvent.Pressed;
                 if (v_href.mouseEvent != v_newEvent)
                 {
