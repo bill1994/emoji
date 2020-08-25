@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GraphMakerAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 1024
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 8
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 8011804a8e5bcb544b4cdf902aa8fe01, type: 3}
+    - {fileID: 2800000, guid: 9768e2e0a108466428cfecfb65ebcb67, type: 3}
+    - {fileID: 2800000, guid: 57b0ac83808ab8f428b7810c532078ce, type: 3}
+    - {fileID: 2800000, guid: 2780a047d157071429ab27a0958caa37, type: 3}
+    - {fileID: 2800000, guid: 7e6ffdd89d7fc424baff9562381e9ec1, type: 3}
+    - {fileID: 2800000, guid: 8d86d5ebb57c30646ae1b37ab463601d, type: 3}
+    - {fileID: 2800000, guid: e21c48a8faee6f94d8841ef142401759, type: 3}
+    - {fileID: 2800000, guid: d0f0591a43816e447af99d7cfd535ca2, type: 3}
+    - {fileID: 2800000, guid: d596400697a94d54d8bd00b629663940, type: 3}
+    - {fileID: 2800000, guid: ceb490f08dbc3c14b9f383ef6683630b, type: 3}
+    - {fileID: 2800000, guid: 6dc603456fab57a43968b105a6687d60, type: 3}
+    - {fileID: 2800000, guid: e517919c73f609b488c8794158811cf7, type: 3}
+    - {fileID: 2800000, guid: cc38ac89666c54147b4e89a6e58535dd, type: 3}
+    - {fileID: 2800000, guid: 48681b64a8428ac49ac6cef5fd5616d8, type: 3}
+    totalSpriteSurfaceArea: 246212
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 9768e2e0a108466428cfecfb65ebcb67, type: 3}
+  - {fileID: 21300000, guid: ceb490f08dbc3c14b9f383ef6683630b, type: 3}
+  - {fileID: 21300000, guid: 57b0ac83808ab8f428b7810c532078ce, type: 3}
+  - {fileID: 21300000, guid: 48681b64a8428ac49ac6cef5fd5616d8, type: 3}
+  - {fileID: 21300000, guid: 6dc603456fab57a43968b105a6687d60, type: 3}
+  - {fileID: 21300000, guid: d596400697a94d54d8bd00b629663940, type: 3}
+  - {fileID: 21300000, guid: 2780a047d157071429ab27a0958caa37, type: 3}
+  - {fileID: 21300000, guid: e21c48a8faee6f94d8841ef142401759, type: 3}
+  - {fileID: 21300000, guid: 7e6ffdd89d7fc424baff9562381e9ec1, type: 3}
+  - {fileID: 21300000, guid: cc38ac89666c54147b4e89a6e58535dd, type: 3}
+  - {fileID: 21300000, guid: d0f0591a43816e447af99d7cfd535ca2, type: 3}
+  - {fileID: 21300000, guid: 8011804a8e5bcb544b4cdf902aa8fe01, type: 3}
+  - {fileID: 21300000, guid: 8d86d5ebb57c30646ae1b37ab463601d, type: 3}
+  - {fileID: 21300000, guid: e517919c73f609b488c8794158811cf7, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Hexagon2
+  - WMG_Link2BotRight
+  - LineSeriesPoint
+  - WMG_NodeHover
+  - WMG_Link_Dotted
+  - WMG_Link2BotLeft
+  - LineSeriesPointTriangle
+  - WMG_Link
+  - PieGraphCircle
+  - WMG_Node
+  - WMG_Link2
+  - Hexagon
+  - WhiteSquare128
+  - WMG_Link_Dotted2
+  m_Tag: GraphMakerAtlas
+  m_IsVariant: 0

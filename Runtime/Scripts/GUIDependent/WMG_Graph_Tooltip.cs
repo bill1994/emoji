@@ -122,7 +122,7 @@ namespace Kyub.GraphMaker
 		//Handle correct multi-monitor mouse positions
 		private Vector2 GetMousePosition()
 		{
-			Vector3 inputPos = Input.mousePosition;
+			Vector3 inputPos = EventSystems.InputCompat.mousePosition;
 			Vector3 relativeInputPos = Display.RelativeMouseAt(inputPos);
 			return (relativeInputPos.z == 0) ? inputPos : relativeInputPos;
 		} //end method
