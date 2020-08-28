@@ -67,7 +67,7 @@ namespace MaterialUI
             if (!string.IsNullOrEmpty(m_ZipPath))
             {
                 DirectoryInfo info = new DirectoryInfo(m_ZipPath);
-                ZipUtil.Unzip(m_ZipPath, Application.temporaryCachePath + "/tempFont");
+                ZipUtil.Uncompress(m_ZipPath, Application.temporaryCachePath + "/tempFont");
                 m_UnzipPath = Application.temporaryCachePath + "/tempFont/" + info.Name.Replace(".zip", "");
             }
         }
