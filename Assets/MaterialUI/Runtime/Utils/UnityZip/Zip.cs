@@ -30,13 +30,13 @@ namespace MaterialUI
 			}
 		}
 
-		public static void Compress(byte[] byteStream, string pathToAdd)
+		public static void Compress(string location, byte[] zipByteStream)
 		{
-			using (var memoryStream = new MemoryStream(byteStream))
+			using (var memoryStream = new MemoryStream(zipByteStream))
 			{
 				using (ZipFile zip = new ZipFile())
 				{
-					zip.AddDirectory(pathToAdd, Path.GetFileName(Path.GetDirectoryName(pathToAdd)));
+					zip.AddDirectory(location, Path.GetFileName(Path.GetDirectoryName(location)));
 					zip.Save(memoryStream);
 				}
 			}
@@ -53,13 +53,16 @@ namespace MaterialUI
 			}
 		}
 
-		public static void Uncompress(string extractLocation, byte[] byteStream)
+		public static void Uncompress(byte[] zipByteStream, string location)
 		{
-			using (var memoryStream = new MemoryStream(byteStream))
+			if (!Directory.Exists(location))
+				Directory.CreateDirectory(location);
+
+			using (var memoryStream = new MemoryStream(zipByteStream))
 			{
 				using (ZipFile zip = ZipFile.Read(memoryStream))
 				{
-					zip.ExtractAll(extractLocation, ExtractExistingFileAction.OverwriteSilently);
+					zip.ExtractAll(location, ExtractExistingFileAction.OverwriteSilently);
 				}
 			}
 		}
