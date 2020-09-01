@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hashCode: -737250198
   material: {fileID: 492905596388270015}
-  materialHashCode: -184325215
+  materialHashCode: 1251382410
   m_Version: 1.1.0
   m_SourceFontFileGUID: ad105ce5c1a24a84f87df69819b699f8
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: ad105ce5c1a24a84f87df69819b699f8,
@@ -42,6 +42,20 @@ MonoBehaviour:
     m_StrikethroughThickness: 2.1484375
     m_TabWidth: 11
   m_GlyphTable:
+  - m_Index: 3
+    m_Metrics:
+      m_Width: 0
+      m_Height: 0
+      m_HorizontalBearingX: 0
+      m_HorizontalBearingY: 0
+      m_HorizontalAdvance: 10.953125
+    m_GlyphRect:
+      m_X: 0
+      m_Y: 0
+      m_Width: 0
+      m_Height: 0
+    m_Scale: 1
+    m_AtlasIndex: 0
   - m_Index: 48
     m_Metrics:
       m_Width: 24.8125
@@ -53,6 +67,20 @@ MonoBehaviour:
       m_X: 6
       m_Y: 6
       m_Width: 25
+      m_Height: 32
+    m_Scale: 1
+    m_AtlasIndex: 0
+  - m_Index: 54
+    m_Metrics:
+      m_Width: 24.8125
+      m_Height: 31.28125
+      m_HorizontalBearingX: 0.96875
+      m_HorizontalBearingY: 31.28125
+      m_HorizontalAdvance: 26.703125
+    m_GlyphRect:
+      m_X: 42
+      m_Y: 6
+      m_Width: 26
       m_Height: 32
     m_Scale: 1
     m_AtlasIndex: 0
@@ -70,6 +98,20 @@ MonoBehaviour:
       m_Height: 25
     m_Scale: 1
     m_AtlasIndex: 0
+  - m_Index: 86
+    m_Metrics:
+      m_Width: 13.28125
+      m_Height: 29.328125
+      m_HorizontalBearingX: 0.171875
+      m_HorizontalBearingY: 28.890625
+      m_HorizontalAdvance: 14.625
+    m_GlyphRect:
+      m_X: 6
+      m_Y: 120
+      m_Width: 14
+      m_Height: 30
+    m_Scale: 1
+    m_AtlasIndex: 0
   - m_Index: 89
     m_Metrics:
       m_Width: 31.1875
@@ -82,34 +124,6 @@ MonoBehaviour:
       m_Y: 85
       m_Width: 32
       m_Height: 24
-    m_Scale: 1
-    m_AtlasIndex: 0
-  - m_Index: 3
-    m_Metrics:
-      m_Width: 0
-      m_Height: 0
-      m_HorizontalBearingX: 0
-      m_HorizontalBearingY: 0
-      m_HorizontalAdvance: 10.953125
-    m_GlyphRect:
-      m_X: 0
-      m_Y: 0
-      m_Width: 0
-      m_Height: 0
-    m_Scale: 1
-    m_AtlasIndex: 0
-  - m_Index: 54
-    m_Metrics:
-      m_Width: 24.8125
-      m_Height: 31.28125
-      m_HorizontalBearingX: 0.96875
-      m_HorizontalBearingY: 31.28125
-      m_HorizontalAdvance: 26.703125
-    m_GlyphRect:
-      m_X: 42
-      m_Y: 6
-      m_Width: 26
-      m_Height: 32
     m_Scale: 1
     m_AtlasIndex: 0
   - m_Index: 90
@@ -126,48 +140,34 @@ MonoBehaviour:
       m_Height: 24
     m_Scale: 1
     m_AtlasIndex: 0
-  - m_Index: 86
-    m_Metrics:
-      m_Width: 13.28125
-      m_Height: 29.328125
-      m_HorizontalBearingX: 0.171875
-      m_HorizontalBearingY: 28.890625
-      m_HorizontalAdvance: 14.625
-    m_GlyphRect:
-      m_X: 6
-      m_Y: 120
-      m_Width: 14
-      m_Height: 30
-    m_Scale: 1
-    m_AtlasIndex: 0
   m_CharacterTable:
-  - m_ElementType: 1
-    m_Unicode: 78
-    m_GlyphIndex: 48
-    m_Scale: 1
-  - m_ElementType: 1
-    m_Unicode: 101
-    m_GlyphIndex: 71
-    m_Scale: 1
-  - m_ElementType: 1
-    m_Unicode: 119
-    m_GlyphIndex: 89
-    m_Scale: 1
   - m_ElementType: 1
     m_Unicode: 32
     m_GlyphIndex: 3
+    m_Scale: 1
+  - m_ElementType: 1
+    m_Unicode: 78
+    m_GlyphIndex: 48
     m_Scale: 1
   - m_ElementType: 1
     m_Unicode: 84
     m_GlyphIndex: 54
     m_Scale: 1
   - m_ElementType: 1
-    m_Unicode: 120
-    m_GlyphIndex: 90
+    m_Unicode: 101
+    m_GlyphIndex: 71
     m_Scale: 1
   - m_ElementType: 1
     m_Unicode: 116
     m_GlyphIndex: 86
+    m_Scale: 1
+  - m_ElementType: 1
+    m_Unicode: 119
+    m_GlyphIndex: 89
+    m_Scale: 1
+  - m_ElementType: 1
+    m_Unicode: 120
+    m_GlyphIndex: 90
     m_Scale: 1
   m_AtlasTextures:
   - {fileID: 7320811070297392387}
@@ -329,7 +329,7 @@ MonoBehaviour:
   normalStyle: 0
   normalSpacingOffset: 0
   boldStyle: 0.75
-  boldSpacing: 7
+  boldSpacing: 0
   italicStyle: 35
   tabSize: 10
 --- !u!21 &492905596388270015
@@ -453,6 +453,8 @@ Texture2D:
   m_TextureFormat: 1
   m_MipCount: 1
   m_IsReadable: 1
+  m_IgnoreMasterTextureLimit: 0
+  m_IsPreProcessed: 0
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_AlphaIsTransparency: 0

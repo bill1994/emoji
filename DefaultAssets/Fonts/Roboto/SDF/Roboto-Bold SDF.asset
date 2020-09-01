@@ -19,6 +19,8 @@ Texture2D:
   m_TextureFormat: 1
   m_MipCount: 1
   m_IsReadable: 1
+  m_IgnoreMasterTextureLimit: 0
+  m_IsPreProcessed: 0
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_AlphaIsTransparency: 0
@@ -54,7 +56,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hashCode: -635320526
   material: {fileID: 929759566765385221}
-  materialHashCode: 1454072953
+  materialHashCode: -1838732846
   m_Version: 1.1.0
   m_SourceFontFileGUID: 6d0cc44c6c0eaf744948352169214e8b
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 6d0cc44c6c0eaf744948352169214e8b,
@@ -21471,7 +21473,7 @@ MonoBehaviour:
   normalStyle: 0
   normalSpacingOffset: 0
   boldStyle: 0.75
-  boldSpacing: 7
+  boldSpacing: 0
   italicStyle: 35
   tabSize: 10
 --- !u!21 &929759566765385221

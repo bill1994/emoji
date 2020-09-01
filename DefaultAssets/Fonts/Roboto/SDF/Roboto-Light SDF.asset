@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hashCode: 2119065385
   material: {fileID: 21057015712240798}
-  materialHashCode: -2023819390
+  materialHashCode: -77814423
   m_Version: 1.1.0
   m_SourceFontFileGUID: c5cecd61dc69a004cb14595341df0dfe
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: c5cecd61dc69a004cb14595341df0dfe,
@@ -21391,7 +21391,7 @@ MonoBehaviour:
   normalStyle: 0
   normalSpacingOffset: 0
   boldStyle: 0.75
-  boldSpacing: 7
+  boldSpacing: 0
   italicStyle: 35
   tabSize: 10
 --- !u!21 &21057015712240798
@@ -21515,6 +21515,8 @@ Texture2D:
   m_TextureFormat: 1
   m_MipCount: 1
   m_IsReadable: 1
+  m_IgnoreMasterTextureLimit: 0
+  m_IsPreProcessed: 0
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_AlphaIsTransparency: 0
