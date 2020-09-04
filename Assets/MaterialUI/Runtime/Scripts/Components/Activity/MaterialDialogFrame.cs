@@ -6,11 +6,12 @@ using UnityEngine.Events;
 namespace MaterialUI
 {
     [DisallowMultipleComponent]
-    public class MaterialDialogFrame : MaterialFrame
+    public class MaterialDialogFrame : MaterialFrame, ISerializationCallbackReceiver
     {
         #region Private Variables
 
-        MaterialActivity _activity = null;
+        [SerializeField]
+        MaterialActivity m_activity = null;
 
         #endregion
 
@@ -20,20 +21,21 @@ namespace MaterialUI
         {
             get
             {
-                if (_activity == null)
+                if (m_activity == null)
                 {
-                    _activity = this != null ? GetComponent<MaterialActivity>() : null;
-                    if(_activity != null)
-                        OnAttachedActivityChanged(_activity);
+                    m_activity = this != null ? GetComponent<MaterialActivity>() : null;
+                    if (m_activity != null)
+                        OnAttachedActivityChanged(m_activity);
                 }
-                return _activity;
+
+                return m_activity;
             }
             protected internal set
             {
-                if (_activity == value)
+                if (m_activity == value || (value != null && !transform.IsChildOf(value.transform)))
                     return;
-                _activity = value;
-                OnAttachedActivityChanged(_activity);
+                m_activity = value;
+                OnAttachedActivityChanged(m_activity);
             }
         }
 
@@ -80,6 +82,21 @@ namespace MaterialUI
 
         protected virtual void OnAttachedActivityChanged(MaterialActivity activity)
         {
+        }
+
+        #endregion
+
+        #region ISerialization Callbacks
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            //Validate activity After deserialize
+            if (m_activity != null && !transform.IsChildOf(m_activity.transform))
+                m_activity = null;
         }
 
         #endregion
