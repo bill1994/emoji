@@ -187,6 +187,7 @@ namespace MaterialUI
         #region Editor Helper Functions
 
 #if UNITY_EDITOR
+        [ContextMenu("RecreateIconSet")]
         protected virtual void RecreateIconSet()
         {
             m_IconSet = new VectorImageSet();
