@@ -50,9 +50,9 @@ namespace Kyub.Performance
             {
                 if (_rootParent != null && _rootParent.worldCamera != null)
                 {
-                    var v_cameraView = _rootParent.worldCamera.GetComponent<SustainedCameraView>();
-                    if (v_cameraView != null)
-                        return v_cameraView.UseRenderBuffer;
+                    var cameraView = _rootParent.worldCamera.GetComponent<SustainedCameraView>();
+                    if (cameraView != null)
+                        return cameraView.UseRenderBuffer;
                 }
                 return false;
             }
@@ -127,34 +127,34 @@ namespace Kyub.Performance
         protected internal float _cachedAlphaValue = 1;
         internal CanvasGroup ConfigureLowPerformanceCanvasGroup()
         {
-            var v_canvasGroup = GetComponent<CanvasGroup>();
-            if (v_canvasGroup == null)
-                v_canvasGroup = gameObject.AddComponent<CanvasGroup>();
+            var canvasGroup = GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+                canvasGroup = gameObject.AddComponent<CanvasGroup>();
             if (_isViewActive)
-                _cachedAlphaValue = v_canvasGroup.alpha;
+                _cachedAlphaValue = canvasGroup.alpha;
 
-            return v_canvasGroup;
+            return canvasGroup;
         }
 
-        protected override void SetViewActive(bool p_active)
+        protected override void SetViewActive(bool active)
         {
-            var v_canvas = Canvas;
-            if (v_canvas != null && _isViewActive != p_active)
+            var canvas = Canvas;
+            if (canvas != null && _isViewActive != active)
             {
-                var v_canvasGroup = GetComponent<CanvasGroup>();
-                if (v_canvasGroup == null)
-                    v_canvasGroup = ConfigureLowPerformanceCanvasGroup();
+                var canvasGroup = GetComponent<CanvasGroup>();
+                if (canvasGroup == null)
+                    canvasGroup = ConfigureLowPerformanceCanvasGroup();
 
-                if (!p_active)
+                if (!active && !Application.isEditor)
                 {
-                    _cachedAlphaValue = v_canvasGroup.alpha;
-                    v_canvasGroup.alpha = 0;
+                    _cachedAlphaValue = canvasGroup.alpha;
+                    canvasGroup.alpha = 0;
                 }
                 else
-                    v_canvasGroup.alpha = _cachedAlphaValue;
+                    canvasGroup.alpha = _cachedAlphaValue;
             }
 
-            _isViewActive = p_active;
+            _isViewActive = active;
         }
 
         #endregion
@@ -200,14 +200,14 @@ namespace Kyub.Performance
             _rootParent = Canvas != null? Canvas.rootCanvas : null;
 
             //Renew Sustained canvas parent based in Canvas
-            var v_newSustainedParent = FindSustainedCanvasParent(this);
+            var newSustainedParent = FindSustainedCanvasParent(this);
 
             //Unregister self from the old SustainedCanvas Parent
-            if (_sustainedCanvasParent != null && v_newSustainedParent != _sustainedCanvasParent)
+            if (_sustainedCanvasParent != null && newSustainedParent != _sustainedCanvasParent)
                 SustainedCanvasView.UnregisterDynamicElement(this);
 
             //Register self to a new SustainedCanvas
-            _sustainedCanvasParent = v_newSustainedParent;
+            _sustainedCanvasParent = newSustainedParent;
             if (_sustainedCanvasParent != null && enabled && gameObject.activeInHierarchy)
                 SustainedCanvasView.RegisterDynamicElement(this);
 
@@ -224,30 +224,30 @@ namespace Kyub.Performance
             _isChildrensDirty = true;
         }
 
-        protected virtual void TryCheckSustainedChildrens(bool p_force = false)
+        protected virtual void TryCheckSustainedChildrens(bool force = false)
         {
-            if (_isChildrensDirty || p_force)
+            if (_isChildrensDirty || force)
             {
                 _isChildrensDirty = false;
 
                 //Invalidate constant repaint based in childrens
-                var v_requireConstantRepaint = false;
+                var requireConstantRepaint = false;
                 foreach (var _sustainedElement in _sustainedChildrenElements)
                 {
                     if (!_sustainedElement.IsDestroyed())
                     {
-                        v_requireConstantRepaint = v_requireConstantRepaint || _sustainedElement.RequiresConstantRepaint;
-                        if (v_requireConstantRepaint)
+                        requireConstantRepaint = requireConstantRepaint || _sustainedElement.RequiresConstantRepaint;
+                        if (requireConstantRepaint)
                             break;
                     }
                 }
 
-                _childrenNeedsConstantRepaint = v_requireConstantRepaint;
+                _childrenNeedsConstantRepaint = requireConstantRepaint;
 
                 //We must invalidate all SustainedCanvas Parents
-                var v_sustainedParent = FindSustainedCanvasParent(this);
-                if (v_sustainedParent != null)
-                    v_sustainedParent.TryCheckSustainedChildrens(true);
+                var sustainedParent = FindSustainedCanvasParent(this);
+                if (sustainedParent != null)
+                    sustainedParent.TryCheckSustainedChildrens(true);
                 else
                     SustainedPerformanceManager.MarkDynamicElementsDirty();
             }
@@ -257,12 +257,12 @@ namespace Kyub.Performance
 
         #region SustainedPerformance Receivers
 
-        /*protected virtual void HandleOnAfterWaitingToPrepareRenderBuffer(int p_invalidCullingMask)
+        /*protected virtual void HandleOnAfterWaitingToPrepareRenderBuffer(int invalidCullingMask)
         {
             SetViewActive(false);
         }*/
 
-        protected virtual void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> p_renderBuffersDict)
+        protected virtual void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> renderBuffersDict)
         {
             UnregisterBufferEvents();
             SetViewActive(true);
@@ -273,17 +273,17 @@ namespace Kyub.Performance
             //We only want to invalidate this canvas if is SelfRequired Constant Repaint
             TryCheckSustainedChildrens();
 
-            //var v_viewIsActive = SustainedPerformanceManager.UseSafeRefreshMode ? SustainedPerformanceManager.RequiresConstantRepaint : this.RequiresConstantRepaint;
+            //var viewIsActive = SustainedPerformanceManager.UseSafeRefreshMode ? SustainedPerformanceManager.RequiresConstantRepaint : this.RequiresConstantRepaint;
 
             //In WorldSpace Canvas we must check for buffer repaint
-            var v_viewIsActive = IsScreenCanvasMember()? 
+            var viewIsActive = IsScreenCanvasMember()? 
                 SustainedPerformanceManager.RequiresConstantRepaint : 
                 SustainedPerformanceManager.RequiresConstantBufferRepaint; 
             
-            SetViewActive(v_viewIsActive);
+            SetViewActive(viewIsActive);
         }
 
-        protected override void HandleOnSetHighPerformance(bool p_invalidateBuffer)
+        protected override void HandleOnSetHighPerformance(bool invalidateBuffer)
         {
             //We only want to invalidate this canvas if is SelfRequired Constant Repaint
             TryCheckSustainedChildrens();
@@ -295,21 +295,21 @@ namespace Kyub.Performance
                     //Register to invalidate After DrawBuffer
                     RegisterBufferEvents();
                 }*/
-                var v_viewIsActive = SustainedPerformanceManager.UseSafeRefreshMode;
-                if (!v_viewIsActive)
+                var viewIsActive = SustainedPerformanceManager.UseSafeRefreshMode;
+                if (!viewIsActive)
                 {
-                    v_viewIsActive = p_invalidateBuffer || SustainedPerformanceManager.RequiresConstantRepaint || SustainedPerformanceManager.IsCanvasViewInvalid(this);
+                    viewIsActive = invalidateBuffer || SustainedPerformanceManager.RequiresConstantRepaint || SustainedPerformanceManager.IsCanvasViewInvalid(this);
                 }
-                SetViewActive(v_viewIsActive);
+                SetViewActive(viewIsActive);
             }
             //WorldSpace Canvas
             else
             {
-                var v_isViewActive = p_invalidateBuffer || SustainedPerformanceManager.RequiresConstantBufferRepaint;
-                if (!v_isViewActive)
-                    v_isViewActive = !UseRenderBuffer;
+                var isViewActive = invalidateBuffer || SustainedPerformanceManager.RequiresConstantBufferRepaint;
+                if (!isViewActive)
+                    isViewActive = !UseRenderBuffer;
 
-                SetViewActive(v_isViewActive);
+                SetViewActive(isViewActive);
             }
         }
 
@@ -325,67 +325,67 @@ namespace Kyub.Performance
 
         #region Static Helper Functions
 
-        public static void RegisterDynamicElement(ISustainedElement p_element)
+        public static void RegisterDynamicElement(ISustainedElement element)
         {
-            SustainedCanvasView v_canvasView = FindSustainedCanvasParent(p_element);
-            if (v_canvasView != null)
+            SustainedCanvasView canvasView = FindSustainedCanvasParent(element);
+            if (canvasView != null)
             {
-                if (!v_canvasView._sustainedChildrenElements.Contains(p_element))
+                if (!canvasView._sustainedChildrenElements.Contains(element))
                 {
-                    v_canvasView._sustainedChildrenElements.Add(p_element);
-                    v_canvasView.MarkDynamicElementDirty();
+                    canvasView._sustainedChildrenElements.Add(element);
+                    canvasView.MarkDynamicElementDirty();
                 }
             }
         }
 
-        public static void UnregisterDynamicElement(ISustainedElement p_element)
+        public static void UnregisterDynamicElement(ISustainedElement element)
         {
-            SustainedCanvasView v_canvasView = FindSustainedCanvasParent(p_element);
-            if (v_canvasView != null)
+            SustainedCanvasView canvasView = FindSustainedCanvasParent(element);
+            if (canvasView != null)
             {
-                v_canvasView._sustainedChildrenElements.Remove(p_element);
-                v_canvasView.MarkDynamicElementDirty();
+                canvasView._sustainedChildrenElements.Remove(element);
+                canvasView.MarkDynamicElementDirty();
             }
         }
 
-        public static SustainedCanvasView FindSustainedCanvasParent(ISustainedElement p_element)
+        public static SustainedCanvasView FindSustainedCanvasParent(ISustainedElement element)
         {
-            SustainedCanvasView v_canvasView = null;
-            if (!p_element.IsDestroyed())
+            SustainedCanvasView canvasView = null;
+            if (!element.IsDestroyed())
             {
-                if (p_element is SustainedCanvasView)
+                if (element is SustainedCanvasView)
                 {
-                    v_canvasView = ((SustainedCanvasView)p_element);
-                    if (v_canvasView.transform.parent != null)
-                        v_canvasView = v_canvasView.transform.parent.GetComponentInParent<SustainedCanvasView>();
+                    canvasView = ((SustainedCanvasView)element);
+                    if (canvasView.transform.parent != null)
+                        canvasView = canvasView.transform.parent.GetComponentInParent<SustainedCanvasView>();
                     else
-                        v_canvasView = null;
+                        canvasView = null;
                 }
-                else if (p_element is Component)
+                else if (element is Component)
                 {
-                    v_canvasView = (p_element as Component).GetComponentInParent<SustainedCanvasView>();
+                    canvasView = (element as Component).GetComponentInParent<SustainedCanvasView>();
                 }
             }
-            return v_canvasView;
+            return canvasView;
         }
 
         public static IList<SustainedCanvasView> FindAllActiveCanvasView()
         {
-            List<SustainedCanvasView> v_activeCanvasViews = new List<SustainedCanvasView>();
-            foreach (var v_view in s_sceneRenderViews)
+            List<SustainedCanvasView> activeCanvasViews = new List<SustainedCanvasView>();
+            foreach (var view in s_sceneRenderViews)
             {
-                var v_sustainedCanvasView = v_view as SustainedCanvasView;
-                if (v_sustainedCanvasView != null &&
-                    v_sustainedCanvasView.enabled && v_sustainedCanvasView.gameObject.activeInHierarchy &&
-                    v_sustainedCanvasView.Canvas != null)
-                    v_activeCanvasViews.Add(v_sustainedCanvasView);
+                var sustainedCanvasView = view as SustainedCanvasView;
+                if (sustainedCanvasView != null &&
+                    sustainedCanvasView.enabled && sustainedCanvasView.gameObject.activeInHierarchy &&
+                    sustainedCanvasView.Canvas != null)
+                    activeCanvasViews.Add(sustainedCanvasView);
             }
 
             //Sort cameras by depth
-            if (v_activeCanvasViews.Count > 1)
-                v_activeCanvasViews.Sort((a, b) => a.Canvas.renderOrder.CompareTo(b.Canvas.renderOrder));
+            if (activeCanvasViews.Count > 1)
+                activeCanvasViews.Sort((a, b) => a.Canvas.renderOrder.CompareTo(b.Canvas.renderOrder));
 
-            return v_activeCanvasViews;
+            return activeCanvasViews;
         }
 
         #endregion

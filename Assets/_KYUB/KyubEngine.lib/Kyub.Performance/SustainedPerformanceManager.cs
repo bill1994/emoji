@@ -1,22 +1,29 @@
-﻿using System.Collections;
+﻿#if UNITY_2019_3_OR_NEWER
+#define SUPPORT_ONDEMAND_RENDERING
+#endif
+
+#if SUPPORT_ONDEMAND_RENDERING
+using UnityEngine.Rendering;
+#endif
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Kyub;
 using System;
 using UnityEngine.SceneManagement;
+using UnityEditor;
 
 namespace Kyub.Performance
 {
-    //public enum RenderBufferModeEnum { Immediate, Delayed }
-
     public class SustainedPerformanceManager : Kyub.Singleton<SustainedPerformanceManager>
     {
+        public enum RenderTechniqueEnum { Legacy = 0, ForceSimulateFrameBuffer = 1, OnDemandRendering = 2, All = 3 }
+
         #region Static Events
 
         public static event Action OnBeforeSetPerformance; //Before Process Performances (Useful to know if LowPerformanceView will be activated)
         public static event Action<bool> OnSetHighPerformance;
         public static event Action OnSetLowPerformance;
-        //public static event Action<int> OnAfterWaitingToPrepareRenderBuffer; //Only in Delayed RenderBuffer Mode
         public static event Action OnAfterSetPerformance; //After Process Performances
         public static event Action<Dictionary<int, RenderTexture>> OnAfterDrawBuffer;
 
@@ -45,52 +52,69 @@ namespace Kyub.Performance
 
         //Used to scale down render buffer
         static Dictionary<int, int> s_maxSizePerBufferIndex = new Dictionary<int, int>();
-        public static int GetRenderBufferMaxSize(int p_bufferIndex)
+        public static int GetRenderBufferMaxSize(int bufferIndex)
         {
-            if (s_maxSizePerBufferIndex.ContainsKey(p_bufferIndex))
-                return s_maxSizePerBufferIndex[p_bufferIndex];
+            if (s_maxSizePerBufferIndex.ContainsKey(bufferIndex))
+                return s_maxSizePerBufferIndex[bufferIndex];
 
             var instance = GetInstanceFastSearch();
             return instance != null ? instance.m_maxRenderBufferSize : -1;
         }
 
         protected static Dictionary<int, RenderTexture> s_renderBufferDict = new Dictionary<int, RenderTexture>();
-        public static RenderTexture GetRenderBuffer(int p_bufferIndex)
+        public static RenderTexture GetRenderBuffer(int bufferIndex)
         {
             //if (IsWaitingRenderBuffer || (!UseImmediateRenderBufferMode && RequiresConstantRepaint))
             //    return null;
 
-            RenderTexture v_renderBuffer = null;
-            if (s_renderBufferDict.ContainsKey(p_bufferIndex))
+            RenderTexture renderBuffer = null;
+            if (s_renderBufferDict.ContainsKey(bufferIndex))
             {
-                v_renderBuffer = s_renderBufferDict[p_bufferIndex];
-                if ((s_useRenderBuffer && v_renderBuffer == null) || (!s_useRenderBuffer && v_renderBuffer != null))
+                renderBuffer = s_renderBufferDict[bufferIndex];
+                if ((s_useRenderBuffer && renderBuffer == null) || (!s_useRenderBuffer && renderBuffer != null))
                 {
-                    CheckBufferTexture(ref v_renderBuffer, GetRenderBufferMaxSize(p_bufferIndex));
+                    CheckBufferTexture(ref renderBuffer, GetRenderBufferMaxSize(bufferIndex));
 
-                    if (v_renderBuffer != null)
-                        s_renderBufferDict[p_bufferIndex] = v_renderBuffer;
+                    if (renderBuffer != null)
+                        s_renderBufferDict[bufferIndex] = renderBuffer;
                     else
-                        s_renderBufferDict.Remove(p_bufferIndex);
+                        s_renderBufferDict.Remove(bufferIndex);
                 }
             }
 
-            return v_renderBuffer;
+            return renderBuffer;
+        }
+
+        public static bool UseOnDemandRendering
+        {
+            get
+            {
+                if (s_instance == null)
+                    s_instance = GetInstanceFastSearch();
+
+                var renderTechnique = s_instance != null ? s_instance.RenderTechnique : RenderTechniqueEnum.Legacy;
+                return renderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering);
+            }
         }
 
         public static bool UseSimulatedFrameBuffer
         {
             get
             {
-#if UNITY_EDITOR && UNITY_IOS
-                return true;
-#else
                 if (s_instance == null)
                     s_instance = GetInstanceFastSearch();
 
-                //Metal/Mobile require simulate frameBuffer
-                return (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal || Application.isMobilePlatform || Application.platform == RuntimePlatform.WebGLPlayer) ||
-                    (s_instance != null && s_instance.m_forceSimulateFrameBuffer);
+
+#if UNITY_EDITOR && UNITY_IOS
+                return true;
+#else
+                var renderTechnique = s_instance != null ? s_instance.RenderTechnique : RenderTechniqueEnum.Legacy;
+                var forceSimulateFrameBuffer = renderTechnique.HasFlag(RenderTechniqueEnum.ForceSimulateFrameBuffer);
+                //Metal/Mobile require simulate frameBuffer in Legacy Mode
+                return forceSimulateFrameBuffer ||
+                    SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal ||
+                    Application.isMobilePlatform ||
+                    Application.platform == RuntimePlatform.WebGLPlayer;
 #endif
             }
         }
@@ -104,34 +128,13 @@ namespace Kyub.Performance
             }
         }
 
-        /*public static bool UseImmediateRenderBufferMode
-        {
-            get
-            {
-                var v_instance = GetInstanceFastSearch();
-                if (v_instance != null)
-                    return v_instance.m_renderBufferMode == RenderBufferModeEnum.Immediate;
-
-                return true;
-            }
-        }
-
-        static bool s_isWaitingRenderBuffer = false;
-        public static bool IsWaitingRenderBuffer
-        {
-            get
-            {
-                return s_isWaitingRenderBuffer;
-            }
-        }*/
-
         public static bool UseSafeRefreshMode
         {
             get
             {
-                var v_instance = GetInstanceFastSearch();
-                if (v_instance != null)
-                    return v_instance.m_safeRefreshMode;
+                var instance = GetInstanceFastSearch();
+                if (instance != null)
+                    return instance.m_safeRefreshMode;
 
                 return true;
             }
@@ -142,9 +145,9 @@ namespace Kyub.Performance
         {
             get
             {
-                var v_instance = GetInstanceFastSearch();
-                if (v_instance != null)
-                    return s_requireConstantRepaint || v_instance.m_forceAlwaysInvalidate;
+                var instance = GetInstanceFastSearch();
+                if (instance != null)
+                    return s_requireConstantRepaint || instance.m_forceAlwaysInvalidate;
 
                 return s_requireConstantRepaint;
             }
@@ -155,22 +158,22 @@ namespace Kyub.Performance
         {
             get
             {
-                var v_instance = GetInstanceFastSearch();
-                if (v_instance != null)
-                    return s_requireConstantBufferRepaint || v_instance.m_forceAlwaysInvalidate;
+                var instance = GetInstanceFastSearch();
+                if (instance != null)
+                    return s_requireConstantBufferRepaint || instance.m_forceAlwaysInvalidate;
 
                 return s_requireConstantBufferRepaint;
             }
         }
 
-        protected static int s_minimumSupportedFps = 0;
+        protected static int s_minimumSupportedFps = 5;
         public static int MinimumSupportedFps
         {
             get
             {
-                var v_instance = GetInstanceFastSearch();
-                if (v_instance != null)
-                    return Mathf.Clamp(s_minimumSupportedFps, (int)v_instance.m_performanceFpsRange.x, (int)v_instance.m_performanceFpsRange.y);
+                var instance = GetInstanceFastSearch();
+                if (instance != null)
+                    return Mathf.Clamp(s_minimumSupportedFps, (int)instance.m_performanceFpsRange.x, (int)instance.m_performanceFpsRange.y);
 
                 return s_minimumSupportedFps;
             }
@@ -182,13 +185,9 @@ namespace Kyub.Performance
 
         [SerializeField, Tooltip("This property will try to add a SustainedRenderView on each Camera/Canvas in Scene")]
         bool m_autoConfigureRenderViews = true;
-        [SerializeField, Tooltip("This property try simulate FrameBuffer (keep last frame between frames). \nSome platforms dicard frameBuffer every cycle so we can activate this property to simulate frameBuffer state")]
-        bool m_forceSimulateFrameBuffer = false;
+        [SerializeField, Tooltip("Change the Adaptative Render Mode Technique.\n* Legacy: Draw with ClearFlag None (only works in stadalone and will fallback to 'ForceSimulateFrameBuffer' in Mobile).\n* ForceSimulateFrameBuffer: Take Screenshot of the Screen to simulate ClearFlag None in Non-Supported Platforms.\n* OnDemandRendering: Use Unity OnDemandRendering with Legacy Mode.\n*All: Use OnDemandRendering with ForceSimulateFrameBuffer Mode.")]
+        RenderTechniqueEnum m_renderTechnique = RenderTechniqueEnum.All;
         [Space]
-        //[Tooltip("* RenderBufferMode.Delayed will wait one cycle to draw to a RenderTexture after invalidation (it optimizes the app if invalidate will be called every cycle)\n" +
-        //         "* RenderBufferModeEnum.Immediate will draw at same cycle of invalidation to a RenderTexture")]
-        //[SerializeField]
-        //RenderBufferModeEnum m_renderBufferMode = RenderBufferModeEnum.Immediate;
         [SerializeField, Tooltip("This property will force invalidate even if not emitted by this canvas hierarchy (Prevent Alpha-Overlap bug)")]
         bool m_safeRefreshMode = true;
         [Space]
@@ -202,7 +201,7 @@ namespace Kyub.Performance
         [SerializeField, Tooltip("Enable this to activate DynamicFps Controller")]
         bool m_canControlFps = true;
         [SerializeField, MinMaxSlider(5, 150)]
-        Vector2 m_performanceFpsRange = new Vector2(25, 60);
+        Vector2 m_performanceFpsRange = new Vector2(20, 60);
         [Space]
         [SerializeField, Range(0.5f, 5.0f)]
         float m_autoDisableHighPerformanceTime = 1.0f;
@@ -219,6 +218,34 @@ namespace Kyub.Performance
         #endregion
 
         #region Properties
+
+        public RenderTechniqueEnum RenderTechnique
+        {
+            get
+            {
+#if !SUPPORT_ONDEMAND_RENDERING
+                if (m_renderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering))
+                {
+                    //Clear OnDemandRendering Flag
+                    var renderTechnique = m_renderTechnique & ~RenderTechniqueEnum.OnDemandRendering;
+                    if (Application.isPlaying)
+                        m_renderTechnique = renderTechnique;
+                    else
+                        return renderTechnique;
+                }
+#endif
+                return m_renderTechnique;
+            }
+            set
+            {
+                if (m_renderTechnique == value)
+                    return;
+                m_renderTechnique = value;
+
+                CheckBufferTextures();
+                Invalidate();
+            }
+        }
 
         public int MaxTextureSize
         {
@@ -327,35 +354,10 @@ namespace Kyub.Performance
         {
             get
             {
-                return m_forceSimulateFrameBuffer;
-            }
-
-            set
-            {
-                if (m_forceSimulateFrameBuffer == value)
-                    return;
-                m_forceSimulateFrameBuffer = value;
-                CheckBufferTextures();
-                Invalidate();
+                var renderTechnique = RenderTechnique;
+                return renderTechnique.HasFlag(RenderTechniqueEnum.ForceSimulateFrameBuffer);
             }
         }
-
-        /*public RenderBufferModeEnum RenderBufferMode
-        {
-            get
-            {
-                return m_renderBufferMode;
-            }
-
-            set
-            {
-                if (m_renderBufferMode == value)
-                    return;
-                m_renderBufferMode = value;
-                CheckBufferTextures();
-                Invalidate();
-            }
-        }*/
 
         #endregion
 
@@ -393,16 +395,13 @@ namespace Kyub.Performance
             }
         }
 
-        protected override void OnSceneWasLoaded(Scene p_scene, LoadSceneMode p_mode)
+        protected override void OnSceneWasLoaded(Scene scene, LoadSceneMode mode)
         {
-            base.OnSceneWasLoaded(p_scene, p_mode);
+            base.OnSceneWasLoaded(scene, mode);
             MarkDynamicElementsDirty();
             TryAutoCreateRenderViews();
 
             Invalidate();
-            //_bufferIsDirty = true;
-            //s_invalidCullingMask = ~0;
-            //SetHighPerformanceDelayed();
         }
 
         protected virtual void Update()
@@ -410,21 +409,20 @@ namespace Kyub.Performance
             if (s_instance == this)
             {
                 s_isEndOfFrame = false;
-#if UNITY_EDITOR
-                if (Application.isPlaying)
+/*#if UNITY_EDITOR
+                if (!_isHighPerformance )
                 {
-                    //Force refresh when SceneView was selected
-                    if (Camera.current != null && Camera.current.name == "SceneCamera" && !Camera.current.scene.IsValid())
+                    var editorForceInvalidate = false;
+                    var cameraCurrent = Camera.current;
+                    if (cameraCurrent != null && cameraCurrent.name == "SceneCamera" && !cameraCurrent.scene.IsValid())
+                        editorForceInvalidate = true;
+                    if (editorForceInvalidate)
+                    {
                         _performanceIsDirty = true;
+                    }
                 }
-#endif
-
+#endif*/
                 TryCheckDynamicElements();
-                //We must check if screen size changed
-                //if (!_bufferIsDirty)
-                //{
-                //    _bufferIsDirty = CheckBufferTextures();
-                //}
                 TryApplyPerformanceUpdate();
             }
         }
@@ -523,7 +521,7 @@ namespace Kyub.Performance
             }
         }
 
-        protected virtual void SetLowPerformanceDelayed(float p_waitTime = 0)
+        protected virtual void SetLowPerformanceDelayed(float waitTime = 0)
         {
             CancelSetHighPerformance();
             if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
@@ -531,23 +529,28 @@ namespace Kyub.Performance
                 if (_lowPerformanceWaitTime <= 0)
                 {
                     CancelSetLowPerformance();
-                    _routineSetLowPerformance = StartCoroutine(SetLowPerformanceInEndOfFrameRoutine(p_waitTime));
+                    _routineSetLowPerformance = StartCoroutine(SetLowPerformanceInEndOfFrameRoutine(waitTime));
                 }
                 else
-                    _lowPerformanceWaitTime = p_waitTime;
+                    _lowPerformanceWaitTime = waitTime;
             }
         }
 
         float _lowPerformanceWaitTime = 0;
         bool _ignoreNextLayoutRebuild = false;
-        protected virtual IEnumerator SetLowPerformanceInEndOfFrameRoutine(float p_waitTime)
+        protected virtual IEnumerator SetLowPerformanceInEndOfFrameRoutine(float waitTime)
         {
-            _lowPerformanceWaitTime = p_waitTime;
+            _lowPerformanceWaitTime = waitTime;
             while (_lowPerformanceWaitTime > 0)
             {
                 _lowPerformanceWaitTime -= Time.unscaledDeltaTime;
                 yield return null;
             }
+
+#if SUPPORT_ONDEMAND_RENDERING
+            //We must revert low performance this cicle because this can never finish if low performance is below than 1 fps
+            OnDemandRendering.renderFrameInterval = 1;
+#endif
 
             yield return new WaitForEndOfFrame(); //Wait until finish draw this cycle
             s_isEndOfFrame = true;
@@ -556,10 +559,12 @@ namespace Kyub.Performance
 
             CallOnBeforeSetPerformance();
 
+            var minFramerate = s_minimumSupportedFps;
             if (CanControlFps)
             {
+                minFramerate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.x);
                 QualitySettings.vSyncCount = 0;
-                Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.x);
+                Application.targetFrameRate = minFramerate;
             }
             else
                 Application.targetFrameRate = -1;
@@ -572,6 +577,16 @@ namespace Kyub.Performance
             _ignoreNextLayoutRebuild = true;
 
             CallOnAfterSetPerformance();
+
+#if SUPPORT_ONDEMAND_RENDERING
+            var useOnDemandRendering = RenderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering);
+            if (useOnDemandRendering)
+            {
+                var renderFrameInterval = Mathf.Max(Application.targetFrameRate / Mathf.Max(QualitySettings.vSyncCount + 1, 1), minFramerate);
+                //Try to set to 1 RenderFrame Per Second
+                OnDemandRendering.renderFrameInterval = renderFrameInterval;
+            }
+#endif
 
             _routineSetLowPerformance = null;
         }
@@ -587,19 +602,19 @@ namespace Kyub.Performance
             }
         }
 
-        protected virtual void SetHighPerformanceImmediate(bool p_autoDisable = true)
+        protected virtual void SetHighPerformanceImmediate(bool autoDisable = true)
         {
             CancelSetLowPerformance();
             CancelSetHighPerformance();
             var bufferIsDirty = _bufferIsDirty;
-            var routine = SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, p_autoDisable, 0, true);
+            var routine = SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, autoDisable, 0, true);
             while (routine.MoveNext()) { };
         }
 
         bool _highPerformanceAutoDisable = false;
         float _highPerformanceWaitTime = 0;
         Coroutine _routineSetHighPerformance = null;
-        protected virtual bool SetHighPerformanceDelayed(bool p_autoDisable = true, float p_waitTime = 0)
+        protected virtual bool SetHighPerformanceDelayed(bool autoDisable = true, float waitTime = 0)
         {
             CancelSetLowPerformance();
             if (Application.isPlaying && enabled && gameObject.activeInHierarchy && _routineSetHighPerformance == null)
@@ -608,12 +623,12 @@ namespace Kyub.Performance
                 //{
                 CancelSetHighPerformance();
                 var bufferIsDirty = _bufferIsDirty;
-                _routineSetHighPerformance = StartCoroutine(SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, p_autoDisable, p_waitTime));
+                _routineSetHighPerformance = StartCoroutine(SetHighPerformanceInEndOfFrameRoutine(bufferIsDirty, autoDisable, waitTime));
                 //}
                 //else
                 //{
-                //    _highPerformanceWaitTime = p_waitTime;
-                //    _highPerformanceAutoDisable = p_autoDisable || _highPerformanceAutoDisable;
+                //    _highPerformanceWaitTime = waitTime;
+                //    _highPerformanceAutoDisable = autoDisable || _highPerformanceAutoDisable;
                 //}
                 return true;
             }
@@ -625,13 +640,17 @@ namespace Kyub.Performance
             return false;
         }
 
-        protected virtual IEnumerator SetHighPerformanceInEndOfFrameRoutine(bool bufferIsDirty, bool p_autoDisable = true, float p_waitTime = 0, bool skipEndOfFrame = false)
+        protected virtual IEnumerator SetHighPerformanceInEndOfFrameRoutine(bool bufferIsDirty, bool autoDisable = true, float waitTime = 0, bool skipEndOfFrame = false)
         {
+#if SUPPORT_ONDEMAND_RENDERING
+            OnDemandRendering.renderFrameInterval = 1;
+#endif
+
             var invalidCullingMask = s_invalidCullingMask;
             bufferIsDirty = _bufferIsDirty || bufferIsDirty;
 
-            _highPerformanceAutoDisable = p_autoDisable;
-            _highPerformanceWaitTime = p_waitTime;
+            _highPerformanceAutoDisable = autoDisable;
+            _highPerformanceWaitTime = waitTime;
             while (_highPerformanceWaitTime > 0)
             {
                 _highPerformanceWaitTime -= Time.unscaledDeltaTime;
@@ -724,50 +743,17 @@ namespace Kyub.Performance
             UpdateLowPerformanceViewActiveStatus();
         }
 
-        protected IEnumerator OnAfterDrawBufferRoutine(int p_invalidCullingMask)
+        protected IEnumerator OnAfterDrawBufferRoutine(int invalidCullingMask)
         {
-            p_invalidCullingMask |= s_invalidCullingMask;
-            //Wait one cycle to draw to a RenderTexture
-            /*if (s_isWaitingRenderBuffer)
-            {
-                var bufferCameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
-
-                //Reset camera RenderTextures
-                foreach (var v_cameraView in bufferCameraViews)
-                {
-                    if (v_cameraView != null && v_cameraView.Camera != null)
-                        v_cameraView.Camera.targetTexture = null;
-                }
-
-                //Wait two cycles before DrawBuffer
-                _ignoreNextLayoutRebuild = true;
-                yield return null;
-                s_isWaitingRenderBuffer = false;
-
-                yield return new WaitForEndOfFrame();
-
-                //Call finish event
-                if (OnAfterWaitingToPrepareRenderBuffer != null)
-                    OnAfterWaitingToPrepareRenderBuffer(p_invalidCullingMask);
-
-                bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
-                DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
-                s_isEndOfFrame = true;
-
-                _ignoreNextLayoutRebuild = true;
-                //Finish Processing Buffer
-            }
-            else
-            {*/
+            invalidCullingMask |= s_invalidCullingMask;
+ 
             CheckBufferTextures();
-            var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(p_invalidCullingMask);
+            var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(invalidCullingMask);
             if (s_isEndOfFrame)
                 DrawCameraViewsWithRenderBufferState(bufferCameraViews, true);
             else
                 yield return new WaitForEndOfFrame();
             s_isEndOfFrame = true;
-            //}
-            //s_isWaitingRenderBuffer = false;
 
             _bufferIsDirty = false;
 
@@ -777,24 +763,24 @@ namespace Kyub.Performance
             UpdateLowPerformanceViewActiveStatus();
         }
 
-        protected IList<SustainedCameraView> PrepareCameraViewsToDrawInBuffer(int p_invalidCullingMask)
+        protected IList<SustainedCameraView> PrepareCameraViewsToDrawInBuffer(int invalidCullingMask)
         {
             //prepare all cameras draw into RenderBuffer changing the render texture target based in index
-            var v_cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
+            var cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
 
-            var v_invalidCameraViews = new List<SustainedCameraView>();
-            foreach (var v_cameraView in v_cameraViews)
+            var invalidCameraViews = new List<SustainedCameraView>();
+            foreach (var cameraView in cameraViews)
             {
-                if (v_cameraView != null && IsCameraViewInvalid(v_cameraView, p_invalidCullingMask))
+                if (cameraView != null && IsCameraViewInvalid(cameraView, invalidCullingMask))
                 {
-                    var v_renderBufferIndex = v_cameraView.RenderBufferIndex;
-                    RenderTexture v_renderTexture = null;
-                    s_renderBufferDict.TryGetValue(v_renderBufferIndex, out v_renderTexture);
-                    v_cameraView.Camera.targetTexture = v_renderTexture;
-                    v_invalidCameraViews.Add(v_cameraView);
+                    var renderBufferIndex = cameraView.RenderBufferIndex;
+                    RenderTexture renderTexture = null;
+                    s_renderBufferDict.TryGetValue(renderBufferIndex, out renderTexture);
+                    cameraView.Camera.targetTexture = renderTexture;
+                    invalidCameraViews.Add(cameraView);
                 }
             }
-            return v_invalidCameraViews;
+            return invalidCameraViews;
         }
 
         protected void DrawCameraViewsWithRenderBufferState(IList<SustainedCameraView> cameraViews, bool isBuffer)
@@ -817,13 +803,13 @@ namespace Kyub.Performance
         {
             if (s_canGenerateLowPerformanceView && Application.isPlaying)
             {
-                var v_activateLowPerformance = !HasAnyCameraRenderingToScreen();
+                var activateLowPerformance = !HasAnyCameraRenderingToScreen();
 
-                if (s_lowPerformanceView == null && v_activateLowPerformance)
+                if (s_lowPerformanceView == null && activateLowPerformance)
                     ConfigureLowPerformanceView();
 
                 if (s_lowPerformanceView != null)
-                    s_lowPerformanceView.SetViewActive(v_activateLowPerformance);
+                    s_lowPerformanceView.SetViewActive(activateLowPerformance);
             }
             else if (s_lowPerformanceView != null)
                 ConfigureLowPerformanceView();
@@ -831,17 +817,17 @@ namespace Kyub.Performance
 
         protected bool HasAnyCameraRenderingToScreen()
         {
-            var v_allCameras = Camera.allCameras;
-            return HasAnyCameraRenderingToScreen(ref v_allCameras);
+            var allCameras = Camera.allCameras;
+            return HasAnyCameraRenderingToScreen(ref allCameras);
         }
 
-        protected bool HasAnyCameraRenderingToScreen(ref Camera[] p_allCameras)
+        protected bool HasAnyCameraRenderingToScreen(ref Camera[] allCameras)
         {
-            if (p_allCameras == null)
-                p_allCameras = Camera.allCameras;
-            foreach (var v_camera in p_allCameras)
+            if (allCameras == null)
+                allCameras = Camera.allCameras;
+            foreach (var camera in allCameras)
             {
-                if (v_camera != null && (s_lowPerformanceView == null || v_camera != s_lowPerformanceView.Camera) && v_camera.enabled && v_camera.targetTexture == null)
+                if (camera != null && (s_lowPerformanceView == null || camera != s_lowPerformanceView.Camera) && camera.enabled && camera.targetTexture == null)
                     return true;
             }
             return false;
@@ -852,43 +838,43 @@ namespace Kyub.Performance
         #region Public Static Functions
 
         static int s_invalidCullingMask = 0;
-        public static void Invalidate(Transform p_transform, bool p_includeChildrens)
+        public static void Invalidate(Transform transform, bool includeChildrens)
         {
-            var v_cullingMasks = 0;
-            if (p_transform != null && s_invalidCullingMask != ~0)
+            var cullingMasks = 0;
+            if (transform != null && s_invalidCullingMask != ~0)
             {
-                List<Transform> v_transforms = new List<Transform>();
-                if (p_includeChildrens)
-                    v_transforms.AddRange(p_transform.GetComponentsInChildren<Transform>());
+                List<Transform> transforms = new List<Transform>();
+                if (includeChildrens)
+                    transforms.AddRange(transform.GetComponentsInChildren<Transform>());
                 else
-                    v_transforms.Add(p_transform);
+                    transforms.Add(transform);
 
                 //Calculate tha InvalidLayer
-                for (int i = 0; i < v_transforms.Count; i++)
+                for (int i = 0; i < transforms.Count; i++)
                 {
-                    v_cullingMasks |= 1 << v_transforms[i].gameObject.layer;
+                    cullingMasks |= 1 << transforms[i].gameObject.layer;
                 }
             }
             else
-                v_cullingMasks = ~0;
-            Invalidate(v_cullingMasks);
+                cullingMasks = ~0;
+            Invalidate(cullingMasks);
         }
 
-        public static void Invalidate(ISustainedElement p_sustainedElement)
+        public static void Invalidate(ISustainedElement sustainedElement)
         {
-            LayerMask v_cullingMask = ~0;
-            if (p_sustainedElement != null && !p_sustainedElement.IsDestroyed())
-                v_cullingMask = p_sustainedElement.CullingMask;
+            LayerMask cullingMask = ~0;
+            if (sustainedElement != null && !sustainedElement.IsDestroyed())
+                cullingMask = sustainedElement.CullingMask;
 
-            Invalidate(v_cullingMask);
+            Invalidate(cullingMask);
         }
 
-        public static void Invalidate(LayerMask p_cullingMask)
+        public static void Invalidate(LayerMask cullingMask)
         {
-            if (s_invalidCullingMask == ~0 || p_cullingMask == ~0)
+            if (s_invalidCullingMask == ~0 || cullingMask == ~0)
                 s_invalidCullingMask = ~0;
             else
-                s_invalidCullingMask |= p_cullingMask;
+                s_invalidCullingMask |= cullingMask;
             MarkToSetHighPerformance(true);
         }
 
@@ -897,27 +883,27 @@ namespace Kyub.Performance
             Invalidate(~0);
         }
 
-        public static void Refresh<T>(IList<T> p_senders)
+        public static void Refresh<T>(IList<T> senders)
         {
-            var v_invalidateAll = p_senders == null || p_senders.Count == 0 || UseSafeRefreshMode;
-            if (!v_invalidateAll)
+            var invalidateAll = senders == null || senders.Count == 0 || UseSafeRefreshMode;
+            if (!invalidateAll)
             {
-                for (int i = 0; i < p_senders.Count; i++)
+                for (int i = 0; i < senders.Count; i++)
                 {
-                    var v_senderTransform = (p_senders[i] as Component) != null ? (p_senders[i] as Component).transform as RectTransform : null;
-                    if (v_senderTransform == null)
+                    var senderTransform = (senders[i] as Component) != null ? (senders[i] as Component).transform as RectTransform : null;
+                    if (senderTransform == null)
                     {
-                        v_invalidateAll = true;
+                        invalidateAll = true;
                         break;
                     }
                     else
                     {
-                        s_pendentInvalidRectTransforms.Add(v_senderTransform);
+                        s_pendentInvalidRectTransforms.Add(senderTransform);
                     }
                 }
             }
 
-            if (v_invalidateAll)
+            if (invalidateAll)
             {
                 s_pendentInvalidRectTransforms.Clear();
                 s_invalidComplexShape = null;
@@ -927,26 +913,26 @@ namespace Kyub.Performance
         }
 
         static HashSet<RectTransform> s_pendentInvalidRectTransforms = new HashSet<RectTransform>();
-        public static void Refresh(Component p_sender = null)
+        public static void Refresh(Component sender = null)
         {
-            RectTransform v_senderTransform = !UseSafeRefreshMode && p_sender != null ? p_sender.transform as RectTransform : null;
+            RectTransform senderTransform = !UseSafeRefreshMode && sender != null ? sender.transform as RectTransform : null;
             //We set ComplexShape to null to force all CanvasViews to refresh
-            if (v_senderTransform == null)
+            if (senderTransform == null)
                 s_invalidComplexShape = null;
-            else if (s_invalidComplexShape != null && !s_pendentInvalidRectTransforms.Contains(v_senderTransform))
+            else if (s_invalidComplexShape != null && !s_pendentInvalidRectTransforms.Contains(senderTransform))
             {
-                s_pendentInvalidRectTransforms.Add(v_senderTransform);
+                s_pendentInvalidRectTransforms.Add(senderTransform);
             }
 
             MarkToSetHighPerformance(false);
         }
 
-        public static void Refresh(Rect p_invalidationScreenRect)
+        public static void Refresh(Rect invalidationScreenRect)
         {
             if (!UseSafeRefreshMode)
             {
                 if (s_invalidComplexShape != null)
-                    s_invalidComplexShape.AddShape(p_invalidationScreenRect);
+                    s_invalidComplexShape.AddShape(invalidationScreenRect);
             }
             else
                 s_invalidComplexShape = null;
@@ -956,85 +942,85 @@ namespace Kyub.Performance
 
         public static void MarkToSetLowPerformance()
         {
-            var v_instance = GetInstanceFastSearch();
-            if (v_instance != null && v_instance._isHighPerformance)
-                v_instance.SetLowPerformanceDelayed(0.1f);
+            var instance = GetInstanceFastSearch();
+            if (instance != null && instance._isHighPerformance)
+                instance.SetLowPerformanceDelayed(0.1f);
         }
 
         public static bool IsHighPerformanceActive()
         {
-            var v_instance = GetInstanceFastSearch();
-            if (v_instance != null)
-                return v_instance._isHighPerformance;
+            var instance = GetInstanceFastSearch();
+            if (instance != null)
+                return instance._isHighPerformance;
 
             return true;
         }
 
         public static bool IsActive()
         {
-            var v_instance = GetInstanceFastSearch();
-            return v_instance != null && v_instance.enabled && v_instance.gameObject.activeInHierarchy;
+            var instance = GetInstanceFastSearch();
+            return instance != null && instance.enabled && instance.gameObject.activeInHierarchy;
         }
 
         #endregion
 
         #region Other Internal Static Functions
 
-        protected static void MarkToSetHighPerformance(bool p_invalidateBuffer)
+        protected static void MarkToSetHighPerformance(bool invalidateBuffer)
         {
-            var v_instance = GetInstanceFastSearch();
-            if (v_instance != null)
+            var instance = GetInstanceFastSearch();
+            if (instance != null)
             {
-                var v_bufferIsDirty = v_instance._bufferIsDirty || p_invalidateBuffer || RequiresConstantBufferRepaint;
+                var bufferIsDirty = instance._bufferIsDirty || invalidateBuffer || RequiresConstantBufferRepaint;
 
                 //We must FORCE call SetHighPerformance Event (Buffer changed state)
-                if (v_bufferIsDirty != v_instance._bufferIsDirty)
+                if (bufferIsDirty != instance._bufferIsDirty)
                 {
-                    v_instance._bufferIsDirty = v_bufferIsDirty;
-                    v_instance.CancelSetLowPerformance();
-                    v_instance._isHighPerformance = false;
+                    instance._bufferIsDirty = bufferIsDirty;
+                    instance.CancelSetLowPerformance();
+                    instance._isHighPerformance = false;
                 }
                 //Invalidate all Cavas
-                if (v_bufferIsDirty)
+                if (bufferIsDirty)
                     s_invalidComplexShape = null;
 
-                if (!v_instance._isHighPerformance || !v_instance.m_safeRefreshMode)
-                    v_instance._performanceIsDirty = true;
-                else if (v_instance._isHighPerformance && v_instance._routineSetHighPerformance == null)
+                if (!instance._isHighPerformance || !instance.m_safeRefreshMode)
+                    instance._performanceIsDirty = true;
+                else if (instance._isHighPerformance && instance._routineSetHighPerformance == null)
                 {
-                    var autoDisableTime = Mathf.Max(0.1f, v_instance.m_autoDisableHighPerformanceTime);
-                    if (v_instance._lowPerformanceWaitTime <= 0 || v_instance._routineSetLowPerformance == null)
-                        v_instance.SetLowPerformanceDelayed(autoDisableTime);
+                    var autoDisableTime = Mathf.Max(0.1f, instance.m_autoDisableHighPerformanceTime);
+                    if (instance._lowPerformanceWaitTime <= 0 || instance._routineSetLowPerformance == null)
+                        instance.SetLowPerformanceDelayed(autoDisableTime);
                     else
-                        v_instance._lowPerformanceWaitTime = autoDisableTime;
+                        instance._lowPerformanceWaitTime = autoDisableTime;
                 }
             }
         }
 
-        protected internal static bool IsCameraViewInvalid(SustainedCameraView p_cameraView)
+        protected internal static bool IsCameraViewInvalid(SustainedCameraView cameraView)
         {
-            return IsCameraViewInvalid(p_cameraView, s_invalidCullingMask);
+            return IsCameraViewInvalid(cameraView, s_invalidCullingMask);
         }
 
-        protected internal static bool IsCameraViewInvalid(SustainedCameraView p_cameraView, int p_cullingMask)
+        protected internal static bool IsCameraViewInvalid(SustainedCameraView cameraView, int cullingMask)
         {
-            return p_cameraView != null && (!p_cameraView.UseRenderBuffer || (int)(p_cameraView.CullingMask & p_cullingMask) != 0);
+            return cameraView != null && (!cameraView.UseRenderBuffer || (int)(cameraView.CullingMask & cullingMask) != 0);
         }
 
-        protected internal static bool IsCanvasViewInvalid(SustainedCanvasView p_canvasView)
+        protected internal static bool IsCanvasViewInvalid(SustainedCanvasView canvasView)
         {
-            if (s_invalidComplexShape == null || UseSafeRefreshMode || !p_canvasView.IsScreenCanvasMember())
+            if (s_invalidComplexShape == null || UseSafeRefreshMode || !canvasView.IsScreenCanvasMember())
                 return true;
 
-            if (p_canvasView != null)
+            if (canvasView != null)
             {
-                var v_canvasViewScreenRect = ScreenRectUtils.GetScreenRect(p_canvasView.transform as RectTransform);
-                if (v_canvasViewScreenRect.width > 0 && v_canvasViewScreenRect.height > 0)
+                var canvasViewScreenRect = ScreenRectUtils.GetScreenRect(canvasView.transform as RectTransform);
+                if (canvasViewScreenRect.width > 0 && canvasViewScreenRect.height > 0)
                     UpdateInvalidShape();
 
                 //If Intersection exists or complexShape is null
-                var v_result = !s_invalidComplexShape.Intersection(v_canvasViewScreenRect).IsEmpty();
-                return v_result;
+                var result = !s_invalidComplexShape.Intersection(canvasViewScreenRect).IsEmpty();
+                return result;
             }
             return false;
         }
@@ -1044,9 +1030,9 @@ namespace Kyub.Performance
         {
             if (s_invalidComplexShape != null)
             {
-                foreach (var v_invalidRectTransform in s_pendentInvalidRectTransforms)
+                foreach (var invalidRectTransform in s_pendentInvalidRectTransforms)
                 {
-                    s_invalidComplexShape.AddShape(ScreenRectUtils.GetScreenRect(v_invalidRectTransform), false);
+                    s_invalidComplexShape.AddShape(ScreenRectUtils.GetScreenRect(invalidRectTransform), false);
                 }
                 s_invalidComplexShape.Optimize();
             }
@@ -1085,27 +1071,27 @@ namespace Kyub.Performance
         {
             if (Application.isPlaying && m_autoConfigureRenderViews)
             {
-                var v_allCameras = Resources.FindObjectsOfTypeAll<Camera>();
-                foreach (var v_camera in v_allCameras)
+                var allCameras = Resources.FindObjectsOfTypeAll<Camera>();
+                foreach (var camera in allCameras)
                 {
-                    if (v_camera != null && (s_lowPerformanceView == null || v_camera != s_lowPerformanceView.Camera) && v_camera.gameObject.scene.IsValid())
+                    if (camera != null && (s_lowPerformanceView == null || camera != s_lowPerformanceView.Camera) && camera.gameObject.scene.IsValid())
                     {
-                        if (v_camera.GetComponent<SustainedRenderView>() == null) //Yeah, we must check for base class
-                            v_camera.gameObject.AddComponent<SustainedCameraView>();
+                        if (camera.GetComponent<SustainedRenderView>() == null) //Yeah, we must check for base class
+                            camera.gameObject.AddComponent<SustainedCameraView>();
                     }
                 }
 
-                var v_allCanvas = Resources.FindObjectsOfTypeAll<Canvas>();
-                foreach (var v_canvas in v_allCanvas)
+                var allCanvas = Resources.FindObjectsOfTypeAll<Canvas>();
+                foreach (var canvas in allCanvas)
                 {
-                    if (v_canvas != null &&
-                        (v_canvas.transform.parent == null || v_canvas.transform.parent.GetComponentInParent<Canvas>() == null)
-                        && v_canvas.gameObject.scene.IsValid())
+                    if (canvas != null &&
+                        (canvas.transform.parent == null || canvas.transform.parent.GetComponentInParent<Canvas>() == null)
+                        && canvas.gameObject.scene.IsValid())
 
-                    //if (v_canvas != null && v_canvas.gameObject.scene.IsValid())
+                    //if (canvas != null && canvas.gameObject.scene.IsValid())
                     {
-                        if (v_canvas.GetComponent<SustainedRenderView>() == null) //Yeah, we must check for base class
-                            v_canvas.gameObject.AddComponent<SustainedCanvasView>();
+                        if (canvas.GetComponent<SustainedRenderView>() == null) //Yeah, we must check for base class
+                            canvas.gameObject.AddComponent<SustainedCanvasView>();
                     }
                 }
                 Invalidate();
@@ -1114,130 +1100,130 @@ namespace Kyub.Performance
 
         protected static bool CheckBufferTextures()
         {
-            var v_sucess = false;
+            var sucess = false;
             //Fill all Used indexes of render buffer in scene
-            HashSet<int> v_validBufferIndexes = new HashSet<int>();
-            var v_sceneViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
-            foreach (var v_renderViews in v_sceneViews)
+            HashSet<int> validBufferIndexes = new HashSet<int>();
+            var sceneViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
+            foreach (var renderViews in sceneViews)
             {
-                var v_cameraView = v_renderViews as SustainedCameraView;
-                if (v_cameraView != null)
+                var cameraView = renderViews as SustainedCameraView;
+                if (cameraView != null)
                 {
-                    var v_validIndex = v_cameraView.RenderBufferIndex;
-                    v_validBufferIndexes.Add(v_validIndex);
+                    var validIndex = cameraView.RenderBufferIndex;
+                    validBufferIndexes.Add(validIndex);
                     //Create Buffer Index Entry
-                    if (!s_renderBufferDict.ContainsKey(v_validIndex) && Application.isPlaying)
-                        s_renderBufferDict[v_validIndex] = null;
+                    if (!s_renderBufferDict.ContainsKey(validIndex) && Application.isPlaying)
+                        s_renderBufferDict[validIndex] = null;
                 }
             }
 
             //Check each of this index to try update renderbuffer textures
-            var v_bufferIndexes = new HashSet<int>(s_renderBufferDict.Keys);
-            foreach (var v_bufferIndex in v_bufferIndexes)
+            var bufferIndexes = new HashSet<int>(s_renderBufferDict.Keys);
+            foreach (var bufferIndex in bufferIndexes)
             {
                 //Remove Unused Render Buffers
-                var v_renderBuffer = s_renderBufferDict[v_bufferIndex];
-                if (!v_validBufferIndexes.Contains(v_bufferIndex))
+                var renderBuffer = s_renderBufferDict[bufferIndex];
+                if (!validBufferIndexes.Contains(bufferIndex))
                 {
-                    s_renderBufferDict.Remove(v_bufferIndex);
-                    ReleaseRenderBuffer(ref v_renderBuffer, v_sceneViews);
+                    s_renderBufferDict.Remove(bufferIndex);
+                    ReleaseRenderBuffer(ref renderBuffer, sceneViews);
                 }
                 //Update Render Buffer Texture
                 else
                 {
-                    v_sucess = CheckBufferTexture(ref v_renderBuffer, GetRenderBufferMaxSize(v_bufferIndex), v_sceneViews) || v_sucess;
-                    s_renderBufferDict[v_bufferIndex] = v_renderBuffer;
+                    sucess = CheckBufferTexture(ref renderBuffer, GetRenderBufferMaxSize(bufferIndex), sceneViews) || sucess;
+                    s_renderBufferDict[bufferIndex] = renderBuffer;
                 }
             }
 
-            return v_sucess;
+            return sucess;
         }
 
         protected static bool ReleaseRenderBuffers()
         {
             var cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
-            var v_sucess = false;
-            var v_bufferIndexes = new HashSet<int>(s_renderBufferDict.Keys);
-            foreach (var v_bufferIndex in v_bufferIndexes)
+            var sucess = false;
+            var bufferIndexes = new HashSet<int>(s_renderBufferDict.Keys);
+            foreach (var bufferIndex in bufferIndexes)
             {
-                var v_renderBuffer = s_renderBufferDict[v_bufferIndex];
-                v_sucess = ReleaseRenderBuffer(ref v_renderBuffer, cameraViews) || v_sucess;
+                var renderBuffer = s_renderBufferDict[bufferIndex];
+                sucess = ReleaseRenderBuffer(ref renderBuffer, cameraViews) || sucess;
             }
             s_renderBufferDict.Clear();
 
-            return v_sucess;
+            return sucess;
         }
 
-        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer, int p_maxSize, ICollection<SustainedCameraView> p_cameraViews = null)
+        protected static bool CheckBufferTexture(ref RenderTexture renderBuffer, int maxSize, ICollection<SustainedCameraView> cameraViews = null)
         {
-            return CheckBufferTexture(ref p_renderBuffer, s_useRenderBuffer, p_maxSize, p_cameraViews);
+            return CheckBufferTexture(ref renderBuffer, s_useRenderBuffer, maxSize, cameraViews);
         }
 
-        protected static bool CheckBufferTexture(ref RenderTexture p_renderBuffer, bool p_isActive, int p_maxSize, ICollection<SustainedCameraView> p_cameraViews = null)
+        protected static bool CheckBufferTexture(ref RenderTexture renderBuffer, bool isActive, int maxSize, ICollection<SustainedCameraView> cameraViews = null)
         {
             if (Application.isPlaying)
             {
-                if (p_isActive)
+                if (isActive)
                 {
-                    var screenSize = GetScreenSizeClamped(p_maxSize);
-                    if (p_renderBuffer == null || !p_renderBuffer.IsCreated() ||
-                        p_renderBuffer.width != screenSize.x || p_renderBuffer.height != screenSize.y)
+                    var screenSize = GetScreenSizeClamped(maxSize);
+                    if (renderBuffer == null || !renderBuffer.IsCreated() ||
+                        renderBuffer.width != screenSize.x || renderBuffer.height != screenSize.y)
                     {
-                        ReleaseRenderBuffer(ref p_renderBuffer, p_cameraViews);
+                        ReleaseRenderBuffer(ref renderBuffer, cameraViews);
 
-                        p_renderBuffer = new RenderTexture(screenSize.x, screenSize.y, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
-                        p_renderBuffer.antiAliasing = Mathf.Max(1, QualitySettings.antiAliasing);
-                        p_renderBuffer.name = "RenderBuffer (" + p_renderBuffer.GetInstanceID() + ")";
-                        p_renderBuffer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
-                        p_renderBuffer.Create();
+                        renderBuffer = new RenderTexture(screenSize.x, screenSize.y, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+                        renderBuffer.antiAliasing = Mathf.Max(1, QualitySettings.antiAliasing);
+                        renderBuffer.name = "RenderBuffer (" + renderBuffer.GetInstanceID() + ")";
+                        renderBuffer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+                        renderBuffer.Create();
                         s_instance._bufferIsDirty = true;
 
                         return true;
                     }
                 }
                 else
-                    ReleaseRenderBuffer(ref p_renderBuffer, p_cameraViews);
+                    ReleaseRenderBuffer(ref renderBuffer, cameraViews);
             }
             return false;
         }
 
-        protected static bool ReleaseRenderBuffer(ref RenderTexture p_renderBuffer, ICollection<SustainedCameraView> p_cameraViews = null)
+        protected static bool ReleaseRenderBuffer(ref RenderTexture renderBuffer, ICollection<SustainedCameraView> cameraViews = null)
         {
-            if (p_renderBuffer != null)
+            if (renderBuffer != null)
             {
-                if (p_renderBuffer == RenderTexture.active)
+                if (renderBuffer == RenderTexture.active)
                     RenderTexture.active = null;
-                if (p_cameraViews == null)
-                    p_cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
-                foreach (var v_camera in p_cameraViews)
+                if (cameraViews == null)
+                    cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
+                foreach (var camera in cameraViews)
                 {
-                    if (v_camera != null && v_camera.Camera != null && v_camera.gameObject.scene.IsValid() && v_camera.Camera.activeTexture == p_renderBuffer || v_camera.Camera.targetTexture == p_renderBuffer)
+                    if (camera != null && camera.Camera != null && camera.gameObject.scene.IsValid() && camera.Camera.activeTexture == renderBuffer || camera.Camera.targetTexture == renderBuffer)
                     {
-                        v_camera.Camera.targetTexture = null;
+                        camera.Camera.targetTexture = null;
                     }
                 }
 
                 //RenderTexture.ReleaseTemporary(s_renderBuffer);
-                if (p_renderBuffer.IsCreated())
-                    p_renderBuffer.Release();
-                RenderTexture.Destroy(p_renderBuffer);
-                p_renderBuffer = null;
+                if (renderBuffer.IsCreated())
+                    renderBuffer.Release();
+                RenderTexture.Destroy(renderBuffer);
+                renderBuffer = null;
 
                 return true;
             }
             return false;
         }
 
-        protected static Vector2Int GetScreenSizeClamped(int p_maxSize)
+        protected static Vector2Int GetScreenSizeClamped(int maxSize)
         {
             var defaultScreenSize = new Vector2Int(Screen.width, Screen.height);
-            if (p_maxSize > 0)
+            if (maxSize > 0)
             {
-                p_maxSize = Mathf.Max(16, p_maxSize);
-                if (p_maxSize < defaultScreenSize.x || p_maxSize < defaultScreenSize.y)
+                maxSize = Mathf.Max(16, maxSize);
+                if (maxSize < defaultScreenSize.x || maxSize < defaultScreenSize.y)
                 {
-                   float defaultMaxSize = Mathf.Max(defaultScreenSize.x, defaultScreenSize.y);
-                   var multiplier = p_maxSize / defaultMaxSize;
+                    float defaultMaxSize = Mathf.Max(defaultScreenSize.x, defaultScreenSize.y);
+                    var multiplier = maxSize / defaultMaxSize;
 
                     defaultScreenSize = new Vector2Int((int)(Screen.width * multiplier), (int)(Screen.height * multiplier)); ;
                 }
@@ -1246,23 +1232,23 @@ namespace Kyub.Performance
             return defaultScreenSize;
         }
 
-        protected static bool RecalculateMaxTextureSize(ICollection<SustainedCameraView> p_cameraViews = null)
+        protected static bool RecalculateMaxTextureSize(ICollection<SustainedCameraView> cameraViews = null)
         {
             var sucess = false;
             var newMaxSizePerBufferIndex = new Dictionary<int, int>();
-            if (p_cameraViews == null)
-                p_cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
+            if (cameraViews == null)
+                cameraViews = SustainedCameraView.FindAllActiveCameraViewsWithRenderBufferState(true);
 
             var instance = GetInstanceFastSearch();
             var instanceMaxRenderTextureSize = instance != null ? instance.m_maxRenderBufferSize : -1;
-            foreach (var cameraView in p_cameraViews)
+            foreach (var cameraView in cameraViews)
             {
                 if (cameraView != null && cameraView.Camera != null && cameraView.UseRenderBuffer)
                 {
                     //Get cached value
                     var cachedMaxSizePerBufferIndex = -1;
                     if (newMaxSizePerBufferIndex.ContainsKey(cameraView.RenderBufferIndex))
-                        cachedMaxSizePerBufferIndex = newMaxSizePerBufferIndex[cameraView.RenderBufferIndex] <= 0? -1 : newMaxSizePerBufferIndex[cameraView.RenderBufferIndex];
+                        cachedMaxSizePerBufferIndex = newMaxSizePerBufferIndex[cameraView.RenderBufferIndex] <= 0 ? -1 : newMaxSizePerBufferIndex[cameraView.RenderBufferIndex];
 
                     //Clamp based in Global TextureSize
                     if (instanceMaxRenderTextureSize > 0)
@@ -1303,7 +1289,7 @@ namespace Kyub.Performance
                     }
                 }
             }
-            if(sucess)
+            if (sucess)
                 s_maxSizePerBufferIndex = newMaxSizePerBufferIndex;
 
             return sucess;
@@ -1324,11 +1310,11 @@ namespace Kyub.Performance
 
         protected virtual void CheckDynamicElements()
         {
-            var v_oldDefaultCullingMask = _defaultInvalidCullingMask;
-            var v_oldMinimumSupportedFps = s_minimumSupportedFps;
-            var v_oldRequireConstantRepaint = s_requireConstantRepaint;
-            var v_oldRequireConstantBufferRepaint = s_requireConstantBufferRepaint;
-            var v_oldUseRenderBuffer = s_useRenderBuffer;
+            var oldDefaultCullingMask = _defaultInvalidCullingMask;
+            var oldMinimumSupportedFps = s_minimumSupportedFps;
+            var oldRequireConstantRepaint = s_requireConstantRepaint;
+            var oldRequireConstantBufferRepaint = s_requireConstantBufferRepaint;
+            var oldUseRenderBuffer = s_useRenderBuffer;
 
             //In this mode we want to invalidate all layers
             if (m_forceAlwaysInvalidate)
@@ -1338,54 +1324,54 @@ namespace Kyub.Performance
 
             s_requireConstantRepaint = m_forceAlwaysInvalidate;
             s_requireConstantBufferRepaint = m_forceAlwaysInvalidate;
-            s_minimumSupportedFps = 0;
+            s_minimumSupportedFps = 5;
             s_useRenderBuffer = false;
-            foreach (var v_element in s_elements)
+            foreach (var element in s_elements)
             {
-                if (!v_element.IsDestroyed())
+                if (!element.IsDestroyed())
                 {
-                    var v_elementBufferConstantRepaint = (!v_element.IsScreenCanvasMember() && v_element.RequiresConstantRepaint);
-                    s_minimumSupportedFps = Mathf.Max(s_minimumSupportedFps, v_element.MinimumSupportedFps);
-                    s_requireConstantRepaint = s_requireConstantRepaint || v_element.RequiresConstantRepaint;
-                    s_requireConstantBufferRepaint = s_requireConstantBufferRepaint || v_elementBufferConstantRepaint;
-                    s_useRenderBuffer = s_useRenderBuffer || v_element.UseRenderBuffer;
+                    var elementBufferConstantRepaint = (!element.IsScreenCanvasMember() && element.RequiresConstantRepaint);
+                    s_minimumSupportedFps = Mathf.Max(s_minimumSupportedFps, element.MinimumSupportedFps);
+                    s_requireConstantRepaint = s_requireConstantRepaint || element.RequiresConstantRepaint;
+                    s_requireConstantBufferRepaint = s_requireConstantBufferRepaint || elementBufferConstantRepaint;
+                    s_useRenderBuffer = s_useRenderBuffer || element.UseRenderBuffer;
 
                     //We want to add contant repaint element culling masks in defaultInvalidCullingMask
-                    if (v_elementBufferConstantRepaint)
-                        _defaultInvalidCullingMask |= v_element.CullingMask;
+                    if (elementBufferConstantRepaint)
+                        _defaultInvalidCullingMask |= element.CullingMask;
                 }
             }
             s_minimumSupportedFps = Mathf.Clamp(s_minimumSupportedFps, (int)m_performanceFpsRange.x, (int)m_performanceFpsRange.y);
 
             var textureSizeChanged = RecalculateMaxTextureSize();
-            if (v_oldRequireConstantRepaint != s_requireConstantRepaint ||
-                v_oldRequireConstantBufferRepaint != s_requireConstantBufferRepaint ||
-                v_oldMinimumSupportedFps != s_minimumSupportedFps ||
-                v_oldUseRenderBuffer != s_useRenderBuffer ||
-                v_oldDefaultCullingMask != _defaultInvalidCullingMask)
+            if (oldRequireConstantRepaint != s_requireConstantRepaint ||
+                oldRequireConstantBufferRepaint != s_requireConstantBufferRepaint ||
+                oldMinimumSupportedFps != s_minimumSupportedFps ||
+                oldUseRenderBuffer != s_useRenderBuffer ||
+                oldDefaultCullingMask != _defaultInvalidCullingMask)
             {
                 if (s_useRenderBuffer)
-                    Invalidate(textureSizeChanged? ~0 : _defaultInvalidCullingMask);
+                    Invalidate(textureSizeChanged ? ~0 : _defaultInvalidCullingMask);
                 else
                     Refresh();
             }
         }
 
         static HashSet<ISustainedElement> s_elements = new HashSet<ISustainedElement>();
-        public static void RegisterDynamicElement(ISustainedElement p_element)
+        public static void RegisterDynamicElement(ISustainedElement element)
         {
-            if (!s_elements.Contains(p_element))
+            if (!s_elements.Contains(element))
             {
-                s_elements.Add(p_element);
+                s_elements.Add(element);
                 MarkDynamicElementsDirty();
             }
         }
 
-        public static void UnregisterDynamicElement(ISustainedElement p_element)
+        public static void UnregisterDynamicElement(ISustainedElement element)
         {
-            if (s_elements.Contains(p_element))
+            if (s_elements.Contains(element))
             {
-                s_elements.Remove(p_element);
+                s_elements.Remove(element);
                 MarkDynamicElementsDirty();
             }
         }

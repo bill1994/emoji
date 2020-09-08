@@ -154,9 +154,9 @@ namespace Kyub.Performance
         }
 
         protected bool _isViewActive = false;
-        protected virtual void SetViewActive(bool p_active)
+        protected virtual void SetViewActive(bool active)
         {
-            _isViewActive = p_active;
+            _isViewActive = active;
         }
 
         #endregion
@@ -175,9 +175,9 @@ namespace Kyub.Performance
 
         protected virtual void UnregisterRenderView()
         {
-            var v_index = s_sceneRenderViews.IndexOf(this);
-            if (v_index >= 0)
-                s_sceneRenderViews.RemoveAt(v_index);
+            var index = s_sceneRenderViews.IndexOf(this);
+            if (index >= 0)
+                s_sceneRenderViews.RemoveAt(index);
         }
 
         protected virtual void RegisterRenderView()
@@ -213,10 +213,10 @@ namespace Kyub.Performance
             SetViewActive(SustainedPerformanceManager.RequiresConstantRepaint);
         }
 
-        protected virtual void HandleOnSetHighPerformance(bool p_invalidateBuffer)
+        protected virtual void HandleOnSetHighPerformance(bool invalidateBuffer)
         {
-            var v_isViewActive = SustainedPerformanceManager.RequiresConstantRepaint || p_invalidateBuffer;
-            SetViewActive(v_isViewActive);
+            var isViewActive = SustainedPerformanceManager.RequiresConstantRepaint || invalidateBuffer;
+            SetViewActive(isViewActive);
         }
 
         #endregion

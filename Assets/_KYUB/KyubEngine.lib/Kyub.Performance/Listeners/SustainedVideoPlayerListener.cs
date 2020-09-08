@@ -17,11 +17,11 @@ namespace Kyub.Performance
         {
             get
             {
-                var v_requireRepaint = base.RequiresConstantRepaint;
-                if(!v_requireRepaint)
-                    v_requireRepaint = GetComponent<VideoPlayer>().isPlaying;
+                var requireRepaint = base.RequiresConstantRepaint;
+                if(!requireRepaint)
+                    requireRepaint = GetComponent<VideoPlayer>().isPlaying;
 
-                return v_requireRepaint;
+                return requireRepaint;
             }
 
             set
@@ -63,21 +63,21 @@ namespace Kyub.Performance
         protected virtual void RegisterEvents()
         {
             UnregisterEvents();
-            var v_videoPlayer = GetComponent<VideoPlayer>();
-            if(v_videoPlayer != null)
+            var videoPlayer = GetComponent<VideoPlayer>();
+            if(videoPlayer != null)
             {
-                v_videoPlayer.started += HandleOnVideoStarted;
-                v_videoPlayer.loopPointReached += HandleOnVideoEnd;
+                videoPlayer.started += HandleOnVideoStarted;
+                videoPlayer.loopPointReached += HandleOnVideoEnd;
             }
         }
 
         protected virtual void UnregisterEvents()
         {
-            var v_videoPlayer = GetComponent<VideoPlayer>();
-            if (v_videoPlayer != null)
+            var videoPlayer = GetComponent<VideoPlayer>();
+            if (videoPlayer != null)
             {
-                v_videoPlayer.started -= HandleOnVideoStarted;
-                v_videoPlayer.loopPointReached -= HandleOnVideoEnd;
+                videoPlayer.started -= HandleOnVideoStarted;
+                videoPlayer.loopPointReached -= HandleOnVideoEnd;
             }
         }
 
