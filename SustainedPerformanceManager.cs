@@ -201,7 +201,7 @@ namespace Kyub.Performance
         [SerializeField, Tooltip("Enable this to activate DynamicFps Controller")]
         bool m_canControlFps = true;
         [SerializeField, MinMaxSlider(5, 150)]
-        Vector2 m_performanceFpsRange = new Vector2(20, 60);
+        Vector2 m_performanceFpsRange = new Vector2(30, 60);
         [Space]
         [SerializeField, Range(0.5f, 5.0f)]
         float m_autoDisableHighPerformanceTime = 1.0f;
