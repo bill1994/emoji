@@ -185,7 +185,7 @@ namespace Kyub.Performance
             {
                 //s_eventBuffer = this;
                 var convertedPosition = ConvertPosition(eventData.position);
-                //Debug.Log("OnPointerClick Screen: " + eventData.position + " Converted: " + v_convertedPosition);
+                //Debug.Log("OnPointerClick Screen: " + eventData.position + " Converted: " + convertedPosition);
                 if (OnClick != null)
                     OnClick.Invoke(eventData, convertedPosition);
                 //s_eventBuffer = null;
@@ -205,63 +205,63 @@ namespace Kyub.Performance
             _isMultiTouching = false;
         }
 
-        protected virtual void RecalculateRectUV(bool p_basedOnScreenSize)
+        protected virtual void RecalculateRectUV(bool basedOnScreenSize)
         {
             if (!Application.isPlaying)
                 return;
 
             _screenRect = ScreenRectUtils.GetScreenRect(this.rectTransform);
-            var v_screenSize = texture != null ? new Vector2(Screen.width, Screen.height) : new Vector2(0, 0);
-            if (v_screenSize.x == 0 || v_screenSize.y == 0)
+            var screenSize = texture != null ? new Vector2(Screen.width, Screen.height) : new Vector2(0, 0);
+            if (screenSize.x == 0 || screenSize.y == 0)
             {
-                var v_normalizedRect = new Rect(0, 0, 1, 1);
-                v_normalizedRect.position += m_offsetUV;
-                uvRect = v_normalizedRect;
+                var normalizedRect = new Rect(0, 0, 1, 1);
+                normalizedRect.position += m_offsetUV;
+                uvRect = normalizedRect;
             }
             else
             {
                 //Only supported in Non-Worldspace mode
-                if (p_basedOnScreenSize)
+                if (basedOnScreenSize)
                 {
-                    var v_canvas = this.canvas;
-                    if (v_canvas == null || v_canvas.renderMode == RenderMode.WorldSpace)
-                        p_basedOnScreenSize = false;
+                    var canvas = this.canvas;
+                    if (canvas == null || canvas.renderMode == RenderMode.WorldSpace)
+                        basedOnScreenSize = false;
                 }
 
-                if (p_basedOnScreenSize)
+                if (basedOnScreenSize)
                 {
-                    var v_normalizedRect = new Rect(_screenRect.x / v_screenSize.x, _screenRect.y / v_screenSize.y, _screenRect.width / v_screenSize.x, _screenRect.height / v_screenSize.y);
-                    v_normalizedRect.position += m_offsetUV;
-                    uvRect = v_normalizedRect;
+                    var normalizedRect = new Rect(_screenRect.x / screenSize.x, _screenRect.y / screenSize.y, _screenRect.width / screenSize.x, _screenRect.height / screenSize.y);
+                    normalizedRect.position += m_offsetUV;
+                    uvRect = normalizedRect;
                 }
                 //Based OnViewPort
                 else
                 {
-                    var v_localRect = new Rect(Vector2.zero, new Vector2(Mathf.Abs(rectTransform.rect.width), Mathf.Abs(rectTransform.rect.height)));
-                    var v_normalizedRect = new Rect(0, 0, 1, 1);
+                    var localRect = new Rect(Vector2.zero, new Vector2(Mathf.Abs(rectTransform.rect.width), Mathf.Abs(rectTransform.rect.height)));
+                    var normalizedRect = new Rect(0, 0, 1, 1);
 
                     var pivot = rectTransform.pivot;
 
-                    if (v_localRect.width > 0 && v_localRect.height > 0)
+                    if (localRect.width > 0 && localRect.height > 0)
                     {
-                        var v_textureProportion = v_screenSize.x / v_screenSize.y;
-                        var v_localRectProportion = v_localRect.width / v_localRect.height;
-                        if (v_localRectProportion > v_textureProportion)
+                        var textureProportion = screenSize.x / screenSize.y;
+                        var localRectProportion = localRect.width / localRect.height;
+                        if (localRectProportion > textureProportion)
                         {
-                            var v_mult = v_localRect.width > 0 ? v_screenSize.x / v_localRect.width : 0;
-                            v_normalizedRect = new Rect(0, 0, 1, (v_localRect.height * v_mult) / v_screenSize.y);
-                            v_normalizedRect.y = Mathf.Max(0, (1 - v_normalizedRect.height) * pivot.y);
+                            var mult = localRect.width > 0 ? screenSize.x / localRect.width : 0;
+                            normalizedRect = new Rect(0, 0, 1, (localRect.height * mult) / screenSize.y);
+                            normalizedRect.y = Mathf.Max(0, (1 - normalizedRect.height) * pivot.y);
                         }
-                        else if (v_localRectProportion < v_textureProportion)
+                        else if (localRectProportion < textureProportion)
                         {
-                            var v_mult = v_localRect.height > 0 ? v_screenSize.y / v_localRect.height : 0;
-                            v_normalizedRect = new Rect(0, 0, (v_localRect.width * v_mult) / v_screenSize.x, 1);
-                            v_normalizedRect.x = Mathf.Max(0, (1 - v_normalizedRect.width) * pivot.x);
+                            var mult = localRect.height > 0 ? screenSize.y / localRect.height : 0;
+                            normalizedRect = new Rect(0, 0, (localRect.width * mult) / screenSize.x, 1);
+                            normalizedRect.x = Mathf.Max(0, (1 - normalizedRect.width) * pivot.x);
                         }
                     }
 
-                    v_normalizedRect.position += m_offsetUV;
-                    uvRect = v_normalizedRect;
+                    normalizedRect.position += m_offsetUV;
+                    uvRect = normalizedRect;
                 }
             }
         }
@@ -284,12 +284,12 @@ namespace Kyub.Performance
         {
             TryCreateClearTexture();
 
-            var v_renderBuffer = SustainedPerformanceManager.GetRenderBuffer(m_renderBufferIndex);
+            var renderBuffer = SustainedPerformanceManager.GetRenderBuffer(m_renderBufferIndex);
             //Setup RenderBuffer
-            if (v_renderBuffer != null)
+            if (renderBuffer != null)
             {
-                if (v_renderBuffer != texture)
-                    texture = v_renderBuffer;
+                if (renderBuffer != texture)
+                    texture = renderBuffer;
             }
             //Apply clear texture
             else
@@ -298,12 +298,12 @@ namespace Kyub.Performance
             RecalculateRectUV(m_uvBasedOnScreenRect);
         }
 
-        protected virtual void InitApplyRenderBuffer(int p_delayFramesCounter = 1)
+        protected virtual void InitApplyRenderBuffer(int delayFramesCounter = 1)
         {
             if (IsActive())
             {
                 StopCoroutine("ApplyRenderBufferRoutine");
-                StartCoroutine("ApplyRenderBufferRoutine", p_delayFramesCounter);
+                StartCoroutine("ApplyRenderBufferRoutine", delayFramesCounter);
             }
             else
             {
@@ -312,14 +312,14 @@ namespace Kyub.Performance
         }
 
         static Texture2D s_clearTexture = null;
-        protected virtual IEnumerator ApplyRenderBufferRoutine(int p_delayFramesCounter)
+        protected virtual IEnumerator ApplyRenderBufferRoutine(int delayFramesCounter)
         {
             TryCreateClearTexture();
 
             //Wait amount of frames
-            while (p_delayFramesCounter > 0)
+            while (delayFramesCounter > 0)
             {
-                p_delayFramesCounter -= 1;
+                delayFramesCounter -= 1;
                 yield return null;
             }
 
@@ -382,15 +382,15 @@ namespace Kyub.Performance
             return s_eventBuffer;
         }
 
-        public static Vector2 ConvertPosition(Vector2 p_mousePosition)
+        public static Vector2 ConvertPosition(Vector2 mousePosition)
         {
             if (s_eventBuffer != null)
             {
-                var v_normalizedPosition = Rect.PointToNormalized(s_eventBuffer.ScreenRect, p_mousePosition);
-                var v_convertedNormalizedPosition = Rect.NormalizedToPoint(s_eventBuffer.uvRect, v_normalizedPosition); //normalized relative to screen (with conversion applied)
-                return Rect.NormalizedToPoint(new Rect(0, 0, Screen.width, Screen.height), v_convertedNormalizedPosition);
+                var normalizedPosition = Rect.PointToNormalized(s_eventBuffer.ScreenRect, mousePosition);
+                var convertedNormalizedPosition = Rect.NormalizedToPoint(s_eventBuffer.uvRect, normalizedPosition); //normalized relative to screen (with conversion applied)
+                return Rect.NormalizedToPoint(new Rect(0, 0, Screen.width, Screen.height), convertedNormalizedPosition);
             }
-            return p_mousePosition;
+            return mousePosition;
         }
 
         #endregion

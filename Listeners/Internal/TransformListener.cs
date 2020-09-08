@@ -80,16 +80,16 @@ namespace Kyub.Performance
 
         #region Internal Helper Functions
 
-        protected void SetInterval_Internal(int p_value)
+        protected void SetInterval_Internal(int value)
         {
             if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
             {
-                if (p_value <= 0 && m_intervalFramerate > 0)
+                if (value <= 0 && m_intervalFramerate > 0)
                     CancelListener();
-                else if (p_value > 0 && m_intervalFramerate <= 0)
+                else if (value > 0 && m_intervalFramerate <= 0)
                     InitListener();
             }
-            m_intervalFramerate = Mathf.Max(0, p_value);
+            m_intervalFramerate = Mathf.Max(0, value);
         }
 
         Coroutine _coroutine = null;
@@ -117,8 +117,8 @@ namespace Kyub.Performance
                     break;
                 else
                 {
-                    var v_waitTime = 1 / m_intervalFramerate;
-                    yield return new WaitForSecondsRealtime(v_waitTime);
+                    var waitTime = 1 / m_intervalFramerate;
+                    yield return new WaitForSecondsRealtime(waitTime);
                 }
             }
         }

@@ -24,11 +24,11 @@ namespace Kyub.Performance
             {
                 if (!(CanvasUpdateRegistry.instance is CanvasRebuildRegistry))
                 {
-                    CanvasUpdateRegistry v_invalidInstance = CanvasUpdateRegistry.instance;
-                    var v_instanceField = typeof(CanvasUpdateRegistry).GetField("s_Instance", BindingFlags.Static | BindingFlags.NonPublic);
-                    if (v_instanceField != null)
+                    CanvasUpdateRegistry invalidInstance = CanvasUpdateRegistry.instance;
+                    var instanceField = typeof(CanvasUpdateRegistry).GetField("s_Instance", BindingFlags.Static | BindingFlags.NonPublic);
+                    if (instanceField != null)
                     {
-                        v_instanceField.SetValue(null, new CanvasRebuildRegistry(v_invalidInstance));
+                        instanceField.SetValue(null, new CanvasRebuildRegistry(invalidInstance));
                     }
                 }
                 return CanvasUpdateRegistry.instance as CanvasRebuildRegistry;
@@ -94,28 +94,28 @@ namespace Kyub.Performance
         #region Constructors
 
         Canvas.WillRenderCanvases OnBasePerformUpdate = null;
-        protected CanvasRebuildRegistry(CanvasUpdateRegistry p_baseInstanceTemplate) : base()
+        protected CanvasRebuildRegistry(CanvasUpdateRegistry baseInstanceTemplate) : base()
         {
             //Unregister base PerformUpdate
-            if (p_baseInstanceTemplate != null)
+            if (baseInstanceTemplate != null)
             {
                 //Unregister events from base type
-                var v_eventOnWillRenderCanvas = GetOnWillRenderCanvasEvent();
-                if (v_eventOnWillRenderCanvas != null)
+                var eventOnWillRenderCanvas = GetOnWillRenderCanvasEvent();
+                if (eventOnWillRenderCanvas != null)
                 {
-                    var v_invocationList = v_eventOnWillRenderCanvas.GetInvocationList();
-                    foreach (var v_delegate in v_invocationList)
+                    var invocationList = eventOnWillRenderCanvas.GetInvocationList();
+                    foreach (var actionDelegate in invocationList)
                     {
-                        if (v_delegate != null &&
-                            v_delegate.Target is CanvasUpdateRegistry &&
-                            (v_delegate.Method.Name == "PerformUpdate"))
+                        if (actionDelegate != null &&
+                            actionDelegate.Target is CanvasUpdateRegistry &&
+                            (actionDelegate.Method.Name == "PerformUpdate"))
                         {
-                            Canvas.willRenderCanvases -= (Canvas.WillRenderCanvases)v_delegate;
+                            Canvas.willRenderCanvases -= (Canvas.WillRenderCanvases)actionDelegate;
 
                             //Save base delegate to force invoke after PerformRefresh
-                            if (v_delegate.Target == this)
+                            if (actionDelegate.Target == this)
                             {
-                                OnBasePerformUpdate = (Canvas.WillRenderCanvases)v_delegate;
+                                OnBasePerformUpdate = (Canvas.WillRenderCanvases)actionDelegate;
                             }
                         }
                     }
@@ -124,28 +124,28 @@ namespace Kyub.Performance
                 //Add invalid graphic elements
                 if (GraphicRebuildQueue != null)
                 {
-                    var v_oldGraphics = s_graphicRebuildQueueInfo.GetValue(p_baseInstanceTemplate) as IList<ICanvasElement>;
-                    if (v_oldGraphics != null)
+                    var oldGraphics = s_graphicRebuildQueueInfo.GetValue(baseInstanceTemplate) as IList<ICanvasElement>;
+                    if (oldGraphics != null)
                     {
-                        for (int i = 0; i < v_oldGraphics.Count; i++)
+                        for (int i = 0; i < oldGraphics.Count; i++)
                         {
-                            var v_graphic = v_oldGraphics[i];
-                            if (!GraphicRebuildQueue.Contains(v_graphic))
-                                GraphicRebuildQueue.Add(v_graphic);
+                            var graphic = oldGraphics[i];
+                            if (!GraphicRebuildQueue.Contains(graphic))
+                                GraphicRebuildQueue.Add(graphic);
                         }
                     }
                 }
                 //Add invalid layout elements
                 if (LayoutRebuildQueue != null)
                 {
-                    var v_oldLayouts = s_layoutRebuildQueueInfo.GetValue(p_baseInstanceTemplate) as IList<ICanvasElement>;
-                    if (v_oldLayouts != null)
+                    var oldLayouts = s_layoutRebuildQueueInfo.GetValue(baseInstanceTemplate) as IList<ICanvasElement>;
+                    if (oldLayouts != null)
                     {
-                        for (int i = 0; i < v_oldLayouts.Count; i++)
+                        for (int i = 0; i < oldLayouts.Count; i++)
                         {
-                            var v_layout = v_oldLayouts[i];
-                            if (!LayoutRebuildQueue.Contains(v_layout))
-                                LayoutRebuildQueue.Add(v_layout);
+                            var layout = oldLayouts[i];
+                            if (!LayoutRebuildQueue.Contains(layout))
+                                LayoutRebuildQueue.Add(layout);
                         }
                     }
                 }
@@ -160,22 +160,22 @@ namespace Kyub.Performance
 
         #region Public Functions (Static)
 
-        public static void RegisterRebuildListener(ICanvasRebuildListener p_listener)
+        public static void RegisterRebuildListener(ICanvasRebuildListener listener)
         {
-            if (p_listener != null && !p_listener.IsDestroyed() && p_listener.transform != null &&
-                !CanvasRebuildRegistry.instance.m_listenerQueue.Contains(p_listener))
+            if (listener != null && !listener.IsDestroyed() && listener.transform != null &&
+                !CanvasRebuildRegistry.instance.m_listenerQueue.Contains(listener))
             {
-                CanvasRebuildRegistry.instance.m_listenerQueue.Add(p_listener);
+                CanvasRebuildRegistry.instance.m_listenerQueue.Add(listener);
             }
         }
 
-        public static void UnregisterRebuildListener(ICanvasRebuildListener p_listener)
+        public static void UnregisterRebuildListener(ICanvasRebuildListener listener)
         {
-            if (p_listener != null && !p_listener.IsDestroyed() && p_listener.transform != null)
+            if (listener != null && !listener.IsDestroyed() && listener.transform != null)
             {
-                var v_index = CanvasRebuildRegistry.instance.m_listenerQueue.IndexOf(p_listener);
-                if(v_index >= 0)
-                    CanvasRebuildRegistry.instance.m_listenerQueue.RemoveAt(v_index);
+                var index = CanvasRebuildRegistry.instance.m_listenerQueue.IndexOf(listener);
+                if(index >= 0)
+                    CanvasRebuildRegistry.instance.m_listenerQueue.RemoveAt(index);
             }
         }
 
@@ -185,44 +185,44 @@ namespace Kyub.Performance
 
         protected void OnBeforePerformUpdate()
         {
-            var v_willRefresh = (GraphicRebuildQueue != null && GraphicRebuildQueue.Count > 0) || (LayoutRebuildQueue != null && LayoutRebuildQueue.Count > 0);
+            var willRefresh = (GraphicRebuildQueue != null && GraphicRebuildQueue.Count > 0) || (LayoutRebuildQueue != null && LayoutRebuildQueue.Count > 0);
 
             //Call Invalidate
-            if (v_willRefresh)
+            if (willRefresh)
             {
                 //Slow method that track invalidate on specific canvas
                 if (m_listenerQueue.Count > 0)
                 {
-                    List<IList<ICanvasElement>> v_rebuildQueues = new List<IList<ICanvasElement>>() { GraphicRebuildQueue, LayoutRebuildQueue };
+                    List<IList<ICanvasElement>> rebuildQueues = new List<IList<ICanvasElement>>() { GraphicRebuildQueue, LayoutRebuildQueue };
 
-                    foreach (var v_queue in v_rebuildQueues)
+                    foreach (var queue in rebuildQueues)
                     {
                         //We founded every Listener so we can break
                         if (_listenersToRefreshHash.Count == m_listenerQueue.Count)
                             break;
-                        if (v_queue != null)
+                        if (queue != null)
                         {
-                            for (int i = 0; i < v_queue.Count; i++)
+                            for (int i = 0; i < queue.Count; i++)
                             {
                                 //Skip if we found all listeners
                                 if (_listenersToRefreshHash.Count == m_listenerQueue.Count)
                                     break;
-                                var v_canvasElement = v_queue[i];
-                                if (v_canvasElement != null && !v_canvasElement.IsDestroyed())
+                                var canvasElement = queue[i];
+                                if (canvasElement != null && !canvasElement.IsDestroyed())
                                 {
-                                    var v_listener = v_canvasElement.transform.GetComponentInParent<ICanvasRebuildListener>();
-                                    if (v_listener != null && !v_listener.IsDestroyed() && !_listenersToRefreshHash.Contains(v_listener))
-                                        _listenersToRefreshHash.Add(v_listener);
+                                    var listener = canvasElement.transform.GetComponentInParent<ICanvasRebuildListener>();
+                                    if (listener != null && !listener.IsDestroyed() && !_listenersToRefreshHash.Contains(listener))
+                                        _listenersToRefreshHash.Add(listener);
                                 }
                             }
                         }
                     }
 
                     //Call Rebuild in all listeners
-                    foreach (var v_listener in _listenersToRefreshHash)
+                    foreach (var listener in _listenersToRefreshHash)
                     {
-                        if (v_listener != null && !v_listener.IsDestroyed())
-                            v_listener.OnCanvasRebuild();
+                        if (listener != null && !listener.IsDestroyed())
+                            listener.OnCanvasRebuild();
                     }
                     _listenersToRefreshHash.Clear();
                 }

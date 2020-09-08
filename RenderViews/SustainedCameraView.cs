@@ -97,21 +97,21 @@ namespace Kyub.Performance
         {
             get
             {
-                int v_currentCullingMask = 0;
+                int currentCullingMask = 0;
 
                 //Find Current CullingMask
-                var v_camera = Camera;
-                if (v_camera == null || !m_useRenderBuffer)
-                    v_currentCullingMask = base.CullingMask;
+                var camera = Camera;
+                if (camera == null || !m_useRenderBuffer)
+                    currentCullingMask = base.CullingMask;
                 else
-                    v_currentCullingMask = v_camera.cullingMask;
+                    currentCullingMask = camera.cullingMask;
 
-                if (_lastCullingMask != v_currentCullingMask)
+                if (_lastCullingMask != currentCullingMask)
                 {
-                    _lastCullingMask = v_currentCullingMask;
+                    _lastCullingMask = currentCullingMask;
                     MarkDynamicElementDirty();
                 }
-                return v_currentCullingMask;
+                return currentCullingMask;
             }
         }
 
@@ -167,27 +167,27 @@ namespace Kyub.Performance
 
         #region Rendering Helper Functions
 
-        protected override void SetViewActive(bool p_active)
+        protected override void SetViewActive(bool active)
         {
             if (m_useRenderBuffer)
                 TryInitRenderBuffer();
 
-            var v_camera = Camera;
-            if (v_camera != null)
+            var camera = Camera;
+            if (camera != null)
             {
-                var cameraActive = p_active; //(p_active && (!m_useRenderBuffer || SustainedPerformanceManager.IsWaitingRenderBuffer));
-                if (v_camera.enabled != cameraActive)
+                var cameraActive = active; //(active && (!m_useRenderBuffer || SustainedPerformanceManager.IsWaitingRenderBuffer));
+                if (camera.enabled != cameraActive)
                 {
                     //Special RenderBuffer Mode (we can't disable camera in this cycle when SustainedPerformanceManager.UseRenderBufferInHighPerformance == false)
-                    //var v_canChangeCameraState = !m_useRenderBuffer || p_active || !SustainedPerformanceManager.IsWaitingRenderBuffer;
-                    //if(v_canChangeCameraState)
-                    v_camera.enabled = cameraActive;
+                    //var canChangeCameraState = !m_useRenderBuffer || active || !SustainedPerformanceManager.IsWaitingRenderBuffer;
+                    //if(canChangeCameraState)
+                    camera.enabled = cameraActive;
                     if (cameraActive)
                         SetDirty();
                 }
             }
             
-            _isViewActive = p_active;
+            _isViewActive = active;
         }
 
         #endregion
@@ -207,10 +207,10 @@ namespace Kyub.Performance
 
         protected internal virtual void ClearRenderBuffer()
         {
-            var v_bufferCamera = Camera;
-            if (v_bufferCamera != null && v_bufferCamera.targetTexture != null)
+            var bufferCamera = Camera;
+            if (bufferCamera != null && bufferCamera.targetTexture != null)
             {
-                v_bufferCamera.targetTexture = null;
+                bufferCamera.targetTexture = null;
             }
         }
 
@@ -220,12 +220,12 @@ namespace Kyub.Performance
             {
                 if (m_useRenderBuffer)
                 {
-                    var v_bufferCamera = Camera;
-                    if (v_bufferCamera != null)
+                    var bufferCamera = Camera;
+                    if (bufferCamera != null)
                     {
-                        var v_renderTexture = SustainedPerformanceManager.GetRenderBuffer(m_renderBufferIndex);
-                        if (v_bufferCamera.targetTexture != v_renderTexture)
-                            v_bufferCamera.targetTexture = v_renderTexture;
+                        var renderTexture = SustainedPerformanceManager.GetRenderBuffer(m_renderBufferIndex);
+                        if (bufferCamera.targetTexture != renderTexture)
+                            bufferCamera.targetTexture = renderTexture;
                     }
                 }
             }
@@ -261,18 +261,18 @@ namespace Kyub.Performance
 
         #region SustainedPerformance Receivers
 
-        /*protected virtual void HandleOnAfterWaitingToPrepareRenderBuffer(int p_invalidCullingMask)
+        /*protected virtual void HandleOnAfterWaitingToPrepareRenderBuffer(int invalidCullingMask)
         {
-            SetViewActive(SustainedPerformanceManager.IsCameraViewInvalid(this, p_invalidCullingMask));
+            SetViewActive(SustainedPerformanceManager.IsCameraViewInvalid(this, invalidCullingMask));
         }*/
 
-        protected virtual void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> p_renderBuffersDict)
+        protected virtual void HandleOnAfterDrawBuffer(Dictionary<int, RenderTexture> renderBuffersDict)
         {
             if (m_useRenderBuffer && !SustainedPerformanceManager.IsCameraViewInvalid(this))
             {
-                var v_camera = Camera;
-                if (v_camera != null)
-                    v_camera.enabled = false;
+                var camera = Camera;
+                if (camera != null)
+                    camera.enabled = false;
             }
         }
 
@@ -281,38 +281,38 @@ namespace Kyub.Performance
             SetViewActive(SustainedPerformanceManager.RequiresConstantBufferRepaint && SustainedPerformanceManager.IsCameraViewInvalid(this));
         }
 
-        protected override void HandleOnSetHighPerformance(bool p_invalidateBuffer)
+        protected override void HandleOnSetHighPerformance(bool invalidateBuffer)
         {
-            var v_isViewActive = (p_invalidateBuffer || SustainedPerformanceManager.RequiresConstantBufferRepaint) && SustainedPerformanceManager.IsCameraViewInvalid(this);
-            if (!v_isViewActive)
-                v_isViewActive = !m_useRenderBuffer;
+            var isViewActive = (invalidateBuffer || SustainedPerformanceManager.RequiresConstantBufferRepaint) && SustainedPerformanceManager.IsCameraViewInvalid(this);
+            if (!isViewActive)
+                isViewActive = !m_useRenderBuffer;
 
-            SetViewActive(v_isViewActive);
+            SetViewActive(isViewActive);
         }
 
         #endregion
 
         #region Static Helper Functions
 
-        public static IList<SustainedCameraView> FindAllActiveCameraViewsWithRenderBufferState(bool? p_useRenderBuffer, bool? viewIsActive = null)
+        public static IList<SustainedCameraView> FindAllActiveCameraViewsWithRenderBufferState(bool? useRenderBuffer, bool? viewIsActive = null)
         {
-            List<SustainedCameraView> v_activeCameraViews = new List<SustainedCameraView>();
-            foreach (var v_view in s_sceneRenderViews)
+            List<SustainedCameraView> activeCameraViews = new List<SustainedCameraView>();
+            foreach (var view in s_sceneRenderViews)
             {
-                var v_sustainedCameraView = v_view as SustainedCameraView;
-                if (v_sustainedCameraView != null &&
-                    v_sustainedCameraView.enabled && v_sustainedCameraView.gameObject.activeInHierarchy &&
-                    (viewIsActive == null || viewIsActive == v_sustainedCameraView.IsViewActive()) &&
-                    (p_useRenderBuffer == null || v_sustainedCameraView.m_useRenderBuffer == p_useRenderBuffer) && 
-                    v_sustainedCameraView.Camera != null)
-                    v_activeCameraViews.Add(v_sustainedCameraView);
+                var sustainedCameraView = view as SustainedCameraView;
+                if (sustainedCameraView != null &&
+                    sustainedCameraView.enabled && sustainedCameraView.gameObject.activeInHierarchy &&
+                    (viewIsActive == null || viewIsActive == sustainedCameraView.IsViewActive()) &&
+                    (useRenderBuffer == null || sustainedCameraView.m_useRenderBuffer == useRenderBuffer) && 
+                    sustainedCameraView.Camera != null)
+                    activeCameraViews.Add(sustainedCameraView);
             }
 
             //Sort cameras by depth
-            if (v_activeCameraViews.Count > 1)
-                v_activeCameraViews.Sort((a, b) => a.Camera.depth.CompareTo(b.Camera.depth));
+            if (activeCameraViews.Count > 1)
+                activeCameraViews.Sort((a, b) => a.Camera.depth.CompareTo(b.Camera.depth));
 
-            return v_activeCameraViews;
+            return activeCameraViews;
         }
 
         #endregion

@@ -131,17 +131,17 @@ namespace Kyub.Performance
 
         protected virtual void RecalculateCullingMask()
         {
-            var v_transforms = GetComponentsInChildren<Transform>();
+            var transforms = GetComponentsInChildren<Transform>();
 
-            var v_cullingMasks = 0;
+            var cullingMasks = 0;
             //Calculate tha InvalidLayer
-            for (int i = 0; i < v_transforms.Length; i++)
+            for (int i = 0; i < transforms.Length; i++)
             {
-                if(v_transforms[i] != null)
-                    v_cullingMasks |= 1 << v_transforms[i].gameObject.layer;
+                if(transforms[i] != null)
+                    cullingMasks |= 1 << transforms[i].gameObject.layer;
             }
 
-            m_cullingMask = v_cullingMasks;
+            m_cullingMask = cullingMasks;
             MarkDynamicElementDirty();
         }
 
@@ -152,17 +152,17 @@ namespace Kyub.Performance
 
         public virtual void MarkDynamicElementDirty()
         {
-            var v_executed = false;
+            var executed = false;
             if (IsScreenCanvasMember())
             {
-                var v_canvasView = GetSustainedCanvasParent();
-                if (v_canvasView != null)
+                var canvasView = GetSustainedCanvasParent();
+                if (canvasView != null)
                 {
-                    v_executed = true;
-                    v_canvasView.MarkDynamicElementDirty();
+                    executed = true;
+                    canvasView.MarkDynamicElementDirty();
                 }
             }
-            if(!v_executed)
+            if(!executed)
                 SustainedPerformanceManager.MarkDynamicElementsDirty();
         }
 
@@ -195,14 +195,14 @@ namespace Kyub.Performance
             _rootParent = GetComponentInParent<Canvas>();
 
             //Renew Sustained canvas parent based in Canvas
-            var v_newSustainedParent = _rootParent != null? _rootParent.GetComponentInParent<SustainedCanvasView>() : null;
+            var newSustainedParent = _rootParent != null? _rootParent.GetComponentInParent<SustainedCanvasView>() : null;
 
             //Unregister self from the old SustainedCanvas Parent
-            if (_sustainedCanvasParent != null && v_newSustainedParent != _sustainedCanvasParent)
+            if (_sustainedCanvasParent != null && newSustainedParent != _sustainedCanvasParent)
                 SustainedCanvasView.UnregisterDynamicElement(this);
 
             //Register self to a new SustainedCanvas
-            _sustainedCanvasParent = v_newSustainedParent;
+            _sustainedCanvasParent = newSustainedParent;
             if (_sustainedCanvasParent != null && enabled && gameObject.activeInHierarchy)
                 SustainedCanvasView.RegisterDynamicElement(this);
 
