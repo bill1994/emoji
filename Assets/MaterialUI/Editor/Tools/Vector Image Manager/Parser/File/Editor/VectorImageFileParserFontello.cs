@@ -33,7 +33,7 @@ namespace MaterialUI
             if (m_ZipPath == null) UnzipFile();
 
             string fileName = System.IO.Path.GetFileNameWithoutExtension(GetFirstFont());
-            return "file:///" + m_UnzipPath + "/css/" + fileName +".css";
+            return "file:///" + m_UnzipPath + "/css/" + fileName + ".css";
         }
 
         public override string GetWebsite()
