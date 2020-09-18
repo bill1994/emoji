@@ -12,11 +12,11 @@ TrueTypeFontImporter:
   fontNames:
   - Roboto
   fallbackFontReferences:
-  - {fileID: 12800000, guid: 32df75141caa2634b86a3c8d54b2bae9, type: 3}
-  - {fileID: 12800000, guid: 48db3625cf615f24e95a49691bdd1302, type: 3}
-  - {fileID: 12800000, guid: 1c5714e62d93c9442a8767b2bb75cf85, type: 3}
-  - {fileID: 12800000, guid: 59190367a1349c84485371e259de4c62, type: 3}
-  - {fileID: 12800000, guid: 48502e879ef32b8418b4f7c28f4a71d1, type: 3}
+  - {instanceID: 0}
+  - {instanceID: 0}
+  - {instanceID: 0}
+  - {instanceID: 0}
+  - {instanceID: 0}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1
