@@ -147,7 +147,8 @@ BOOL multiline;
 
 - (void)create:(NSDictionary *)data {
     NSString *placeholder = [data valueForKey:@"placeholder"];
-	NSString* font = [data valueForKey:@"font"];
+	NSString *font = [data valueForKey:@"font"];
+	NSString *fontTrueName = [font stringByDeletingPathExtension];
 	
     float fontSize = [[data valueForKey:@"font_size"] floatValue];
     float x = [[data valueForKey:@"x"] floatValue] * viewController.view.bounds.size.width;
@@ -306,11 +307,11 @@ BOOL multiline;
 	
 	//Create Font Asset
 	UIFont *uiFont = nil;
-    if (!password && [font length] > 0)
+    if (!password && [fontTrueName length] > 0)
     {
-        uiFont = [UIFont fontWithName:font size:fontSize];
+        uiFont = [UIFont fontWithName:fontTrueName size:fontSize];
     }
-    if(uiFont == nil || [font length] == 0)
+    if(uiFont == nil || [fontTrueName length] == 0)
     {
         uiFont = [UIFont systemFontOfSize:fontSize]; //[UIFont fontWithName:@"Helvetica" size:fontSize];
     } 

@@ -302,8 +302,13 @@ public class MobileInput {
                         tf = null;
                     }
                 }
-                //Try Create From FontFamily
-                if (tf == null) {
+                //Remove Extension
+                int pos = font.lastIndexOf(".");
+                if (pos > 0)
+                    font = font.substring(0, pos);
+                
+                //Try Create From Font True Name
+                if (tf == null && !font.isEmpty()) {
                     try {
                         tf = Typeface.create(font, Typeface.NORMAL);
                     } catch (Exception e) {
@@ -553,5 +558,4 @@ public class MobileInput {
         catch(JSONException e) {}
         Plugin.common.sendData(Plugin.name, data.toString());
     }
-
 }
