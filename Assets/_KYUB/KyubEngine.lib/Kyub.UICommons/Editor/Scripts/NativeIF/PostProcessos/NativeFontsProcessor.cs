@@ -14,6 +14,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 using Kyub.Internal.NativeInputPlugin;
+using UnityEditor.iOS.Xcode;
 
 namespace KyubEditor.Internal.NativeInputPlugin
 {
@@ -31,10 +32,14 @@ namespace KyubEditor.Internal.NativeInputPlugin
 
         public void OnPostprocessBuild(BuildReport report)
         {
+            AddFontsToXcodePlist(report.summary.platform, report.summary.outputPath);
+            //Add PostScriptTable to Delete Schedule
+            if(s_lastCopyFiles != null)
+                s_lastCopyFiles.Add(GetPostScriptTableFile());
             if (DeleteCopies(s_lastCopyFiles))
             {
                 AssetDatabase.Refresh();
-                var foldersToDelete = new string[] { GetFontDirectoryPath(), GetPostStriptTableDirectoryPath() };
+                var foldersToDelete = new string[] { GetFontDirectoryPath(), GetPostScriptTableDirectoryPath() };
                 foreach (var folder in foldersToDelete)
                 {
                     try
@@ -48,6 +53,58 @@ namespace KyubEditor.Internal.NativeInputPlugin
                 }
                 s_lastCopyFiles = null;
             }
+        }
+
+        public static void AddFontsToXcodePlist(BuildTarget buildTarget, string pathToBuiltProject)
+        {
+            try
+            {
+                if (buildTarget == BuildTarget.iOS)
+                {
+                    // Get plist
+                    string plistPath = pathToBuiltProject + "/Info.plist";
+                    PlistDocument plist = new PlistDocument();
+                    plist.ReadFromString(File.ReadAllText(plistPath));
+
+                    // Get root
+                    PlistElementDict rootDict = plist.root;
+
+                    // Change value of CFBundleVersion in Xcode plist
+                    const string uiFontKey = "UIAppFonts";
+                    PlistElement appFontsListUncasted = null;
+                    if (!rootDict.values.TryGetValue(uiFontKey, out appFontsListUncasted) || appFontsListUncasted == null)
+                        appFontsListUncasted = rootDict.CreateArray(uiFontKey);
+                    PlistElementArray uiFontArray = appFontsListUncasted.AsArray();
+
+                    //Pick previous added elements in PList (someone already changed this)
+                    HashSet<string> fontFiles = new HashSet<string>();
+                    foreach (var element in uiFontArray.values)
+                    {
+                        var fontFile = element != null ? element.AsString() : string.Empty;
+                        if (!string.IsNullOrEmpty(fontFile))
+                            fontFiles.Add(fontFile);
+                    }
+                    uiFontArray.values.Clear();
+
+                    //Add Custom Fonts calculated in OnPreBuild
+                    foreach (var copyElement in s_lastCopyFiles)
+                    {
+                        var copyElementFileName = System.IO.Path.GetFileName(copyElement);
+                        fontFiles.Add(copyElementFileName);
+                    }
+
+                    //Merge Plist with new CustomFonts
+                    foreach (var element in fontFiles)
+                    {
+                        if (!string.IsNullOrEmpty(element))
+                            uiFontArray.AddString(element);
+                    }
+
+                    // Write to file
+                    File.WriteAllText(plistPath, plist.WriteToString());
+                }
+            }
+            catch { }
         }
 
         #region Helper Static Functions
@@ -124,7 +181,6 @@ namespace KyubEditor.Internal.NativeInputPlugin
 
         protected static HashSet<string> CopyToPath(string rootPath, HashSet<Font> fonts)
         {
-
             PostScriptTableData table = new PostScriptTableData();
             HashSet<string> copyFiles = new HashSet<string>();
             if (fonts != null)
@@ -150,11 +206,10 @@ namespace KyubEditor.Internal.NativeInputPlugin
             }
 
             //Save PostScript Table
-            var postScriptResourcesPath = GetPostStriptTableDirectoryPath();
+            var postScriptResourcesPath = GetPostScriptTableDirectoryPath();
             if (!Directory.Exists(postScriptResourcesPath))
                 Directory.CreateDirectory(postScriptResourcesPath);
-            var postScriptTablePath = postScriptResourcesPath + "/" + PostScriptNameUtils.POST_SCRIPT_TABLE;
-            copyFiles.Add(postScriptTablePath);
+            var postScriptTablePath = GetPostScriptTableFile();
             File.WriteAllText(postScriptTablePath, JsonUtility.ToJson(table));
 
             return copyFiles;
@@ -209,9 +264,15 @@ namespace KyubEditor.Internal.NativeInputPlugin
             return Application.streamingAssetsPath + "/res/font";
         }
 
-        public static string GetPostStriptTableDirectoryPath()
+        public static string GetPostScriptTableDirectoryPath()
         {
             var tableFile = Application.dataPath + "/Resources/res/font";
+            return tableFile;
+        }
+
+        public static string GetPostScriptTableFile()
+        {
+            var tableFile = GetPostScriptTableDirectoryPath() + "/" + PostScriptNameUtils.POST_SCRIPT_TABLE;
             return tableFile;
         }
 
