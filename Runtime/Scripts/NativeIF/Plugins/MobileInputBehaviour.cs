@@ -5,14 +5,14 @@
 
 using System;
 using System.Collections;
-using MobileInputNativePlugin.NiceJson;
+using Kyub.Internal.NativeInputPlugin.NiceJson;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 
-namespace MobileInputNativePlugin
+namespace Kyub.Internal.NativeInputPlugin
 {
     public interface INativeInputField
     {
@@ -35,7 +35,7 @@ namespace MobileInputNativePlugin
         UnityEvent<string> onEndEdit { get; }
         UnityEvent onReturnPressed { get; }
 
-        bool SetTextNative(string p_text);
+        bool SetTextNative(string text);
         void RecreateKeyboard();
         void ActivateInputField();
         void DeactivateInputField();
@@ -286,15 +286,15 @@ namespace MobileInputNativePlugin
             {
                 if (Visible && _inputObject.isFocused)
                 {
-                    var v_camera = GetComponentInParent<Canvas>().rootCanvas.worldCamera;
+                    var camera = GetComponentInParent<Canvas>().rootCanvas.worldCamera;
 
                     for (int i = 0; i < input.touchCount; i++)
                     {
-                        var v_touch = input.GetTouch(i);
-                        if (v_touch.phase == TouchPhase.Began)
+                        var touch = input.GetTouch(i);
+                        if (touch.phase == TouchPhase.Began)
                         {
-                            var v_isInside = RectTransformUtility.RectangleContainsScreenPoint((RectTransform)this.transform, v_touch.position, v_camera);
-                            if (!v_isInside)
+                            var isInside = RectTransformUtility.RectangleContainsScreenPoint((RectTransform)this.transform, touch.position, camera);
+                            if (!isInside)
                             {
                                 SetVisible(false);
                                 break;
@@ -400,33 +400,30 @@ namespace MobileInputNativePlugin
         {
             if (_inputObject != null && !_inputObject.IsDestroyed())
             {
-                var v_inputField = _inputObject as InputField;
-                var v_tmpInputField = _inputObject as TMP_InputField;
+                var inputField = _inputObject as InputField;
+                var tmpInputField = _inputObject as TMP_InputField;
 
-                var v_textObject = _inputObjectText as Text;
-                var v_tmpTextObject = _inputObjectText as TMP_Text;
+                var textObject = _inputObjectText as Text;
+                var tmpTextObject = _inputObjectText as TMP_Text;
 
                 Graphic placeHolder = _inputObject.placeholder != null ? _inputObject.placeholder : null;
                 _config.Placeholder = placeHolder is Text ? ((Text)placeHolder).text : (placeHolder is TMP_Text ? ((TMP_Text)placeHolder).text : "");
                 _config.PlaceholderColor = placeHolder != null ? placeHolder.color : Color.white;
                 _config.CharacterLimit = _inputObject.characterLimit;
-                _config.Font = v_textObject != null && v_textObject.font.fontNames.Length > 0 ? v_textObject.font.fontNames[0] :
-#if UNITY_2018_3_OR_NEWER
-                    v_tmpTextObject != null && v_tmpTextObject.font.faceInfo.familyName.Length > 0 ? v_tmpTextObject.font.faceInfo.familyName : "";
-#else
-                    v_tmpTextObject != null && v_tmpTextObject.font.fontInfo.Name.Length > 0 ? v_tmpTextObject.font.fontInfo.Name : "";
-#endif
+                _config.Font = textObject != null ? PostScriptNameUtils.GetPostScriptName(textObject.font) :
+                    (tmpTextObject != null ? PostScriptNameUtils.GetPostScriptName(tmpTextObject.font) : string.Empty);
+
                 _config.FontSize = GetNativeFontSize();
                 _config.TextColor = _inputObjectText.color;
                 _config.Align = GetGraphicTextAnchor(_inputObjectText).ToString();
-                _config.ContentType = v_inputField != null ? v_inputField.contentType.ToString() :
-                    (v_tmpInputField != null ? v_tmpInputField.contentType.ToString() : "");
+                _config.ContentType = inputField != null ? inputField.contentType.ToString() :
+                    (tmpInputField != null ? tmpInputField.contentType.ToString() : "");
                 _config.BackgroundColor = new Color(1.0f, 1.0f, 1.0f, 0.0f);
-                _config.Multiline = (v_inputField != null && v_inputField.lineType != UnityEngine.UI.InputField.LineType.SingleLine) ||
-                                    (v_tmpInputField != null && v_tmpInputField.lineType != TMP_InputField.LineType.SingleLine);
+                _config.Multiline = (inputField != null && inputField.lineType != UnityEngine.UI.InputField.LineType.SingleLine) ||
+                                    (tmpInputField != null && tmpInputField.lineType != TMP_InputField.LineType.SingleLine);
                 _config.KeyboardType = _inputObject.keyboardType.ToString();
-                _config.InputType = v_inputField != null ? v_inputField.inputType.ToString() :
-                    (v_tmpInputField != null ? v_tmpInputField.inputType.ToString() : "");
+                _config.InputType = inputField != null ? inputField.inputType.ToString() :
+                    (tmpInputField != null ? tmpInputField.inputType.ToString() : "");
 
                 _isVisibleOnCreate = false;
             }
@@ -434,11 +431,11 @@ namespace MobileInputNativePlugin
 
         protected virtual float GetNativeFontSize()
         {
-            var v_textObject = _inputObjectText as Text;
-            var v_tmpTextObject = _inputObjectText as TMP_Text;
+            var textObject = _inputObjectText as Text;
+            var tmpTextObject = _inputObjectText as TMP_Text;
             Rect rect = GetScreenRectFromRectTransform(this._inputObjectText.rectTransform);
             float ratio = rect.height / _inputObjectText.rectTransform.rect.height;
-            var fontSize = (v_textObject != null ? ((float)v_textObject.fontSize) : (v_tmpTextObject != null ? v_tmpTextObject.fontSize : 0)) * ratio;
+            var fontSize = (textObject != null ? ((float)textObject.fontSize) : (tmpTextObject != null ? tmpTextObject.fontSize : 0)) * ratio;
             return fontSize;
         }
 
@@ -517,13 +514,13 @@ namespace MobileInputNativePlugin
             }
             else if (msg.Equals(RETURN_PRESSED) || msg.Equals(DONE_KEY_DOWN))
             {
-                var v_isDone = msg.Equals(DONE_KEY_DOWN);
-                var v_inputField = _inputObject as InputField;
-                var v_tmpInputField = _inputObject as TMP_InputField;
+                var isDone = msg.Equals(DONE_KEY_DOWN);
+                var inputField = _inputObject as InputField;
+                var tmpInputField = _inputObject as TMP_InputField;
 
-                if (v_isDone ||
-                    (v_inputField != null && (v_inputField.lineType == UnityEngine.UI.InputField.LineType.MultiLineSubmit || v_inputField.lineType == UnityEngine.UI.InputField.LineType.SingleLine)) ||
-                    (v_tmpInputField != null && (v_tmpInputField.lineType == TMP_InputField.LineType.MultiLineSubmit || v_tmpInputField.lineType == TMP_InputField.LineType.SingleLine)))
+                if (isDone ||
+                    (inputField != null && (inputField.lineType == UnityEngine.UI.InputField.LineType.MultiLineSubmit || inputField.lineType == UnityEngine.UI.InputField.LineType.SingleLine)) ||
+                    (tmpInputField != null && (tmpInputField.lineType == TMP_InputField.LineType.MultiLineSubmit || tmpInputField.lineType == TMP_InputField.LineType.SingleLine)))
                 {
                     if (OnReturnPressed != null)
                         OnReturnPressed();
@@ -612,7 +609,7 @@ namespace MobileInputNativePlugin
                     data["return_key_type"] = "Default";
                     break;
             }
-
+            Debug.Log("MobileInput CreateNativeEdit " + data.ToJsonString());
             this.Execute(data);
             Ready();
         }
@@ -775,15 +772,15 @@ namespace MobileInputNativePlugin
 #endif
         }
 
-        protected virtual void SetUnityTextEnabled(bool p_enabled)
+        protected virtual void SetUnityTextEnabled(bool enabled)
         {
             //Add a canvas group in unitytext component to prevent disable it (this will make UI Layout be updated preventing bugs with Layouts)
             if (_inputObjectText != null)
             {
-                var v_group = _inputObjectText.GetComponent<CanvasGroup>();
-                if (v_group == null)
-                    v_group = _inputObjectText.gameObject.AddComponent<CanvasGroup>();
-                v_group.alpha = p_enabled ? 1 : 0;
+                var group = _inputObjectText.GetComponent<CanvasGroup>();
+                if (group == null)
+                    group = _inputObjectText.gameObject.AddComponent<CanvasGroup>();
+                group.alpha = enabled ? 1 : 0;
             }
         }
 

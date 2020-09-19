@@ -2,8 +2,9 @@
 
 using UnityEditor;
 using UnityEngine;
+using Kyub.Internal.NativeInputPlugin;
 
-namespace MobileInputNativePlugin {
+namespace KyubEditor.Internal.NativeInputPlugin {
 
     [CustomEditor (typeof (MobileInputBehaviour))]
     public class MobileInputBehaviourEditor : Editor {

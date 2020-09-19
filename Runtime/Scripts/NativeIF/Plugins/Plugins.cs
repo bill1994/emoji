@@ -1,18 +1,17 @@
 ﻿// ----------------------------------------------------------------------------
 // The MIT License
-// UnityMobileInput https://github.com/mopsicus/UnityMobileInput
-// Copyright (c) 2018 Mopsicus <mail@mopsicus.ru>
+// Based in UnityMobileInput https://github.com/mopsicus/UnityMobileInput
 // ----------------------------------------------------------------------------
 
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using MobileInputNativePlugin.NiceJson;
+using Kyub.Internal.NativeInputPlugin.NiceJson;
 #if UNITY_IOS
 using System.Runtime.InteropServices;
 #endif
 
-namespace MobileInputNativePlugin {
+namespace Kyub.Internal.NativeInputPlugin {
 
     /// <summary>
     /// Mobile plugin interface
@@ -45,7 +44,7 @@ namespace MobileInputNativePlugin {
         /// <summary>
         /// Mask for Java classes
         /// </summary>
-        public const string ANDROID_CLASS_MASK = "ru.mopsicus.{0}.Plugin";
+        public const string ANDROID_CLASS_MASK = "kyub.uicommons.{0}.Plugin";
 #elif UNITY_IOS
         /// <summary>
         /// Init iOS plugins

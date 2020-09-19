@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using MobileInputNativePlugin;
+using Kyub.Internal.NativeInputPlugin;
 
 namespace Kyub.UI
 {

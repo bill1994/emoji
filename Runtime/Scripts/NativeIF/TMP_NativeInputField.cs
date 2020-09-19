@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using MobileInputNativePlugin;
+using Kyub.Internal.NativeInputPlugin;
 using TMPro;
 using Kyub.EventSystems;
 
@@ -61,7 +61,7 @@ namespace Kyub.UI
         {
             base.OnEnable();
             CheckAsteriskChar();
-
+            
             MobileInputBehaviour v_nativeBox = GetComponent<MobileInputBehaviour>();
             if (MobileInputBehaviour.IsSupported())
             {
@@ -205,6 +205,16 @@ namespace Kyub.UI
 
             CheckAsteriskChar();
         }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            //Track font from textComponent
+            if (textComponent != null && textComponent.font != fontAsset)
+                m_GlobalFontAsset = textComponent.font;
+            base.OnValidate();
+        }
+#endif
 
         #endregion
 

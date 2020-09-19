@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using MobileInputNativePlugin;
+using Kyub.Internal.NativeInputPlugin;
 using TMPro;
 
 namespace Kyub.UI
