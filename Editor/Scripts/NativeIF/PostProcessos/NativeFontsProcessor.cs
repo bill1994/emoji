@@ -20,9 +20,16 @@ namespace KyubEditor.Internal.NativeInputPlugin
 {
     class NativeFontsProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
     {
+
+        #region Fields and Properties
+
         static HashSet<string> s_lastCopyFiles = null;
 
         public int callbackOrder { get { return 0; } }
+
+        #endregion
+
+        #region Processor Functions
         public void OnPreprocessBuild(BuildReport report)
         {
             var fontFiles = GetAllUsedFont();
@@ -84,12 +91,13 @@ namespace KyubEditor.Internal.NativeInputPlugin
                     uiFontArray.values.Clear();
 
                     var fontRootPath = GetFontDirectoryPath();
+                    var xcodeFontRootPath = GetXCodeFontDirectoryPath();
                     //Add Custom Fonts calculated in OnPreBuild
                     foreach (var copyElement in s_lastCopyFiles)
                     {
                         if (copyElement.StartsWith(fontRootPath))
                         {
-                            var copyElementFileName = Path.GetFileName(copyElement);
+                            var copyElementFileName = xcodeFontRootPath + "/" + Path.GetFileName(copyElement);
                             fontFiles.Add(copyElementFileName);
                         }
                     }
@@ -107,6 +115,8 @@ namespace KyubEditor.Internal.NativeInputPlugin
             }
             catch { }
         }
+
+        #endregion
 
         #region Helper Static Functions
 
@@ -191,7 +201,7 @@ namespace KyubEditor.Internal.NativeInputPlugin
                 foreach (var font in fonts)
                 {
                     var filePath = AssetDatabase.GetAssetPath(font);
-                    var postScriptName = GetPostScriptName(filePath);
+                    var postScriptName = BuildPostScriptName(filePath);
                     table.AddEntry(font, postScriptName);
                     var copyPath = Path.Combine(rootPath, postScriptName).Replace("\\", "/");
                     try
@@ -251,19 +261,25 @@ namespace KyubEditor.Internal.NativeInputPlugin
             return fonts;
         }
 
-        protected static string GetPostScriptName(string fontFile)
+        protected static string BuildPostScriptName(string fontFile)
         {
             using (var filestream = new FileStream(fontFile, FileMode.Open))
             {
                 var fontReader = new OpenFontReader();
                 var preview = fontReader.ReadPreview(filestream);
-                return preview.NameEntry.PostScriptName;
+                var extension = Path.GetExtension(fontFile);
+                return preview.NameEntry.PostScriptName + extension;
             }
         }
 
         protected static string GetFontDirectoryPath()
         {
             return Application.streamingAssetsPath + "/res/font";
+        }
+
+        protected static string GetXCodeFontDirectoryPath()
+        {
+            return "Data/Raw/res/font";
         }
 
         public static string GetPostScriptTableDirectoryPath()
