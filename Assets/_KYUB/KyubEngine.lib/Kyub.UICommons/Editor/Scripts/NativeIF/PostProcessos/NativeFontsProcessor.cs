@@ -1,7 +1,7 @@
 ﻿// This File will try to copy all fonts used in project to StreamingAssets/res/font before build (and remove after build).
 // Doing this we can access TTF files in Native Platforms to draw using NativeInputField.
 
-#if UNITY_EDITOR && UNITY_ANDROID
+#if UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
 #define SUPPORT_PROCESSOR
 #endif
 
@@ -33,9 +33,6 @@ namespace KyubEditor.Internal.NativeInputPlugin
         public void OnPostprocessBuild(BuildReport report)
         {
             AddFontsToXcodePlist(report.summary.platform, report.summary.outputPath);
-            //Add PostScriptTable to Delete Schedule
-            if(s_lastCopyFiles != null)
-                s_lastCopyFiles.Add(GetPostScriptTableFile());
             if (DeleteCopies(s_lastCopyFiles))
             {
                 AssetDatabase.Refresh();
@@ -86,11 +83,15 @@ namespace KyubEditor.Internal.NativeInputPlugin
                     }
                     uiFontArray.values.Clear();
 
+                    var fontRootPath = GetFontDirectoryPath();
                     //Add Custom Fonts calculated in OnPreBuild
                     foreach (var copyElement in s_lastCopyFiles)
                     {
-                        var copyElementFileName = System.IO.Path.GetFileName(copyElement);
-                        fontFiles.Add(copyElementFileName);
+                        if (copyElement.StartsWith(fontRootPath))
+                        {
+                            var copyElementFileName = Path.GetFileName(copyElement);
+                            fontFiles.Add(copyElementFileName);
+                        }
                     }
 
                     //Merge Plist with new CustomFonts
@@ -210,6 +211,7 @@ namespace KyubEditor.Internal.NativeInputPlugin
             if (!Directory.Exists(postScriptResourcesPath))
                 Directory.CreateDirectory(postScriptResourcesPath);
             var postScriptTablePath = GetPostScriptTableFile();
+            copyFiles.Add(postScriptTablePath);
             File.WriteAllText(postScriptTablePath, JsonUtility.ToJson(table));
 
             return copyFiles;
