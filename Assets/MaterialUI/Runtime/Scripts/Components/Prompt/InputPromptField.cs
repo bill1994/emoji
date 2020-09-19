@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using MobileInputNativePlugin;
-using MaterialUI;
 using TMPro;
 
 namespace MaterialUI

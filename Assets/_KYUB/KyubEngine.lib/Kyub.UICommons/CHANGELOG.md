@@ -1,3 +1,7 @@
+[VERSION 1.4.0]
+Added initial support to Native Fonts
+Renamed Namespaces of MobileInputField
+
 [VERSION 1.1.4]
 Removed InputCompat class from this package
 Added InputCompat as reference from a new package (com.kyub.inputcompat)

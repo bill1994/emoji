@@ -16,6 +16,7 @@ namespace KyubEditor.UI
         private SerializedProperty m_AsteriskChar;
         private SerializedProperty m_OnReturnPressed;
         private SerializedProperty m_PanContent;
+        private SerializedProperty m_GlobalFontAsset;
 
         protected override void OnEnable()
         {
@@ -23,13 +24,25 @@ namespace KyubEditor.UI
             m_AsteriskChar = serializedObject.FindProperty("m_AsteriskChar");
             m_PanContent = serializedObject.FindProperty("m_PanContent");
             m_OnReturnPressed = serializedObject.FindProperty("OnReturnPressed");
+            m_GlobalFontAsset = serializedObject.FindProperty("m_GlobalFontAsset");
         }
 
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
-
             serializedObject.Update();
+            var cachedFont = m_GlobalFontAsset.objectReferenceValue;
+            
+            base.OnInspectorGUI();
+            serializedObject.Update();
+            if (cachedFont != m_GlobalFontAsset.objectReferenceValue)
+            {
+                foreach (var target in targets)
+                {
+                    var nativeInput = target as TMP_NativeInputField;
+                    nativeInput.SetGlobalFontAsset(m_GlobalFontAsset.objectReferenceValue as TMP_FontAsset);
+                }
+            }
+
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Password Special Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(m_AsteriskChar);

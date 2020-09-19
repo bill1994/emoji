@@ -34,7 +34,7 @@ using System.Collections;
 using System.Globalization;
 using System.Text;
 
-namespace MobileInputNativePlugin.NiceJson
+namespace Kyub.Internal.NativeInputPlugin.NiceJson
 {
 	[Serializable]
 	public abstract class JsonNode

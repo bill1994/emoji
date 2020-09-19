@@ -1,18 +1,17 @@
 // ----------------------------------------------------------------------------
 // The MIT License
-// UnityMobileInput https://github.com/mopsicus/UnityMobileInput
-// Copyright (c) 2018 Mopsicus <mail@mopsicus.ru>
+// Based in UnityMobileInput https://github.com/mopsicus/UnityMobileInput
 // ----------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
-using MobileInputNativePlugin.NiceJson;
+using Kyub.Internal.NativeInputPlugin.NiceJson;
 using UnityEngine;
 #if UNITY_IOS
 using System.Runtime.InteropServices;
 #endif
 
-namespace MobileInputNativePlugin {
+namespace Kyub.Internal.NativeInputPlugin {
 
     /// <summary>
     /// Base class for InputField
