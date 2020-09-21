@@ -9,8 +9,9 @@ namespace Kyub.Internal.NativeInputPlugin
     {
         #region Static Fields
 
-        public const string POST_SCRIPT_TABLE = "root_ps_table.txt";
-        static PostScriptTableData s_loadedPostScriptTable = null;
+        public const string POST_SCRIPT_TABLE = "root_ps_table.json";
+        protected static PostScriptTableData s_loadedPostScriptTable = null;
+        protected static bool s_initialized = false;
 
         #endregion
 
@@ -19,7 +20,16 @@ namespace Kyub.Internal.NativeInputPlugin
         [RuntimeInitializeOnLoadMethod]
         static void Initialize()
         {
-            ReloadPostScriptTable();
+            if (Application.isMobilePlatform)
+            {
+                LoadPostScriptTableAsync_Internal((result) =>
+                {
+                    s_initialized = true;
+                    s_loadedPostScriptTable = result;
+                });
+            }
+            else
+                s_initialized = true;
         }
 
         #endregion
@@ -28,48 +38,68 @@ namespace Kyub.Internal.NativeInputPlugin
 
         public static string GetPostScriptName(string entry)
         {
-            if(s_loadedPostScriptTable == null)
-                ReloadPostScriptTable();
-            return s_loadedPostScriptTable != null ? s_loadedPostScriptTable.GetPostScriptName(entry) : string.Empty;
+            while (!s_initialized) { };
+            return s_loadedPostScriptTable != null ? s_loadedPostScriptTable.GetPostScriptName(entry) : entry;
         }
 
         public static string GetPostScriptName(TMP_FontAsset tmpfont)
         {
-            if (s_loadedPostScriptTable == null)
-                ReloadPostScriptTable();
-            return s_loadedPostScriptTable != null ? s_loadedPostScriptTable.GetPostScriptName(tmpfont) : string.Empty;
+            while (!s_initialized) { };
+            return s_loadedPostScriptTable != null ? s_loadedPostScriptTable.GetPostScriptName(tmpfont) : 
+                (tmpfont != null ? tmpfont.faceInfo.familyName + "-" + tmpfont.faceInfo.styleName : string.Empty);
         }
 
         public static string GetPostScriptName(Font font)
         {
-            if (s_loadedPostScriptTable == null)
-                ReloadPostScriptTable();
-            return s_loadedPostScriptTable != null ? s_loadedPostScriptTable.GetPostScriptName(font) : string.Empty;
+            while (!s_initialized) { };
+            return s_loadedPostScriptTable != null ? s_loadedPostScriptTable.GetPostScriptName(font) :
+                (font != null ? font.name : string.Empty);
         }
 
-        public static void ReloadPostScriptTable()
-        {
-            var tableFile = GetPostStriptTableResourcesFilePath();
-            var tableTextAsset = Resources.Load<TextAsset>(tableFile);
-            PostScriptTableData table = new PostScriptTableData();
-            if (tableTextAsset != null)
-            {
-                try
-                {
-                    JsonUtility.FromJsonOverwrite(tableTextAsset.text, table);
-                }
-                catch (System.Exception)
-                {
-                    Debug.LogWarning("Failed to deserialize PostScriptTableData");
-                }
-            }
-            s_loadedPostScriptTable = table;
-        }
+        #endregion
 
-        public static string GetPostStriptTableResourcesFilePath()
+        #region Helper Functions
+
+        static string GetPostStriptTableStreamingAssetFilePath()
         {
-            var tableFile = "res/font/" + System.IO.Path.GetFileNameWithoutExtension(POST_SCRIPT_TABLE);
+            var tableFile = System.IO.Path.Combine(Application.streamingAssetsPath, "res/font/" + POST_SCRIPT_TABLE).Replace("\\", "/");
             return tableFile;
+        }
+
+        static void LoadPostScriptTableAsync_Internal(System.Action<PostScriptTableData> callback)
+        {
+            PostScriptTableData table = new PostScriptTableData();
+            try
+            {
+                var tableFile = GetPostStriptTableStreamingAssetFilePath();
+                var www = UnityWebRequest.Get(tableFile);
+                var operation = www.SendWebRequest();
+                operation.completed += (result) =>
+                {
+                    if (www != null)
+                    {
+                        if (!www.isNetworkError && !www.isHttpError && string.IsNullOrEmpty(www.error))
+                        {
+                            try
+                            {
+                                JsonUtility.FromJsonOverwrite(www.downloadHandler.text, table);
+                            }
+                            catch (System.Exception)
+                            {
+                                Debug.LogWarning("Failed to deserialize PostScriptTableData");
+                            }
+                        }
+                        www.Dispose();
+                    }
+                    if (callback != null)
+                        callback.Invoke(table);
+                };
+            }
+            catch
+            {
+                if (callback != null)
+                    callback.Invoke(table);
+            }
         }
 
         #endregion
