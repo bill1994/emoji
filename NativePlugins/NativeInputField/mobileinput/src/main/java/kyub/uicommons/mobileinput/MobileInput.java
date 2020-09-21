@@ -155,6 +155,7 @@ public class MobileInput {
             Rect rect = new Rect((int) x, (int) y, (int) (x + width), (int) (y + height));
             Rect panRect = new Rect((int) pan_x, (int) pan_y, (int) (pan_x + pan_width), (int) (pan_y + pan_height));
             int offset = panRect.bottom - rect.bottom > 0? panRect.bottom - rect.bottom : 0;
+            boolean isPassword = false;
 
             LayoutParams params = new LayoutParams(rect.width(), rect.height() + offset);
             params.setMargins(rect.left, rect.top, 0, 0);
@@ -184,6 +185,7 @@ public class MobileInput {
                     editInputType |= InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
                     break;
                 case "Password":
+                    isPassword = true;
                     editInputType |= InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
                     break;
                 case "Pin":
@@ -229,6 +231,7 @@ public class MobileInput {
                             editInputType |= InputType.TYPE_TEXT_FLAG_AUTO_CORRECT;
                             break;
                         case "Password":
+                            isPassword = true;
                             if (keyboardType != "NumbersAndPunctuation" && keyboardType != "NumberPad" && keyboardType != "PhonePad") {
                                 editInputType |= InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
                             } else {
@@ -290,22 +293,19 @@ public class MobileInput {
             edit.setBackgroundColor(Color.argb(backColor_a, backColor_r, backColor_g, backColor_b));
             edit.setHintTextColor(Color.argb(placeHolderColor_a, placeHolderColor_r, placeHolderColor_g, placeHolderColor_b));
             edit.setIncludeFontPadding(false);
-            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //    edit.setLetterSpacing(0.01f);
-            //}
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                edit.setLetterSpacing(0.0115f);
+            }
 
             Typeface tf = null;
-
-            if(font != null && !font.isEmpty()) {
+            //Only San-Serif (Roboto-Regular) is available while using Password Field
+            if(!isPassword && font != null && !font.isEmpty()) {
                 //Try Create From File
-                if (tf == null) {
-                    try {
-                        String assetPath = "res/font/" + font;
-                        tf = TypefaceCache.GetOrCreate(Plugin.activity.getApplicationContext(), assetPath);
-                    }
-                    catch (Exception e){
-                        tf = null;
-                    }
+                try {
+                    String assetPath = "res/font/" + font;
+                    tf = TypefaceCache.GetOrCreate(Plugin.activity.getApplicationContext(), assetPath);
+                } catch (Exception e) {
+                    tf = null;
                 }
             }
 

@@ -300,10 +300,6 @@ BOOL multiline;
         returnKeyType = UIReturnKeySearch;
     }
     fontSize = fontSize / [UIScreen mainScreen].scale;
-	/*if(password)
-	{
-		fontSize = fontSize / 2;
-	}*/
 	
 	//Create Font Asset
 	UIFont *uiFont = nil;
