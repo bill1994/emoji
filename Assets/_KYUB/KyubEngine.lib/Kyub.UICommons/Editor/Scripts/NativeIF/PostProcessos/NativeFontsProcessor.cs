@@ -46,6 +46,13 @@ namespace KyubEditor.Internal.NativeInputPlugin
             //Copy FontAssets to Gradle StreamingAssetPath
             var fontPath = PathCombine(grandlePath, GetGradleFontRelativePath());
             var fontFiles = GetAllUsedFont();
+            var ignoreNames = new HashSet<string>() {
+                "Roboto-Regular",
+                "Roboto-Light",
+                "Roboto-Thin",
+                "Roboto-Bold",
+                "Roboto-Medium"
+            };
             CopyToPath(fontPath, fontFiles);
         }
 
@@ -54,6 +61,18 @@ namespace KyubEditor.Internal.NativeInputPlugin
         #endregion
 
         #region Helper Static Functions
+
+        protected static HashSet<string> FilterFiles(HashSet<string> files, HashSet<string> ignoredNames)
+        {
+            HashSet<string> filteredFiles = new HashSet<string>();
+            foreach (var file in files)
+            {
+                var fileWithoutExtension = Path.GetFileNameWithoutExtension(file);
+                if (string.IsNullOrEmpty(file) && !ignoredNames.Contains(fileWithoutExtension) && !ignoredNames.Contains(file))
+                    filteredFiles.Add(file);
+            }
+            return filteredFiles;
+        }
 
         protected static void AddFontsToXCodePlist(string xcodePath)
         {

@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -288,30 +289,21 @@ public class MobileInput {
             edit.setTextColor(Color.argb(textColor_a, textColor_r, textColor_g, textColor_b));
             edit.setBackgroundColor(Color.argb(backColor_a, backColor_r, backColor_g, backColor_b));
             edit.setHintTextColor(Color.argb(placeHolderColor_a, placeHolderColor_r, placeHolderColor_g, placeHolderColor_b));
+            edit.setIncludeFontPadding(false);
+            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //    edit.setLetterSpacing(0.01f);
+            //}
 
             Typeface tf = null;
 
             if(font != null && !font.isEmpty()) {
                 //Try Create From File
                 if (tf == null) {
-                    String internalPath = "res/font/" + font;
-                    AssetManager assetManager = Plugin.activity.getApplicationContext().getAssets();
                     try {
-                        tf = Typeface.createFromAsset(assetManager, internalPath);
-                    } catch (Exception e) {
-                        tf = null;
+                        String assetPath = "res/font/" + font;
+                        tf = TypefaceCache.GetOrCreate(Plugin.activity.getApplicationContext(), assetPath);
                     }
-                }
-                //Remove Extension
-                int pos = font.lastIndexOf(".");
-                if (pos > 0)
-                    font = font.substring(0, pos);
-
-                //Try Create From Font True Name
-                if (tf == null && !font.isEmpty()) {
-                    try {
-                        tf = Typeface.create(font, Typeface.NORMAL);
-                    } catch (Exception e) {
+                    catch (Exception e){
                         tf = null;
                     }
                 }
