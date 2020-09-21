@@ -80,7 +80,7 @@ namespace Kyub
                     foreach (Group v_group in m.Groups)
                     {
 #if NET_STANDARD_2_0
-                        var groupName = groupCounter < groupNames.Length? null : groupNames[groupCounter];
+                        var groupName = groupCounter < groupNames.Length? groupNames[groupCounter] : null;
 #else
                         var groupName = v_group.Name;
 #endif
