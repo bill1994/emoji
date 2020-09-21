@@ -226,14 +226,16 @@ namespace Kyub.Internal.NativeInputPlugin
             var result = string.Empty;
             if (tmpfont != null)
             {
-                if (!string.IsNullOrEmpty(tmpfont.name) && _table.TryGetValue(tmpfont.name, out result))
-                    return string.IsNullOrEmpty(result) ? tmpfont.name : result;
-
-                var familyAndStyle = tmpfont.faceInfo.familyName + "-" + tmpfont.faceInfo.styleName;
-                if (!string.IsNullOrEmpty(familyAndStyle) && _table.TryGetValue(familyAndStyle, out result))
-                    return string.IsNullOrEmpty(result) ? familyAndStyle : result;
-                else if (familyAndStyle != null)
-                    return familyAndStyle;
+                if (tmpfont.sourceFontFile != null)
+                    return GetPostScriptName(tmpfont.sourceFontFile);
+                else
+                {
+                    var familyAndStyle = tmpfont.faceInfo.familyName + "-" + tmpfont.faceInfo.styleName;
+                    if (!string.IsNullOrEmpty(familyAndStyle) && _table.TryGetValue(familyAndStyle, out result))
+                        return string.IsNullOrEmpty(result) ? familyAndStyle : result;
+                    else if (familyAndStyle != null)
+                        return familyAndStyle;
+                }
             }
             return result == null ? string.Empty : result;
         }

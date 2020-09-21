@@ -1,4 +1,5 @@
-﻿// This File will try to copy all fonts used in project to StreamingAssets/res/font before build (and remove after build).
+﻿#if UNITY_EDITOR
+// This File will try to copy all fonts used in project to StreamingAssets/res/font before build (and remove after build).
 // Doing this we can access TTF files in Native Platforms to draw using NativeInputField.
 
 using KyubEditor.Typography.OpenFont;
@@ -11,7 +12,6 @@ using UnityEngine;
 using Kyub.Internal.NativeInputPlugin;
 using UnityEditor.iOS.Xcode;
 using UnityEditor.Android;
-using System.Runtime.CompilerServices;
 
 namespace KyubEditor.Internal.NativeInputPlugin
 {
@@ -93,7 +93,7 @@ namespace KyubEditor.Internal.NativeInputPlugin
                     HashSet<string> validExtensions = new HashSet<string>() { ".ttf", ".otf" };
                     foreach (var copyElement in files)
                     {
-                        var extension = Path.GetFileName(copyElement).ToLower();
+                        var extension = Path.GetExtension(copyElement).ToLower();
                         if (!string.IsNullOrEmpty(extension) && (validExtensions.Count == 0 || validExtensions.Contains(extension)))
                         {
                             var copyElementFileName = PathCombine(xcodeFontRelativePath, Path.GetFileName(copyElement));
@@ -108,7 +108,7 @@ namespace KyubEditor.Internal.NativeInputPlugin
                     if (!string.IsNullOrEmpty(element))
                         uiFontArray.AddString(element);
                 }
-
+                rootDict.values[uiFontKey] = uiFontArray;
                 // Write to file
                 File.WriteAllText(plistPath, plist.WriteToString());
             }
@@ -152,6 +152,7 @@ namespace KyubEditor.Internal.NativeInputPlugin
         {
             List<Object> objectsToTrack = new List<Object>();
             objectsToTrack.AddRange(Resources.LoadAll<GameObject>(""));
+            objectsToTrack.AddRange(Resources.LoadAll<TMPro.TMP_FontAsset>(""));
             foreach (var editorScene in EditorBuildSettings.scenes)
             {
                 if (editorScene.enabled)
@@ -212,3 +213,4 @@ namespace KyubEditor.Internal.NativeInputPlugin
         #endregion
     }
 }
+#endif

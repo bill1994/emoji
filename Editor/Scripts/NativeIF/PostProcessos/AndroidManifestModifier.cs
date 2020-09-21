@@ -11,14 +11,10 @@ namespace KyubEditor
 
         public void OnPostGenerateGradleAndroidProject(string basePath)
         {
-            // If needed, add condition checks on whether you need to run the modification routine.
-            // For example, specific configuration/app options enabled
-
             var androidManifest = new AndroidManifest(GetManifestPath(basePath));
 
             androidManifest.SetHardwareAccel();
-
-            // Add your XML manipulation routines
+            androidManifest.SetWindowSoftInputModeAdjustPan();
 
             androidManifest.Save();
         }
@@ -107,9 +103,15 @@ namespace KyubEditor
         {
             GetActivityWithLaunchIntent().Attributes.Append(CreateAndroidAttribute("name", activityName));
         }
+
         internal void SetHardwareAccel()
         {
             GetActivityWithLaunchIntent().Attributes.Append(CreateAndroidAttribute("hardwareAccelerated", "true"));
+        }
+
+        internal void SetWindowSoftInputModeAdjustPan()
+        {
+            GetActivityWithLaunchIntent().Attributes.Append(CreateAndroidAttribute("windowSoftInputMode", "adjustPan"));
         }
     }
 }
