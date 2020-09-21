@@ -40,6 +40,10 @@ namespace KyubEditor.UI
                 {
                     var nativeInput = target as TMP_NativeInputField;
                     nativeInput.SetGlobalFontAsset(m_GlobalFontAsset.objectReferenceValue as TMP_FontAsset);
+                    if (nativeInput.textComponent != null)
+                        EditorUtility.SetDirty(nativeInput.textComponent);
+                    if (nativeInput.placeholder is TextMeshProUGUI)
+                        EditorUtility.SetDirty(nativeInput.placeholder);
                 }
             }
 

@@ -1,11 +1,6 @@
 ﻿// This File will try to copy all fonts used in project to StreamingAssets/res/font before build (and remove after build).
 // Doing this we can access TTF files in Native Platforms to draw using NativeInputField.
 
-#if UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
-#define SUPPORT_PROCESSOR
-#endif
-
-#if SUPPORT_PROCESSOR
 using KyubEditor.Typography.OpenFont;
 using System.Collections.Generic;
 using System.IO;
@@ -15,195 +10,125 @@ using UnityEditor.Build.Reporting;
 using UnityEngine;
 using Kyub.Internal.NativeInputPlugin;
 using UnityEditor.iOS.Xcode;
+using UnityEditor.Android;
+using System.Runtime.CompilerServices;
 
 namespace KyubEditor.Internal.NativeInputPlugin
 {
-    class NativeFontsProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+    class NativeFontsProcessor : IPostprocessBuildWithReport, IPostGenerateGradleAndroidProject
     {
 
         #region Fields and Properties
-
-        static HashSet<string> s_lastCopyFiles = null;
 
         public int callbackOrder { get { return 0; } }
 
         #endregion
 
         #region Processor Functions
-        public void OnPreprocessBuild(BuildReport report)
-        {
-            var fontFiles = GetAllUsedFont();
-            s_lastCopyFiles = CopyToPath(GetFontDirectoryPath(), fontFiles);
-            AssetDatabase.Refresh();
-        }
 
         public void OnPostprocessBuild(BuildReport report)
         {
-            AddFontsToXcodePlist(report.summary.platform, report.summary.outputPath);
-            if (DeleteCopies(s_lastCopyFiles))
+            if (report.summary.platform == BuildTarget.iOS)
             {
-                AssetDatabase.Refresh();
-                var foldersToDelete = new string[] { GetFontDirectoryPath(), GetPostScriptTableDirectoryPath() };
-                foreach (var folder in foldersToDelete)
-                {
-                    try
-                    {
-                        var parentFolder = new DirectoryInfo(folder).Parent;
-                        DeleteFolderAndContents(folder);
-                        if (parentFolder != null)
-                            ClearAssetFolderRecursiveUp(parentFolder.FullName);
-                    }
-                    catch { }
-                }
-                s_lastCopyFiles = null;
+                var xcodePath = report.summary.outputPath;
+                //Copy FontAssets to XCodeProject StreamingAssetPath
+                var fontPath = PathCombine(xcodePath, GetXCodeFontRelativePath());
+                var fontFiles = GetAllUsedFont();
+                CopyToPath(fontPath, fontFiles);
+
+                //Modify PList
+                AddFontsToXCodePlist(xcodePath);
             }
         }
 
-        public static void AddFontsToXcodePlist(BuildTarget buildTarget, string pathToBuiltProject)
+        public void OnPostGenerateGradleAndroidProject(string grandlePath)
         {
-            try
-            {
-                if (buildTarget == BuildTarget.iOS)
-                {
-                    // Get plist
-                    string plistPath = pathToBuiltProject + "/Info.plist";
-                    PlistDocument plist = new PlistDocument();
-                    plist.ReadFromString(File.ReadAllText(plistPath));
-
-                    // Get root
-                    PlistElementDict rootDict = plist.root;
-
-                    // Change value of CFBundleVersion in Xcode plist
-                    const string uiFontKey = "UIAppFonts";
-                    PlistElement appFontsListUncasted = null;
-                    if (!rootDict.values.TryGetValue(uiFontKey, out appFontsListUncasted) || appFontsListUncasted == null)
-                        appFontsListUncasted = rootDict.CreateArray(uiFontKey);
-                    PlistElementArray uiFontArray = appFontsListUncasted.AsArray();
-
-                    //Pick previous added elements in PList (someone already changed this)
-                    HashSet<string> fontFiles = new HashSet<string>();
-                    foreach (var element in uiFontArray.values)
-                    {
-                        var fontFile = element != null ? element.AsString() : string.Empty;
-                        if (!string.IsNullOrEmpty(fontFile))
-                            fontFiles.Add(fontFile);
-                    }
-                    uiFontArray.values.Clear();
-
-                    var fontRootPath = GetFontDirectoryPath();
-                    var xcodeFontRootPath = GetXCodeFontDirectoryPath();
-                    //Add Custom Fonts calculated in OnPreBuild
-                    foreach (var copyElement in s_lastCopyFiles)
-                    {
-                        if (copyElement.StartsWith(fontRootPath))
-                        {
-                            var copyElementFileName = xcodeFontRootPath + "/" + Path.GetFileName(copyElement);
-                            fontFiles.Add(copyElementFileName);
-                        }
-                    }
-
-                    //Merge Plist with new CustomFonts
-                    foreach (var element in fontFiles)
-                    {
-                        if (!string.IsNullOrEmpty(element))
-                            uiFontArray.AddString(element);
-                    }
-
-                    // Write to file
-                    File.WriteAllText(plistPath, plist.WriteToString());
-                }
-            }
-            catch { }
+            //Copy FontAssets to Gradle StreamingAssetPath
+            var fontPath = PathCombine(grandlePath, GetGradleFontRelativePath());
+            var fontFiles = GetAllUsedFont();
+            CopyToPath(fontPath, fontFiles);
         }
+
+
 
         #endregion
 
         #region Helper Static Functions
 
-        protected virtual void DeleteFolderAndContents(string folderFullPath)
+        protected static void AddFontsToXCodePlist(string xcodePath)
         {
             try
             {
-                var applicationDataPath = Application.dataPath;
-                var folderInfoToTrack = new DirectoryInfo(folderFullPath);
-                var parent = folderInfoToTrack.Parent;
-                var directoryAssetPath = folderInfoToTrack.FullName.Replace("\\", "/").Replace(applicationDataPath, "Assets");
-                //Try Delete Asset using Unity API
-                if (!UnityEditor.AssetDatabase.DeleteAsset(directoryAssetPath))
-                    folderInfoToTrack.Delete(true);
+                // Get plist
+                string plistPath = PathCombine(xcodePath, "Info.plist");
+                PlistDocument plist = new PlistDocument();
+                plist.ReadFromString(File.ReadAllText(plistPath));
+
+                // Get root
+                PlistElementDict rootDict = plist.root;
+
+                // Change value of CFBundleVersion in Xcode plist
+                const string uiFontKey = "UIAppFonts";
+                PlistElement appFontsListUncasted = null;
+                if (!rootDict.values.TryGetValue(uiFontKey, out appFontsListUncasted) || appFontsListUncasted == null)
+                    appFontsListUncasted = rootDict.CreateArray(uiFontKey);
+                PlistElementArray uiFontArray = appFontsListUncasted.AsArray();
+
+                //Pick previous added elements in PList (someone already changed this)
+                HashSet<string> fontFiles = new HashSet<string>();
+                foreach (var element in uiFontArray.values)
+                {
+                    var fontFile = element != null ? element.AsString() : string.Empty;
+                    if (!string.IsNullOrEmpty(fontFile))
+                        fontFiles.Add(fontFile);
+                }
+                uiFontArray.values.Clear();
+
+                var xcodeFontRelativePath = GetXCodeFontRelativePath();
+                var xcodeFontFullpath = PathCombine(xcodePath, xcodeFontRelativePath);
+                var files = Directory.GetFiles(xcodeFontFullpath);
+                //Add Fonts Previous
+                if (files != null)
+                {
+                    HashSet<string> validExtensions = new HashSet<string>() { ".ttf", ".otf" };
+                    foreach (var copyElement in files)
+                    {
+                        var extension = Path.GetFileName(copyElement).ToLower();
+                        if (!string.IsNullOrEmpty(extension) && (validExtensions.Count == 0 || validExtensions.Contains(extension)))
+                        {
+                            var copyElementFileName = PathCombine(xcodeFontRelativePath, Path.GetFileName(copyElement));
+                            fontFiles.Add(copyElementFileName);
+                        }
+                    }
+                }
+
+                //Merge Plist with new CustomFonts
+                foreach (var element in fontFiles)
+                {
+                    if (!string.IsNullOrEmpty(element))
+                        uiFontArray.AddString(element);
+                }
+
+                // Write to file
+                File.WriteAllText(plistPath, plist.WriteToString());
             }
             catch { }
         }
 
-        protected virtual void ClearAssetFolderRecursiveUp(string folderFullPath)
-        {
-            var applicationDataPath = Application.dataPath;
-            var assetInfo = new DirectoryInfo(applicationDataPath);
-            var folderInfoToTrack = new DirectoryInfo(folderFullPath);
-            //We can only delete folders until Assets
-            if (folderInfoToTrack == null || assetInfo.FullName == folderInfoToTrack.FullName || !folderInfoToTrack.FullName.Contains(assetInfo.FullName))
-                return;
-
-            while (folderInfoToTrack != null && folderInfoToTrack.GetFiles().Length == 0 && folderInfoToTrack.GetDirectories().Length == 0)
-            {
-                try
-                {
-                    var parent = folderInfoToTrack.Parent;
-                    var directoryAssetPath = folderInfoToTrack.FullName.Replace("\\", "/").Replace(applicationDataPath, "Assets");
-                    //Try Delete Asset using Unity API
-                    if (!UnityEditor.AssetDatabase.DeleteAsset(directoryAssetPath))
-                        folderInfoToTrack.Delete();
-                    folderInfoToTrack = parent;
-                    //We can only delete folders until Assets
-                    if (folderInfoToTrack == null || assetInfo.FullName == folderInfoToTrack.FullName || !folderInfoToTrack.FullName.Contains(assetInfo.FullName))
-                        return;
-                }
-                catch
-                {
-                    return;
-                }
-            }
-        }
-
-        protected static bool DeleteCopies(HashSet<string> copyFiles)
-        {
-            var sucess = false;
-            var applicationDataPath = Application.dataPath;
-            if (copyFiles != null)
-            {
-                foreach (var copyFile in copyFiles)
-                {
-                    try
-                    {
-                        var copyAssetPath = copyFile.Replace("\\", "/").Replace(applicationDataPath, "Assets");
-                        if (!UnityEditor.AssetDatabase.DeleteAsset(copyAssetPath))
-                        {
-                            File.Delete(copyFile);
-                            sucess = true;
-                        }
-                        else
-                            sucess = true;
-                    }
-                    catch { }
-                }
-            }
-            return sucess;
-        }
-
         protected static HashSet<string> CopyToPath(string rootPath, HashSet<Font> fonts)
         {
-            PostScriptTableData table = new PostScriptTableData();
             HashSet<string> copyFiles = new HashSet<string>();
             if (fonts != null)
             {
+                PostScriptTableData table = new PostScriptTableData();
                 if (!Directory.Exists(rootPath))
                     Directory.CreateDirectory(rootPath);
                 foreach (var font in fonts)
                 {
                     var filePath = AssetDatabase.GetAssetPath(font);
-                    var postScriptName = BuildPostScriptName(filePath);
+                    var postScriptName = GeneratePostScriptName(filePath);
                     table.AddEntry(font, postScriptName);
-                    var copyPath = Path.Combine(rootPath, postScriptName).Replace("\\", "/");
+                    var copyPath = PathCombine(rootPath, postScriptName);
                     try
                     {
                         if (!File.Exists(copyPath))
@@ -214,15 +139,11 @@ namespace KyubEditor.Internal.NativeInputPlugin
                     }
                     catch { }
                 }
-            }
 
-            //Save PostScript Table
-            var postScriptResourcesPath = GetPostScriptTableDirectoryPath();
-            if (!Directory.Exists(postScriptResourcesPath))
-                Directory.CreateDirectory(postScriptResourcesPath);
-            var postScriptTablePath = GetPostScriptTableFile();
-            copyFiles.Add(postScriptTablePath);
-            File.WriteAllText(postScriptTablePath, JsonUtility.ToJson(table));
+                var postScriptTablePath = PathCombine(rootPath, PostScriptNameUtils.POST_SCRIPT_TABLE);
+                copyFiles.Add(postScriptTablePath);
+                File.WriteAllText(postScriptTablePath, JsonUtility.ToJson(table));
+            }
 
             return copyFiles;
         }
@@ -261,7 +182,7 @@ namespace KyubEditor.Internal.NativeInputPlugin
             return fonts;
         }
 
-        protected static string BuildPostScriptName(string fontFile)
+        protected static string GeneratePostScriptName(string fontFile)
         {
             using (var filestream = new FileStream(fontFile, FileMode.Open))
             {
@@ -272,30 +193,22 @@ namespace KyubEditor.Internal.NativeInputPlugin
             }
         }
 
-        protected static string GetFontDirectoryPath()
-        {
-            return Application.streamingAssetsPath + "/res/font";
-        }
-
-        protected static string GetXCodeFontDirectoryPath()
+        protected static string GetXCodeFontRelativePath()
         {
             return "Data/Raw/res/font";
         }
 
-        public static string GetPostScriptTableDirectoryPath()
+        protected static string GetGradleFontRelativePath()
         {
-            var tableFile = Application.dataPath + "/Resources/res/font";
-            return tableFile;
+            return "src/main/assets/res/font";
         }
 
-        public static string GetPostScriptTableFile()
+        protected static string PathCombine(string path1, string path2)
         {
-            var tableFile = GetPostScriptTableDirectoryPath() + "/" + PostScriptNameUtils.POST_SCRIPT_TABLE;
-            return tableFile;
+            var mergePath = Path.Combine(path1, path2).Replace("\\", "/");
+            return mergePath;
         }
 
         #endregion
     }
 }
-
-#endif

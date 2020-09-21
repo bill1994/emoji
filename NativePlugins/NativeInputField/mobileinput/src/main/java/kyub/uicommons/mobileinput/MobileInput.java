@@ -306,7 +306,7 @@ public class MobileInput {
                 int pos = font.lastIndexOf(".");
                 if (pos > 0)
                     font = font.substring(0, pos);
-                
+
                 //Try Create From Font True Name
                 if (tf == null && !font.isEmpty()) {
                     try {
