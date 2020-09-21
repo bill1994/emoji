@@ -71,35 +71,66 @@ namespace Kyub.Internal.NativeInputPlugin
             PostScriptTableData table = new PostScriptTableData();
             try
             {
-                var tableFile = GetPostStriptTableStreamingAssetFilePath();
-                var www = UnityWebRequest.Get(tableFile);
-                var operation = www.SendWebRequest();
-                operation.completed += (result) =>
+                var tableFilePath = GetPostStriptTableStreamingAssetFilePath();
+                ReadAllText_Internal(tableFilePath, (json) =>
                 {
-                    if (www != null)
+                    if (!string.IsNullOrEmpty(json))
                     {
-                        if (!www.isNetworkError && !www.isHttpError && string.IsNullOrEmpty(www.error))
+                        try
                         {
-                            try
-                            {
-                                JsonUtility.FromJsonOverwrite(www.downloadHandler.text, table);
-                            }
-                            catch (System.Exception)
-                            {
-                                Debug.LogWarning("Failed to deserialize PostScriptTableData");
-                            }
+                            JsonUtility.FromJsonOverwrite(json, table);
                         }
-                        www.Dispose();
+                        catch (System.Exception)
+                        {
+                            Debug.LogWarning("Failed to deserialize PostScriptTableData");
+                        }
                     }
                     if (callback != null)
                         callback.Invoke(table);
-                };
+                });
             }
             catch
             {
                 if (callback != null)
                     callback.Invoke(table);
             }
+        }
+
+        static void ReadAllText_Internal(string url, System.Action<string> callback)
+        {
+            string filePath = System.IO.Path.Combine(Application.streamingAssetsPath, "MyFile");
+            string textResult = "";
+            if (filePath.Contains("://"))
+            {
+                var www = UnityWebRequest.Get(url);
+                var operation = www.SendWebRequest();
+                operation.completed += (result) =>
+                {
+                    if (www != null)
+                    {
+                        if (!www.isNetworkError && !www.isHttpError && string.IsNullOrEmpty(www.error))
+                            textResult = www.downloadHandler.text;
+
+                        www.Dispose();
+                    }
+
+                    if (callback != null)
+                        callback.Invoke(textResult == null ? string.Empty : textResult);
+                };
+                return;
+            }
+            else if (System.IO.File.Exists(url))
+            {
+                try
+                {
+                    textResult = System.IO.File.ReadAllText(filePath);
+                }
+                catch { }
+            }
+
+            if (callback != null)
+                callback.Invoke(textResult == null? string.Empty : textResult);
+
         }
 
         #endregion
