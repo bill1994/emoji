@@ -43,17 +43,19 @@ namespace KyubEditor.Internal.NativeInputPlugin
 
         public void OnPostGenerateGradleAndroidProject(string grandlePath)
         {
-            //Copy FontAssets to Gradle StreamingAssetPath
-            var fontPath = PathCombine(grandlePath, GetGradleFontRelativePath());
-            var fontFiles = GetAllUsedFont();
-            var ignoreNames = new HashSet<string>() {
+            //Android Default Fonts
+            var ignoredAndroidFonts = new HashSet<string>() {
                 "Roboto-Regular",
                 "Roboto-Light",
                 "Roboto-Thin",
                 "Roboto-Bold",
                 "Roboto-Medium"
             };
-            CopyToPath(fontPath, fontFiles);
+
+            //Copy FontAssets to Gradle StreamingAssetPath
+            var fontPath = PathCombine(grandlePath, GetGradleFontRelativePath());
+            var fontFiles = GetAllUsedFont();
+            CopyToPath(fontPath, fontFiles, ignoredAndroidFonts);
         }
 
 
@@ -61,18 +63,6 @@ namespace KyubEditor.Internal.NativeInputPlugin
         #endregion
 
         #region Helper Static Functions
-
-        protected static HashSet<string> FilterFiles(HashSet<string> files, HashSet<string> ignoredNames)
-        {
-            HashSet<string> filteredFiles = new HashSet<string>();
-            foreach (var file in files)
-            {
-                var fileWithoutExtension = Path.GetFileNameWithoutExtension(file);
-                if (string.IsNullOrEmpty(file) && !ignoredNames.Contains(fileWithoutExtension) && !ignoredNames.Contains(file))
-                    filteredFiles.Add(file);
-            }
-            return filteredFiles;
-        }
 
         protected static void AddFontsToXCodePlist(string xcodePath)
         {
@@ -134,7 +124,7 @@ namespace KyubEditor.Internal.NativeInputPlugin
             catch { }
         }
 
-        protected static HashSet<string> CopyToPath(string rootPath, HashSet<Font> fonts)
+        protected static HashSet<string> CopyToPath(string rootPath, HashSet<Font> fonts, HashSet<string> ignoreList = null)
         {
             HashSet<string> copyFiles = new HashSet<string>();
             if (fonts != null)
@@ -147,21 +137,32 @@ namespace KyubEditor.Internal.NativeInputPlugin
                     var filePath = AssetDatabase.GetAssetPath(font);
                     var postScriptName = GeneratePostScriptName(filePath);
                     table.AddEntry(font, postScriptName);
-                    var copyPath = PathCombine(rootPath, postScriptName);
-                    try
+
+                    var postScriptNameWithoutExtension = Path.GetFileNameWithoutExtension(postScriptName);
+                    if (!string.IsNullOrEmpty(postScriptName) &&
+                        (ignoreList == null ||
+                        ignoreList.Count == 0 ||
+                        (!ignoreList.Contains(postScriptName) && !ignoreList.Contains(postScriptNameWithoutExtension))))
                     {
-                        if (!File.Exists(copyPath))
+                        var copyPath = PathCombine(rootPath, postScriptName);
+                        try
                         {
-                            File.Copy(filePath, copyPath, false);
-                            copyFiles.Add(copyPath);
+                            if (!File.Exists(copyPath))
+                            {
+                                File.Copy(filePath, copyPath, false);
+                                copyFiles.Add(copyPath);
+                            }
                         }
+                        catch { }
                     }
-                    catch { }
                 }
 
-                var postScriptTablePath = PathCombine(rootPath, PostScriptNameUtils.POST_SCRIPT_TABLE);
-                copyFiles.Add(postScriptTablePath);
-                File.WriteAllText(postScriptTablePath, JsonUtility.ToJson(table));
+                if (table.Table.Count > 0)
+                {
+                    var postScriptTablePath = PathCombine(rootPath, PostScriptNameUtils.POST_SCRIPT_TABLE);
+                    copyFiles.Add(postScriptTablePath);
+                    File.WriteAllText(postScriptTablePath, JsonUtility.ToJson(table));
+                }
             }
 
             return copyFiles;
