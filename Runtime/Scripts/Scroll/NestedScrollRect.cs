@@ -36,6 +36,16 @@ namespace Kyub.UI
 
         #endregion
 
+        #region Constructors
+
+        public NestedScrollRect()
+        {
+            scrollSensitivity = 20;
+            decelerationRate = 0.3f;
+        }
+
+        #endregion
+
         #region Unity Functions
 
         /// <summary>
