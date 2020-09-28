@@ -9,8 +9,8 @@ namespace Kyub.UI
     {
         #region Private Variables
 
-        [SerializeField, Tooltip("Apply reload in next cycle (can cause layout inconsistencies)")]
-        private bool m_delayedReload = false;
+        //[SerializeField, Tooltip("Apply reload in next cycle (can cause layout inconsistencies)")]
+        //private bool m_delayedReload = false;
 
         protected ScrollDataView.ReloadEventArgs _cachedReloadEventArgs = new ScrollDataView.ReloadEventArgs() { LayoutElementIndex = -1, DataIndex = -1 };
 
@@ -66,7 +66,7 @@ namespace Kyub.UI
             }
         }
 
-        public bool DelayedReload
+        /*public bool DelayedReload
         {
             get
             {
@@ -79,7 +79,7 @@ namespace Kyub.UI
                     return;
                 m_delayedReload = value;
             }
-        }
+        }*/
 
         #endregion
 
@@ -91,7 +91,7 @@ namespace Kyub.UI
 
         protected virtual void OnDisable()
         {
-            _reloadRoutine = null;
+            //_reloadRoutine = null;
         }
 
         #endregion
@@ -110,14 +110,18 @@ namespace Kyub.UI
 
         #region Internal Helper Functions
 
-        Coroutine _reloadRoutine = null;
+        //Coroutine _reloadRoutine = null;
         protected void Reload(ScrollDataView.ReloadEventArgs args)
         {
             var oldArgs = _cachedReloadEventArgs;
             _cachedReloadEventArgs = args;
 
+            ApplyReload(oldArgs, args);
+            if (OnReload != null)
+                OnReload.Invoke();
+
             //Cancel previous reloads
-            if (_reloadRoutine != null)
+            /*if (_reloadRoutine != null)
             {
                 StopCoroutine(_reloadRoutine);
                 _reloadRoutine = null;
@@ -133,10 +137,10 @@ namespace Kyub.UI
             {
                 //Execute Synchronously
                 while (routine.MoveNext()) { }
-            }
+            }*/
         }
 
-        protected virtual IEnumerator ReloadRoutine(ScrollDataView.ReloadEventArgs oldArgs, ScrollDataView.ReloadEventArgs newArgs)
+        /*protected virtual IEnumerator ReloadRoutine(ScrollDataView.ReloadEventArgs oldArgs, ScrollDataView.ReloadEventArgs newArgs)
         {
             yield return null;
             ApplyReload(oldArgs, newArgs);
@@ -144,7 +148,7 @@ namespace Kyub.UI
                 OnReload.Invoke();
 
             _reloadRoutine = null;
-        }
+        }*/
 
         /// <summary>
         /// Override this function to implement your own custom logic to reload
@@ -155,7 +159,7 @@ namespace Kyub.UI
 
         protected virtual bool IsReloading()
         {
-            return _reloadRoutine != null;
+            return false; //_reloadRoutine != null;
         }
 
         #endregion
