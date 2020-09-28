@@ -86,6 +86,12 @@ namespace MaterialUI
             TryInstantiateContent();
         }
 
+        protected override void OnEnable()
+        {
+            RegisterEvents();
+            base.OnEnable();
+        }
+
         protected override void Start()
         {
             base.Start();
@@ -102,6 +108,12 @@ namespace MaterialUI
             {
                 TryInit();
             }
+        }
+
+        protected override void OnDisable()
+        {
+            UnregisterEvents();
+            base.OnDisable();
         }
 
         protected override void OnDestroy()
@@ -159,9 +171,34 @@ namespace MaterialUI
                 RefreshContentChildrenDelayed();
         }
 
+        protected virtual void OnCanvasAreaChanged(bool scaleChanged, bool orientationChanged)
+        {
+            if (scaleChanged || orientationChanged)
+            {
+                ClearCachedInteropInfos();
+                _LastSafeArea = new Rect(0, 0, 0, 0);
+                TryInit();
+            }
+        }
+
         #endregion
 
         #region Helper Functions
+
+        protected virtual void RegisterEvents()
+        {
+            UnregisterEvents();
+            var canvasScaler = GetComponentInParent<MaterialCanvasScaler>();
+            if (canvasScaler != null)
+                canvasScaler.onCanvasAreaChanged.AddListener(OnCanvasAreaChanged);
+        }
+
+        protected virtual void UnregisterEvents()
+        {
+            var canvasScaler = GetComponentInParent<MaterialCanvasScaler>();
+            if (canvasScaler != null)
+                canvasScaler.onCanvasAreaChanged.RemoveListener(OnCanvasAreaChanged);
+        }
 
         protected virtual void RefreshContentChildrenDelayed()
         {
@@ -296,7 +333,7 @@ namespace MaterialUI
             else
             {
                 Rect safeArea = Screen.safeArea;
-                if (Application.isEditor)
+                if (Application.isEditor && Screen.safeArea == nsa)
                 {
 #if UNITY_EDITOR
                     nsa = EditorSafeAreaSimulator.GetNormalizedSafeArea();
