@@ -25,6 +25,11 @@ namespace Kyub.UI
         bool IsDestroyed();
     }
 
+    public interface IDelayedReloadableDataViewElement : IReloadableDataViewElement
+    {
+        bool IsReloading();
+    }
+
     public class ScrollDataView : MonoBehaviour
     {
         #region Helper Classes
