@@ -100,7 +100,7 @@ namespace Kyub.UI
             _routeToParent = false;
         }
 
-        protected override void LateUpdate()
+        /*protected override void LateUpdate()
         {
             if (!content)
                 return;
@@ -171,7 +171,7 @@ namespace Kyub.UI
             }
             UpdateScrollbarVisibility();
             Scrolling = false;
-        }
+        }*/
 
         #endregion
 
@@ -339,9 +339,9 @@ namespace Kyub.UI
 
         #endregion
 
-        #region Scroll Helper Functions
+        #region ScrollRect Hidden Static Functions
 
-        internal static Vector2 InternalCalculateOffset(Bounds viewBounds, ref Bounds contentBounds, bool horizontal, bool vertical, MovementType movementType, ref Vector2 delta)
+        protected internal static Vector2 InternalCalculateOffset(Bounds viewBounds, ref Bounds contentBounds, bool horizontal, bool vertical, MovementType movementType, ref Vector2 delta)
         {
             Vector2 offset = Vector2.zero;
             if (movementType == MovementType.Unrestricted)
