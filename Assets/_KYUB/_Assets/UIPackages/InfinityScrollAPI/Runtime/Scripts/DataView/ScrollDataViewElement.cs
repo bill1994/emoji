@@ -111,10 +111,10 @@ namespace Kyub.UI
         #region Internal Helper Functions
 
         Coroutine _reloadRoutine = null;
-        protected void Reload(ScrollDataView.ReloadEventArgs p_args)
+        protected void Reload(ScrollDataView.ReloadEventArgs args)
         {
-            var v_oldArgs = _cachedReloadEventArgs;
-            _cachedReloadEventArgs = p_args;
+            var oldArgs = _cachedReloadEventArgs;
+            _cachedReloadEventArgs = args;
 
             //Cancel previous reloads
             if (_reloadRoutine != null)
@@ -123,23 +123,23 @@ namespace Kyub.UI
                 _reloadRoutine = null;
             }
 
-            var v_routine = ReloadRoutine(v_oldArgs, p_args);
+            var routine = ReloadRoutine(oldArgs, args);
             //Execure Delayed
             if (m_delayedReload && enabled && gameObject.activeInHierarchy)
             {
-                _reloadRoutine = StartCoroutine(v_routine);
+                _reloadRoutine = StartCoroutine(routine);
             }
             else
             {
                 //Execute Synchronously
-                while (v_routine.MoveNext()) { }
+                while (routine.MoveNext()) { }
             }
         }
 
-        protected virtual IEnumerator ReloadRoutine(ScrollDataView.ReloadEventArgs p_oldArgs, ScrollDataView.ReloadEventArgs p_newArgs)
+        protected virtual IEnumerator ReloadRoutine(ScrollDataView.ReloadEventArgs oldArgs, ScrollDataView.ReloadEventArgs newArgs)
         {
             yield return null;
-            ApplyReload(p_oldArgs, p_newArgs);
+            ApplyReload(oldArgs, newArgs);
             if (OnReload != null)
                 OnReload.Invoke();
 
@@ -149,8 +149,13 @@ namespace Kyub.UI
         /// <summary>
         /// Override this function to implement your own custom logic to reload
         /// </summary>
-        protected virtual void ApplyReload(ScrollDataView.ReloadEventArgs p_oldArgs, ScrollDataView.ReloadEventArgs p_newArgs)
+        protected virtual void ApplyReload(ScrollDataView.ReloadEventArgs oldArgs, ScrollDataView.ReloadEventArgs newArgs)
         {
+        }
+
+        protected virtual bool IsReloading()
+        {
+            return _reloadRoutine != null;
         }
 
         #endregion
@@ -159,12 +164,12 @@ namespace Kyub.UI
 
         bool IDelayedReloadableDataViewElement.IsReloading()
         {
-            return _reloadRoutine != null;
+            return IsReloading();
         }
 
-        void IReloadableDataViewElement.Reload(ScrollDataView.ReloadEventArgs p_args)
+        void IReloadableDataViewElement.Reload(ScrollDataView.ReloadEventArgs args)
         {
-            Reload(p_args);
+            Reload(args);
         }
 
         bool IReloadableDataViewElement.IsDestroyed()
