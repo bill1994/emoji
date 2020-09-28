@@ -5,7 +5,7 @@ using UnityEngine.Events;
 namespace Kyub.UI
 {
 
-    public class ScrollDataViewElement : MonoBehaviour, IReloadableDataViewElement
+    public class ScrollDataViewElement : MonoBehaviour, IDelayedReloadableDataViewElement
     {
         #region Private Variables
 
@@ -156,6 +156,11 @@ namespace Kyub.UI
         #endregion
 
         #region Interface Implementations
+
+        bool IDelayedReloadableDataViewElement.IsReloading()
+        {
+            return _reloadRoutine != null;
+        }
 
         void IReloadableDataViewElement.Reload(ScrollDataView.ReloadEventArgs p_args)
         {

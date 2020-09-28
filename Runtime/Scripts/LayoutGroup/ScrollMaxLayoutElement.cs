@@ -159,8 +159,22 @@ namespace Kyub.UI
             CancelInvoke("ApplyElementSize");
             if (ScrollLayoutGroup != null && LayoutElementIndex >= 0 && _isVisible)
             {
-                ScrollLayoutGroup.SetCachedElementSize(LayoutElementIndex, ScrollLayoutGroup.CalculateElementSize(transform, ScrollLayoutGroup.IsVertical()));
+                if (IsReloading())
+                    SetElementSizeDirty();
+                else
+                    ScrollLayoutGroup.SetCachedElementSize(LayoutElementIndex, ScrollLayoutGroup.CalculateElementSize(transform, ScrollLayoutGroup.IsVertical()));
             }
+        }
+
+        protected bool IsReloading()
+        {
+            var delayedElements = GetComponents<IDelayedReloadableDataViewElement>();
+            foreach (var delayedElement in delayedElements)
+            {
+                if (delayedElement != null && !delayedElement.IsDestroyed() && delayedElement.IsReloading())
+                    return true;
+            }
+            return false;
         }
 
         #endregion
