@@ -173,11 +173,13 @@ namespace MaterialUI
 
         protected virtual void OnCanvasAreaChanged(bool scaleChanged, bool orientationChanged)
         {
-            if (scaleChanged || orientationChanged)
+            if (!scaleChanged && !orientationChanged)
+                return;
+
+            if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
             {
                 ClearCachedInteropInfos();
-                _LastSafeArea = new Rect(0, 0, 0, 0);
-                TryInit();
+                Refresh();
             }
         }
 
