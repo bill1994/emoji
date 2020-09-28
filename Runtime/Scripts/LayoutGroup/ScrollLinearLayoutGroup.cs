@@ -162,7 +162,7 @@ namespace Kyub.UI
 
         public override void CalculateLayoutInputHorizontal()
         {
-            TryRecalculateLayout();
+            //TryRecalculateLayout();
             var isVertical = IsVertical();
             if (isVertical && !IsFullRecalcRequired())
                 CalculateAnotherAxisPreferredSize(isVertical);
