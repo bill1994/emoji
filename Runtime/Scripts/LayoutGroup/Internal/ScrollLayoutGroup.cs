@@ -1505,7 +1505,7 @@ namespace Kyub.UI
         protected Vector2 _layoutSize = new Vector2(-1, -1);
         public virtual void CalculateLayoutInputHorizontal()
         {
-            TryRecalculateLayout();
+            //TryRecalculateLayout();
             _layoutSize = new Vector2(GetLocalWidth(Content), _layoutSize.y);
         }
 
