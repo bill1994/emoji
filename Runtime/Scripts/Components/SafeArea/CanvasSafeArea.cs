@@ -266,7 +266,7 @@ namespace MaterialUI
                         rectChild.anchorMax = anchorMax;
                     }
                     else
-                        rectChild.localPosition = anchoredPosition3D;
+                        child.localPosition = anchoredPosition3D;
                 }
             }
             _isExecutingRefreshContentChildren = false;
