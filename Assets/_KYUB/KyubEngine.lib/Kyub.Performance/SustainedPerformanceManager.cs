@@ -409,19 +409,19 @@ namespace Kyub.Performance
             if (s_instance == this)
             {
                 s_isEndOfFrame = false;
-/*#if UNITY_EDITOR
-                if (!_isHighPerformance )
-                {
-                    var editorForceInvalidate = false;
-                    var cameraCurrent = Camera.current;
-                    if (cameraCurrent != null && cameraCurrent.name == "SceneCamera" && !cameraCurrent.scene.IsValid())
-                        editorForceInvalidate = true;
-                    if (editorForceInvalidate)
-                    {
-                        _performanceIsDirty = true;
-                    }
-                }
-#endif*/
+                /*#if UNITY_EDITOR
+                                if (!_isHighPerformance )
+                                {
+                                    var editorForceInvalidate = false;
+                                    var cameraCurrent = Camera.current;
+                                    if (cameraCurrent != null && cameraCurrent.name == "SceneCamera" && !cameraCurrent.scene.IsValid())
+                                        editorForceInvalidate = true;
+                                    if (editorForceInvalidate)
+                                    {
+                                        _performanceIsDirty = true;
+                                    }
+                                }
+                #endif*/
                 TryCheckDynamicElements();
                 TryApplyPerformanceUpdate();
             }
@@ -579,7 +579,7 @@ namespace Kyub.Performance
             CallOnAfterSetPerformance();
 
 #if SUPPORT_ONDEMAND_RENDERING
-            var useOnDemandRendering = RenderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering);
+            var useOnDemandRendering = RenderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering) && !RequiresConstantRepaint && !RequiresConstantBufferRepaint;
             if (useOnDemandRendering)
             {
                 var renderFrameInterval = Mathf.Max(Application.targetFrameRate / Mathf.Max(QualitySettings.vSyncCount + 1, 1), minFramerate);
@@ -746,7 +746,7 @@ namespace Kyub.Performance
         protected IEnumerator OnAfterDrawBufferRoutine(int invalidCullingMask)
         {
             invalidCullingMask |= s_invalidCullingMask;
- 
+
             CheckBufferTextures();
             var bufferCameraViews = PrepareCameraViewsToDrawInBuffer(invalidCullingMask);
             if (s_isEndOfFrame)
