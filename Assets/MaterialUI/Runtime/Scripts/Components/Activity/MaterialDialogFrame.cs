@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Kyub;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -95,8 +96,11 @@ namespace MaterialUI
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
             //Validate activity After deserialize
-            if (m_activity != null && !transform.IsChildOf(m_activity.transform))
-                m_activity = null;
+            ApplicationContext.RunOnMainThread((GetHashCode() + "OnAfterDeserialize").GetHashCode(), () =>
+            {
+                if (this != null && m_activity != null && !transform.IsChildOf(m_activity.transform))
+                    m_activity = null;
+            });
         }
 
         #endregion

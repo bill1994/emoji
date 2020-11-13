@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
+using UnityEditor.SceneManagement;
+using UnityEditor.Experimental.SceneManagement;
+using UnityEngine.SceneManagement;
 
 namespace MaterialUI
 {
@@ -86,10 +89,16 @@ namespace MaterialUI
 
             CreateCanvasIfNeeded();
 
+            // Setting the element to be a child of an element already in the scene should
+            // be sufficient to also move the element to that scene.
+            SceneManager.MoveGameObjectToScene(m_LastInstance, m_SelectedObject.scene);
+
             m_LastInstance.transform.SetParent(m_SelectedObject.transform);
             m_LastInstance.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             m_LastInstance.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
             Selection.activeObject = m_LastInstance;
+
+
 
             Undo.RegisterCreatedObjectUndo(m_LastInstance, "create " + m_LastInstance.name);
         }
@@ -104,7 +113,7 @@ namespace MaterialUI
 
             if (m_SelectedObject)
             {
-                if (GameObject.Find(m_SelectedObject.name))
+                if (m_SelectedObject.scene.IsValid())
                 {
                     m_NotCanvas = m_SelectedObject.GetComponentInParent<Canvas>() == null;
                 }
@@ -120,25 +129,35 @@ namespace MaterialUI
 
             if (m_NotCanvas)
             {
-                if (!Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>())
+                Canvas[] canvasArray = StageUtility.GetCurrentStageHandle().FindComponentsOfType<Canvas>();
+                for (int i = 0; i < canvasArray.Length; i++)
                 {
-                    Object.Instantiate(AssetDatabase.LoadAssetAtPath(mainFolderPath + "Common/EventSystem.prefab", typeof(GameObject))).name = "EventSystem";
-                }
-
-                Canvas[] canvases = Object.FindObjectsOfType<Canvas>();
-
-                for (int i = 0; i < canvases.Length; i++)
-                {
-                    if (canvases[i].isRootCanvas)
+                    if (canvasArray[i].isRootCanvas)
                     {
-                        m_SelectedObject = canvases[i].gameObject;
+                        m_SelectedObject = canvasArray[i].gameObject;
                     }
                 }
+
+                // If in Prefab Mode, Canvas has to be part of Prefab contents,
+                // otherwise use Prefab root instead.
+                PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+                if (prefabStage != null && !prefabStage.IsPartOfPrefabContents(m_SelectedObject))
+                    m_SelectedObject = prefabStage.prefabContentsRoot;
+
                 if (!m_SelectedObject)
                 {
                     m_SelectedObject = Object.Instantiate(AssetDatabase.LoadAssetAtPath(mainFolderPath + "Common/Canvas.prefab", typeof(GameObject))) as GameObject;
+                    StageUtility.PlaceGameObjectInCurrentStage(m_SelectedObject);
                     m_SelectedObject.name = "Canvas";
                 }
+
+                if (canvasArray.Length == 0)
+                {
+                    var eventSystem = Object.Instantiate(AssetDatabase.LoadAssetAtPath(mainFolderPath + "Common/EventSystem.prefab", typeof(GameObject))) as GameObject;
+                    eventSystem.name = "EventSystem";
+                    StageUtility.PlaceGameObjectInCurrentStage(eventSystem);
+                }
+
             }
         }
 
