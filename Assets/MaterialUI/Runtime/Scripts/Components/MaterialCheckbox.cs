@@ -102,7 +102,7 @@ namespace MaterialUI
             base.TurnOnInstant();
             if (m_Toggle != null)
             {
-                if (m_Toggle.interactable)
+                if (IsInteractable())
                 {
                     AnimOnComplete();
                 }
@@ -131,7 +131,7 @@ namespace MaterialUI
 
             if (m_Toggle != null)
             {
-                if (m_Toggle.interactable)
+                if (IsInteractable())
                 {
                     AnimOffComplete();
                 }
@@ -172,10 +172,11 @@ namespace MaterialUI
         {
             base.AnimOn();
 
-            if(checkImage != null)
-                checkImage.color = Tween.QuintOut(m_CurrentColor, onColor, m_AnimDeltaTime, m_AnimationDuration);
+            var isInteractable = IsInteractable();
+            if (checkImage != null)
+                checkImage.color = Tween.QuintOut(m_CurrentColor, isInteractable ? onColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
             if(frameImage != null)
-                frameImage.color = Tween.QuintOut(m_CurrentFrameColor, onColor, m_AnimDeltaTime, m_AnimationDuration);
+                frameImage.color = Tween.QuintOut(m_CurrentFrameColor, isInteractable ? onColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
 
             float tempSize = Tween.QuintOut(m_CurrentCheckSize, m_AnimationSize, m_AnimDeltaTime, m_AnimationDuration);
 
@@ -187,10 +188,11 @@ namespace MaterialUI
         {
             base.AnimOnComplete();
 
-            if(checkImage != null)
-                checkImage.color = onColor;
+            var isInteractable = IsInteractable();
+            if (checkImage != null)
+                checkImage.color = isInteractable ? onColor : disabledColor;
             if (frameImage != null)
-                frameImage.color = onColor;
+                frameImage.color = isInteractable ? onColor : disabledColor;
 
             if (checkRectTransform != null)
                 checkRectTransform.sizeDelta = new Vector2(m_AnimationSize, m_AnimationSize);
@@ -200,10 +202,11 @@ namespace MaterialUI
         {
             base.AnimOff();
 
+            var isInteractable = IsInteractable();
             if (checkImage != null)
-                checkImage.color = Tween.QuintOut(m_CurrentColor, offColor, m_AnimDeltaTime, m_AnimationDuration);
+                checkImage.color = Tween.QuintOut(m_CurrentColor, isInteractable ? offColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
             if (frameImage != null)
-                frameImage.color = Tween.QuintOut(m_CurrentFrameColor, offColor, m_AnimDeltaTime, m_AnimationDuration);
+                frameImage.color = Tween.QuintOut(m_CurrentFrameColor, isInteractable ? offColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
 
             float tempSize = Tween.QuintOut(m_CurrentCheckSize, 0, m_AnimDeltaTime, m_AnimationDuration);
 
@@ -215,10 +218,11 @@ namespace MaterialUI
         {
             base.AnimOffComplete();
 
+            var isInteractable = IsInteractable();
             if (checkImage != null)
-                checkImage.color = offColor;
+                checkImage.color = isInteractable ? offColor : disabledColor;
             if (frameImage != null)
-                frameImage.color = offColor;
+                frameImage.color = isInteractable ? offColor : disabledColor;
 
             if (checkRectTransform != null)
                 checkRectTransform.sizeDelta = new Vector2(0, 0);
