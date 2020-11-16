@@ -162,10 +162,17 @@ namespace MaterialUI
         {
             base.ApplyInteractableOff();
 
-            if(checkImage != null)
-                checkImage.color = disabledColor;
-            if(frameImage != null)
-                frameImage.color = disabledColor;
+            if (m_Toggle != null)
+            {
+                if (m_Toggle.isOn)
+                {
+                    AnimOnComplete();
+                }
+                else
+                {
+                    AnimOffComplete();
+                }
+            }
         }
 
         protected override void AnimOn()

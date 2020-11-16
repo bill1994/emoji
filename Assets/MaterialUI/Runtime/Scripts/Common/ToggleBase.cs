@@ -390,7 +390,7 @@ namespace MaterialUI
                     m_Interactable = value;
                     toggle.interactable = value;
 
-                    if (value)
+                    if (value && IsInteractable())
                     {
                         ApplyInteractableOn();
                     }
@@ -567,10 +567,25 @@ namespace MaterialUI
 #endif
         }
 
+        protected bool _isChangingCanvasGroup = false;
         protected override void OnCanvasGroupChanged()
         {
-            base.OnCanvasGroupChanged();
-            ApplyCanvasGroupChanged();
+            if (!_isChangingCanvasGroup)
+            {
+                try
+                {
+                    _isChangingCanvasGroup = true;
+                    base.OnCanvasGroupChanged();
+                    ApplyCanvasGroupChanged();
+
+                    UpdateColorToggleState(false);
+                    UpdateGraphicToggleState();
+                }
+                finally
+                {
+                    _isChangingCanvasGroup = false;
+                }
+            }
         }
 
 #if UNITY_EDITOR
@@ -587,6 +602,7 @@ namespace MaterialUI
             if (m_Toggle != null && m_Toggle.group != null && m_Group != null)
                 m_Toggle.group = null;
 
+            ApplyCanvasGroupChanged();
             UpdateColorToggleState(false);
             UpdateGraphicToggleState();
         }
@@ -668,14 +684,11 @@ namespace MaterialUI
                         TurnOffInstant();
                 }
             }
-            if (m_Interactable)
-            {
-                if(m_Interactable)
-                    ApplyInteractableOn();
-                else
-                    ApplyInteractableOff();
-            }
-            ApplyInteractableOn();
+            bool interactable = IsInteractable();
+            if (interactable)
+                ApplyInteractableOn();
+            else
+                ApplyInteractableOff();
         }
 
         public override void RefreshVisualStyles(bool p_canAnimate = true)
@@ -771,7 +784,8 @@ namespace MaterialUI
 
         public virtual void TurnOnInstant()
         {
-            if (m_Interactable)
+            bool interactable = m_Interactable;
+            if (interactable)
             {
                 SetOnColor();
             }
@@ -801,7 +815,8 @@ namespace MaterialUI
 
         public virtual void TurnOffInstant()
         {
-            if (m_Interactable)
+            bool interactable = m_Interactable;
+            if (interactable)
             {
                 SetOffColor();
             }
@@ -854,7 +869,8 @@ namespace MaterialUI
             Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             if (m_Graphic && changeGraphicColor)
             {
-                m_Graphic.color = Tween.QuintSoftOut(m_CurrentGraphicColor, m_Interactable ? m_GraphicOnColor : m_GraphicDisabledColor, m_AnimDeltaTime, m_AnimationDuration);
+                var isInteractable = IsInteractable();
+                m_Graphic.color = Tween.QuintSoftOut(m_CurrentGraphicColor, isInteractable ? m_GraphicOnColor : m_GraphicDisabledColor, m_AnimDeltaTime, m_AnimationDuration);
             }
             if (m_ChangeRippleColor && m_MaterialRipple != null)
             {
@@ -874,7 +890,7 @@ namespace MaterialUI
             Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             if (m_Graphic && m_ChangeGraphicColor)
             {
-                m_Graphic.color = Tween.QuintSoftOut(m_CurrentGraphicColor, m_Interactable ? m_GraphicOffColor : m_GraphicDisabledColor, m_AnimDeltaTime, m_AnimationDuration * 0.75f);
+                m_Graphic.color = Tween.QuintSoftOut(m_CurrentGraphicColor, IsInteractable() ? m_GraphicOffColor : m_GraphicDisabledColor, m_AnimDeltaTime, m_AnimationDuration * 0.75f);
             }
             if (m_ChangeRippleColor && m_MaterialRipple != null)
             {
@@ -894,7 +910,7 @@ namespace MaterialUI
             RefreshVisualStyles(false);
             if (m_Graphic && m_ChangeGraphicColor)
             {
-                m_Graphic.color = m_Interactable ? m_GraphicOnColor : m_GraphicDisabledColor;
+                m_Graphic.color = IsInteractable() ? m_GraphicOnColor : m_GraphicDisabledColor;
             }
             if (materialRipple && m_ChangeRippleColor)
             {
@@ -907,7 +923,7 @@ namespace MaterialUI
             RefreshVisualStyles(false);
             if (m_Graphic && m_ChangeGraphicColor)
             {
-                m_Graphic.color = m_Interactable ? m_GraphicOffColor : m_GraphicDisabledColor;
+                m_Graphic.color = IsInteractable() ? m_GraphicOffColor : m_GraphicDisabledColor;
             }
             if (materialRipple && m_ChangeRippleColor)
             {
@@ -1037,29 +1053,29 @@ namespace MaterialUI
 
             #region Helper Functions
 
-            public override void Tween(BaseStyleElement p_sender, bool p_canAnimate, float p_animationDuration)
+            public override void Tween(BaseStyleElement sender, bool canAnimate, float animationDuration)
             {
                 TweenManager.EndTween(_tweenId);
 
-                var v_graphic = GetTarget<Graphic>();
-                if (v_graphic != null)
+                var graphic = GetTarget<Graphic>();
+                if (graphic != null)
                 {
-                    var v_toggleBase = p_sender as ToggleBase;
-                    var v_isActive = v_toggleBase != null ? v_toggleBase.toggle.isOn : true;
-                    var v_isInteractable = v_toggleBase != null? v_toggleBase.m_Interactable : true;
+                    var toggleBase = sender as ToggleBase;
+                    var isActive = toggleBase != null ? toggleBase.toggle.isOn : true;
+                    var isInteractable = toggleBase != null? toggleBase.IsInteractable() : true;
 
-                    var v_endColor = !v_isInteractable ? m_colorDisabled : (v_isActive ? m_colorOn : m_colorOff);
-                    if (p_canAnimate && Application.isPlaying)
+                    var v_endColor = !isInteractable ? m_colorDisabled : (isActive ? m_colorOn : m_colorOff);
+                    if (canAnimate && Application.isPlaying)
                     {
                         _tweenId = TweenManager.TweenColor(
                                 (color) =>
                                 {
-                                    if (v_graphic != null)
-                                        v_graphic.color = color;
+                                    if (graphic != null)
+                                        graphic.color = color;
                                 },
-                                v_graphic.color,
+                                graphic.color,
                                 v_endColor,
-                                p_animationDuration,
+                                animationDuration,
                                 0,
                                 null,
                                 false, 
@@ -1069,7 +1085,7 @@ namespace MaterialUI
                     }
                     else
                     {
-                        v_graphic.color = v_endColor;
+                        graphic.color = v_endColor;
                     }
                 }
             }
