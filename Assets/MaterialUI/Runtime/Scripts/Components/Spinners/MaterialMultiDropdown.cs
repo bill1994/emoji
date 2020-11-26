@@ -27,6 +27,9 @@ namespace MaterialUI
         [System.Serializable]
         public class MaterialMultiDropdownEvent : UnityEvent<int[]> { }
 
+        [System.Serializable]
+        public class DialogCheckboxUnityEvent : UnityEvent<DialogCheckboxList> { }
+
         #endregion
 
         #region Private Variables
@@ -63,7 +66,9 @@ namespace MaterialUI
 
         #region Callbacks
 
-        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_OnItemsSelected")]
+        public DialogCheckboxUnityEvent OnShowCheckboxDialogCallback = new DialogCheckboxUnityEvent();
+        [Space]
+        [UnityEngine.Serialization.FormerlySerializedAs("m_OnItemsSelected")]
         public MaterialMultiDropdownEvent OnItemsSelected = new MaterialMultiDropdownEvent();
 
         #endregion
@@ -284,11 +289,17 @@ namespace MaterialUI
             ShowFrameActivity(_CacheDialogList, prefabAddress, (dialog, isDialog) =>
             {
                 _CacheDialogList = dialog;
-                if (isDialog)
-                    dialog.Initialize(options.ToArray(), Select, "OK", hintOption.text, hintOption.imageData, HandleOnHide, "Cancel", selectedIndexes);
-                //Dont show title in Dropdown Mode
-                else
-                    dialog.Initialize(options.ToArray(), Select, "OK", null, null, HandleOnHide, "Cancel", selectedIndexes);
+                if (dialog != null)
+                {
+                    if (isDialog)
+                        dialog.Initialize(options.ToArray(), Select, "OK", hintOption.text, hintOption.imageData, HandleOnHide, "Cancel", selectedIndexes);
+                    //Dont show title in Dropdown Mode
+                    else
+                        dialog.Initialize(options.ToArray(), Select, "OK", null, null, HandleOnHide, "Cancel", selectedIndexes);
+
+                    if (this != null && OnShowCheckboxDialogCallback != null)
+                        OnShowCheckboxDialogCallback.Invoke(dialog);
+                }
             });
         }
 

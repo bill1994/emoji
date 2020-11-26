@@ -37,6 +37,7 @@ namespace MaterialUI
         private SerializedProperty m_SelectedIndex;
 
         private SerializedProperty OnCancelCallback;
+        private SerializedProperty OnShowCallback;
         private SerializedProperty OnItemSelected;
 
         SerializedProperty m_OptionDataList = null;
@@ -70,6 +71,7 @@ namespace MaterialUI
             m_AllowSwitchOff = serializedObject.FindProperty("m_AllowSwitchOff");
 
             OnCancelCallback = serializedObject.FindProperty("OnCancelCallback");
+            OnShowCallback = serializedObject.FindProperty("OnShowRadioDialogCallback");
             OnItemSelected = serializedObject.FindProperty("OnItemSelected");
         }
 
@@ -116,6 +118,7 @@ namespace MaterialUI
 
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(OnItemSelected);
+            EditorGUILayout.PropertyField(OnShowCallback);
             EditorGUILayout.PropertyField(OnCancelCallback);
 
             EditorGUILayout.Space();

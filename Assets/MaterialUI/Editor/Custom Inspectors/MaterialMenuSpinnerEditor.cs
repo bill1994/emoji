@@ -27,6 +27,7 @@ namespace MaterialUI
         private SerializedProperty m_CustomFramePrefabAddress;
 
         private SerializedProperty OnCancelCallback;
+        private SerializedProperty OnShowCallback;
 
         protected override void OnEnable()
         {
@@ -42,6 +43,7 @@ namespace MaterialUI
             m_DropdownFramePreferredSize = serializedObject.FindProperty("m_DropdownFramePreferredSize");
             m_CustomFramePrefabAddress = serializedObject.FindProperty("m_CustomFramePrefabAddress");
             OnCancelCallback = serializedObject.FindProperty("OnCancelCallback");
+            OnShowCallback = serializedObject.FindProperty("OnShowMenuCallback");
         }
 
         public override void OnInspectorGUI()
@@ -72,6 +74,7 @@ namespace MaterialUI
             EditorGUI.indentLevel--;
 
             EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(OnShowCallback);
             EditorGUILayout.PropertyField(OnCancelCallback);
 
             EditorGUILayout.Space();

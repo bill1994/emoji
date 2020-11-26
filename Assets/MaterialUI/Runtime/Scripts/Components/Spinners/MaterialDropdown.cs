@@ -24,6 +24,9 @@ namespace MaterialUI
         [System.Serializable]
         public class MaterialDropdownEvent : UnityEvent<int> { }
 
+        [System.Serializable]
+        public class DialogRadioUnityEvent : UnityEvent<DialogRadioList> { }
+
         #endregion
 
         #region Private Variables
@@ -59,7 +62,9 @@ namespace MaterialUI
 
         #region Callbacks
 
-        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_OnItemSelected")]
+        public DialogRadioUnityEvent OnShowRadioDialogCallback = new DialogRadioUnityEvent();
+        [Space]
+        [UnityEngine.Serialization.FormerlySerializedAs("m_OnItemSelected")]
         public MaterialDropdownEvent OnItemSelected = new MaterialDropdownEvent();
 
         #endregion
@@ -251,11 +256,17 @@ namespace MaterialUI
             ShowFrameActivity(_CacheDialogList, prefabAddress, (dialog, isDialog) => 
             {
                 _CacheDialogList = dialog;
-                if(isDialog)
-                    dialog.Initialize(options.ToArray(), Select, "OK", hintOption.text, hintOption.imageData, HandleOnHide, "Cancel", selectedIndex, allowSwitchOff);
-                //Dont show title in Dropdown Mode
-                else
-                    dialog.Initialize(options.ToArray(), Select, "OK", null, null, HandleOnHide, "Cancel", selectedIndex, allowSwitchOff);
+                if (dialog != null)
+                {
+                    if (isDialog)
+                        dialog.Initialize(options.ToArray(), Select, "OK", hintOption.text, hintOption.imageData, HandleOnHide, "Cancel", selectedIndex, allowSwitchOff);
+                    //Dont show title in Dropdown Mode
+                    else
+                        dialog.Initialize(options.ToArray(), Select, "OK", null, null, HandleOnHide, "Cancel", selectedIndex, allowSwitchOff);
+
+                    if (this != null && OnShowRadioDialogCallback != null)
+                        OnShowRadioDialogCallback.Invoke(dialog);
+                }
             });
         }
 

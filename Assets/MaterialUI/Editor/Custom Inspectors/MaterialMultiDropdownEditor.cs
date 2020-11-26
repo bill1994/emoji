@@ -37,6 +37,7 @@ namespace MaterialUI
         private SerializedProperty m_SelectedIndexes;
 
         private SerializedProperty OnCancelCallback;
+        private SerializedProperty OnShowCallback;
         private SerializedProperty OnItemsSelected;
 
         SerializedProperty m_OptionDataList = null;
@@ -71,6 +72,7 @@ namespace MaterialUI
             m_SelectedIndexes = serializedObject.FindProperty("m_SelectedIndexes");
 
             OnCancelCallback = serializedObject.FindProperty("OnCancelCallback");
+            OnShowCallback = serializedObject.FindProperty("OnShowCheckboxDialogCallback");
             OnItemsSelected = serializedObject.FindProperty("OnItemsSelected");
         }
 
@@ -182,6 +184,7 @@ namespace MaterialUI
 
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(OnItemsSelected);
+            EditorGUILayout.PropertyField(OnShowCallback);
             EditorGUILayout.PropertyField(OnCancelCallback);
 
             EditorGUILayout.Space();

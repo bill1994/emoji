@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MaterialUI
 {
@@ -17,6 +18,9 @@ namespace MaterialUI
             }
         }
 
+        [System.Serializable]
+        public class DialogFrameUnityEvent : UnityEvent<MaterialDialogFrame> { }
+
         #endregion
 
         #region Private Variables
@@ -26,6 +30,12 @@ namespace MaterialUI
 
         protected MaterialDialogFrame _CacheDialogFrame = null;
         protected PrefabAddress _CachedPrefabAdress = null;
+
+        #endregion
+
+        #region Callbacks
+
+        public DialogFrameUnityEvent OnShowMenuCallback = new DialogFrameUnityEvent();
 
         #endregion
 
@@ -116,6 +126,12 @@ namespace MaterialUI
             ShowFrameActivity(_CacheDialogFrame, prefabAddress, (dialog, isDialog) =>
             {
                 _CacheDialogFrame = dialog;
+
+                if (dialog != null)
+                {
+                    if (this != null && OnShowMenuCallback != null)
+                        OnShowMenuCallback.Invoke(dialog);
+                }
             });
         }
 
