@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -16,6 +14,12 @@ namespace MaterialUI
         public class DateUnityEvent : UnityEvent<System.DateTime> { }
         [System.Serializable]
         public class StrUnityEvent : UnityEvent<string> { }
+
+        [System.Serializable]
+        public class DateDialogUnityEvent : UnityEvent<DialogDatePicker> { }
+
+        [System.Serializable]
+        public class TimeDialogUnityEvent : UnityEvent<DialogTimePicker> { }
 
         #endregion
 
@@ -63,8 +67,11 @@ namespace MaterialUI
         #region Callback
 
         [Header("DateTime Callbacks")]
-        public DateUnityEvent OnDateTimeChangedCallback;
-        public StrUnityEvent OnFormattedDateTimeChangedCallback;
+        public DateDialogUnityEvent OnShowDateDialogCallback = new DateDialogUnityEvent();
+        public TimeDialogUnityEvent OnShowTimeDialogCallback = new TimeDialogUnityEvent();
+        [Space]
+        public DateUnityEvent OnDateTimeChangedCallback = new DateUnityEvent();
+        public StrUnityEvent OnFormattedDateTimeChangedCallback = new StrUnityEvent();
 
         #endregion
 
@@ -263,6 +270,8 @@ namespace MaterialUI
                             {
                                 s_TimePicker = dialog;
                                 dialog.Initialize(pickedDate, HandleOnChangeTimeKeepingLastDate, m_DialogColor);
+                                if (this != null && OnShowTimeDialogCallback != null)
+                                    OnShowTimeDialogCallback.Invoke(dialog);
                             });
                     }
                 };
@@ -276,6 +285,8 @@ namespace MaterialUI
                                     s_MonthPicker = dialog;
                                     dialog.Initialize(date.Year, date.Month, date.Day, onChangeDate, HandleOnHide, m_DialogColor);
                                     dialog.SetCultureInfo(GetCultureInfo());
+                                    if (this != null && OnShowDateDialogCallback != null)
+                                        OnShowDateDialogCallback.Invoke(dialog);
                                 });
                 }
                 else
@@ -286,6 +297,8 @@ namespace MaterialUI
                                     s_DatePicker = dialog;
                                     dialog.Initialize(date.Year, date.Month, date.Day, onChangeDate, HandleOnHide, m_DialogColor);
                                     dialog.SetCultureInfo(GetCultureInfo());
+                                    if (this != null && OnShowDateDialogCallback != null)
+                                        OnShowDateDialogCallback.Invoke(dialog);
                                 });
                 } 
             }
@@ -298,6 +311,8 @@ namespace MaterialUI
                             {
                                 s_TimePicker = dialog;
                                 dialog.Initialize(date, HandleOnChangeDateTime, m_DialogColor);
+                                if (this != null && OnShowTimeDialogCallback != null)
+                                    OnShowTimeDialogCallback.Invoke(dialog);
                             });
             }
         }

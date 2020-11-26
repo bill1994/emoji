@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MaterialUI
 {
@@ -17,6 +18,9 @@ namespace MaterialUI
             }
         }
 
+        [System.Serializable]
+        public class AlertUnityEvent : UnityEvent<DialogAlert> { }
+
         #endregion
 
         #region Private Variables
@@ -30,6 +34,12 @@ namespace MaterialUI
 
         protected DialogAlert _CacheDialogFrame = null;
         protected PrefabAddress _CachedPrefabAdress = null;
+
+        #endregion
+
+        #region Callbacks
+
+        public AlertUnityEvent OnShowTooltipCallback = new AlertUnityEvent();
 
         #endregion
 
@@ -48,7 +58,7 @@ namespace MaterialUI
             }
         }
 
-        public override SpinnerUIEventTriggerMode uiShowTriggerMode
+        /*public override SpinnerUIEventTriggerMode uiShowTriggerMode
         {
             get
             {
@@ -72,7 +82,7 @@ namespace MaterialUI
             set
             {
             }
-        }
+        }*/
 
         public string tipText
         {
@@ -155,8 +165,8 @@ namespace MaterialUI
             base.OnValidate();
             ClearCache(false);
             m_OpenDialogAsync = false;
-            m_UIShowTriggerMode = SpinnerUIEventTriggerMode.OnPointerEnter;
-            m_UIHideTriggerMode = SpinnerUIEventTriggerMode.OnPointerExit;
+            //m_UIShowTriggerMode = SpinnerUIEventTriggerMode.OnPointerEnter;
+            //m_UIHideTriggerMode = SpinnerUIEventTriggerMode.OnPointerExit;
         }
 #endif
 
@@ -192,8 +202,8 @@ namespace MaterialUI
         {
             var prefabAddress = cachedPrefabAddress == null || cachedPrefabAddress.IsEmpty() || !cachedPrefabAddress.IsResources() ?
                 PrefabManager.ResourcePrefabs.dialogTooltip : cachedPrefabAddress;
-            if (prefabAddress == null || 
-                (string.IsNullOrEmpty(m_TipText) && (m_TipImageData == null || !m_TipImageData.ContainsData()) ))
+            if (prefabAddress == null ||
+                (string.IsNullOrEmpty(m_TipText) && (m_TipImageData == null || !m_TipImageData.ContainsData())))
             {
                 if (IsExpanded())
                     Hide();
@@ -204,7 +214,12 @@ namespace MaterialUI
             {
                 _CacheDialogFrame = dialog;
                 if (dialog != null)
+                {
                     dialog.Initialize("", null, null, m_TipText, new ImageData(m_TipImageData), null, null);
+
+                    if (this != null && OnShowTooltipCallback != null)
+                        OnShowTooltipCallback.Invoke(dialog);
+                }
             });
         }
 

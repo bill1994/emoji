@@ -30,6 +30,7 @@ namespace MaterialUI
         private SerializedProperty m_TipImageData;
 
         private SerializedProperty OnCancelCallback;
+        private SerializedProperty OnShowCallback;
 
         protected override void OnEnable()
         {
@@ -48,15 +49,16 @@ namespace MaterialUI
             m_DropdownFramePreferredSize = serializedObject.FindProperty("m_DropdownFramePreferredSize");
             m_CustomFramePrefabAddress = serializedObject.FindProperty("m_CustomFramePrefabAddress");
             OnCancelCallback = serializedObject.FindProperty("OnCancelCallback");
+            OnShowCallback = serializedObject.FindProperty("OnShowTooltipCallback");
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            //EditorGUILayout.PropertyField(m_UIShowTriggerMode);
-            //EditorGUILayout.PropertyField(m_UIHideTriggerMode);
-            //EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_UIShowTriggerMode);
+            EditorGUILayout.PropertyField(m_UIHideTriggerMode);
+            EditorGUILayout.Space();
 
             EditorGUILayout.PropertyField(m_TipText);
             EditorGUILayout.PropertyField(m_TipImageData);
@@ -82,6 +84,7 @@ namespace MaterialUI
             EditorGUI.indentLevel--;
 
             EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(OnShowCallback);
             EditorGUILayout.PropertyField(OnCancelCallback);
 
             EditorGUILayout.Space();
