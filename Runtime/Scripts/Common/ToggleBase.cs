@@ -610,35 +610,12 @@ namespace MaterialUI
 
         #endregion
 
-        #region Receivers
-
-        protected virtual void HandleOnToggleChanged(bool value)
-        {
-            Toggle();
-
-            var callback = value ? onToggleOn : onToggleOff;
-            if (callback != null)
-                callback.Invoke();
-
-            //Validate Toggle State when setted by m_Toggle instead isOn
-            if (m_Group != null && Application.isPlaying)
-            {
-                ApplyGroupAllowSwitchOff();
-
-                if (value)
-                    m_Group.NotifyToggleValueChanged(this, true);
-
-                if (m_LastToggleState != isOn)
-                {
-                    m_LastToggleState = isOn;
-                    m_Group.EnsureValidState();
-                }
-            }
-        }
-
-        #endregion
-
         #region Helper Functions
+
+        public virtual bool CanUseDisabledColor()
+        {
+            return canvasGroup == null || !canvasGroup.enabled;
+        }
 
         protected virtual void SetIsOnInternal(bool value, bool sendCallback)
         {
@@ -784,15 +761,8 @@ namespace MaterialUI
 
         public virtual void TurnOnInstant()
         {
-            bool interactable = m_Interactable;
-            if (interactable)
-            {
-                SetOnColor();
-            }
-            else
-            {
-                Kyub.Performance.SustainedPerformanceManager.Refresh(this);
-            }
+            SetOnColor();
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
 
             UpdateGraphicToggleState();
         }
@@ -815,15 +785,8 @@ namespace MaterialUI
 
         public virtual void TurnOffInstant()
         {
-            bool interactable = m_Interactable;
-            if (interactable)
-            {
-                SetOffColor();
-            }
-            else
-            {
-                Kyub.Performance.SustainedPerformanceManager.Refresh(this);
-            }
+            SetOffColor();
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
 
             UpdateGraphicToggleState();
         }
@@ -853,6 +816,18 @@ namespace MaterialUI
         {
             RefreshVisualStyles(false);
 
+            if (m_Toggle != null)
+            {
+                if (m_Toggle.isOn)
+                {
+                    SetOnColor();
+                }
+                else
+                {
+                    SetOffColor();
+                }
+            }
+
             if (canvasGroup != null)
             {
                 canvasGroup.blocksRaycasts = false;
@@ -870,7 +845,8 @@ namespace MaterialUI
             if (m_Graphic && changeGraphicColor)
             {
                 var isInteractable = IsInteractable();
-                m_Graphic.color = Tween.QuintSoftOut(m_CurrentGraphicColor, isInteractable ? m_GraphicOnColor : m_GraphicDisabledColor, m_AnimDeltaTime, m_AnimationDuration);
+                var canUseDisabledColor = CanUseDisabledColor();
+                m_Graphic.color = Tween.QuintSoftOut(m_CurrentGraphicColor, !canUseDisabledColor || isInteractable ? m_GraphicOnColor : m_GraphicDisabledColor, m_AnimDeltaTime, m_AnimationDuration);
             }
             if (m_ChangeRippleColor && m_MaterialRipple != null)
             {
@@ -890,7 +866,7 @@ namespace MaterialUI
             Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             if (m_Graphic && m_ChangeGraphicColor)
             {
-                m_Graphic.color = Tween.QuintSoftOut(m_CurrentGraphicColor, IsInteractable() ? m_GraphicOffColor : m_GraphicDisabledColor, m_AnimDeltaTime, m_AnimationDuration * 0.75f);
+                m_Graphic.color = Tween.QuintSoftOut(m_CurrentGraphicColor, !CanUseDisabledColor() || IsInteractable() ? m_GraphicOffColor : m_GraphicDisabledColor, m_AnimDeltaTime, m_AnimationDuration * 0.75f);
             }
             if (m_ChangeRippleColor && m_MaterialRipple != null)
             {
@@ -910,7 +886,7 @@ namespace MaterialUI
             RefreshVisualStyles(false);
             if (m_Graphic && m_ChangeGraphicColor)
             {
-                m_Graphic.color = IsInteractable() ? m_GraphicOnColor : m_GraphicDisabledColor;
+                m_Graphic.color = !CanUseDisabledColor() || IsInteractable() ? m_GraphicOnColor : m_GraphicDisabledColor;
             }
             if (materialRipple && m_ChangeRippleColor)
             {
@@ -923,7 +899,7 @@ namespace MaterialUI
             RefreshVisualStyles(false);
             if (m_Graphic && m_ChangeGraphicColor)
             {
-                m_Graphic.color = IsInteractable() ? m_GraphicOffColor : m_GraphicDisabledColor;
+                m_Graphic.color = !CanUseDisabledColor() || IsInteractable() ? m_GraphicOffColor : m_GraphicDisabledColor;
             }
             if (materialRipple && m_ChangeRippleColor)
             {
@@ -969,6 +945,34 @@ namespace MaterialUI
                     m_Toggle.enabled = !isOn;
                 else if (m_Toggle != null)
                     m_Toggle.enabled = true;
+            }
+        }
+
+        #endregion
+
+        #region Receivers
+
+        protected virtual void HandleOnToggleChanged(bool value)
+        {
+            Toggle();
+
+            var callback = value ? onToggleOn : onToggleOff;
+            if (callback != null)
+                callback.Invoke();
+
+            //Validate Toggle State when setted by m_Toggle instead isOn
+            if (m_Group != null && Application.isPlaying)
+            {
+                ApplyGroupAllowSwitchOff();
+
+                if (value)
+                    m_Group.NotifyToggleValueChanged(this, true);
+
+                if (m_LastToggleState != isOn)
+                {
+                    m_LastToggleState = isOn;
+                    m_Group.EnsureValidState();
+                }
             }
         }
 
@@ -1063,8 +1067,9 @@ namespace MaterialUI
                     var toggleBase = sender as ToggleBase;
                     var isActive = toggleBase != null ? toggleBase.toggle.isOn : true;
                     var isInteractable = toggleBase != null? toggleBase.IsInteractable() : true;
+                    var canUseDisabledColor = toggleBase != null ? toggleBase.CanUseDisabledColor() : true;
 
-                    var v_endColor = !isInteractable ? m_colorDisabled : (isActive ? m_colorOn : m_colorOff);
+                    var v_endColor = !canUseDisabledColor || isInteractable ? (isActive ? m_colorOn : m_colorOff) : m_colorDisabled;
                     if (canAnimate && Application.isPlaying)
                     {
                         _tweenId = TweenManager.TweenColor(

@@ -97,21 +97,6 @@ namespace MaterialUI
         }
 
 
-        public override void TurnOnInstant()
-        {
-            base.TurnOnInstant();
-            if (m_Toggle != null)
-            {
-                if (IsInteractable())
-                {
-                    AnimOnComplete();
-                }
-            }
-
-            if (checkRectTransform != null)
-                checkRectTransform.sizeDelta = new Vector2(m_AnimationSize, m_AnimationSize);
-        }
-
         public override void TurnOff()
         {
             if (checkImage != null)
@@ -125,65 +110,16 @@ namespace MaterialUI
             base.TurnOff();
         }
 
-        public override void TurnOffInstant()
-        {
-            base.TurnOffInstant();
-
-            if (m_Toggle != null)
-            {
-                if (IsInteractable())
-                {
-                    AnimOffComplete();
-                }
-            }
-
-            if (checkRectTransform != null)
-                checkRectTransform.sizeDelta = Vector2.zero;
-        }
-
-        protected override void ApplyInteractableOn()
-        {
-            base.ApplyInteractableOn();
-
-            if (m_Toggle != null)
-            {
-                if (m_Toggle.isOn)
-                {
-                    AnimOnComplete();
-                }
-                else
-                {
-                    AnimOffComplete();
-                }
-            }
-        }
-
-        protected override void ApplyInteractableOff()
-        {
-            base.ApplyInteractableOff();
-
-            if (m_Toggle != null)
-            {
-                if (m_Toggle.isOn)
-                {
-                    AnimOnComplete();
-                }
-                else
-                {
-                    AnimOffComplete();
-                }
-            }
-        }
-
         protected override void AnimOn()
         {
             base.AnimOn();
 
+            var canUseDisabledColor = CanUseDisabledColor();
             var isInteractable = IsInteractable();
             if (checkImage != null)
-                checkImage.color = Tween.QuintOut(m_CurrentColor, isInteractable ? onColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
+                checkImage.color = Tween.QuintOut(m_CurrentColor, !canUseDisabledColor || isInteractable ? onColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
             if(frameImage != null)
-                frameImage.color = Tween.QuintOut(m_CurrentFrameColor, isInteractable ? onColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
+                frameImage.color = Tween.QuintOut(m_CurrentFrameColor, !canUseDisabledColor || isInteractable ? onColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
 
             float tempSize = Tween.QuintOut(m_CurrentCheckSize, m_AnimationSize, m_AnimDeltaTime, m_AnimationDuration);
 
@@ -191,29 +127,16 @@ namespace MaterialUI
                 checkRectTransform.sizeDelta = new Vector2(tempSize, tempSize);
         }
 
-        protected override void AnimOnComplete()
-        {
-            base.AnimOnComplete();
-
-            var isInteractable = IsInteractable();
-            if (checkImage != null)
-                checkImage.color = isInteractable ? onColor : disabledColor;
-            if (frameImage != null)
-                frameImage.color = isInteractable ? onColor : disabledColor;
-
-            if (checkRectTransform != null)
-                checkRectTransform.sizeDelta = new Vector2(m_AnimationSize, m_AnimationSize);
-        }
-
         protected override void AnimOff()
         {
             base.AnimOff();
 
+            var canUseDisabledColor = CanUseDisabledColor();
             var isInteractable = IsInteractable();
             if (checkImage != null)
-                checkImage.color = Tween.QuintOut(m_CurrentColor, isInteractable ? offColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
+                checkImage.color = Tween.QuintOut(m_CurrentColor, !canUseDisabledColor || isInteractable ? offColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
             if (frameImage != null)
-                frameImage.color = Tween.QuintOut(m_CurrentFrameColor, isInteractable ? offColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
+                frameImage.color = Tween.QuintOut(m_CurrentFrameColor, !canUseDisabledColor || isInteractable ? offColor : disabledColor, m_AnimDeltaTime, m_AnimationDuration);
 
             float tempSize = Tween.QuintOut(m_CurrentCheckSize, 0, m_AnimDeltaTime, m_AnimationDuration);
 
@@ -221,15 +144,32 @@ namespace MaterialUI
                 checkRectTransform.sizeDelta = new Vector2(tempSize, tempSize);
         }
 
-        protected override void AnimOffComplete()
+        protected override void SetOnColor()
         {
-            base.AnimOffComplete();
+            base.SetOnColor();
 
+            var canUseDisabledColor = CanUseDisabledColor();
+            var isInteractable = IsInteractable();
+
+            if (checkImage != null)
+                checkImage.color = !canUseDisabledColor || isInteractable ? onColor : disabledColor;
+            if (frameImage != null)
+                frameImage.color = !canUseDisabledColor || isInteractable ? onColor : disabledColor;
+
+            if (checkRectTransform != null)
+                checkRectTransform.sizeDelta = new Vector2(m_AnimationSize, m_AnimationSize);
+        }
+
+        protected override void SetOffColor()
+        {
+            base.SetOffColor();
+
+            var canUseDisabledColor = CanUseDisabledColor();
             var isInteractable = IsInteractable();
             if (checkImage != null)
-                checkImage.color = isInteractable ? offColor : disabledColor;
+                checkImage.color = !canUseDisabledColor || isInteractable ? offColor : disabledColor;
             if (frameImage != null)
-                frameImage.color = isInteractable ? offColor : disabledColor;
+                frameImage.color = !canUseDisabledColor || isInteractable ? offColor : disabledColor;
 
             if (checkRectTransform != null)
                 checkRectTransform.sizeDelta = new Vector2(0, 0);

@@ -120,6 +120,7 @@ namespace MaterialUI
 
             if (EditorGUILayout.BeginFadeGroup(m_ShowColorsAnimBool.faded))
             {
+                EditorGUILayout.HelpBox("Disabled colors only used when CanvasGroup is NULL or disabled", MessageType.Info);
                 drawSection();
             }
             EditorGUILayout.EndFadeGroup();
