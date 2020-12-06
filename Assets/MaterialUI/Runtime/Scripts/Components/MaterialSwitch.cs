@@ -111,88 +111,28 @@ namespace MaterialUI
 
         #endregion
 
-        #region Unity Functions
-
-#if UNITY_EDITOR
-
-        protected override void OnValidateDelayed()
-        {
-            base.OnValidateDelayed();
-
-            if (m_Interactable)
-            {
-                if (m_SwitchImage) m_SwitchImage.color = isOn ? m_OnColor : m_OffColor;
-                if (m_BackImage) m_BackImage.color = isOn ? m_BackOnColor : m_BackOffColor;
-            }
-            else
-            {
-                if (m_SwitchImage) m_SwitchImage.color = m_DisabledColor;
-                if (m_BackImage) m_BackImage.color = m_BackDisabledColor;
-            }
-        }
-#endif
-
-        #endregion
-
         #region Other Functions
 
         public override void TurnOn()
         {
-            if (switchImage) m_CurrentColor = switchImage.color;
+            if (switchImage) 
+                m_CurrentColor = switchImage.color;
             m_CurrentBackColor = backImage.color;
 
             base.TurnOn();
         }
 
-        public override void TurnOnInstant()
-        {
-            base.TurnOnInstant();
-
-            if (interactable)
-            {
-                if (switchImage) switchImage.color = m_OnColor;
-                if (backImage) backImage.color = backOnColor;
-            }
-
-            if (slideSwitch)
-                switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(true);
-        }
-
         public override void TurnOff()
         {
-            if(switchImage) m_CurrentColor = switchImage.color;
+            if(switchImage) 
+                m_CurrentColor = switchImage.color;
             m_CurrentBackColor = backImage.color;
 
             base.TurnOff();
         }
 
-        public override void TurnOffInstant()
-        {
-            base.TurnOffInstant();
-
-            if (interactable)
-            {
-                if (switchImage) switchImage.color = m_OffColor;
-                if (backImage) backImage.color = backOffColor;
-            }
-
-            if (slideSwitch)
-                switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(false);
-        }
-
         protected override void ApplyInteractableOn()
         {
-            if (isOn)
-            {
-                if (switchImage) switchImage.color = m_OnColor;
-                if (backImage) backImage.color = backOnColor;
-            }
-            else
-            {
-                if (switchImage) switchImage.color = m_OffColor;
-                if (backImage) backImage.color = backOffColor;
-            }
-
             if(shadowImage != null)
                 shadowImage.enabled = true;
 
@@ -201,9 +141,6 @@ namespace MaterialUI
 
         protected override void ApplyInteractableOff()
         {
-            if(switchImage) switchImage.color = m_DisabledColor;
-            if(backImage) backImage.color = backDisabledColor;
-
             if (shadowImage != null)
                 shadowImage.enabled = false;
 
@@ -214,41 +151,61 @@ namespace MaterialUI
         {
             base.AnimOn();
 
-            if (switchImage) switchImage.color = Tween.QuintOut(m_CurrentColor, m_OnColor, m_AnimDeltaTime, m_AnimationDuration);
-            if (backImage) backImage.color = Tween.QuintOut(m_CurrentBackColor, backOnColor, m_AnimDeltaTime, m_AnimationDuration);
+            var canUseDisabledColor = CanUseDisabledColor();
+            var isInteractable = IsInteractable();
+
+            if (switchImage) 
+                switchImage.color = Tween.QuintOut(m_CurrentColor, !canUseDisabledColor || isInteractable ? m_OnColor : m_DisabledColor, m_AnimDeltaTime, m_AnimationDuration);
+            if (backImage) 
+                backImage.color = Tween.QuintOut(m_CurrentBackColor, !canUseDisabledColor || isInteractable ? backOnColor : backDisabledColor, m_AnimDeltaTime, m_AnimationDuration);
 
             if (slideSwitch)
                 switchRectTransform.anchoredPosition = Tween.SeptSoftOut(switchRectTransform.anchoredPosition, GetSlideAnchoredPosition(true), m_AnimDeltaTime, m_AnimationDuration);
-        }
-
-        protected override void AnimOnComplete()
-        {
-            base.AnimOnComplete();
-
-            if (switchImage) switchImage.color = m_OnColor;
-            if (backImage) backImage.color = backOnColor;
-
-            if (slideSwitch)
-                switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(true);
         }
 
         protected override void AnimOff()
         {
             base.AnimOff();
 
-            if (switchImage) switchImage.color = Tween.QuintOut(m_CurrentColor, m_OffColor, m_AnimDeltaTime, m_AnimationDuration);
-            if (backImage) backImage.color = Tween.QuintOut(m_CurrentBackColor, backOffColor, m_AnimDeltaTime, m_AnimationDuration);
+            var canUseDisabledColor = CanUseDisabledColor();
+            var isInteractable = IsInteractable();
+
+            if (switchImage) 
+                switchImage.color = Tween.QuintOut(m_CurrentColor, !canUseDisabledColor || isInteractable ? m_OffColor : m_DisabledColor, m_AnimDeltaTime, m_AnimationDuration);
+            if (backImage) 
+                backImage.color = Tween.QuintOut(m_CurrentBackColor, !canUseDisabledColor || isInteractable ? backOffColor : backDisabledColor, m_AnimDeltaTime, m_AnimationDuration);
 
             if (slideSwitch)
                 switchRectTransform.anchoredPosition = Tween.SeptSoftOut(switchRectTransform.anchoredPosition, GetSlideAnchoredPosition(false), m_AnimDeltaTime, m_AnimationDuration);
         }
 
-        protected override void AnimOffComplete()
+        protected override void SetOnColor()
         {
-            base.AnimOffComplete();
+            base.SetOnColor();
 
-            if (switchImage) switchImage.color = m_OffColor;
-            if (backImage) backImage.color = backOffColor;
+            var canUseDisabledColor = CanUseDisabledColor();
+            var isInteractable = IsInteractable();
+
+            if (switchImage)
+                switchImage.color = !canUseDisabledColor || isInteractable ? m_OnColor : m_DisabledColor;
+            if (backImage)
+                backImage.color = !canUseDisabledColor || isInteractable ? backOnColor : backDisabledColor;
+
+            if (slideSwitch)
+                switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(true);
+        }
+
+        protected override void SetOffColor()
+        {
+            base.SetOffColor();
+
+            var canUseDisabledColor = CanUseDisabledColor();
+            var isInteractable = IsInteractable();
+
+            if (switchImage)
+                switchImage.color = !canUseDisabledColor || isInteractable ? m_OffColor : m_DisabledColor;
+            if (backImage)
+                backImage.color = !canUseDisabledColor || isInteractable ? backOffColor : backDisabledColor;
 
             if (slideSwitch)
                 switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(false);

@@ -35,7 +35,7 @@ namespace MaterialUI
         protected SerializedProperty m_RippleOnColor;
         protected SerializedProperty m_RippleOffColor;
 
-		protected bool m_IsControllingChildren = false;
+        protected bool m_IsControllingChildren = false;
 
         protected override void OnEnable()
         {
@@ -191,6 +191,17 @@ namespace MaterialUI
             EditorGUI.indentLevel++;
             LayoutStyle_PropertyField(m_Graphic);
             EditorGUI.indentLevel--;
+        }
+
+        protected virtual bool CanUseDisabledColor()
+        {
+            for (int i = 0; i < targets.Length; i++)
+            {
+                var toggleBase = targets[i] as ToggleBase;
+                if (toggleBase != null && !toggleBase.CanUseDisabledColor())
+                    return false;
+            }
+            return true;
         }
     }
 }
