@@ -177,12 +177,12 @@ namespace MaterialUI
         {
             public static void LoadAsync<T>(GenericAssetAddress<T> assetAddress, System.Action<string, T> callback) where T : UnityEngine.Object
             {
-                var request = assetAddress.LoadAssetAsync();
-                request.onComplete += (result) =>
-                {
-                    if (callback != null)
-                        callback(assetAddress.Name, request.asset as T);
-                };
+                var request = assetAddress.LoadAssetAsync(
+                    (result) =>
+                        {
+                            if (callback != null)
+                                callback(assetAddress.Name, result as T);
+                        });
             }
 
             public static void LoadAsync<T>(string path, System.Action<string, T> callback) where T : UnityEngine.Object
