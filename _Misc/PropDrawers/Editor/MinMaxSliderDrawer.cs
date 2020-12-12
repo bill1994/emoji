@@ -8,53 +8,125 @@ namespace KyubEditor
     [CustomPropertyDrawer(typeof(MinMaxSliderAttribute))]
     class MinMaxSliderDrawer : PropertyDrawer
     {
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-        {
-            if (property.propertyType == SerializedPropertyType.Vector2)
-            {
-                position.width -= 5;
-                float textFieldWidth = 50;
-                
-                position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+		const string kVectorMinName = "x";
+		const string kVectorMaxName = "y";
+		const float kFloatFieldWidth = 30f;
+		const float kSpacing = 2f;
+		const float kRoundingValue = 100f;
 
-                var v_indentLevel = EditorGUI.indentLevel;
-                EditorGUI.indentLevel = 0;
-                Vector2 range = property.vector2Value;
-                float min = range.x;
-                float max = range.y;
-                MinMaxSliderAttribute attr = attribute as MinMaxSliderAttribute;
+		float Round(float value, float roundingValue)
+		{
+			if (roundingValue == 0)
+			{
+				return value;
+			}
 
-                EditorGUI.BeginChangeCheck();
-                Rect minPos = new Rect(position);
-                //minPos.x += v_labelWidth;
-                minPos.width = textFieldWidth;
-                min = EditorGUI.FloatField(minPos, min);
+			return Mathf.Round(value * roundingValue) / roundingValue;
+		}
 
-                var v_padding = 5;
-                Rect sliderPos = new Rect(position);
-                sliderPos.width -= (textFieldWidth*2) + (v_padding);
-                sliderPos.x += v_padding + textFieldWidth;
+		bool SetVectorValue(SerializedProperty property, float min, float max)
+		{
+			if (property.propertyType == SerializedPropertyType.Vector2)
+			{
+				min = Round(min, kRoundingValue);
+				max = Round(max, kRoundingValue);
+				property.vector2Value = new Vector2(min, max);
+			}
+			else if (property.propertyType == SerializedPropertyType.Vector2Int)
+			{
+				property.vector2IntValue = new Vector2Int((int)min, (int)max);
+			}
+			else
+			{
+				return false;
+			}
 
-                EditorGUI.MinMaxSlider(sliderPos, ref min, ref max, attr.min, attr.max);
+			return true;
+		}
 
-                Rect maxPos = new Rect(sliderPos.xMax + v_padding, sliderPos.y, textFieldWidth, sliderPos.height);
-                max = EditorGUI.FloatField(maxPos, max);
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			float min = 0f;
+			float max = 0f;
 
-                if (min > max)
-                    min = max;
-                if (EditorGUI.EndChangeCheck())
-                {
-                    range.x = min;
-                    range.y = max;
-                    property.vector2Value = range;
-                }
-                EditorGUI.indentLevel = v_indentLevel;
-            }
-            else
-            {
-                EditorGUI.LabelField(position, label, "Use only with Vector2");
-            }
-        }
-    }
+			if (property.propertyType == SerializedPropertyType.Vector2)
+			{
+				var v = property.vector2Value;
+				min = v.x;
+				max = v.y;
+			}
+			else if (property.propertyType == SerializedPropertyType.Vector2Int)
+			{
+				var v = property.vector2IntValue;
+				min = v.x;
+				max = v.y;
+			}
+			else
+			{
+				var c = new GUIContent("Unsupported field type " + property.type);
+				EditorGUI.LabelField(position, label, c);
+				return;
+			}
+
+			float ppp = EditorGUIUtility.pixelsPerPoint;
+			float spacing = kSpacing * ppp;
+			float fieldWidth = kFloatFieldWidth * ppp;
+
+			var indent = EditorGUI.indentLevel;
+
+			var attr = attribute as MinMaxSliderAttribute;
+
+			var r = EditorGUI.PrefixLabel(position, label);
+
+			Rect sliderPos = r;
+
+			sliderPos.x += fieldWidth + spacing;
+			sliderPos.width -= (fieldWidth + spacing) * 2;
+
+			EditorGUI.BeginChangeCheck();
+			EditorGUI.indentLevel = 0;
+			EditorGUI.MinMaxSlider(sliderPos, ref min, ref max, attr.min, attr.max);
+			EditorGUI.indentLevel = indent;
+			if (EditorGUI.EndChangeCheck())
+			{
+				SetVectorValue(property, min, max);
+			}
+
+			Rect minPos = r;
+			minPos.width = fieldWidth;
+
+			var vectorMinProp = property.FindPropertyRelative(kVectorMinName);
+			EditorGUI.showMixedValue = vectorMinProp.hasMultipleDifferentValues;
+			EditorGUI.BeginChangeCheck();
+			EditorGUI.indentLevel = 0;
+			min = EditorGUI.DelayedFloatField(minPos, min);
+			EditorGUI.indentLevel = indent;
+			if (EditorGUI.EndChangeCheck())
+			{
+				min = Mathf.Max(min, attr.min);
+				min = Mathf.Min(min, max);
+				SetVectorValue(property, min, max);
+			}
+
+			Rect maxPos = position;
+			maxPos.x += maxPos.width - fieldWidth;
+			maxPos.width = fieldWidth;
+
+			var vectorMaxProp = property.FindPropertyRelative(kVectorMaxName);
+			EditorGUI.showMixedValue = vectorMaxProp.hasMultipleDifferentValues;
+			EditorGUI.BeginChangeCheck();
+			EditorGUI.indentLevel = 0;
+			max = EditorGUI.DelayedFloatField(maxPos, max);
+			EditorGUI.indentLevel = indent;
+			if (EditorGUI.EndChangeCheck())
+			{
+				max = Mathf.Min(max, attr.max);
+				max = Mathf.Max(max, min);
+				SetVectorValue(property, min, max);
+			}
+
+			EditorGUI.showMixedValue = false;
+		}
+	}
 }
 #endif
