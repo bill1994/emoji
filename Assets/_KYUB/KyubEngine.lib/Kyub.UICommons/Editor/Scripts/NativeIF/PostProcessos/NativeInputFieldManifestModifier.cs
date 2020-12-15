@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿#if UNITY_EDITOR && UNITY_ANDROID
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -6,9 +6,8 @@ using UnityEditor.Android;
 
 namespace KyubEditor
 {
-    public class AndroidManifestModifier : IPostGenerateGradleAndroidProject
+    public class NativeInputFieldManifestModifier : IPostGenerateGradleAndroidProject
     {
-
         public void OnPostGenerateGradleAndroidProject(string basePath)
         {
             var androidManifest = new AndroidManifest(GetManifestPath(basePath));
@@ -37,8 +36,7 @@ namespace KyubEditor
         }
     }
 
-
-    internal class AndroidXmlDocument : XmlDocument
+    class AndroidXmlDocument : XmlDocument
     {
         private string m_Path;
         protected XmlNamespaceManager nsMgr;
