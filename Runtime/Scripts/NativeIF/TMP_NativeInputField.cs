@@ -14,12 +14,29 @@ namespace Kyub.UI
     {
         #region Private Variables
 
+        [Tooltip("Force monospace character with distance (value)em when password selected")]
+        [SerializeField]
+        protected float m_MonospacePasswordDistEm = 0.5f;
         [SerializeField]
         RectTransform m_PanContent = null;
 
         #endregion
 
         #region Public Properties
+
+        public float MonospacePasswordDistEm
+        {
+            get
+            {
+                return m_MonospacePasswordDistEm;
+            }
+            set
+            {
+                if (m_MonospacePasswordDistEm == value)
+                    return;
+                m_MonospacePasswordDistEm = value;
+            }
+        }
 
         public RectTransform panContent
         {
@@ -61,7 +78,7 @@ namespace Kyub.UI
         {
             base.OnEnable();
             CheckAsteriskChar();
-            
+
             MobileInputBehaviour nativeBox = GetComponent<MobileInputBehaviour>();
             if (MobileInputBehaviour.IsSupported())
             {
@@ -97,6 +114,18 @@ namespace Kyub.UI
                 CachedInputRenderer.transform.SetSiblingIndex(m_TextComponent.transform.GetSiblingIndex());
                 AssignPositioningIfNeeded();
             }
+
+            if (m_TextComponent != null)
+            {
+                //Unregister base.UpdateLabel
+                m_TextComponent.UnregisterDirtyVerticesCallback(base.UpdateLabel);
+                //Registe new UpdateLabel
+                m_TextComponent.RegisterDirtyVerticesCallback(UpdateLabel);
+            }
+        }
+        protected override void OnDisable()
+        {
+            BaseOnDisable();
         }
 
         protected override void Start()
@@ -216,12 +245,46 @@ namespace Kyub.UI
                 UnityEditor.EditorUtility.SetDirty(this);
             }
             base.OnValidate();
+            UpdateLabel();
         }
 #endif
 
         #endregion
 
         #region Helper Functions
+
+        protected new void UpdateLabel()
+        {
+            base.UpdateLabel();
+            if (m_MonospacePasswordDistEm != 0 && inputType == InputType.Password &&
+                m_TextComponent != null && m_TextComponent.font != null && PreventCallback == false)
+            {
+                PreventCallback = true;
+                //We must support richtext when password with monospace active
+                m_TextComponent.richText = true;
+                var text = m_TextComponent.text;
+                if(ApplyMonoSpacingValues(text, out text))
+                {
+                    m_TextComponent.text = text;
+                }
+                PreventCallback = false;
+            }
+        }
+
+        protected virtual bool ApplyMonoSpacingValues(string text, out string outText)
+        {
+            bool sucess = false;
+
+            if (m_MonospacePasswordDistEm != 0)
+            {
+                outText = "<mspace=" + m_MonospacePasswordDistEm.ToString(System.Globalization.CultureInfo.InvariantCulture) + "em>" + text;
+                sucess = true;
+            }
+            else
+                outText = text;
+
+            return sucess;
+        }
 
         /// <summary>
         /// Force update text in Native Keyboard
@@ -464,7 +527,7 @@ namespace Kyub.UI
             if (Application.isPlaying && asteriskChar != '●')
                 asteriskChar = '●';
 #elif UNITY_ANDROID
-            //The security character in Android is locked to 'Buller', so we must reflect this in Unity.
+            //The security character in Android is locked to 'Bullet', so we must reflect this in Unity.
             //Bullet Char
             if (Application.isPlaying && asteriskChar != '•')
                 asteriskChar = '•';
@@ -731,6 +794,24 @@ namespace Kyub.UI
                     m_ProcessingEventInfo = typeof(TMPro.TMP_InputField).GetField("m_ProcessingEvent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
                 if (m_ProcessingEventInfo != null)
                     m_ProcessingEventInfo.SetValue(this, value);
+            }
+        }
+
+        System.Reflection.FieldInfo m_PreventCallbackInfo = null;
+        protected bool PreventCallback
+        {
+            get
+            {
+                if (m_PreventCallbackInfo == null)
+                    m_PreventCallbackInfo = typeof(TMPro.TMP_InputField).GetField("m_PreventCallback", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                return (bool)m_PreventCallbackInfo.GetValue(this);
+            }
+            set
+            {
+                if (m_PreventCallbackInfo == null)
+                    m_PreventCallbackInfo = typeof(TMPro.TMP_InputField).GetField("m_PreventCallback", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                if (m_PreventCallbackInfo != null)
+                    m_PreventCallbackInfo.SetValue(this, value);
             }
         }
 

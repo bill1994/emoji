@@ -18,10 +18,6 @@ namespace Kyub.UI
         #region Unity Functions
 
 #if FIX_NEW_INPUTSYSTEM_SUPPORT
-        protected override void OnDisable()
-        {
-            BaseOnDisable();
-        }
 
         public override void OnPointerDown(PointerEventData eventData)
         {
@@ -35,6 +31,9 @@ namespace Kyub.UI
 
         protected virtual void BaseOnDisable()
         {
+            if (m_TextComponent != null)
+                m_TextComponent.UnregisterDirtyVerticesCallback(UpdateLabel);
+
 #if FIX_NEW_INPUTSYSTEM_SUPPORT
             // the coroutine will be terminated, so this will ensure it restarts when we are next activated
             BlinkCoroutine = null;
@@ -43,7 +42,7 @@ namespace Kyub.UI
             if (m_TextComponent != null)
             {
                 m_TextComponent.UnregisterDirtyVerticesCallback(MarkGeometryAsDirty);
-                m_TextComponent.UnregisterDirtyVerticesCallback(UpdateLabel);
+                m_TextComponent.UnregisterDirtyVerticesCallback(base.UpdateLabel);
 
                 if (m_VerticalScrollbar != null)
                 {
