@@ -54,10 +54,10 @@ namespace KyubEditor.EmojiSearch
             }
 
             EditorGUILayout.Space();
-            var v_newFont = EditorGUILayout.ObjectField("Source Font File", m_font, typeof(Font), false) as Font;
-            if (m_font != v_newFont)
+            var newFont = EditorGUILayout.ObjectField("Source Font File", m_font, typeof(Font), false) as Font;
+            if (m_font != newFont)
             {
-                m_font = v_newFont;
+                m_font = newFont;
                 m_charsRange = PickAllCharsRangeFromFont(m_font);
             }
             EditorGUILayout.Space();
@@ -71,66 +71,66 @@ namespace KyubEditor.EmojiSearch
 
         #region Helper Static Functions
 
-        public static string PickAllCharsRangeFromFont(Font p_font)
+        public static string PickAllCharsRangeFromFont(Font font)
         {
-            string v_charsRange = "";
-            if (p_font != null)
+            string charsRange = "";
+            if (font != null)
             {
-                TrueTypeFontImporter v_fontReimporter = null;
+                TrueTypeFontImporter fontReimporter = null;
 
                 //A GLITCH: Unity's Font.CharacterInfo doesn't work
                 //properly on dynamic mode, we need to change it to Unicode first
-                if (p_font.dynamic)
+                if (font.dynamic)
                 {
-                    var assetPath = AssetDatabase.GetAssetPath(p_font);
-                    v_fontReimporter = (TrueTypeFontImporter)AssetImporter.GetAtPath(assetPath);
+                    var assetPath = AssetDatabase.GetAssetPath(font);
+                    fontReimporter = (TrueTypeFontImporter)AssetImporter.GetAtPath(assetPath);
 
-                    v_fontReimporter.fontTextureCase = FontTextureCase.Unicode;
-                    v_fontReimporter.SaveAndReimport();
+                    fontReimporter.fontTextureCase = FontTextureCase.Unicode;
+                    fontReimporter.SaveAndReimport();
                 }
 
                 //Only Non-Dynamic Fonts define the characterInfo array
-                Vector2Int v_minMaxRange = new Vector2Int(-1, -1);
-                for (int i = 0; i < p_font.characterInfo.Length; i++)
+                Vector2Int minMaxRange = new Vector2Int(-1, -1);
+                for (int i = 0; i < font.characterInfo.Length; i++)
                 {
-                    var v_charInfo = p_font.characterInfo[i];
-                    var v_apply = true;
-                    if (v_minMaxRange.x < 0 || v_minMaxRange.y < 0)
+                    var charInfo = font.characterInfo[i];
+                    var apply = true;
+                    if (minMaxRange.x < 0 || minMaxRange.y < 0)
                     {
-                        v_apply = false;
-                        v_minMaxRange = new Vector2Int(v_charInfo.index, v_charInfo.index);
+                        apply = false;
+                        minMaxRange = new Vector2Int(charInfo.index, charInfo.index);
                     }
-                    else if (v_charInfo.index == v_minMaxRange.y + 1)
+                    else if (charInfo.index == minMaxRange.y + 1)
                     {
-                        v_apply = false;
-                        v_minMaxRange.y = v_charInfo.index;
+                        apply = false;
+                        minMaxRange.y = charInfo.index;
                     }
 
-                    if (v_apply || i == p_font.characterInfo.Length - 1)
+                    if (apply || i == font.characterInfo.Length - 1)
                     {
-                        if (!string.IsNullOrEmpty(v_charsRange))
-                            v_charsRange += "\n,";
-                        v_charsRange += v_minMaxRange.x + "-" + v_minMaxRange.y;
+                        if (!string.IsNullOrEmpty(charsRange))
+                            charsRange += "\n,";
+                        charsRange += minMaxRange.x + "-" + minMaxRange.y;
 
-                        if (i == p_font.characterInfo.Length - 1)
+                        if (i == font.characterInfo.Length - 1)
                         {
-                            if (v_charInfo.index >= 0 && (v_charInfo.index  < v_minMaxRange.x || v_charInfo.index > v_minMaxRange.y))
-                                v_charsRange += "\n," + v_charInfo.index + "-" + v_charInfo.index;
+                            if (charInfo.index >= 0 && (charInfo.index  < minMaxRange.x || charInfo.index > minMaxRange.y))
+                                charsRange += "\n," + charInfo.index + "-" + charInfo.index;
                         }
                         else
-                            v_minMaxRange = new Vector2Int(v_charInfo.index, v_charInfo.index);
+                            minMaxRange = new Vector2Int(charInfo.index, charInfo.index);
 
                     }
                 }
 
                 // Change back to dynamic font
-                if (v_fontReimporter != null)
+                if (fontReimporter != null)
                 {
-                    v_fontReimporter.fontTextureCase = FontTextureCase.Dynamic;
-                    v_fontReimporter.SaveAndReimport();
+                    fontReimporter.fontTextureCase = FontTextureCase.Dynamic;
+                    fontReimporter.SaveAndReimport();
                 }
             }
-            return v_charsRange;
+            return charsRange;
         }
 
         #endregion

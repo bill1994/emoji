@@ -25,67 +25,67 @@ namespace Kyub.EmojiSearch.Utilities
         /// <summary>
         /// Try parse text converting to supported EmojiSequence format (all char sequences will be replaced to <sprite=index>)
         /// </summary>
-        /// <param name="p_spriteAsset"></param>
+        /// <param name="spriteAsset"></param>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static bool ParseEmojiCharSequence(TMP_SpriteAsset p_spriteAsset, ref string p_text)
+        public static bool ParseEmojiCharSequence(TMP_SpriteAsset spriteAsset, ref string text)
         {
-            bool v_changed = false;
-            TryUpdateSequenceLookupTable(p_spriteAsset);
-            if (!string.IsNullOrEmpty(p_text))
+            bool changed = false;
+            TryUpdateSequenceLookupTable(spriteAsset);
+            if (!string.IsNullOrEmpty(text))
             {
-                var v_mainSpriteAsset = p_spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : p_spriteAsset;
-                var v_fastLookupPath = v_mainSpriteAsset != null && s_fastLookupPath.ContainsKey(v_mainSpriteAsset) ? s_fastLookupPath[v_mainSpriteAsset] : new HashSet<string>();
-                var v_lookupTableSequences = v_mainSpriteAsset != null && s_lookupTableSequences.ContainsKey(v_mainSpriteAsset) ? s_lookupTableSequences[v_mainSpriteAsset] : new Dictionary<string, string>();
+                var mainSpriteAsset = spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : spriteAsset;
+                var fastLookupPath = mainSpriteAsset != null && s_fastLookupPath.ContainsKey(mainSpriteAsset) ? s_fastLookupPath[mainSpriteAsset] : new HashSet<string>();
+                var lookupTableSequences = mainSpriteAsset != null && s_lookupTableSequences.ContainsKey(mainSpriteAsset) ? s_lookupTableSequences[mainSpriteAsset] : new Dictionary<string, string>();
 
-                if (v_lookupTableSequences == null || v_lookupTableSequences.Count == 0)
+                if (lookupTableSequences == null || lookupTableSequences.Count == 0)
                     return false;
 
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
                 //Eficient way to check characters
-                for (int i = 0; i < p_text.Length; i++)
+                for (int i = 0; i < text.Length; i++)
                 {
-                    int v_endCounter = i;
-                    System.Text.StringBuilder v_auxSequence = new System.Text.StringBuilder();
+                    int endCounter = i;
+                    System.Text.StringBuilder auxSequence = new System.Text.StringBuilder();
 
                     //Look for sequences in fastLookupPath
-                    while (p_text.Length > v_endCounter &&
-                           (v_endCounter == i ||
-                           v_fastLookupPath.Contains(v_auxSequence.ToString()))
+                    while (text.Length > endCounter &&
+                           (endCounter == i ||
+                           fastLookupPath.Contains(auxSequence.ToString()))
                           )
                     {
                         //We must skip variant selectors (if found it)
-                        v_auxSequence.Append(p_text[v_endCounter]);
-                        v_endCounter++;
+                        auxSequence.Append(text[endCounter]);
+                        endCounter++;
                     }
 
                     //Remove last added guy (the previous one is the correct)
-                    if (v_auxSequence.Length > 0 && !v_fastLookupPath.Contains(v_auxSequence.ToString()))
-                        v_auxSequence.Remove(v_auxSequence.Length - 1, 1);
+                    if (auxSequence.Length > 0 && !fastLookupPath.Contains(auxSequence.ToString()))
+                        auxSequence.Remove(auxSequence.Length - 1, 1);
 
-                    var v_sequence = v_auxSequence.Length > 0 ? v_auxSequence.ToString() : "";
+                    var sequence = auxSequence.Length > 0 ? auxSequence.ToString() : "";
                     //Found a sequence, add it instead add the character
-                    if (v_sequence.Length > 0 && v_lookupTableSequences.ContainsKey(v_sequence))
+                    if (sequence.Length > 0 && lookupTableSequences.ContainsKey(sequence))
                     {
-                        v_changed = true;
+                        changed = true;
                         //Changed Index to Sprite Name to prevent erros when looking at fallbacks
-                        sb.Append(string.Format("<sprite name=\"{0}\">", v_lookupTableSequences[v_sequence]));
+                        sb.Append(string.Format("<sprite name=\"{0}\">", lookupTableSequences[sequence]));
 
-                        i += (v_sequence.Length - 1); //jump checked characters
+                        i += (sequence.Length - 1); //jump checked characters
                     }
                     //add the char (normal character)
                     else
                     {
-                        sb.Append(p_text[i]);
+                        sb.Append(text[i]);
                     }
                 }
 
-                if (v_changed)
-                    p_text = sb.ToString();
+                if (changed)
+                    text = sb.ToString();
             }
 
-            return v_changed;
+            return changed;
         }
 
         /// <summary>
@@ -95,114 +95,114 @@ namespace Kyub.EmojiSearch.Utilities
         /// The sequence will be the name of the TMP_Sprite in UTF32 or UTF16 HEX format separeted by '-' for each character (see below the example)
         /// Ex: 0023-fe0f-20e3.png
         /// </summary>
-        /// <param name="p_spriteAsset"> The sprite asset used to cache the sequences</param>
-        /// <param name="p_forceUpdate"> force update the lookup table of this SpriteAsset</param>
+        /// <param name="spriteAsset"> The sprite asset used to cache the sequences</param>
+        /// <param name="forceUpdate"> force update the lookup table of this SpriteAsset</param>
         /// <returns>true if lookup table changed</returns>
-        public static bool TryUpdateSequenceLookupTable(TMP_SpriteAsset p_spriteAsset, bool p_forceUpdate = false)
+        public static bool TryUpdateSequenceLookupTable(TMP_SpriteAsset spriteAsset, bool forceUpdate = false)
         {
-            var v_mainSpriteAsset = p_spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : p_spriteAsset;
+            var mainSpriteAsset = spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : spriteAsset;
 
-            if (v_mainSpriteAsset != null && (!s_lookupTableSequences.ContainsKey(v_mainSpriteAsset) || s_lookupTableSequences[v_mainSpriteAsset] == null || p_forceUpdate))
+            if (mainSpriteAsset != null && (!s_lookupTableSequences.ContainsKey(mainSpriteAsset) || s_lookupTableSequences[mainSpriteAsset] == null || forceUpdate))
             {
                 //Init FastlookupPath
-                if (v_mainSpriteAsset != null && (!s_fastLookupPath.ContainsKey(v_mainSpriteAsset) || s_fastLookupPath[v_mainSpriteAsset] == null))
-                    s_fastLookupPath[v_mainSpriteAsset] = new HashSet<string>();
-                var v_fastLookupPath = v_mainSpriteAsset != null && s_fastLookupPath.ContainsKey(v_mainSpriteAsset) ? s_fastLookupPath[v_mainSpriteAsset] : new HashSet<string>();
-                v_fastLookupPath.Clear();
+                if (mainSpriteAsset != null && (!s_fastLookupPath.ContainsKey(mainSpriteAsset) || s_fastLookupPath[mainSpriteAsset] == null))
+                    s_fastLookupPath[mainSpriteAsset] = new HashSet<string>();
+                var fastLookupPath = mainSpriteAsset != null && s_fastLookupPath.ContainsKey(mainSpriteAsset) ? s_fastLookupPath[mainSpriteAsset] : new HashSet<string>();
+                fastLookupPath.Clear();
 
                 //Init Lookup Table
-                if (v_mainSpriteAsset != null && (!s_lookupTableSequences.ContainsKey(v_mainSpriteAsset) || s_lookupTableSequences[v_mainSpriteAsset] == null))
-                    s_lookupTableSequences[v_mainSpriteAsset] = new Dictionary<string, string>();
-                var v_lookupTableSequences = v_mainSpriteAsset != null && s_lookupTableSequences.ContainsKey(v_mainSpriteAsset) ? s_lookupTableSequences[v_mainSpriteAsset] : new Dictionary<string, string>();
-                v_lookupTableSequences.Clear();
+                if (mainSpriteAsset != null && (!s_lookupTableSequences.ContainsKey(mainSpriteAsset) || s_lookupTableSequences[mainSpriteAsset] == null))
+                    s_lookupTableSequences[mainSpriteAsset] = new Dictionary<string, string>();
+                var lookupTableSequences = mainSpriteAsset != null && s_lookupTableSequences.ContainsKey(mainSpriteAsset) ? s_lookupTableSequences[mainSpriteAsset] : new Dictionary<string, string>();
+                lookupTableSequences.Clear();
 
-                List<TMPro.TMP_SpriteAsset> v_spriteAssetsChecked = new List<TMPro.TMP_SpriteAsset>();
-                v_spriteAssetsChecked.Add(v_mainSpriteAsset);
+                List<TMPro.TMP_SpriteAsset> spriteAssetsChecked = new List<TMPro.TMP_SpriteAsset>();
+                spriteAssetsChecked.Add(mainSpriteAsset);
                 //Add the main sprite asset
-                if (TMPro.TMP_Settings.defaultSpriteAsset != null && !v_spriteAssetsChecked.Contains(TMPro.TMP_Settings.defaultSpriteAsset))
-                    v_spriteAssetsChecked.Add(TMPro.TMP_Settings.defaultSpriteAsset);
+                if (TMPro.TMP_Settings.defaultSpriteAsset != null && !spriteAssetsChecked.Contains(TMPro.TMP_Settings.defaultSpriteAsset))
+                    spriteAssetsChecked.Add(TMPro.TMP_Settings.defaultSpriteAsset);
 
                 //Check in all spriteassets (and fallbacks)
-                for (int i = 0; i < v_spriteAssetsChecked.Count; i++)
+                for (int i = 0; i < spriteAssetsChecked.Count; i++)
                 {
-                    var v_spriteAsset = v_spriteAssetsChecked[i];
-                    if (v_spriteAsset != null)
+                    spriteAsset = spriteAssetsChecked[i];
+                    if (spriteAsset != null)
                     {
                         //Check all sprites in this sprite asset
-                        for (int j = 0; j < v_spriteAsset.spriteInfoList.Count; j++)
+                        for (int j = 0; j < spriteAsset.spriteInfoList.Count; j++)
                         {
-                            var v_element = v_spriteAsset.spriteInfoList[j];
+                            var element = spriteAsset.spriteInfoList[j];
 
-                            if (v_element == null || string.IsNullOrEmpty(v_element.name) || !v_element.name.Contains("-"))
+                            if (element == null || string.IsNullOrEmpty(element.name) || !element.name.Contains("-"))
                                 continue;
 
-                            var v_elementName = BuildNameInEmojiSurrogateFormat(v_element.name);
-                            var v_unicodeX8 = v_element.unicode.ToString("X8");
+                            var elementName = BuildNameInEmojiSurrogateFormat(element.name);
+                            var unicodeX8 = element.unicode.ToString("X8");
 
                             //Check for elements that Unicode is different from Name
-                            if (!string.IsNullOrEmpty(v_elementName) &&
-                                !string.Equals(v_elementName, v_unicodeX8, System.StringComparison.InvariantCultureIgnoreCase))
+                            if (!string.IsNullOrEmpty(elementName) &&
+                                !string.Equals(elementName, unicodeX8, System.StringComparison.InvariantCultureIgnoreCase))
                             {
-                                var v_tableStringBuilder = new System.Text.StringBuilder();
-                                for (int k = 0; k < v_elementName.Length; k += 8)
+                                var tableStringBuilder = new System.Text.StringBuilder();
+                                for (int k = 0; k < elementName.Length; k += 8)
                                 {
-                                    var v_hexUTF32 = v_elementName.Substring(k, Mathf.Min(v_elementName.Length - k, 8));
+                                    var hexUTF32 = elementName.Substring(k, Mathf.Min(elementName.Length - k, 8));
 #if UNITY_2018_3_OR_NEWER
-                                    var v_intValue = TMPro.TMP_TextUtilities.StringHexToInt(v_hexUTF32);
+                                    var intValue = TMPro.TMP_TextUtilities.StringHexToInt(hexUTF32);
 #else
-                                    var v_intValue = TMPro.TMP_TextUtilities.StringToInt(v_hexUTF32);
+                                    var intValue = TMPro.TMP_TextUtilities.StringToInt(hexUTF32);
 #endif
 
                                     //Not a surrogate and is valid UTF32 (conditions to use char.ConvertFromUtf32 function)
-                                    if (v_intValue > 0x000000 && v_intValue < 0x10ffff &&
-                                        (v_intValue < 0x00d800 || v_intValue > 0x00dfff))
+                                    if (intValue > 0x000000 && intValue < 0x10ffff &&
+                                        (intValue < 0x00d800 || intValue > 0x00dfff))
                                     {
-                                        var v_UTF16Surrogate = char.ConvertFromUtf32(v_intValue);
-                                        if (!string.IsNullOrEmpty(v_UTF16Surrogate))
+                                        var UTF16Surrogate = char.ConvertFromUtf32(intValue);
+                                        if (!string.IsNullOrEmpty(UTF16Surrogate))
                                         {
                                             //Add chars into cache (we must include the both char paths in fastLookupPath)
-                                            foreach (var v_surrogateChar in v_UTF16Surrogate)
+                                            foreach (var surrogateChar in UTF16Surrogate)
                                             {
-                                                v_tableStringBuilder.Append(v_surrogateChar);
+                                                tableStringBuilder.Append(surrogateChar);
                                                 //Add current path to lookup fast path
-                                                v_fastLookupPath.Add(v_tableStringBuilder.ToString());
+                                                fastLookupPath.Add(tableStringBuilder.ToString());
                                             }
                                         }
                                     }
                                     //Split into two chars (we failed to match conditions of char.ConvertFromUtf32 so we must split into two UTF16 chars)
                                     else
                                     {
-                                        for (int l = 0; l < v_hexUTF32.Length; l += 4)
+                                        for (int l = 0; l < hexUTF32.Length; l += 4)
                                         {
-                                            var v_hexUTF16 = v_hexUTF32.Substring(l, Mathf.Min(v_hexUTF32.Length - l, 4));
+                                            var hexUTF16 = hexUTF32.Substring(l, Mathf.Min(hexUTF32.Length - l, 4));
 #if UNITY_2018_3_OR_NEWER
-                                            var v_charValue = (char)TMPro.TMP_TextUtilities.StringHexToInt(v_hexUTF16);
+                                            var charValue = (char)TMPro.TMP_TextUtilities.StringHexToInt(hexUTF16);
 #else
-                                            var v_charValue = (char)TMPro.TMP_TextUtilities.StringToInt(v_hexUTF16);
+                                            var charValue = (char)TMPro.TMP_TextUtilities.StringToInt(hexUTF16);
 #endif
-                                            v_tableStringBuilder.Append(v_charValue);
+                                            tableStringBuilder.Append(charValue);
 
                                             //Add current path to lookup fast path
-                                            v_fastLookupPath.Add(v_tableStringBuilder.ToString());
+                                            fastLookupPath.Add(tableStringBuilder.ToString());
                                         }
                                     }
 
                                 }
-                                var v_tableKey = v_tableStringBuilder.ToString();
+                                var tableKey = tableStringBuilder.ToString();
                                 //Add key as sequence in lookupTable
-                                if (!string.IsNullOrEmpty(v_tableKey) && !v_lookupTableSequences.ContainsKey(v_tableKey))
+                                if (!string.IsNullOrEmpty(tableKey) && !lookupTableSequences.ContainsKey(tableKey))
                                 {
-                                    v_lookupTableSequences[v_tableKey] = v_element.name; //j;
+                                    lookupTableSequences[tableKey] = element.name; //j;
                                 }
                             }
                         }
 
                         //Add Fallbacks (before the next sprite asset and after this sprite asset)
-                        for (int k = v_spriteAsset.fallbackSpriteAssets.Count - 1; k >= 0; k--)
+                        for (int k = spriteAsset.fallbackSpriteAssets.Count - 1; k >= 0; k--)
                         {
-                            var v_fallback = v_spriteAsset.fallbackSpriteAssets[k];
-                            if (v_fallback != null && !v_spriteAssetsChecked.Contains(v_fallback))
-                                v_spriteAssetsChecked.Insert(i + 1, v_fallback);
+                            var fallback = spriteAsset.fallbackSpriteAssets[k];
+                            if (fallback != null && !spriteAssetsChecked.Contains(fallback))
+                                spriteAssetsChecked.Insert(i + 1, fallback);
                         }
                     }
                 }
@@ -216,46 +216,46 @@ namespace Kyub.EmojiSearch.Utilities
 
         #region Other Helper Functions
 
-        /*public static int GetSpriteIndexFromCharSequence(TMP_SpriteAsset p_spriteAsset, string p_charSequence)
+        /*public static int GetSpriteIndexFromCharSequence(TMP_SpriteAsset spriteAsset, string charSequence)
         {
-            var v_mainSpriteAsset = p_spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : p_spriteAsset;
-            TryUpdateSequenceLookupTable(v_mainSpriteAsset);
+            var mainSpriteAsset = spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : spriteAsset;
+            TryUpdateSequenceLookupTable(mainSpriteAsset);
 
-            Dictionary<string, int> v_lookupTable = null;
-            s_lookupTableSequences.TryGetValue(v_mainSpriteAsset, out v_lookupTable);
+            Dictionary<string, int> lookupTable = null;
+            s_lookupTableSequences.TryGetValue(mainSpriteAsset, out lookupTable);
 
-            int v_index;
-            if (v_lookupTable == null || !v_lookupTable.TryGetValue(p_charSequence, out v_index))
-                v_index = -1;
+            int index;
+            if (lookupTable == null || !lookupTable.TryGetValue(charSequence, out index))
+                index = -1;
 
-            return v_index;
+            return index;
         }*/
 
-        public static string GetSpriteNameFromCharSequence(TMP_SpriteAsset p_spriteAsset, string p_charSequence)
+        public static string GetSpriteNameFromCharSequence(TMP_SpriteAsset spriteAsset, string charSequence)
         {
-            var v_mainSpriteAsset = p_spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : p_spriteAsset;
-            TryUpdateSequenceLookupTable(v_mainSpriteAsset);
+            var mainSpriteAsset = spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : spriteAsset;
+            TryUpdateSequenceLookupTable(mainSpriteAsset);
 
-            Dictionary<string, string> v_lookupTable = null;
-            s_lookupTableSequences.TryGetValue(v_mainSpriteAsset, out v_lookupTable);
+            Dictionary<string, string> lookupTable = null;
+            s_lookupTableSequences.TryGetValue(mainSpriteAsset, out lookupTable);
 
-            string v_name;
-            if (v_lookupTable == null || !v_lookupTable.TryGetValue(p_charSequence, out v_name))
-                v_name = null;
+            string name;
+            if (lookupTable == null || !lookupTable.TryGetValue(charSequence, out name))
+                name = null;
 
-            return v_name;
+            return name;
         }
 
-        public static Dictionary<string, string> GetAllCharSequences(TMP_SpriteAsset p_spriteAsset)
+        public static Dictionary<string, string> GetAllCharSequences(TMP_SpriteAsset spriteAsset)
         {
-            var v_mainSpriteAsset = p_spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : p_spriteAsset;
-            TryUpdateSequenceLookupTable(v_mainSpriteAsset);
+            var mainSpriteAsset = spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : spriteAsset;
+            TryUpdateSequenceLookupTable(mainSpriteAsset);
 
-            Dictionary<string, string> v_lookupTable = null;
-            if (!s_lookupTableSequences.TryGetValue(v_mainSpriteAsset, out v_lookupTable) && v_lookupTable == null)
-                v_lookupTable = new Dictionary<string, string>();
+            Dictionary<string, string> lookupTable = null;
+            if (!s_lookupTableSequences.TryGetValue(mainSpriteAsset, out lookupTable) && lookupTable == null)
+                lookupTable = new Dictionary<string, string>();
 
-            return v_lookupTable;
+            return lookupTable;
         }
 
         public static void ClearCache()
@@ -264,44 +264,44 @@ namespace Kyub.EmojiSearch.Utilities
             s_fastLookupPath.Clear();
         }
 
-        public static void ClearCache(TMP_SpriteAsset p_spriteAsset)
+        public static void ClearCache(TMP_SpriteAsset spriteAsset)
         {
-            var v_mainSpriteAsset = p_spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : p_spriteAsset;
+            var mainSpriteAsset = spriteAsset == null ? TMPro.TMP_Settings.defaultSpriteAsset : spriteAsset;
 
-            s_lookupTableSequences.Remove(v_mainSpriteAsset);
-            s_lookupTableSequences.Remove(v_mainSpriteAsset);
+            s_lookupTableSequences.Remove(mainSpriteAsset);
+            s_lookupTableSequences.Remove(mainSpriteAsset);
         }
 
         #endregion
 
         #region Name Pattern Functions
 
-        public static string BuildNameInEmojiSurrogateFormat(string p_name)
+        public static string BuildNameInEmojiSurrogateFormat(string name)
         {
-            if (p_name == null)
-                p_name = "";
+            if (name == null)
+                name = "";
 
             //Remove variant selectors (FE0F and FE0E)
             //ex: 2665-1F0FF5-FE0F.png will be converted to 2665-1f0f5 (remove variant selectors, cast to lower and remove file extension)
-            var v_fileName = System.IO.Path.GetFileNameWithoutExtension(p_name).ToLower();
+            var fileName = System.IO.Path.GetFileNameWithoutExtension(name).ToLower();
 
             //Split Surrogates and change to UTF16 or UTF32 (based in length of each string splitted)
             //ex: 2665-1f0f5 will be converted to [2665, 0001f0f5] and after that converted to 26650001f0f5
-            if (v_fileName.Contains("-"))
+            if (fileName.Contains("-"))
             {
-                var v_splitArray = v_fileName.Split(new char[] { '-' }, System.StringSplitOptions.RemoveEmptyEntries);
-                v_fileName = "";
-                for (int i = 0; i < v_splitArray.Length; i++)
+                var splitArray = fileName.Split(new char[] { '-' }, System.StringSplitOptions.RemoveEmptyEntries);
+                fileName = "";
+                for (int i = 0; i < splitArray.Length; i++)
                 {
-                    var v_split = v_splitArray[i];
-                    while (/*v_split.Length > 4 && */v_split.Length < 8)
+                    var split = splitArray[i];
+                    while (/*split.Length > 4 && */split.Length < 8)
                     {
-                        v_split = "0" + v_split;
+                        split = "0" + split;
                     }
-                    v_fileName += v_split;
+                    fileName += split;
                 }
             }
-            return v_fileName;
+            return fileName;
         }
 
         #endregion

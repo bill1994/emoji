@@ -110,24 +110,24 @@ namespace Kyub.EmojiSearch.UI
             //Only parse when richtext active (we need the <sprite=index> tag)
             if (m_isRichText)
             {
-                var v_parsedEmoji = false;
-                var v_oldText = m_text;
+                var parsedEmoji = false;
+                var oldText = m_text;
 
                 /*//Parse Sprite Chars
                 ParseInputText();
 
                 //Parse Emojis
                 m_text = CharBufferToString(); //Pick the char unicodes to parse the emojis
-                v_parsedEmoji = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref m_text);
+                parsedEmoji = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref m_text);
 
                 //Apply parsed Emoji to char buffer
-                if (v_parsedEmoji)
+                if (parsedEmoji)
                 {
                     StringToCharArray(m_text, ref m_char_buffer);
                     SetArraySizes(m_char_buffer);
                 }*/
 
-                v_parsedEmoji = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref m_text);
+                parsedEmoji = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref m_text);
 
                 m_emojiParsingRequired = false;
                 IsInputParsingRequired_Internal = false;
@@ -140,13 +140,13 @@ namespace Kyub.EmojiSearch.UI
 
                 //Debug.Log("ParseInputTextAndEmojiCharSequence");
                 //We must revert the original text because we dont want to permanently change the text
-                m_text = v_oldText;
+                m_text = oldText;
 
 #if !TMP_2_1_0_PREVIEW_10_OR_NEWER
                 m_isCalculateSizeRequired = true;
 #endif
 
-                return v_parsedEmoji;
+                return parsedEmoji;
             }
 
             return false;
@@ -219,36 +219,36 @@ namespace Kyub.EmojiSearch.UI
 
         /*public string CharBufferToString()
         {
-            System.Text.StringBuilder v_builder = new System.Text.StringBuilder();
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
             if (m_char_buffer != null)
             {
                 for (int i = 0; i < m_char_buffer.Length; i++)
                 {
-                    var v_intValue = m_char_buffer[i];
+                    var intValue = m_char_buffer[i];
 
                     //Not a surrogate and is valid UTF32 (conditions to use char.ConvertFromUtf32 function)
-                    if (v_intValue > 0x000000 && v_intValue < 0x10ffff &&
-                                        (v_intValue < 0x00d800 || v_intValue > 0x00dfff))
+                    if (intValue > 0x000000 && intValue < 0x10ffff &&
+                                        (intValue < 0x00d800 || intValue > 0x00dfff))
                     {
-                        var v_UTF16Surrogate = char.ConvertFromUtf32(v_intValue);
-                        if (!string.IsNullOrEmpty(v_UTF16Surrogate))
+                        var UTF16Surrogate = char.ConvertFromUtf32(intValue);
+                        if (!string.IsNullOrEmpty(UTF16Surrogate))
                         {
                             //Add chars into cache (we must include the both char paths in fastLookupPath)
-                            foreach (var v_surrogateChar in v_UTF16Surrogate)
+                            foreach (var surrogateChar in UTF16Surrogate)
                             {
-                                v_builder.Append(v_surrogateChar);
+                                builder.Append(surrogateChar);
                             }
                         }
                     }
                     //Simple Append
                     else
                     {
-                        v_builder.Append((char)v_intValue);
+                        builder.Append((char)intValue);
                     }
                 }
             }
 
-            return v_builder.ToString();
+            return builder.ToString();
         }*/
 
 #endregion
