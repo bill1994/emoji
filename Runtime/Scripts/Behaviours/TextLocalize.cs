@@ -127,29 +127,29 @@ namespace Kyub.Localization.UI
         {
             get
             {
-                var v_graphic = GraphicComponent;
-                if (v_graphic != null)
+                var graphic = GraphicComponent;
+                if (graphic != null)
                 {
-                    if (v_graphic is TMPro.TMP_Text)
-                        return ((TMPro.TMP_Text)v_graphic).text;
-                    else if (v_graphic is Text)
-                        return ((Text)v_graphic).text;
+                    if (graphic is TMPro.TMP_Text)
+                        return ((TMPro.TMP_Text)graphic).text;
+                    else if (graphic is Text)
+                        return ((Text)graphic).text;
                 }
 
                 return null;
             }
             set
             {
-                var v_graphic = GraphicComponent;
-                if (v_graphic != null)
+                var graphic = GraphicComponent;
+                if (graphic != null)
                 {
                     if (value == null)
                         value = "";
 
-                    if (v_graphic is TMPro.TMP_Text)
-                        ((TMPro.TMP_Text)v_graphic).text = value;
-                    else if (v_graphic is Text)
-                        ((Text)v_graphic).text = value;
+                    if (graphic is TMPro.TMP_Text)
+                        ((TMPro.TMP_Text)graphic).text = value;
+                    else if (graphic is Text)
+                        ((Text)graphic).text = value;
                 }
             }
         }
@@ -219,9 +219,9 @@ namespace Kyub.Localization.UI
 
             if (!Application.isPlaying)
             {
-                var v_graphic = GraphicComponent;
-                if (v_graphic != null)
-                    v_graphic.RegisterDirtyVerticesCallback(HandleEditorReplaceLocaleTagsDelayed);
+                var graphic = GraphicComponent;
+                if (graphic != null)
+                    graphic.RegisterDirtyVerticesCallback(HandleEditorReplaceLocaleTagsDelayed);
             }
             else
             {
@@ -229,9 +229,9 @@ namespace Kyub.Localization.UI
 
                 if (m_autoTrackKey)
                 {
-                    var v_graphic = GraphicComponent;
-                    if (v_graphic != null)
-                        v_graphic.RegisterDirtyVerticesCallback(HandleOnVerticesDirty);
+                    var graphic = GraphicComponent;
+                    if (graphic != null)
+                        graphic.RegisterDirtyVerticesCallback(HandleOnVerticesDirty);
                 }
             }
         }
@@ -240,17 +240,17 @@ namespace Kyub.Localization.UI
         {
             if (!Application.isPlaying)
             {
-                var v_graphic = GraphicComponent;
-                if (v_graphic != null)
-                    v_graphic.UnregisterDirtyVerticesCallback(HandleEditorReplaceLocaleTagsDelayed);
+                var graphic = GraphicComponent;
+                if (graphic != null)
+                    graphic.UnregisterDirtyVerticesCallback(HandleEditorReplaceLocaleTagsDelayed);
             }
             else
             {
                 LocaleManager.OnLocalizeChanged -= HandleOnLocalize;
 
-                var v_graphic = GraphicComponent;
-                if (v_graphic != null)
-                    v_graphic.UnregisterDirtyVerticesCallback(HandleOnVerticesDirty);
+                var graphic = GraphicComponent;
+                if (graphic != null)
+                    graphic.UnregisterDirtyVerticesCallback(HandleOnVerticesDirty);
             }
         }
 
@@ -263,9 +263,9 @@ namespace Kyub.Localization.UI
             {
                 UnregisterEvents();
                 
-                string v_localizedValue;
-                if (TryGetLocalizedText(out v_localizedValue))
-                    Text = v_localizedValue;
+                string localizedValue;
+                if (TryGetLocalizedText(out localizedValue))
+                    Text = localizedValue;
 
                 _language = LocaleManager.Instance.CurrentLanguage;
 
@@ -276,9 +276,9 @@ namespace Kyub.Localization.UI
             _lastLocalizedValue = Text;
         }
 
-        protected bool TryGetLocalizedText(out string p_localizedValue)
+        protected bool TryGetLocalizedText(out string localizedValue)
         {
-            bool v_sucess = false;
+            bool sucess = false;
             if ((!string.IsNullOrEmpty(m_key) || m_autoTrackKey) && LocaleManager.InstanceExists())
             {
                 // If no localization key has been specified, use the label's/Input's text as the key
@@ -289,29 +289,29 @@ namespace Kyub.Localization.UI
 
                 // If we still don't have a key, leave the value as blank
                 if (string.IsNullOrEmpty(m_key))
-                    p_localizedValue = "";
+                    localizedValue = "";
                 else
                 {
-                    v_sucess = LocaleManager.TryGetLocalizedText(m_key, out p_localizedValue, m_supportLocaleRichTextTags);
+                    sucess = LocaleManager.TryGetLocalizedText(m_key, out localizedValue, m_supportLocaleRichTextTags);
                 }
 
                 //Return Key value if localization is empty
-                if(!v_sucess)
-                    p_localizedValue = m_key;
+                if(!sucess)
+                    localizedValue = m_key;
             }
             else
-                p_localizedValue = m_key != null? m_key : "";
+                localizedValue = m_key != null? m_key : "";
 
-            return v_sucess;
+            return sucess;
         }
 
         #endregion
 
         #region Receivers
 
-        protected virtual void HandleOnLocalize(bool p_forceReapply)
+        protected virtual void HandleOnLocalize(bool forceReapply)
         {
-            if (p_forceReapply || !string.Equals(Language, LocaleManager.Instance.CurrentLanguage, StringComparison.InvariantCultureIgnoreCase))
+            if (forceReapply || !string.Equals(Language, LocaleManager.Instance.CurrentLanguage, StringComparison.InvariantCultureIgnoreCase))
                 SetDirty();
         }
 
@@ -320,11 +320,11 @@ namespace Kyub.Localization.UI
             if (!m_autoTrackKey || !Application.isPlaying)
                 return;
 
-            string v_componentText = Text;
-            if (_lastLocalizedValue != v_componentText)
+            string componentText = Text;
+            if (_lastLocalizedValue != componentText)
             {
                 //Update the key based in the value of GraphicComponent.text
-                Key = v_componentText;
+                Key = componentText;
             }
         }
 
@@ -339,14 +339,14 @@ namespace Kyub.Localization.UI
         {
             if (this != null && !Application.isPlaying && m_autoTrackKey)
             {
-                var v_text = RegexUtils.BulkReplace(Text, new Dictionary<string, string> {
+                var text = RegexUtils.BulkReplace(Text, new Dictionary<string, string> {
                     { @"<locale>", "" },
                     { @"<\/locale>", "" },
                     { @"<localeparam=([0-9])+>", "" },
                     { @"<\/localeparam>", "" },
                     { @"<skiplocale>", "" }});
-                if (v_text != Text)
-                    Text = v_text;
+                if (text != Text)
+                    Text = text;
             }
         }
 
