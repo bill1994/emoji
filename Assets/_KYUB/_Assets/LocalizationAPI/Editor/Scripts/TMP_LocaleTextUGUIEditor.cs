@@ -26,9 +26,9 @@ namespace KyubEditor.Localization.UI
 
         protected override void DrawExtraSettings()
         {
-            //var v_oldGui = GUI.enabled;
+            //var oldGui = GUI.enabled;
 
-            var v_target = target as TMP_LocaleTextUGUI;
+            var guiTarget = target as TMP_LocaleTextUGUI;
 
             base.DrawExtraSettings();
             EditorGUILayout.Space();
@@ -39,10 +39,10 @@ namespace KyubEditor.Localization.UI
             EditorGUILayout.PropertyField(m_isLocalized);
 
             //GUI.enabled = m_isLocalized.boolValue;
-            if (!v_target.richText && m_supportLocaleRichTextTags.boolValue)
+            if (!guiTarget.richText && m_supportLocaleRichTextTags.boolValue)
                 EditorGUILayout.HelpBox("Require richtext active to work", MessageType.Warning);
             EditorGUILayout.PropertyField(m_supportLocaleRichTextTags);
-            //GUI.enabled = v_oldGui;
+            //GUI.enabled = oldGui;
 
             EditorGUI.indentLevel--;
         }

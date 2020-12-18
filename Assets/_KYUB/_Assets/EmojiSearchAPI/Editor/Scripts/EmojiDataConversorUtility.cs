@@ -23,14 +23,14 @@ namespace KyubEditor.EmojiSearch
             {
                 //Unity cannot deserialize Dictionary, so we converted the dictionary to List using MiniJson
                 json = ConvertToUnityJsonFormat(json);
-                PreConvertedSpritesheetData v_preData = JsonUtility.FromJson<PreConvertedSpritesheetData>(json);
-                TexturePackerData.SpriteDataObject v_postData = v_preData.ToTexturePacketDataObject(gridSize, padding, spacing);
+                PreConvertedSpritesheetData preData = JsonUtility.FromJson<PreConvertedSpritesheetData>(json);
+                TexturePackerData.SpriteDataObject postData = preData.ToTexturePacketDataObject(gridSize, padding, spacing);
 
-                return JsonUtility.ToJson(v_postData);
+                return JsonUtility.ToJson(postData);
             }
-            catch (System.Exception p_exception)
+            catch (System.Exception exception)
             {
-                Debug.Log("Failed to convert to EmojiOne\n: " + p_exception);
+                Debug.Log("Failed to convert to EmojiOne\n: " + exception);
             }
 
             return "";
@@ -40,37 +40,37 @@ namespace KyubEditor.EmojiSearch
         {
             json = "{\"frames\":" + json + "}";
 
-            var v_changed = false;
-            var v_jObject = MiniJsonEditor.Deserialize(json) as Dictionary<string, object>;
-            if (v_jObject != null)
+            var changed = false;
+            var jObject = MiniJsonEditor.Deserialize(json) as Dictionary<string, object>;
+            if (jObject != null)
             {
-                var v_array = v_jObject.ContainsKey("frames") ? v_jObject["frames"] as IList : null;
-                if (v_array != null)
+                var array = jObject.ContainsKey("frames") ? jObject["frames"] as IList : null;
+                if (array != null)
                 {
-                    foreach (var v_jPreDataNonCasted in v_array)
+                    foreach (var jPreDataNonCasted in array)
                     {
-                        var v_jPredataObject = v_jPreDataNonCasted as Dictionary<string, object>;
-                        if (v_jPredataObject != null)
+                        var jPredataObject = jPreDataNonCasted as Dictionary<string, object>;
+                        if (jPredataObject != null)
                         {
-                            var v_skin_variation_dict = v_jPredataObject.ContainsKey("skin_variations") ? v_jPredataObject["skin_variations"] as Dictionary<string, object> : null;
+                            var skin_variation_dict = jPredataObject.ContainsKey("skin_variations") ? jPredataObject["skin_variations"] as Dictionary<string, object> : null;
 
-                            if (v_skin_variation_dict != null)
+                            if (skin_variation_dict != null)
                             {
-                                v_changed = true;
-                                List<object> v_skin_variation_array = new List<object>();
+                                changed = true;
+                                List<object> skin_variation_array = new List<object>();
 
-                                foreach (var v_skinVariationObject in v_skin_variation_dict.Values)
+                                foreach (var skinVariationObject in skin_variation_dict.Values)
                                 {
                                     
-                                    v_skin_variation_array.Add(v_skinVariationObject);
+                                    skin_variation_array.Add(skinVariationObject);
                                 }
-                                v_jPredataObject["skin_variations"] = v_skin_variation_array;
+                                jPredataObject["skin_variations"] = skin_variation_array;
                             }
                         }
                     }
                 }
             }
-            return v_jObject != null && v_changed ? MiniJsonEditor.Serialize(v_jObject) : json;
+            return jObject != null && changed ? MiniJsonEditor.Serialize(jObject) : json;
         }
 
         #endregion
@@ -131,60 +131,60 @@ namespace KyubEditor.EmojiSearch
         {
             public List<PreConvertedImgDataWithVariants> frames = new List<PreConvertedImgDataWithVariants>();
 
-            public virtual TexturePackerData.SpriteDataObject ToTexturePacketDataObject(Vector2Int p_gridSize, Vector2 p_padding, Vector2 p_spacing)
+            public virtual TexturePackerData.SpriteDataObject ToTexturePacketDataObject(Vector2Int gridSize, Vector2 padding, Vector2 spacing)
             {
-                TexturePackerData.SpriteDataObject v_postData = new TexturePackerData.SpriteDataObject();
-                v_postData.frames = new List<TexturePackerData.Frame>();
+                TexturePackerData.SpriteDataObject postData = new TexturePackerData.SpriteDataObject();
+                postData.frames = new List<TexturePackerData.Frame>();
 
                 if (frames != null)
                 {
-                    var v_framesToCheck = new List<PreConvertedImgData>();
+                    var framesToCheck = new List<PreConvertedImgData>();
                     if (frames != null)
                     {
-                        foreach (var v_frameToCheck in frames)
+                        foreach (var frameToCheck in frames)
                         {
-                            v_framesToCheck.Add(v_frameToCheck);
+                            framesToCheck.Add(frameToCheck);
                         }
                     }
 
-                    for(int i=0; i< v_framesToCheck.Count; i++)
+                    for(int i=0; i< framesToCheck.Count; i++)
                     {
-                        var v_preFrame = v_framesToCheck[i];
+                        var preFrame = framesToCheck[i];
 
                         //Add all variations in list to check (after the current PreFrame)
-                        var v_preFrameWithVariants = v_framesToCheck[i] as PreConvertedImgDataWithVariants;
-                        if (v_preFrameWithVariants != null && v_preFrameWithVariants.skin_variations != null && v_preFrameWithVariants.skin_variations.Count > 0)
+                        var preFrameWithVariants = framesToCheck[i] as PreConvertedImgDataWithVariants;
+                        if (preFrameWithVariants != null && preFrameWithVariants.skin_variations != null && preFrameWithVariants.skin_variations.Count > 0)
                         {
-                            for (int j = v_preFrameWithVariants.skin_variations.Count-1; j >=0; j--)
+                            for (int j = preFrameWithVariants.skin_variations.Count-1; j >=0; j--)
                             {
-                                var v_skinVariantFrame = v_preFrameWithVariants.skin_variations[j];
-                                if (v_skinVariantFrame != null)
-                                    v_framesToCheck.Insert(i+1, v_skinVariantFrame);
+                                var skinVariantFrame = preFrameWithVariants.skin_variations[j];
+                                if (skinVariantFrame != null)
+                                    framesToCheck.Insert(i+1, skinVariantFrame);
                             }
                         }
 
                         //Create TexturePacker SpriteData
-                        var v_postFrame = new TexturePackerData.Frame();
+                        var postFrame = new TexturePackerData.Frame();
 
-                        v_postFrame.filename = v_preFrame.image;
-                        v_postFrame.rotated = false;
-                        v_postFrame.trimmed = false;
-                        v_postFrame.sourceSize = new TexturePackerData.SpriteSize() { w = p_gridSize.x, h = p_gridSize.y };
-                        v_postFrame.spriteSourceSize = new TexturePackerData.SpriteFrame() { x = 0, y = 0, w = p_gridSize.x, h = p_gridSize.y };
-                        v_postFrame.frame = new TexturePackerData.SpriteFrame()
+                        postFrame.filename = preFrame.image;
+                        postFrame.rotated = false;
+                        postFrame.trimmed = false;
+                        postFrame.sourceSize = new TexturePackerData.SpriteSize() { w = gridSize.x, h = gridSize.y };
+                        postFrame.spriteSourceSize = new TexturePackerData.SpriteFrame() { x = 0, y = 0, w = gridSize.x, h = gridSize.y };
+                        postFrame.frame = new TexturePackerData.SpriteFrame()
                         {
-                            x = (v_preFrame.sheet_x * (p_gridSize.x + p_spacing.x)) + p_padding.x,
-                            y = (v_preFrame.sheet_y * (p_gridSize.y + p_spacing.y)) + p_padding.y,
-                            w = p_gridSize.x,
-                            h = p_gridSize.y
+                            x = (preFrame.sheet_x * (gridSize.x + spacing.x)) + padding.x,
+                            y = (preFrame.sheet_y * (gridSize.y + spacing.y)) + padding.y,
+                            w = gridSize.x,
+                            h = gridSize.y
                         };
-                        v_postFrame.pivot = new Vector2(0f, 0f);
+                        postFrame.pivot = new Vector2(0f, 0f);
 
-                        v_postData.frames.Add(v_postFrame);
+                        postData.frames.Add(postFrame);
                     }
                 }
 
-                return v_postData;
+                return postData;
             }
         }
 

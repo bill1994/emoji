@@ -19,10 +19,10 @@ namespace Kyub.Localization
         {
         }
 
-        public ResourcesAssetPathAttribute(System.Type p_type)
+        public ResourcesAssetPathAttribute(System.Type type)
         {
-            if (Kyub.Extensions.TypeExtensions.IsSameOrSubClassOrImplementInterface(p_type, typeof(Object)))
-                _filterType = p_type;
+            if (Kyub.Extensions.TypeExtensions.IsSameOrSubClassOrImplementInterface(type, typeof(Object)))
+                _filterType = type;
             else
                 _filterType = typeof(Object);
         }

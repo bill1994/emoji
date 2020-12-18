@@ -99,23 +99,23 @@ namespace Kyub.Localization
             }
             set
             {
-                var v_index = 0;
+                var index = 0;
                 if (value != null)
                 {
-                    var v_value = value.ToUpper();
+                    value = value.ToUpper();
                     for (int i = 0; i < LocalizationDatas.Count; i++)
                     {
-                        var v_data = LocalizationDatas[i];
-                        if (v_data != null && (string.Equals(v_data.Name, v_value, System.StringComparison.InvariantCultureIgnoreCase) || string.Equals(v_data.FullName, v_value, System.StringComparison.InvariantCultureIgnoreCase)))
+                        var data = LocalizationDatas[i];
+                        if (data != null && (string.Equals(data.Name, value, System.StringComparison.InvariantCultureIgnoreCase) || string.Equals(data.FullName, value, System.StringComparison.InvariantCultureIgnoreCase)))
                         {
-                            v_index = i;
+                            index = i;
                             break;
                         }
                     }
                 }
-                if (v_index == _index)
+                if (index == _index)
                     return;
-                _index = v_index;
+                _index = index;
                 SetDirty();
             }
         }
@@ -208,21 +208,21 @@ namespace Kyub.Localization
 
         #region Helper Functions
 
-        public virtual bool HasLanguage(string p_language)
+        public virtual bool HasLanguage(string language)
         {
-            return GetLocationDataFromLanguage(p_language) != null;
+            return GetLocationDataFromLanguage(language) != null;
         }
 
-        public virtual LocalizationData GetLocationDataFromLanguage(string p_language)
+        public virtual LocalizationData GetLocationDataFromLanguage(string language)
         {
             if (m_localizationDatas != null)
             {
-                foreach (var v_langData in m_localizationDatas)
+                foreach (var langData in m_localizationDatas)
                 {
-                    if (v_langData != null && 
-                        (string.Equals(v_langData.Name, p_language) || string.Equals(v_langData.FullName, p_language)))
+                    if (langData != null && 
+                        (string.Equals(langData.Name, language) || string.Equals(langData.FullName, language)))
                     {
-                        return v_langData;
+                        return langData;
                     }
                 }
             }
@@ -249,15 +249,15 @@ namespace Kyub.Localization
         {
             if (PlayerPrefs.HasKey(LANGUANGE_KEY))
                 PlayerPrefs.DeleteKey(LANGUANGE_KEY);
-            string v_sysLanguageString = CultureInfo.CurrentUICulture.Name;
-            string v_unitySysLanguageString = Application.systemLanguage.ToString();
+            string sysLanguageString = CultureInfo.CurrentUICulture.Name;
+            string unitySysLanguageString = Application.systemLanguage.ToString();
             //Try Match Name
-            foreach (var v_datas in LocalizationDatas)
+            foreach (var datas in LocalizationDatas)
             {
-                if (string.Equals(v_sysLanguageString, v_datas.Name, System.StringComparison.InvariantCultureIgnoreCase) || string.Equals(v_sysLanguageString, v_datas.FullName, System.StringComparison.InvariantCultureIgnoreCase) ||
-                   (string.Equals(v_unitySysLanguageString, v_datas.Name, System.StringComparison.InvariantCultureIgnoreCase) || string.Equals(v_unitySysLanguageString, v_datas.FullName, System.StringComparison.InvariantCultureIgnoreCase)))
+                if (string.Equals(sysLanguageString, datas.Name, System.StringComparison.InvariantCultureIgnoreCase) || string.Equals(sysLanguageString, datas.FullName, System.StringComparison.InvariantCultureIgnoreCase) ||
+                   (string.Equals(unitySysLanguageString, datas.Name, System.StringComparison.InvariantCultureIgnoreCase) || string.Equals(unitySysLanguageString, datas.FullName, System.StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    StartingLanguage = v_datas.Name;
+                    StartingLanguage = datas.Name;
                     break;
                 }
             }
@@ -266,20 +266,20 @@ namespace Kyub.Localization
 
         protected virtual Dictionary<string, string> GetCurrentDictionaryData()
         {
-            var v_loc = GetOrLoadCurrentData();
-            return v_loc != null? v_loc.Dictionary : null;
+            var loc = GetOrLoadCurrentData();
+            return loc != null? loc.Dictionary : null;
         }
 
         protected virtual LocalizationData GetOrLoadCurrentData()
         {
-            var v_loc = LocalizationDatas.Count > _index ? LocalizationDatas[_index] : null;
-            if (v_loc != null)
+            var loc = LocalizationDatas.Count > _index ? LocalizationDatas[_index] : null;
+            if (loc != null)
             {
-                if (!v_loc.IsLoaded && v_loc.CanLoadFromResources())
-                    v_loc.LoadFromCachedResourcesPath();
+                if (!loc.IsLoaded && loc.CanLoadFromResources())
+                    loc.LoadFromCachedResourcesPath();
             }
 
-            return v_loc;
+            return loc;
         }
 
         protected bool _isDirty = false;
@@ -295,9 +295,9 @@ namespace Kyub.Localization
             _forceReapplyToAll = true;
         }
 
-        public void TryApply(bool p_force = false)
+        public void TryApply(bool force = false)
         {
-            if (p_force || _isDirty)
+            if (force || _isDirty)
             {
                 _isDirty = false;
                 Apply();
@@ -314,110 +314,110 @@ namespace Kyub.Localization
             //Unload all other loaclization datas
             for (int i = 0; i < LocalizationDatas.Count; i++)
             {
-                var v_data = LocalizationDatas[i];
-                if (i != CurrentIndex && v_data != null &&
-                    v_data.MemoryConfigOption != LocalizationDataMemoryConfigEnum.Unloadable &&
-                    v_data.IsLoaded)
+                var data = LocalizationDatas[i];
+                if (i != CurrentIndex && data != null &&
+                    data.MemoryConfigOption != LocalizationDataMemoryConfigEnum.Unloadable &&
+                    data.IsLoaded)
                 {
-                    v_data.Unload();
+                    data.Unload();
                 }
             }
-            var v_forceReapply = _forceReapplyToAll;
+            var forceReapply = _forceReapplyToAll;
             _forceReapplyToAll = false;
 
             //Update CurrentCulture to reflect to same name as CurrentLanguage
             TryUpdateCurrentCulture();
             if (OnLocalizeChanged != null)
-                OnLocalizeChanged(v_forceReapply);
+                OnLocalizeChanged(forceReapply);
             
         }
 
-        protected internal virtual bool TryGetLocalizedText_Internal(string p_key, out string p_val)
+        protected internal virtual bool TryGetLocalizedText_Internal(string key, out string val)
         {
-            p_key = p_key != null ? Kyub.RegexUtils.BulkReplace(p_key, s_uselessCharsDict).Trim() : "";
-            var v_dictionary = GetCurrentDictionaryData();
+            key = key != null ? Kyub.RegexUtils.BulkReplace(key, s_uselessCharsDict).Trim() : "";
+            var dictionary = GetCurrentDictionaryData();
 
-            bool v_sucess = false;
+            bool sucess = false;
             if (!Application.isPlaying)
             {
-                v_sucess = false;
-                p_val = p_key;
+                sucess = false;
+                val = key;
             }
             else
             {
-                p_val = p_key;
-                if (v_dictionary != null && v_dictionary.TryGetValue(p_key, out p_val))
-                    v_sucess = true;
+                val = key;
+                if (dictionary != null && dictionary.TryGetValue(key, out val))
+                    sucess = true;
             }
 
 #if UNITY_EDITOR
-            if (m_addInvalidRequestedKeysInEditor && !v_sucess && !string.IsNullOrEmpty(p_key) && !p_key.Equals("\u200B"))
+            if (m_addInvalidRequestedKeysInEditor && !sucess && !string.IsNullOrEmpty(key) && !key.Equals("\u200B"))
             {
-                Debug.Log("[LocaleManager] Insert missing key <b>'" + p_key + "'</b> to <b>'" + CurrentLanguage + "'</b> Data");
-                var v_loc = LocalizationDatas.Count > _index ? LocalizationDatas[_index] : null;
-                if (v_loc != null)
+                Debug.Log("[LocaleManager] Insert missing key <b>'" + key + "'</b> to <b>'" + CurrentLanguage + "'</b> Data");
+                var loc = LocalizationDatas.Count > _index ? LocalizationDatas[_index] : null;
+                if (loc != null)
                 {
-                    if (v_loc._keyValueArray == null)
-                        v_loc._keyValueArray = new List<LocalizationPair>();
-                    v_loc._keyValueArray.Add(new LocalizationPair() { Key = p_key, Value = p_key });
+                    if (loc._keyValueArray == null)
+                        loc._keyValueArray = new List<LocalizationPair>();
+                    loc._keyValueArray.Add(new LocalizationPair() { Key = key, Value = key });
                 }
 
-                v_dictionary[p_key] = p_key;
+                dictionary[key] = key;
             }
 #endif
-            if (p_val == null)
-                p_val = p_key;
-            return v_sucess;
+            if (val == null)
+                val = key;
+            return sucess;
         }
 
-        protected internal bool TryClearLocaleTags_Internal(string p_text, out string p_outText)
+        protected internal bool TryClearLocaleTags_Internal(string text, out string outText)
         {
-            bool v_sucess = false;
+            bool sucess = false;
 
-            p_outText = Kyub.RegexUtils.BulkReplace(p_text, s_localeClearTagsDict);
-            if (p_text != p_outText)
-                v_sucess = true;
+            outText = Kyub.RegexUtils.BulkReplace(text, s_localeClearTagsDict);
+            if (text != outText)
+                sucess = true;
 
-            return v_sucess;
+            return sucess;
         }
 
-        protected internal virtual bool TryLocalizeByLocaleTag_Internal(string p_text, out string p_localizedValue)
+        protected internal virtual bool TryLocalizeByLocaleTag_Internal(string text, out string localizedValue)
         {
-            if (p_text.StartsWith(LOCALE_SKIP_TAG, System.StringComparison.InvariantCultureIgnoreCase))
+            if (text.StartsWith(LOCALE_SKIP_TAG, System.StringComparison.InvariantCultureIgnoreCase))
             {
-                TryClearLocaleTags_Internal(p_text, out p_localizedValue);
+                TryClearLocaleTags_Internal(text, out localizedValue);
                 return true;
             }
 
-            var v_sucess = false;
-            Dictionary<string, string> v_params = null;
-            p_localizedValue = s_localeRegexCompiled.Replace(p_text,
+            var sucess = false;
+            Dictionary<string, string> paramsDict = null;
+            localizedValue = s_localeRegexCompiled.Replace(text,
                 (m) =>
                 {
                     //Match <locale>..</locale>
                     if (m.Groups[1].Success)
                     {
-                        v_sucess = true;
-                        var v_groupLocale = m.Groups[2].Value;
-                        TryLocalizeByLocaleTag_Internal(v_groupLocale, out v_groupLocale);
+                        sucess = true;
+                        var groupLocale = m.Groups[2].Value;
+                        TryLocalizeByLocaleTag_Internal(groupLocale, out groupLocale);
 
                         //return localized locale
-                        TryGetLocalizedText_Internal(v_groupLocale, out v_groupLocale);
-                        return v_groupLocale;
+                        TryGetLocalizedText_Internal(groupLocale, out groupLocale);
+                        return groupLocale;
                     }
                     //Match <localeparam=number>..</localeparam>
                     else if (m.Groups[3].Success)
                     {
-                        v_sucess = true;
-                        var v_groupParamIndex = m.Groups[4].Value; //localeparam Index
-                        var v_groupParam = m.Groups[5].Value; //localeparam Content
-                        TryLocalizeByLocaleTag_Internal(v_groupParam, out v_groupParam);
+                        sucess = true;
+                        var groupParamIndex = m.Groups[4].Value; //localeparam Index
+                        var groupParam = m.Groups[5].Value; //localeparam Content
+                        TryLocalizeByLocaleTag_Internal(groupParam, out groupParam);
 
-                        if (v_params == null)
-                            v_params = new Dictionary<string, string>();
+                        if (paramsDict == null)
+                            paramsDict = new Dictionary<string, string>();
 
-                        v_params[@"\{" + v_groupParamIndex + @"\}"] = v_groupParam;
-                        return "{" + v_groupParamIndex + "}"; //format to replace after
+                        paramsDict[@"\{" + groupParamIndex + @"\}"] = groupParam;
+                        return "{" + groupParamIndex + "}"; //format to replace after
                     }
 
                     return m.Value;
@@ -425,13 +425,13 @@ namespace Kyub.Localization
 
 
             //Localize text and than replace the parameters found
-            if (v_params != null)
+            if (paramsDict != null)
             {
-                TryGetLocalizedText_Internal(p_localizedValue, out p_localizedValue);
-                p_localizedValue = Kyub.RegexUtils.BulkReplace(p_localizedValue, v_params);
+                TryGetLocalizedText_Internal(localizedValue, out localizedValue);
+                localizedValue = Kyub.RegexUtils.BulkReplace(localizedValue, paramsDict);
             }
 
-            return v_sucess;
+            return sucess;
         }
 
         protected virtual bool TryUpdateCurrentCulture()
@@ -455,25 +455,25 @@ namespace Kyub.Localization
 
         #region Static
 
-        public static bool TryGetLocalizedText(string p_key, out string p_localizedText, bool p_supportLocaleTag = false)
+        public static bool TryGetLocalizedText(string key, out string localizedText, bool supportLocaleTag = false)
         {
             if (InstanceExists())
             {
-                if (p_supportLocaleTag && Instance.TryLocalizeByLocaleTag_Internal(p_key, out p_localizedText))
+                if (supportLocaleTag && Instance.TryLocalizeByLocaleTag_Internal(key, out localizedText))
                     return true;
 
-                return Instance.TryGetLocalizedText_Internal(p_key, out p_localizedText);
+                return Instance.TryGetLocalizedText_Internal(key, out localizedText);
             }
             else
-                p_localizedText = p_key;
+                localizedText = key;
 
             return false;
         }
 
-        public static string GetLocalizedText(string p_key, bool p_supportLocaleTag = false)
+        public static string GetLocalizedText(string key, bool supportLocaleTag = false)
         {
             string localizedText;
-            TryGetLocalizedText(p_key, out localizedText, p_supportLocaleTag);
+            TryGetLocalizedText(key, out localizedText, supportLocaleTag);
 
             return localizedText;
         }
@@ -493,22 +493,22 @@ namespace Kyub.Localization
         [ContextMenu("ExportCurrentLocalizationData")]
         protected virtual void ExportCurrentLocalizationData()
         {
-            var v_loc = GetOrLoadCurrentData();
+            var loc = GetOrLoadCurrentData();
 
-            System.Text.StringBuilder v_builder = new System.Text.StringBuilder();
-            v_builder.AppendLine(string.Format("\"//Keys\";\"Text({0})\"" , CurrentLanguage));
-            if (v_loc != null && v_loc._keyValueArray != null)
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            builder.AppendLine(string.Format("\"//Keys\";\"Text({0})\"" , CurrentLanguage));
+            if (loc != null && loc._keyValueArray != null)
             {
-                foreach (var v_pair in v_loc._keyValueArray)
+                foreach (var pair in loc._keyValueArray)
                 {
                     //Escape to double quotemark format (used in csv)
-                    var v_key = v_pair.Key == null ? "" : v_pair.Key.Trim().Replace("\"", "\"\"").Replace("\n", "\\n").Replace("\r", "");
-                    var v_value = v_pair.Value == null ? "" : v_pair.Value.Trim().Replace("\"", "\"\"").Replace("\n", "\\n").Replace("\r", "");
-                    if (!string.IsNullOrEmpty(v_key) && !v_key.Equals("\u200B"))
-                        v_builder.AppendLine(string.Format("\"{0}\";\"{1}\"", v_key, v_value));
+                    var key = pair.Key == null ? "" : pair.Key.Trim().Replace("\"", "\"\"").Replace("\n", "\\n").Replace("\r", "");
+                    var value = pair.Value == null ? "" : pair.Value.Trim().Replace("\"", "\"\"").Replace("\n", "\\n").Replace("\r", "");
+                    if (!string.IsNullOrEmpty(key) && !key.Equals("\u200B"))
+                        builder.AppendLine(string.Format("\"{0}\";\"{1}\"", key, value));
                 }
             }
-            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.csv", v_builder.ToString());
+            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.csv", builder.ToString());
 
             UnityEditor.AssetDatabase.Refresh();
         }
@@ -630,16 +630,16 @@ namespace Kyub.Localization
         {
         }
 
-        public LocalizationData(string p_name, string p_fullName)
+        public LocalizationData(string name, string fullName)
         {
-            m_name = p_name;
-            m_fullName = p_fullName;
+            m_name = name;
+            m_fullName = fullName;
         }
 
-        public LocalizationData(string p_name, IDictionary<string, string> p_dictionary)
+        public LocalizationData(string name, IDictionary<string, string> dictionary)
         {
-            m_name = p_name;
-            _cachedDict = new Dictionary<string, string>(p_dictionary);
+            m_name = name;
+            _cachedDict = new Dictionary<string, string>(dictionary);
         }
 
         #endregion
@@ -651,27 +651,27 @@ namespace Kyub.Localization
             LoadFromResourcesPath(m_resourcesFilePath, m_fileType);
         }
 
-        protected virtual void LoadFromResourcesPath(string p_resourcesPath, LocalizationDataFileTypeEnum p_fileType)
+        protected virtual void LoadFromResourcesPath(string resourcesPath, LocalizationDataFileTypeEnum fileType)
         {
-            TextAsset v_asset = Resources.Load<TextAsset>(p_resourcesPath);
-            LoadFromAsset(v_asset, p_fileType);
-            m_resourcesFilePath = p_resourcesPath;
-            m_fileType = p_fileType;
+            TextAsset asset = Resources.Load<TextAsset>(resourcesPath);
+            LoadFromAsset(asset, fileType);
+            m_resourcesFilePath = resourcesPath;
+            m_fileType = fileType;
         }
 
-        protected virtual void LoadFromAsset(TextAsset p_asset, LocalizationDataFileTypeEnum p_fileType)
+        protected virtual void LoadFromAsset(TextAsset asset, LocalizationDataFileTypeEnum fileType)
         {
             m_resourcesFilePath = "";
-            if (p_asset != null)
+            if (asset != null)
             {
-                if (p_fileType == LocalizationDataFileTypeEnum.Csv)
+                if (fileType == LocalizationDataFileTypeEnum.Csv)
                 {
-                    LocalizationCsvFileReader v_reader = new LocalizationCsvFileReader(p_asset);
-                    _cachedDict = v_reader.ReadDictionary();
+                    LocalizationCsvFileReader reader = new LocalizationCsvFileReader(asset);
+                    _cachedDict = reader.ReadDictionary();
                 }
                 else
                 {
-                    this.LoadFromJson(p_asset.text);
+                    this.LoadFromJson(asset.text);
                     return;
                 }
                 _isLoaded = true;
@@ -687,11 +687,11 @@ namespace Kyub.Localization
             FinishLoad();
         }
 
-        public virtual void LoadFromDictionary(Dictionary<string, string> p_dict)
+        public virtual void LoadFromDictionary(Dictionary<string, string> dict)
         {
-            if (p_dict != null)
+            if (dict != null)
             {
-                _cachedDict = p_dict;
+                _cachedDict = dict;
                 _isLoaded = true;
             }
             else
@@ -702,10 +702,10 @@ namespace Kyub.Localization
             FinishLoad();
         }
 
-        public virtual void LoadFromJson(string p_json)
+        public virtual void LoadFromJson(string json)
         {
-            if (!string.IsNullOrEmpty(p_json))
-                SerializationUtils.FromJsonOverwrite(p_json, this);
+            if (!string.IsNullOrEmpty(json))
+                SerializationUtils.FromJsonOverwrite(json, this);
 
             if (_cachedDict != null || _keyValueArray != null)
             {
@@ -730,12 +730,12 @@ namespace Kyub.Localization
             {
                 _isLoaded = true;
                 _cachedDict = new Dictionary<string, string>();
-                foreach (var v_pair in _keyValueArray)
+                foreach (var pair in _keyValueArray)
                 {
-                    if (_cachedDict.ContainsKey(v_pair.Key.ToLower()))
-                        _cachedDict[v_pair.Key.ToLower()] = v_pair.Value;
+                    if (_cachedDict.ContainsKey(pair.Key.ToLower()))
+                        _cachedDict[pair.Key.ToLower()] = pair.Value;
                     else
-                        _cachedDict.Add(v_pair.Key.ToLower(), v_pair.Value);
+                        _cachedDict.Add(pair.Key.ToLower(), pair.Value);
                 }
                 if (!Application.isEditor || !Application.isPlaying)
                     _keyValueArray = null;
@@ -753,15 +753,15 @@ namespace Kyub.Localization
                 _keyValueArray = null;
             else if(Application.isPlaying)
             {
-                var v_valueArray = new List<LocalizationPair>();
+                var valueArray = new List<LocalizationPair>();
                 if (_cachedDict != null)
                 {
-                    foreach (string v_key in _cachedDict.Keys)
+                    foreach (string key in _cachedDict.Keys)
                     {
-                        v_valueArray.Add(new LocalizationPair() { Key = v_key, Value = _cachedDict[v_key] });
+                        valueArray.Add(new LocalizationPair() { Key = key, Value = _cachedDict[key] });
                     }
                 }
-                _keyValueArray = v_valueArray;
+                _keyValueArray = valueArray;
             }
         }
 
@@ -769,11 +769,11 @@ namespace Kyub.Localization
 
         #region Static Functions
 
-        public static LocalizationData CreateFromJson(string p_json)
+        public static LocalizationData CreateFromJson(string json)
         {
-            LocalizationData v_data = new LocalizationData();
-            v_data.LoadFromJson(p_json);
-            return v_data;
+            LocalizationData data = new LocalizationData();
+            data.LoadFromJson(json);
+            return data;
         }
 
         #endregion

@@ -164,13 +164,13 @@ namespace Kyub.Localization.UI
             //Only parse when richtext active (we need the <sprite=index> tag)
             if (LocaleManager.InstanceExists() || !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized))
             {
-                var v_parsedLocale = false;
-                var v_oldText = m_text;
+                var parsedLocale = false;
+                var oldText = m_text;
 
                 if (IsInputParsingRequired_Internal)
                     m_text = m_text != null ? m_text.Replace("\n", "\\n").Replace("\r", "") : null;
 
-                v_parsedLocale = !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized) ?
+                parsedLocale = !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized) ?
                     TryClearLocaleTags(m_text, out m_text) :
                     TryGetLocalizedText(m_text, out m_text);
 
@@ -186,51 +186,51 @@ namespace Kyub.Localization.UI
 
                 //Debug.Log("ParseInputTextAndEmojiCharSequence");
                 //We must revert the original text because we dont want to permanently change the text
-                m_text = v_oldText;
+                m_text = oldText;
 
 #if !TMP_2_1_0_PREVIEW_10_OR_NEWER
                 m_isCalculateSizeRequired = true;
 #endif
 
-                return v_parsedLocale;
+                return parsedLocale;
             }
 
             return false;
         }
 
-        protected bool TryClearLocaleTags(string p_text, out string p_outText)
+        protected bool TryClearLocaleTags(string text, out string outText)
         {
-            bool v_sucess = false;
+            bool sucess = false;
 
             if (m_supportLocaleRichTextTags && m_isRichText)
             {
-                p_outText = Kyub.RegexUtils.BulkReplace(p_text, LocaleManager.s_localeClearTagsDict);
-                if (p_text != p_outText)
-                    v_sucess = true;
+                outText = Kyub.RegexUtils.BulkReplace(text, LocaleManager.s_localeClearTagsDict);
+                if (text != outText)
+                    sucess = true;
             }
             else
-                p_outText = p_text;
+                outText = text;
 
-            return v_sucess;
+            return sucess;
         }
 
-        protected bool TryGetLocalizedText(string p_text, out string p_localizedValue)
+        protected bool TryGetLocalizedText(string text, out string localizedValue)
         {
-            bool v_sucess = false;
-            if (m_isLocalized && !string.IsNullOrEmpty(p_text) && LocaleManager.InstanceExists())
+            bool sucess = false;
+            if (m_isLocalized && !string.IsNullOrEmpty(text) && LocaleManager.InstanceExists())
             {
-                v_sucess = LocaleManager.TryGetLocalizedText(p_text, out p_localizedValue, m_supportLocaleRichTextTags && m_isRichText);
+                sucess = LocaleManager.TryGetLocalizedText(text, out localizedValue, m_supportLocaleRichTextTags && m_isRichText);
 
                 //Return Key value if localization is empty
-                if (!v_sucess)
-                    p_localizedValue = p_text;
+                if (!sucess)
+                    localizedValue = text;
 
                 _lastLocalizedLanguage = LocaleManager.Instance.CurrentLanguage;
             }
             else
-                p_localizedValue = p_text != null ? p_text : "";
+                localizedValue = text != null ? text : "";
 
-            return v_sucess;
+            return sucess;
         }
 
         #endregion
@@ -320,9 +320,9 @@ namespace Kyub.Localization.UI
 
         #region Receivers
 
-        protected virtual void HandleOnLocalize(bool p_forceReapply)
+        protected virtual void HandleOnLocalize(bool forceReapply)
         {
-            if (LocaleManager.InstanceExists() && m_isLocalized && (p_forceReapply || !string.Equals(_lastLocalizedLanguage, LocaleManager.Instance.CurrentLanguage)))
+            if (LocaleManager.InstanceExists() && m_isLocalized && (forceReapply || !string.Equals(_lastLocalizedLanguage, LocaleManager.Instance.CurrentLanguage)))
             {
                 //Invalidate Text
                 SetText(m_text);
