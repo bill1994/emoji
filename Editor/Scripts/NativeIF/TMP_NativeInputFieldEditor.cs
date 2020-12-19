@@ -17,7 +17,7 @@ namespace KyubEditor.UI
         private SerializedProperty m_OnReturnPressed;
         private SerializedProperty m_PanContent;
         private SerializedProperty m_GlobalFontAsset;
-        private SerializedProperty m_MonospacePasswordDistEm;
+        private SerializedProperty m_MonospacePassDistEm;
 
         protected override void OnEnable()
         {
@@ -26,7 +26,7 @@ namespace KyubEditor.UI
             m_PanContent = serializedObject.FindProperty("m_PanContent");
             m_OnReturnPressed = serializedObject.FindProperty("OnReturnPressed");
             m_GlobalFontAsset = serializedObject.FindProperty("m_GlobalFontAsset");
-            m_MonospacePasswordDistEm = serializedObject.FindProperty("m_MonospacePasswordDistEm");
+            m_MonospacePassDistEm = serializedObject.FindProperty("m_MonospacePassDistEm");
         }
 
         public override void OnInspectorGUI()
@@ -52,7 +52,7 @@ namespace KyubEditor.UI
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Password Special Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(m_AsteriskChar);
-            EditorGUILayout.PropertyField(m_MonospacePasswordDistEm);
+            EditorGUILayout.PropertyField(m_MonospacePassDistEm);
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Virtual Keyboard Layout Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(m_PanContent);
