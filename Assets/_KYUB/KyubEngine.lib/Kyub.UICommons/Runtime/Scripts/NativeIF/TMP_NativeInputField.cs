@@ -270,7 +270,7 @@ namespace Kyub.UI
                     var newMonoSpace = inputType == InputType.Password ? m_MonospacePassDistEm : 0;
 
                     if (monoSpace != newMonoSpace)
-                        property.SetValue(this, newMonoSpace);
+                        property.SetValue(m_TextComponent, newMonoSpace);
                 }
                 PreventCallback = false;
             }
