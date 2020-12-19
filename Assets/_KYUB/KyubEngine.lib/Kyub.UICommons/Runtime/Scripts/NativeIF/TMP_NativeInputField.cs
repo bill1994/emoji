@@ -14,9 +14,9 @@ namespace Kyub.UI
     {
         #region Private Variables
 
-        [Tooltip("Force monospace character with distance (value)em when password selected")]
+        [Tooltip("Force monospace character with distance (value)em when password selected.\nRequire RichText active")]
         [SerializeField]
-        protected float m_MonospacePasswordDistEm = 0.5f;
+        protected float m_MonospacePassDistEm = 0;
         [SerializeField]
         RectTransform m_PanContent = null;
 
@@ -24,17 +24,17 @@ namespace Kyub.UI
 
         #region Public Properties
 
-        public float MonospacePasswordDistEm
+        public float MonospacePassDistEm
         {
             get
             {
-                return m_MonospacePasswordDistEm;
+                return m_MonospacePassDistEm;
             }
             set
             {
-                if (m_MonospacePasswordDistEm == value)
+                if (m_MonospacePassDistEm == value)
                     return;
-                m_MonospacePasswordDistEm = value;
+                m_MonospacePassDistEm = value;
             }
         }
 
@@ -256,34 +256,24 @@ namespace Kyub.UI
         protected new void UpdateLabel()
         {
             base.UpdateLabel();
-            if (m_MonospacePasswordDistEm != 0 && inputType == InputType.Password &&
-                m_TextComponent != null && m_TextComponent.font != null && PreventCallback == false)
+
+            //Require RichText
+            if (m_TextComponent != null && m_TextComponent.font != null && richText && !PreventCallback && m_MonospacePassDistEm > 0)
             {
                 PreventCallback = true;
-                //We must support richtext when password with monospace active
-                m_TextComponent.richText = true;
-                var text = m_TextComponent.text;
-                if(ApplyMonoSpacingValues(text, out text))
+
+                //Try get Float MonospaceDistEm Property in EmojiTextUGUI of LocaleTextUGUI
+                var property = m_TextComponent.GetType().GetProperty("MonospaceDistEm", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if (property != null)
                 {
-                    m_TextComponent.text = text;
+                    var monoSpace = (float)property.GetValue(m_TextComponent);
+                    var newMonoSpace = inputType == InputType.Password ? m_MonospacePassDistEm : 0;
+
+                    if (monoSpace != newMonoSpace)
+                        property.SetValue(this, newMonoSpace);
                 }
                 PreventCallback = false;
             }
-        }
-
-        protected virtual bool ApplyMonoSpacingValues(string text, out string outText)
-        {
-            bool sucess = false;
-
-            if (m_MonospacePasswordDistEm != 0)
-            {
-                outText = "<mspace=" + m_MonospacePasswordDistEm.ToString(System.Globalization.CultureInfo.InvariantCulture) + "em>" + text;
-                sucess = true;
-            }
-            else
-                outText = text;
-
-            return sucess;
         }
 
         /// <summary>

@@ -11,6 +11,8 @@ namespace Kyub.Localization.UI
     {
         #region Private Fields
 
+        [SerializeField, Tooltip("Force monospace character with (value)em.\nRequire RichText active")]
+        protected float m_monospaceDistEm = 0;
         [SerializeField]
         protected bool m_isLocalized = true;
         [Tooltip("support use of:\n *<locale>...</locale> to localize part of text instead of the full text.\n" +
@@ -27,6 +29,21 @@ namespace Kyub.Localization.UI
         #endregion
 
         #region Properties
+
+        public float MonospaceDistEm
+        {
+            get
+            {
+                return m_monospaceDistEm;
+            }
+            set
+            {
+                if (m_monospaceDistEm == value)
+                    return;
+                m_monospaceDistEm = value;
+                SetVerticesDirty();
+            }
+        }
 
         public bool SupportLocaleRichTextTags
         {
@@ -162,7 +179,7 @@ namespace Kyub.Localization.UI
             _localeParsingRequired = false;
 
             //Only parse when richtext active (we need the <sprite=index> tag)
-            if (LocaleManager.InstanceExists() || !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized))
+            if (LocaleManager.InstanceExists() || !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized) || (m_monospaceDistEm != 0 && m_isRichText))
             {
                 var parsedLocale = false;
                 var oldText = m_text;
@@ -174,6 +191,8 @@ namespace Kyub.Localization.UI
                     TryClearLocaleTags(m_text, out m_text) :
                     TryGetLocalizedText(m_text, out m_text);
 
+                if(m_monospaceDistEm != 0)
+                    ApplyMonoSpacingValues(m_text, out m_text);
 
                 _localeParsingRequired = false;
                 IsInputParsingRequired_Internal = false;
@@ -196,6 +215,21 @@ namespace Kyub.Localization.UI
             }
 
             return false;
+        }
+
+        protected virtual bool ApplyMonoSpacingValues(string text, out string outText)
+        {
+            bool sucess = false;
+
+            if (m_monospaceDistEm != 0)
+            {
+                outText = "<mspace=" + m_monospaceDistEm.ToString(System.Globalization.CultureInfo.InvariantCulture) + "em>" + text;
+                sucess = true;
+            }
+            else
+                outText = text;
+
+            return sucess;
         }
 
         protected bool TryClearLocaleTags(string text, out string outText)
@@ -242,7 +276,7 @@ namespace Kyub.Localization.UI
             //In textmeshpro 1.4 the parameter "m_isInputParsingRequired" changed to internal, so, to dont use reflection i changed to "m_havePropertiesChanged" parameter
             if (IsInputParsingRequired_Internal)
             {
-                _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText);
+                _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
             }
             base.SetVerticesDirty();
         }

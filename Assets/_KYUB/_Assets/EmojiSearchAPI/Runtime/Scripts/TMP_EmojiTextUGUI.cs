@@ -15,11 +15,29 @@ namespace Kyub.EmojiSearch.UI
     {
         #region Private Fields
 
+        [SerializeField, Tooltip("Force monospace character with (value)em.\nRequire RichText active")]
+        protected float m_monospaceDistEm = 0;
+
         protected bool m_emojiParsingRequired = true;
 
         #endregion
 
         #region Properties
+
+        public float MonospaceDistEm
+        {
+            get
+            {
+                return m_monospaceDistEm;
+            }
+            set
+            {
+                if (m_monospaceDistEm == value)
+                    return;
+                m_monospaceDistEm = value;
+                SetVerticesDirty();
+            }
+        }
 
 #if TMP_1_4_0_OR_NEWER
         protected System.Reflection.FieldInfo _isInputParsingRequired_Field = null;
@@ -129,6 +147,9 @@ namespace Kyub.EmojiSearch.UI
 
                 parsedEmoji = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref m_text);
 
+                if (m_monospaceDistEm != 0)
+                    ApplyMonoSpacingValues(m_text, out m_text);
+
                 m_emojiParsingRequired = false;
                 IsInputParsingRequired_Internal = false;
                 InputSource_Internal = TextInputSources.Text;
@@ -150,6 +171,21 @@ namespace Kyub.EmojiSearch.UI
             }
 
             return false;
+        }
+
+        protected virtual bool ApplyMonoSpacingValues(string text, out string outText)
+        {
+            bool sucess = false;
+
+            if (m_monospaceDistEm != 0)
+            {
+                outText = "<mspace=" + m_monospaceDistEm.ToString(System.Globalization.CultureInfo.InvariantCulture) + "em>" + text;
+                sucess = true;
+            }
+            else
+                outText = text;
+
+            return sucess;
         }
 
         #endregion
