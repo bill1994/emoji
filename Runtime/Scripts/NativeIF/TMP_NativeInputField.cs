@@ -14,9 +14,9 @@ namespace Kyub.UI
     {
         #region Private Variables
 
-        [Tooltip("Force monospace character with distance (value)em when password selected.\nRequire RichText active")]
-        [SerializeField]
-        protected float m_MonospacePassDistEm = 0;
+        //[Tooltip("Force monospace character with distance (value)em when password selected.\nRequire RichText active")]
+        //[SerializeField]
+        //protected float m_MonospacePassDistEm = 0;
         [SerializeField]
         RectTransform m_PanContent = null;
 
@@ -24,7 +24,7 @@ namespace Kyub.UI
 
         #region Public Properties
 
-        public float MonospacePassDistEm
+        /*public float MonospacePassDistEm
         {
             get
             {
@@ -36,7 +36,7 @@ namespace Kyub.UI
                     return;
                 m_MonospacePassDistEm = value;
             }
-        }
+        }*/
 
         public RectTransform panContent
         {
@@ -258,7 +258,7 @@ namespace Kyub.UI
             base.UpdateLabel();
 
             //Require RichText
-            if (m_TextComponent != null && m_TextComponent.font != null && richText && !PreventCallback && m_MonospacePassDistEm > 0)
+            /*if (m_TextComponent != null && m_TextComponent.font != null && richText && !PreventCallback && m_MonospacePassDistEm > 0)
             {
                 PreventCallback = true;
 
@@ -273,7 +273,7 @@ namespace Kyub.UI
                         property.SetValue(m_TextComponent, newMonoSpace);
                 }
                 PreventCallback = false;
-            }
+            }*/
         }
 
         /// <summary>
