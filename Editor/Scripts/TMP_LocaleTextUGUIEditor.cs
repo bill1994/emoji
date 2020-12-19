@@ -15,6 +15,7 @@ namespace KyubEditor.Localization.UI
     {
         SerializedProperty m_isLocalized = null;
         SerializedProperty m_supportLocaleRichTextTags = null;
+        SerializedProperty m_monospaceDistEm = null;
 
         protected override void OnEnable()
         {
@@ -22,11 +23,13 @@ namespace KyubEditor.Localization.UI
 
             m_isLocalized = serializedObject.FindProperty("m_isLocalized");
             m_supportLocaleRichTextTags = serializedObject.FindProperty("m_supportLocaleRichTextTags");
+            m_monospaceDistEm = serializedObject.FindProperty("m_monospaceDistEm");
         }
 
         protected override void DrawExtraSettings()
         {
             //var oldGui = GUI.enabled;
+            EditorGUILayout.PropertyField(m_monospaceDistEm);
 
             var guiTarget = target as TMP_LocaleTextUGUI;
 
