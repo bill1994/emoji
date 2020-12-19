@@ -19,6 +19,20 @@ namespace KyubEditor.EmojiSearch.UI
     public class TMP_EmojiTextUGUIEditor : TMP_UiEditorPanel
 #endif
     {
+        SerializedProperty m_monospaceDistEm = null;
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+
+            m_monospaceDistEm = serializedObject.FindProperty("m_monospaceDistEm");
+        }
+
+        protected override void DrawExtraSettings()
+        {
+            EditorGUILayout.PropertyField(m_monospaceDistEm);
+
+            base.DrawExtraSettings();
+        }
     }
 }
 
