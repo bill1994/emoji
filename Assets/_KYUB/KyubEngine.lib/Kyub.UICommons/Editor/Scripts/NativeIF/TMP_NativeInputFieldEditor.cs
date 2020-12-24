@@ -6,6 +6,7 @@ using UnityEditor;
 using Kyub;
 using Kyub.UI;
 using TMPro;
+using Kyub.Internal.NativeInputPlugin;
 
 namespace KyubEditor.UI
 {
@@ -17,6 +18,13 @@ namespace KyubEditor.UI
         private SerializedProperty m_OnReturnPressed;
         private SerializedProperty m_PanContent;
         private SerializedProperty m_GlobalFontAsset;
+
+        private SerializedProperty m_ShowDoneButton;
+        private SerializedProperty m_ShowClearButton;
+        private SerializedProperty m_ReturnKeyType;
+
+        private SerializedProperty m_TextComponent;
+        
         //private SerializedProperty m_MonospacePassDistEm;
 
         protected override void OnEnable()
@@ -27,11 +35,18 @@ namespace KyubEditor.UI
             m_OnReturnPressed = serializedObject.FindProperty("OnReturnPressed");
             m_GlobalFontAsset = serializedObject.FindProperty("m_GlobalFontAsset");
             //m_MonospacePassDistEm = serializedObject.FindProperty("m_MonospacePassDistEm");
+
+            m_ShowDoneButton = serializedObject.FindProperty("m_ShowDoneButton");
+            m_ShowClearButton = serializedObject.FindProperty("m_ShowClearButton");
+            m_ReturnKeyType = serializedObject.FindProperty("m_ReturnKeyType");
+            m_TextComponent = serializedObject.FindProperty("m_TextComponent");
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+            EditorGUI.BeginDisabledGroup(m_TextComponent == null || m_TextComponent.objectReferenceValue == null);
+
             var cachedFont = m_GlobalFontAsset.objectReferenceValue;
             
             base.OnInspectorGUI();
@@ -57,9 +72,24 @@ namespace KyubEditor.UI
             EditorGUILayout.LabelField("Virtual Keyboard Layout Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(m_PanContent);
 
-            GUILayout.Space(5);
-            EditorGUILayout.PropertyField(m_OnReturnPressed);
+            OnGUIExtraNativeFields();
+            EditorGUI.EndDisabledGroup();
+
             serializedObject.ApplyModifiedProperties();
+        }
+
+        public virtual void OnGUIExtraNativeFields()
+        {
+            GUILayout.Space(20);
+            GUILayout.Label("Native Keyboard Return Type", EditorStyles.boldLabel);
+            m_ReturnKeyType.enumValueIndex = GUILayout.Toolbar((int)m_ReturnKeyType.enumValueIndex, new string[] { "Default", "Next", "Done", "Search" });
+            EditorGUILayout.Space();
+            GUILayout.Label("Native Keyboard Options", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(m_ShowDoneButton, new GUIContent("Show \"Done\" button"));
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_ShowClearButton, new GUIContent("Show \"Clear\" button"));
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_OnReturnPressed);
         }
     }
 }

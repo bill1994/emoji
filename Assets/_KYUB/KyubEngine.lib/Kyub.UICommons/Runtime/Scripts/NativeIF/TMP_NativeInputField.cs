@@ -18,7 +18,14 @@ namespace Kyub.UI
         //[SerializeField]
         //protected float m_MonospacePassDistEm = 0;
         [SerializeField]
-        RectTransform m_PanContent = null;
+        protected RectTransform m_PanContent = null;
+
+        [SerializeField]
+        protected bool m_ShowDoneButton = true;
+        [SerializeField]
+        protected bool m_ShowClearButton = false;
+        [SerializeField]
+        protected MobileInputBehaviour.ReturnKeyType m_ReturnKeyType = MobileInputBehaviour.ReturnKeyType.Done;
 
         #endregion
 
@@ -51,6 +58,51 @@ namespace Kyub.UI
                 if (m_PanContent == value)
                     return;
                 m_PanContent = value;
+            }
+        }
+
+        public bool showDoneButton
+        {
+            get
+            {
+                return m_ShowDoneButton;
+            }
+            set
+            {
+                if (m_ShowDoneButton == value)
+                    return;
+                m_ShowDoneButton = value;
+                ApplyNativeKeyboardParams();
+            }
+        }
+
+        public bool showClearButton
+        {
+            get
+            {
+                return m_ShowClearButton;
+            }
+            set
+            {
+                if (m_ShowClearButton == value)
+                    return;
+                m_ShowClearButton = value;
+                ApplyNativeKeyboardParams();
+            }
+        }
+
+        public MobileInputBehaviour.ReturnKeyType returnKeyType
+        {
+            get
+            {
+                return m_ReturnKeyType;
+            }
+            set
+            {
+                if (m_ReturnKeyType == value)
+                    return;
+                m_ReturnKeyType = value;
+                ApplyNativeKeyboardParams();
             }
         }
 
@@ -99,6 +151,7 @@ namespace Kyub.UI
                 }
             }
 
+            ApplyNativeKeyboardParams();
             //Activate native edit box
             if (nativeBox != null)
             {
@@ -297,6 +350,24 @@ namespace Kyub.UI
 
         #region Helper Functions
 
+        protected virtual void ApplyNativeKeyboardParams()
+        {
+            MobileInputBehaviour nativeBox = GetComponent<MobileInputBehaviour>();
+            if (nativeBox != null)
+            {
+                var changed = m_ReturnKeyType != nativeBox.ReturnKey ||
+                    m_ShowClearButton != nativeBox.IsWithClearButton ||
+                    m_ShowDoneButton != nativeBox.IsWithDoneButton;
+
+                nativeBox.ReturnKey = m_ReturnKeyType;
+                nativeBox.IsWithClearButton = m_ShowClearButton;
+                nativeBox.IsWithDoneButton = m_ShowDoneButton;
+
+                if(changed)
+                    MarkToRecreateKeyboard();
+            }
+        }
+
         protected new void UpdateLabel()
         {
             base.UpdateLabel();
@@ -345,6 +416,13 @@ namespace Kyub.UI
             var nativeBox = GetComponent<MobileInputBehaviour>();
             if (nativeBox != null)
                 nativeBox.RecreateNativeEdit();
+        }
+
+        public void MarkToRecreateKeyboard()
+        {
+            var nativeBox = GetComponent<MobileInputBehaviour>();
+            if (nativeBox != null)
+                nativeBox.MarkToRecreateNativeEdit();
         }
 
         #endregion

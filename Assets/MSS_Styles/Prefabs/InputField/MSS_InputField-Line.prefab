@@ -1698,6 +1698,9 @@ MonoBehaviour:
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
   m_PanContent: {fileID: 0}
+  m_ShowDoneButton: 1
+  m_ShowClearButton: 0
+  m_ReturnKeyType: 2
   OnReturnPressed:
     m_PersistentCalls:
       m_Calls: []
@@ -1744,7 +1747,7 @@ MonoBehaviour:
   m_ActiveLineTransform: {fileID: 224528054761638240}
   m_LeftContentTransform: {fileID: 4908730340147961153}
   m_RightContentTransform: {fileID: 6041012654101038546}
-  m_ClearButton: {fileID: 114238903104461062}
+  m_ClearButton: {fileID: 224449771468203420}
   m_ActiveLineCanvasGroup: {fileID: 0}
   m_HintTextCanvasGroup: {fileID: 225479618651563814}
   m_ValidationCanvasGroup: {fileID: 225613140615027262}
@@ -1781,6 +1784,7 @@ MonoBehaviour:
     m_Right: 15
     m_Top: 6
     m_Bottom: 6
+  m_ClearButtonDisplayMode: 0
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
