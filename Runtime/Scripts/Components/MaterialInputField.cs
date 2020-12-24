@@ -1,6 +1,3 @@
-//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
-
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -39,6 +36,12 @@ namespace MaterialUI
             Default,
             IgnoreContent,
             IgnoreContentAndPadding
+        }
+
+        public enum ClearButtonDisplayModeEnum
+        {
+            Manual,
+            Auto
         }
 
         public enum ColorSelectionState
@@ -106,7 +109,7 @@ namespace MaterialUI
         [SerializeField]
         private RectTransform m_RightContentTransform = null;
         [SerializeField]
-        private MaterialButton m_ClearButton = null;
+        private RectTransform m_ClearButton = null;
         [SerializeField]
         private CanvasGroup m_ActiveLineCanvasGroup = null;
         [SerializeField]
@@ -176,6 +179,8 @@ namespace MaterialUI
         float m_AnimationDuration = 0.25f;
         [SerializeField, SerializeStyleProperty]
         private RectOffset m_Padding = new RectOffset();
+        [SerializeField, SerializeStyleProperty]
+        ClearButtonDisplayModeEnum m_ClearButtonDisplayMode = ClearButtonDisplayModeEnum.Manual;
 
         [System.NonSerialized]
         private Selectable m_InputField = null;
@@ -766,7 +771,9 @@ namespace MaterialUI
             {
                 if (m_RectTransform == null)
                 {
-                    m_RectTransform = (RectTransform)transform;
+                    m_RectTransform = transform as RectTransform;
+                    if (m_RectTransform == null)
+                        m_RectTransform = gameObject.AddComponent<RectTransform>();
                 }
                 return m_RectTransform;
             }
@@ -928,7 +935,7 @@ namespace MaterialUI
             }
         }
 
-        public MaterialButton clearButton
+        public RectTransform clearButton
         {
             get { return m_ClearButton; }
             set
@@ -936,6 +943,9 @@ namespace MaterialUI
                 m_ClearButton = value;
                 SetLayoutDirty();
                 RefreshVisualStyles();
+
+                if (m_ClearButton != null && m_ClearButtonDisplayMode == ClearButtonDisplayModeEnum.Auto)
+                    SetClearButtonActive(!string.IsNullOrEmpty(text));
             }
         }
 
@@ -1323,6 +1333,23 @@ namespace MaterialUI
             }
         }
 
+        public ClearButtonDisplayModeEnum clearButtonDisplayMode
+        {
+            get
+            {
+                return m_ClearButtonDisplayMode;
+            }
+            set
+            {
+                if (m_ClearButtonDisplayMode == value)
+                    return;
+                m_ClearButtonDisplayMode = value;
+
+                if (m_ClearButtonDisplayMode == ClearButtonDisplayModeEnum.Auto)
+                    SetClearButtonActive(!string.IsNullOrEmpty(text));
+            }
+        }
+
         #endregion
 
         #region Unity Functions
@@ -1540,7 +1567,9 @@ namespace MaterialUI
             ValidateText();
             if (!m_FloatingHint)
                 SetHintLayoutToFloatingValue();
-            SetClearButtonActive(!string.IsNullOrEmpty(value));
+
+            if(m_ClearButtonDisplayMode == ClearButtonDisplayModeEnum.Auto)
+                SetClearButtonActive(!string.IsNullOrEmpty(value));
         }
 
         #endregion
@@ -2192,17 +2221,6 @@ namespace MaterialUI
             if (this == null || !Application.isPlaying || !this.gameObject.scene.IsValid())
                 return;
 
-#if UNITY_IOS && !UNITY_EDITOR && UI_COMMONS_DEFINED
-            if (isActive && Application.isMobilePlatform)
-            {
-                //We must check if is iOS platform because ios native input contains native clear button
-                var nativeInput = inputField as Kyub.Internal.NativeInputPlugin.INativeInputField;
-                if (nativeInput != null && !nativeInput.IsDestroyed() && nativeInput.shouldHideMobileInput)
-                {
-                    isActive = false;
-                }
-            }   
-#endif
             if (m_ClearButton != null && m_ClearButton.gameObject.activeSelf != isActive)
                 m_ClearButton.gameObject.SetActive(isActive);
         }

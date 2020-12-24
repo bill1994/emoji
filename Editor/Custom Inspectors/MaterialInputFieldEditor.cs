@@ -75,6 +75,7 @@ namespace MaterialUI
         private SerializedProperty m_CounterActiveColor;
         private SerializedProperty m_CounterInactiveColor;
 
+        private SerializedProperty m_ClearButtonDisplayMode;
         private SerializedProperty m_Padding;
         private SerializedProperty m_LeftContentGraphic;
         private SerializedProperty m_RightContentGraphic;
@@ -154,6 +155,7 @@ namespace MaterialUI
             m_LeftContentGraphic = serializedObject.FindProperty("m_LeftContentGraphic");
             m_RightContentGraphic = serializedObject.FindProperty("m_RightContentGraphic");
 
+            m_ClearButtonDisplayMode = serializedObject.FindProperty("m_ClearButtonDisplayMode");
             m_Padding = serializedObject.FindProperty("m_Padding");
 
             onValueChanged = serializedObject.FindProperty("onValueChanged");
@@ -231,6 +233,9 @@ namespace MaterialUI
             EditorGUILayout.Space();
 
             LayoutStyle_PropertyField(m_AnimationDuration);
+            EditorGUILayout.Space();
+
+            LayoutStyle_PropertyField(m_ClearButtonDisplayMode);
             EditorGUILayout.Space();
 
             LayoutStyle_PropertyField(m_BackgroundLayoutMode);
@@ -324,7 +329,6 @@ namespace MaterialUI
             EditorGUILayout.Space();
 
             LayoutStyle_PropertyField(m_Padding, true);
-
             EditorGUILayout.Space();
 
             DrawFoldoutColors(ColorsSection);
