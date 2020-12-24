@@ -324,6 +324,11 @@ namespace Kyub.Internal.NativeInputPlugin
                 _inputObject.onValueChanged.RemoveListener(HandleOnInputValueChanged);
         }
 
+        public void MarkToRecreateNativeEdit()
+        {
+            _needRecreate = true;
+        }
+
         public void RecreateNativeEdit()
         {
             RecreateNativeEdit(Visible);
@@ -717,8 +722,11 @@ namespace Kyub.Internal.NativeInputPlugin
         public void Show()
         {
             var isVisible = true;
-            if (_isMobileInputCreated && !Mathf.Approximately(GetNativeFontSize(), _config.FontSize))
+            if (_isMobileInputCreated && (!Mathf.Approximately(GetNativeFontSize(), _config.FontSize) || _needRecreate))
+            {
+                _needRecreate = false;
                 RecreateNativeEdit(isVisible);
+            }
             else
                 SetVisibleAndFocus_Internal(isVisible);
         }

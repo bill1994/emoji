@@ -17,6 +17,13 @@ namespace Kyub.UI
         [SerializeField]
         RectTransform m_TextViewport = null;
 
+        [SerializeField]
+        protected bool m_ShowDoneButton = true;
+        [SerializeField]
+        protected bool m_ShowClearButton = false;
+        [SerializeField]
+        protected MobileInputBehaviour.ReturnKeyType m_ReturnKeyType = MobileInputBehaviour.ReturnKeyType.Done;
+
         #endregion
 
         #region Public Properties
@@ -53,6 +60,51 @@ namespace Kyub.UI
             }
         }
 
+        public bool showDoneButton
+        {
+            get
+            {
+                return m_ShowDoneButton;
+            }
+            set
+            {
+                if (m_ShowDoneButton == value)
+                    return;
+                m_ShowDoneButton = value;
+                ApplyNativeKeyboardParams();
+            }
+        }
+
+        public bool showClearButton
+        {
+            get
+            {
+                return m_ShowClearButton;
+            }
+            set
+            {
+                if (m_ShowClearButton == value)
+                    return;
+                m_ShowClearButton = value;
+                ApplyNativeKeyboardParams();
+            }
+        }
+
+        public MobileInputBehaviour.ReturnKeyType returnKeyType
+        {
+            get
+            {
+                return m_ReturnKeyType;
+            }
+            set
+            {
+                if (m_ReturnKeyType == value)
+                    return;
+                m_ReturnKeyType = value;
+                ApplyNativeKeyboardParams();
+            }
+        }
+
         #endregion
 
         #region Callbacks
@@ -78,32 +130,33 @@ namespace Kyub.UI
             base.OnEnable();
             CheckAsteriskChar();
 
-            MobileInputBehaviour v_nativeBox = GetComponent<MobileInputBehaviour>();
+            MobileInputBehaviour nativeBox = GetComponent<MobileInputBehaviour>();
             if (MobileInputBehaviour.IsSupported())
             {
-                if (v_nativeBox == null && Application.isPlaying)
-                    v_nativeBox = gameObject.AddComponent<MobileInputBehaviour>();
+                if (nativeBox == null && Application.isPlaying)
+                    nativeBox = gameObject.AddComponent<MobileInputBehaviour>();
             }
             //Not Supported Platform
             else
             {
                 if (Application.isPlaying)
                 {
-                    if (v_nativeBox != null)
+                    if (nativeBox != null)
                     {
 
                         Debug.LogWarning("[NativeInputField] Not Supported Platform (sender " + name + ")");
-                        GameObject.Destroy(v_nativeBox);
+                        GameObject.Destroy(nativeBox);
                     }
                 }
             }
 
+            ApplyNativeKeyboardParams();
             //Activate native edit box
-            if (v_nativeBox != null)
+            if (nativeBox != null)
             {
-                v_nativeBox.hideFlags = HideFlags.None;
-                if (enabled && !v_nativeBox.enabled)
-                    v_nativeBox.enabled = true;
+                nativeBox.hideFlags = HideFlags.None;
+                if (enabled && !nativeBox.enabled)
+                    nativeBox.enabled = true;
             }
             RegisterEvents();
         }
@@ -112,9 +165,9 @@ namespace Kyub.UI
         {
             base.OnDestroy();
 
-            var v_nativeBox = GetComponent<MobileInputBehaviour>();
-            if (v_nativeBox != null)
-                v_nativeBox.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
+            var nativeBox = GetComponent<MobileInputBehaviour>();
+            if (nativeBox != null)
+                nativeBox.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
 
             UnregisterEvents();
         }
@@ -167,9 +220,9 @@ namespace Kyub.UI
             //Get keycode pressed before consume event
             if (IsNativeKeyboardSupported())
             {
-                var v_oldShouldActivateNextUpdate = ShouldActivateNextUpdate;
+                var oldShouldActivateNextUpdate = ShouldActivateNextUpdate;
                 //Prevent Unity Keyboard Activation when call base.OnUpdateSelected(eventData);
-                if (v_oldShouldActivateNextUpdate)
+                if (oldShouldActivateNextUpdate)
                 {
                     ShouldActivateNextUpdate = false;
                     SafeActivateInputFieldInternal();
@@ -203,18 +256,18 @@ namespace Kyub.UI
                 if (ProcessingEvent.rawType == EventType.KeyDown)
                 {
                     consumedEvent = true;
-                    var v_shouldBreak = false;
+                    var shouldBreak = false;
                     var shouldContinue = KeyPressed(ProcessingEvent);
                     if (shouldContinue == EditState.Finish)
                     {
                         DeactivateInputField();
-                        v_shouldBreak = true;
+                        shouldBreak = true;
                     }
                     //Extra feature to check KeyPress Down in non supported platforms
                     CheckReturnPressedNonSupportedPlatforms(ProcessingEvent);
 
                     //Break loop if needed
-                    if (v_shouldBreak)
+                    if (shouldBreak)
                         break;
                 }
             }
@@ -235,20 +288,38 @@ namespace Kyub.UI
 
         #region Helper Functions
 
+        protected virtual void ApplyNativeKeyboardParams()
+        {
+            MobileInputBehaviour nativeBox = GetComponent<MobileInputBehaviour>();
+            if (nativeBox != null)
+            {
+                var changed = m_ReturnKeyType != nativeBox.ReturnKey ||
+                    m_ShowClearButton != nativeBox.IsWithClearButton ||
+                    m_ShowDoneButton != nativeBox.IsWithDoneButton;
+
+                nativeBox.ReturnKey = m_ReturnKeyType;
+                nativeBox.IsWithClearButton = m_ShowClearButton;
+                nativeBox.IsWithDoneButton = m_ShowDoneButton;
+
+                if (changed)
+                    MarkToRecreateKeyboard();
+            }
+        }
+
         /// <summary>
         /// Force update text in Native Keyboard
         /// </summary>
-        /// <param name="p_text"></param>
-        public bool SetTextNative(string p_text)
+        /// <param name="text"></param>
+        public bool SetTextNative(string text)
         {
-            var v_nativeBox = GetComponent<MobileInputBehaviour>();
-            if (v_nativeBox != null)
+            var nativeBox = GetComponent<MobileInputBehaviour>();
+            if (nativeBox != null)
             {
-                v_nativeBox.Text = p_text;
+                nativeBox.Text = text;
                 return true;
             }
             else
-                this.text = p_text;
+                this.text = text;
             return false;
         }
 
@@ -257,9 +328,16 @@ namespace Kyub.UI
         /// </summary>
         public void RecreateKeyboard()
         {
-            var v_nativeBox = GetComponent<MobileInputBehaviour>();
-            if (v_nativeBox != null)
-                v_nativeBox.RecreateNativeEdit();
+            var nativeBox = GetComponent<MobileInputBehaviour>();
+            if (nativeBox != null)
+                nativeBox.RecreateNativeEdit();
+        }
+
+        public void MarkToRecreateKeyboard()
+        {
+            var nativeBox = GetComponent<MobileInputBehaviour>();
+            if (nativeBox != null)
+                nativeBox.MarkToRecreateNativeEdit();
         }
 
         #endregion
@@ -442,15 +520,15 @@ namespace Kyub.UI
 #endif
         }
 
-        protected virtual void CheckReturnPressedNonSupportedPlatforms(Event p_event)
+        protected virtual void CheckReturnPressedNonSupportedPlatforms(Event action)
         {
             if (!TouchScreenKeyboard.isSupported &&
-                (p_event != null && p_event.isKey && p_event.rawType == EventType.KeyDown))
+                (action != null && action.isKey && action.rawType == EventType.KeyDown))
             {
-                var v_returnPressed = p_event.keyCode == KeyCode.Return;
-                //var v_tabPressed = p_event.keyCode == KeyCode.Tab;
-                if ((lineType != LineType.MultiLineNewline && v_returnPressed) ||
-                    (lineType == LineType.MultiLineNewline && p_event.shift && v_returnPressed))
+                var returnPressed = action.keyCode == KeyCode.Return;
+                //var tabPressed = event.keyCode == KeyCode.Tab;
+                if ((lineType != LineType.MultiLineNewline && returnPressed) ||
+                    (lineType == LineType.MultiLineNewline && action.shift && returnPressed))
                 {
                     HandleOnReturnPressed();
                 }
@@ -462,9 +540,9 @@ namespace Kyub.UI
             UnregisterEvents();
             if (IsNativeKeyboardSupported())
             {
-                var v_nativeBox = GetComponent<MobileInputBehaviour>();
-                if (v_nativeBox != null && v_nativeBox.OnReturnPressedEvent != null)
-                    v_nativeBox.OnReturnPressedEvent.AddListener(HandleOnReturnPressed);
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null && nativeBox.OnReturnPressedEvent != null)
+                    nativeBox.OnReturnPressedEvent.AddListener(HandleOnReturnPressed);
             }
         }
 
@@ -472,22 +550,22 @@ namespace Kyub.UI
         {
             if (IsNativeKeyboardSupported())
             {
-                var v_nativeBox = GetComponent<MobileInputBehaviour>();
-                if (v_nativeBox != null && v_nativeBox.OnReturnPressedEvent != null)
-                    v_nativeBox.OnReturnPressedEvent.RemoveListener(HandleOnReturnPressed);
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null && nativeBox.OnReturnPressedEvent != null)
+                    nativeBox.OnReturnPressedEvent.RemoveListener(HandleOnReturnPressed);
             }
         }
 
         protected bool IsUnityKeyboardSupported()
         {
-            var v_isSupported = TouchScreenKeyboard.isSupported && (!shouldHideMobileInput || !MobileInputBehaviour.IsSupported());
-            return v_isSupported;
+            var isSupported = TouchScreenKeyboard.isSupported && (!shouldHideMobileInput || !MobileInputBehaviour.IsSupported());
+            return isSupported;
         }
 
         protected bool IsNativeKeyboardSupported()
         {
-            var v_isSupported = TouchScreenKeyboard.isSupported && shouldHideMobileInput && MobileInputBehaviour.IsSupported();
-            return v_isSupported;
+            var isSupported = TouchScreenKeyboard.isSupported && shouldHideMobileInput && MobileInputBehaviour.IsSupported();
+            return isSupported;
         }
 
         #endregion
@@ -659,11 +737,11 @@ namespace Kyub.UI
 
             if (IsNativeKeyboardSupported())
             {
-                var v_nativeBox = GetComponent<MobileInputBehaviour>();
-                if (v_nativeBox != null)
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null)
                 {
-                    v_nativeBox.Text = m_Text;
-                    v_nativeBox.Show();
+                    nativeBox.Text = m_Text;
+                    nativeBox.Show();
                 }
                 ShouldActivateNextUpdate = false;
                 AllowInput = true;
@@ -689,11 +767,11 @@ namespace Kyub.UI
             }
             else if (IsNativeKeyboardSupported())
             {
-                var v_nativeBox = GetComponent<MobileInputBehaviour>();
-                if (v_nativeBox != null)
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null)
                 {
-                    v_nativeBox.Text = m_Text;
-                    v_nativeBox.Show();
+                    nativeBox.Text = m_Text;
+                    nativeBox.Show();
                 }
             }
             else

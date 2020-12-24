@@ -17,6 +17,10 @@ namespace KyubEditor.UI
         private SerializedProperty m_TextViewport;
         private SerializedProperty m_PanContent;
 
+        private SerializedProperty m_ShowDoneButton;
+        private SerializedProperty m_ShowClearButton;
+        private SerializedProperty m_ReturnKeyType;
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -24,6 +28,10 @@ namespace KyubEditor.UI
             m_AsteriskChar = serializedObject.FindProperty("m_AsteriskChar");
             m_PanContent = serializedObject.FindProperty("m_PanContent");
             m_OnReturnPressed = serializedObject.FindProperty("OnReturnPressed");
+
+            m_ShowDoneButton = serializedObject.FindProperty("m_ShowDoneButton");
+            m_ShowClearButton = serializedObject.FindProperty("m_ShowClearButton");
+            m_ReturnKeyType = serializedObject.FindProperty("m_ReturnKeyType");
         }
 
         public override void OnInspectorGUI()
@@ -42,9 +50,22 @@ namespace KyubEditor.UI
             EditorGUILayout.LabelField("Virtual Keyboard Layout Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(m_PanContent);
 
-            GUILayout.Space(5);
-            EditorGUILayout.PropertyField(m_OnReturnPressed);
+            OnGUIExtraNativeFields();
             serializedObject.ApplyModifiedProperties();
+        }
+
+        public virtual void OnGUIExtraNativeFields()
+        {
+            GUILayout.Space(20);
+            GUILayout.Label("Native Keyboard Return Type", EditorStyles.boldLabel);
+            m_ReturnKeyType.enumValueIndex = GUILayout.Toolbar((int)m_ReturnKeyType.enumValueIndex, new string[] { "Default", "Next", "Done", "Search" });
+            EditorGUILayout.Space();
+            GUILayout.Label("Native Keyboard Options", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(m_ShowDoneButton, new GUIContent("Show \"Done\" button"));
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_ShowClearButton, new GUIContent("Show \"Clear\" button"));
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_OnReturnPressed);
         }
     }
 }
