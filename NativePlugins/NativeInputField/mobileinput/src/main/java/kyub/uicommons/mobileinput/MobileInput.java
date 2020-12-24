@@ -23,6 +23,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import com.unity3d.player.UnityPlayer;
 import java.io.IOException;
 
 public class MobileInput {
@@ -470,9 +472,17 @@ public class MobileInput {
             double width = data.getDouble("width") * (double) layout.getWidth();
             double height = data.getDouble("height") * (double) layout.getHeight();
             Rect rect = new Rect((int) x, (int) y, (int) (x + width), (int) (y + height));
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(rect.width(), rect.height() + edit.getPaddingBottom());
+            final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(rect.width(), rect.height() + edit.getPaddingBottom());
             params.setMargins(rect.left, rect.top, 0, 0);
-            edit.setLayoutParams(params);
+
+            //Fix crash when SetRect is applied outside main thread
+            final Activity a = UnityPlayer.currentActivity;
+            a.runOnUiThread(new Runnable() {public void run() {
+                if (edit == null) {
+                    return;
+                }
+                edit.setLayoutParams(params);
+            }});
         } catch (JSONException e) {}
     }
 
