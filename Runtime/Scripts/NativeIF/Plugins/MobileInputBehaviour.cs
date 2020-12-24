@@ -28,6 +28,8 @@ namespace Kyub.Internal.NativeInputPlugin
         RectTransform textViewport { get; set; }
         TouchScreenKeyboardType keyboardType { get; set; }
 
+        bool shouldHideMobileInput { get; set; }
+
         //Used as reference to PAN all screen
         RectTransform panContent { get; set; }
 

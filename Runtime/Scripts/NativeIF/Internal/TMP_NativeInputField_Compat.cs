@@ -15,18 +15,6 @@ namespace Kyub.UI
 {
     public partial class TMP_NativeInputField : TMPro.TMP_InputField, INativeInputField
     {
-        #region Unity Functions
-
-#if FIX_NEW_INPUTSYSTEM_SUPPORT
-
-        public override void OnPointerDown(PointerEventData eventData)
-        {
-            BaseOnPointerDown(eventData);
-        }
-#endif
-
-        #endregion
-
         #region Base Unity Functions
 
         protected virtual void BaseOnDisable()

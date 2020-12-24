@@ -10,7 +10,7 @@ using Kyub.EventSystems;
 
 namespace Kyub.UI
 {
-    public partial class TMP_NativeInputField : TMPro.TMP_InputField, INativeInputField
+    public partial class TMP_NativeInputField : TMPro.TMP_InputField, INativeInputField, IPointerDownHandler, IPointerUpHandler
     {
         #region Private Variables
 
@@ -151,12 +151,75 @@ namespace Kyub.UI
             UnregisterEvents();
         }
 
+        protected bool _isPointerPressed = false;
+        public override void OnPointerDown(PointerEventData eventData)
+        {
+            _isPointerPressed = true;
+            BaseOnPointerDown(eventData);
+        }
+
+        public override void OnPointerUp(PointerEventData eventData)
+        {
+            _isPointerPressed = false;
+            base.OnPointerUp(eventData);
+        }
+
         public override void OnSelect(BaseEventData eventData)
         {
             HasSelection = true;
             EvaluateAndTransitionToSelectionState(eventData);
             SendOnFocus();
-            ActivateInputField();
+
+            //We can only activate inputfield if not raised by pointerdown event as we want to only activate inputfield in OnPointerClick
+            if(!_isPointerPressed)
+                ActivateInputField();
+        }
+
+        public override void OnScroll(PointerEventData eventData)
+        {
+            if (!isFocused && transform.parent != null)
+                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.scrollHandler);
+            else
+                base.OnScroll(eventData);
+        }
+
+        protected bool _isDragging = false;
+        public override void OnBeginDrag(PointerEventData eventData)
+        {
+            if (!isFocused && transform.parent != null)
+            {
+                _isDragging = true;
+                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
+            }
+            else
+                base.OnBeginDrag(eventData);
+        }
+
+        public override void OnDrag(PointerEventData eventData)
+        {
+            if (!isFocused && transform.parent != null && _isDragging)
+                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
+            else
+                base.OnDrag(eventData);
+        }
+
+        public override void OnEndDrag(PointerEventData eventData)
+        {
+            var isDragging = _isDragging;
+            _isDragging = false;
+
+            if (!isFocused && transform.parent != null && isDragging)
+                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
+            else
+                base.OnEndDrag(eventData);
+        }
+
+        public override void OnPointerClick(PointerEventData eventData)
+        {
+            if (_isDragging)
+                return;
+
+            base.OnPointerClick(eventData);
         }
 
         public override void OnUpdateSelected(BaseEventData eventData)
