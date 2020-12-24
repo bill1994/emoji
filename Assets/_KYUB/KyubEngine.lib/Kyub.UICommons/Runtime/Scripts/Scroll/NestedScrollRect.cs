@@ -54,7 +54,7 @@ namespace Kyub.UI
         /// </summary>
         public override void OnInitializePotentialDrag(PointerEventData eventData)
         {
-            if (m_NestedDragActive)
+            if (m_NestedDragActive && transform.parent != null)
                 ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.initializePotentialDrag);
             base.OnInitializePotentialDrag(eventData);
         }
@@ -64,7 +64,7 @@ namespace Kyub.UI
         /// </summary>
         public override void OnDrag(UnityEngine.EventSystems.PointerEventData eventData)
         {
-            if (_routeToParent && m_NestedDragActive)
+            if (_routeToParent && m_NestedDragActive && transform.parent != null)
                 ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
             else
                 base.OnDrag(eventData);
@@ -82,7 +82,7 @@ namespace Kyub.UI
             else
                 _routeToParent = false;
 
-            if (_routeToParent && m_NestedDragActive)
+            if (_routeToParent && m_NestedDragActive && transform.parent != null)
                 ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
             else
                 base.OnBeginDrag(eventData);
@@ -93,7 +93,7 @@ namespace Kyub.UI
         /// </summary>
         public override void OnEndDrag(UnityEngine.EventSystems.PointerEventData eventData)
         {
-            if (_routeToParent && m_NestedDragActive)
+            if (_routeToParent && m_NestedDragActive && transform.parent != null)
                 ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
             else
                 base.OnEndDrag(eventData);

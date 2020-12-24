@@ -56,6 +56,7 @@ namespace MaterialUI
         private SerializedProperty m_ActiveLineTransform;
         private SerializedProperty m_LeftContentTransform;
         private SerializedProperty m_RightContentTransform;
+        private SerializedProperty m_ClearButton;
 
         private SerializedProperty m_LeftContentActiveColor;
         private SerializedProperty m_LeftContentInactiveColor;
@@ -80,6 +81,7 @@ namespace MaterialUI
 
         private SerializedProperty onValueChanged;
         private SerializedProperty onEndEdit;
+        private SerializedProperty onReturnPressed;
 
         protected override void OnEnable()
         {
@@ -130,6 +132,7 @@ namespace MaterialUI
             m_ActiveLineTransform = serializedObject.FindProperty("m_ActiveLineTransform");
             m_LeftContentTransform = serializedObject.FindProperty("m_LeftContentTransform");
             m_RightContentTransform = serializedObject.FindProperty("m_RightContentTransform");
+            m_ClearButton = serializedObject.FindProperty("m_ClearButton");
 
             m_LeftContentActiveColor = serializedObject.FindProperty("m_LeftContentActiveColor");
             m_LeftContentInactiveColor = serializedObject.FindProperty("m_LeftContentInactiveColor");
@@ -155,6 +158,7 @@ namespace MaterialUI
 
             onValueChanged = serializedObject.FindProperty("onValueChanged");
             onEndEdit = serializedObject.FindProperty("onEndEdit");
+            onReturnPressed = serializedObject.FindProperty("onReturnPressed");
 
             foreach (var target in targets)
             {
@@ -330,6 +334,7 @@ namespace MaterialUI
 
             EditorGUILayout.PropertyField(onValueChanged);
             EditorGUILayout.PropertyField(onEndEdit);
+            EditorGUILayout.PropertyField(onReturnPressed);
 
             DrawStyleGUIFolder();
 
@@ -379,6 +384,8 @@ namespace MaterialUI
             LayoutStyle_PropertyField(m_LeftContentGraphic);
             LayoutStyle_PropertyField(m_RightContentTransform);
             LayoutStyle_PropertyField(m_RightContentGraphic);
+            EditorGUILayout.Space();
+            LayoutStyle_PropertyField(m_ClearButton);
             EditorGUI.indentLevel--;
         }
     }
