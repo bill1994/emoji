@@ -8,7 +8,7 @@ using TMPro;
 
 namespace MaterialUI
 {
-    public class InputPromptField : Selectable, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, ISubmitHandler
+    public class InputPromptField : Selectable, IPointerClickHandler, ISubmitHandler
     {
         #region Private Variables
 
@@ -348,30 +348,10 @@ namespace MaterialUI
 
         #region UI Unity Functions
 
-        protected bool _isDragging = false;
-        public virtual void OnBeginDrag(PointerEventData eventData)
-        {
-            _isDragging = true;
-            ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
-        }
-
-        public virtual void OnDrag(PointerEventData eventData)
-        {
-            ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
-        }
-
-        public virtual void OnEndDrag(PointerEventData eventData)
-        {
-            var isDragging = _isDragging;
-            _isDragging = false;
-
-            ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
-        }
-
         // Trigger all registered callbacks.
         public virtual void OnPointerClick(PointerEventData eventData)
         {
-            if (_isDragging || eventData.button != PointerEventData.InputButton.Left)
+            if (eventData.button != PointerEventData.InputButton.Left)
                 return;
 
             OpenPromptDialog();

@@ -23,7 +23,7 @@ namespace MaterialUI
     [ExecuteInEditMode]
     //[RequireComponent(typeof(CanvasGroup))]
     [AddComponentMenu("MaterialUI/Material Input Field", 100)]
-    public class MaterialInputField : StyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, ISelectHandler, IDeselectHandler, ISerializationCallbackReceiver
+    public class MaterialInputField : StyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, ISelectHandler, IDeselectHandler, ISerializationCallbackReceiver
     {
         public enum BackgroundLayoutMode
         {
@@ -1371,7 +1371,7 @@ namespace MaterialUI
         {
             base.OnRectTransformDimensionsChange();
             SetLayoutDirty();
-            if (m_HasBeenSelected)
+            if (m_HasBeenSelected && isFocused)
                 AnimateActiveLineSelect(true);
         }
 
@@ -1417,18 +1417,12 @@ namespace MaterialUI
                 if (isFocused)
                 {
                     if (changed)
-                    {
-                        m_LastFocussedState = true;
                         OnSelect(new PointerEventData(EventSystem.current));
-                    }
                 }
                 else 
                 {
                     if (changed)
-                    {
-                        m_LastFocussedState = false;
                         OnDeselect(new PointerEventData(EventSystem.current));
-                    }
                 }
 
                 //if (changed)
@@ -1442,73 +1436,15 @@ namespace MaterialUI
             }
         }
 
-        protected bool _isDragging = false;
-        public virtual void OnBeginDrag(PointerEventData eventData)
-        {
-            var canSubmit = m_InputField == null;
-            _isDragging = true;
-
-            if (canSubmit)
-            {
-                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
-            }
-        }
-
-        public virtual void OnDrag(PointerEventData eventData)
-        {
-            var canSubmit = m_InputField == null;
-
-            if (canSubmit)
-                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
-        }
-
-        public virtual void OnEndDrag(PointerEventData eventData)
-        {
-            var canSubmit = m_InputField == null;
-
-            var isDragging = _isDragging;
-            _isDragging = false;
-
-            if (canSubmit)
-                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
-        }
-
-        protected bool _isPointerPressed = false;
-        public virtual void OnPointerDown(PointerEventData eventData)
-        {
-            _isPointerPressed = true;
-        }
-
-        public virtual void OnPointerUp(PointerEventData eventData)
-        {
-            _isPointerPressed = false;
-        }
-
-        public virtual void OnPointerClick(PointerEventData eventData)
-        {
-            if (_isDragging && !isFocused)
-                return;
-
-            if (!m_HasBeenSelected)
-            {
-                m_HasBeenSelected = true;
-                AnimateActiveLineSelect();
-                AnimateHintTextSelect();
-                RefreshVisualStyles();
-
-                ValidateText();
-            }
-        }
-
         public void OnSelect(BaseEventData eventData)
         {
-            var canSelect = !_isPointerPressed && (m_InputField == null || isFocused);
+            m_HasBeenSelected = true;
+            var canSelect = (m_InputField == null || isFocused);
 
             //We can only activate inputfield if not raised by pointerdown event as we want to only activate inputfield in OnPointerClick
             if (canSelect)
             {
-                m_HasBeenSelected = true;
-
+                m_LastFocussedState = true;
                 AnimateActiveLineSelect();
                 AnimateHintTextSelect();
                 RefreshVisualStyles();
