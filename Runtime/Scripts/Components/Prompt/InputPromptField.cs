@@ -8,7 +8,7 @@ using TMPro;
 
 namespace MaterialUI
 {
-    public class InputPromptField : Selectable, IPointerClickHandler, ISubmitHandler
+    public class InputPromptField : Selectable, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, ISubmitHandler
     {
         #region Private Variables
 
@@ -39,11 +39,11 @@ namespace MaterialUI
         [Header("Control Settings")]
         [SerializeField]
         private bool m_HideMobileInput = false;
-        
+
         [Header("Password Special Settings")]
         [SerializeField]
         char m_AsteriskChar = '•';
-       
+
         #endregion
 
         #region Callbacks
@@ -116,7 +116,7 @@ namespace MaterialUI
                 m_CharacterValidation = value;
                 SetToCustom();
             }
-        } 
+        }
 
         public InputField.InputType inputType
         {
@@ -198,7 +198,7 @@ namespace MaterialUI
             }
             set
             {
-                value = value == null? string.Empty : value;
+                value = value == null ? string.Empty : value;
                 if (m_Text == value)
                     return;
 
@@ -232,7 +232,7 @@ namespace MaterialUI
         public Object fontAsset
         {
             get
-            {   if (m_TextComponent is Text)
+            { if (m_TextComponent is Text)
                     return (m_TextComponent as Text).font;
                 if (m_TextComponent is TMP_Text)
                     return (m_TextComponent as TMP_Text).font;
@@ -348,10 +348,30 @@ namespace MaterialUI
 
         #region UI Unity Functions
 
+        protected bool _isDragging = false;
+        public virtual void OnBeginDrag(PointerEventData eventData)
+        {
+            _isDragging = true;
+            ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
+        }
+
+        public virtual void OnDrag(PointerEventData eventData)
+        {
+            ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
+        }
+
+        public virtual void OnEndDrag(PointerEventData eventData)
+        {
+            var isDragging = _isDragging;
+            _isDragging = false;
+
+            ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
+        }
+
         // Trigger all registered callbacks.
         public virtual void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button != PointerEventData.InputButton.Left)
+            if (_isDragging || eventData.button != PointerEventData.InputButton.Left)
                 return;
 
             OpenPromptDialog();

@@ -23,7 +23,7 @@ namespace MaterialUI
     [ExecuteInEditMode]
     //[RequireComponent(typeof(CanvasGroup))]
     [AddComponentMenu("MaterialUI/Material Input Field", 100)]
-    public class MaterialInputField : StyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, ISelectHandler, IDeselectHandler, ISerializationCallbackReceiver
+    public class MaterialInputField : StyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, ISelectHandler, IDeselectHandler, ISerializationCallbackReceiver
     {
         public enum BackgroundLayoutMode
         {
@@ -105,6 +105,8 @@ namespace MaterialUI
         private RectTransform m_LeftContentTransform = null;
         [SerializeField]
         private RectTransform m_RightContentTransform = null;
+        [SerializeField]
+        private MaterialButton m_ClearButton = null;
         [SerializeField]
         private CanvasGroup m_ActiveLineCanvasGroup = null;
         [SerializeField]
@@ -225,6 +227,7 @@ namespace MaterialUI
         //Events when inputfield is null and text is not null
         public InputField.OnChangeEvent onValueChanged = new InputField.OnChangeEvent();
         public InputField.OnChangeEvent onEndEdit = new InputField.OnChangeEvent();
+        public UnityEvent onReturnPressed = new UnityEvent();
 
         /*public UnityEvent<string> onValueChanged
         {
@@ -510,7 +513,8 @@ namespace MaterialUI
                 var tmpInputField = m_InputField as TMP_InputField;
                 var promptInputField = m_InputField as InputPromptField;
 
-                System.Func<string> getGraphicText = () => {
+                System.Func<string> getGraphicText = () =>
+                {
                     var graphicText = m_InputText != null ? m_InputText.GetGraphicText() : "";
                     if (!string.IsNullOrEmpty(graphicText))
                         graphicText = graphicText.EndsWith("\u200B") ? graphicText.Substring(0, graphicText.Length - 1) : graphicText;
@@ -919,6 +923,17 @@ namespace MaterialUI
             set
             {
                 m_RightContentTransform = value;
+                SetLayoutDirty();
+                RefreshVisualStyles();
+            }
+        }
+
+        public MaterialButton clearButton
+        {
+            get { return m_ClearButton; }
+            set
+            {
+                m_ClearButton = value;
                 SetLayoutDirty();
                 RefreshVisualStyles();
             }
@@ -1401,19 +1416,23 @@ namespace MaterialUI
                 var changed = m_LastFocussedState != isFocused;
                 if (isFocused)
                 {
-                    m_LastFocussedState = true;
+                    if (changed)
+                    {
+                        m_LastFocussedState = true;
+                        OnSelect(new PointerEventData(EventSystem.current));
+                    }
                 }
-                else
+                else 
                 {
-                    if (m_LastFocussedState)
+                    if (changed)
                     {
                         m_LastFocussedState = false;
                         OnDeselect(new PointerEventData(EventSystem.current));
                     }
                 }
 
-                if (changed)
-                    RefreshVisualStyles();
+                //if (changed)
+                //    RefreshVisualStyles();
                 //CheckHintText();
 
                 if (m_AnimateHintText)
@@ -1423,15 +1442,79 @@ namespace MaterialUI
             }
         }
 
+        protected bool _isDragging = false;
+        public virtual void OnBeginDrag(PointerEventData eventData)
+        {
+            var canSubmit = m_InputField == null;
+            _isDragging = true;
+
+            if (canSubmit)
+            {
+                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
+            }
+        }
+
+        public virtual void OnDrag(PointerEventData eventData)
+        {
+            var canSubmit = m_InputField == null;
+
+            if (canSubmit)
+                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
+        }
+
+        public virtual void OnEndDrag(PointerEventData eventData)
+        {
+            var canSubmit = m_InputField == null;
+
+            var isDragging = _isDragging;
+            _isDragging = false;
+
+            if (canSubmit)
+                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
+        }
+
+        protected bool _isPointerPressed = false;
+        public virtual void OnPointerDown(PointerEventData eventData)
+        {
+            _isPointerPressed = true;
+        }
+
+        public virtual void OnPointerUp(PointerEventData eventData)
+        {
+            _isPointerPressed = false;
+        }
+
+        public virtual void OnPointerClick(PointerEventData eventData)
+        {
+            if (_isDragging && !isFocused)
+                return;
+
+            if (!m_HasBeenSelected)
+            {
+                m_HasBeenSelected = true;
+                AnimateActiveLineSelect();
+                AnimateHintTextSelect();
+                RefreshVisualStyles();
+
+                ValidateText();
+            }
+        }
+
         public void OnSelect(BaseEventData eventData)
         {
-            m_HasBeenSelected = true;
+            var canSelect = !_isPointerPressed && (m_InputField == null || isFocused);
 
-            AnimateActiveLineSelect();
-            AnimateHintTextSelect();
-            RefreshVisualStyles();
+            //We can only activate inputfield if not raised by pointerdown event as we want to only activate inputfield in OnPointerClick
+            if (canSelect)
+            {
+                m_HasBeenSelected = true;
 
-            ValidateText();
+                AnimateActiveLineSelect();
+                AnimateHintTextSelect();
+                RefreshVisualStyles();
+
+                ValidateText();
+            }
         }
 
         public void OnDeselect(BaseEventData eventData)
@@ -1482,6 +1565,12 @@ namespace MaterialUI
             OnEndEditInternal(value);
         }
 
+        protected virtual void HandleOnReturnPressed()
+        {
+            if (onReturnPressed != null)
+                onReturnPressed.Invoke();
+        }
+
         protected virtual void OnEndEditInternal(string value)
         {
             if (onEndEdit != null)
@@ -1515,6 +1604,7 @@ namespace MaterialUI
             ValidateText();
             if (!m_FloatingHint)
                 SetHintLayoutToFloatingValue();
+            SetClearButtonActive(!string.IsNullOrEmpty(value));
         }
 
         #endregion
@@ -1620,6 +1710,17 @@ namespace MaterialUI
                 promptInputField.onEndEdit.AddListener(HandleOnEndEdit);
             else if (m_InputText != null)
                 m_InputText.RegisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
+
+            if (m_InputField != null)
+            {
+                var onReturnPressedField = m_InputField.GetType().GetField("OnReturnPressed", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                if (onReturnPressedField != null)
+                {
+                    var onReturnPressedEvent = onReturnPressedField.GetValue(m_InputField) as UnityEvent;
+                    if (onReturnPressedEvent != null)
+                        onReturnPressedEvent.AddListener(HandleOnReturnPressed);
+                }
+            }
         }
 
         protected virtual void UnregisterEvents()
@@ -1645,6 +1746,17 @@ namespace MaterialUI
                 promptInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
             else if (m_InputText != null)
                 m_InputText.UnregisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
+
+            if (m_InputField != null)
+            {
+                var onReturnPressedField = m_InputField.GetType().GetField("OnReturnPressed", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                if (onReturnPressedField != null)
+                {
+                    var onReturnPressedEvent = onReturnPressedField.GetValue(m_InputField) as UnityEvent;
+                    if (onReturnPressedEvent != null)
+                        onReturnPressedEvent.RemoveListener(HandleOnReturnPressed);
+                }
+            }
         }
 
         public void ClearText()
@@ -2070,6 +2182,7 @@ namespace MaterialUI
                     if (m_ActiveLineTransform != null)
                         m_ActiveLineTransform.anchoredPosition = new Vector2(f, m_ActiveLineTransform.anchoredPosition.y);
                 }, m_ActiveLineTransform.anchoredPosition.x, 0f, m_AnimationDuration);
+
                 m_ActiveLineSizeTweener = TweenManager.TweenFloat(f =>
                 {
                     if (m_ActiveLineTransform != null)
@@ -2136,6 +2249,26 @@ namespace MaterialUI
         protected void SetHintLayoutToFloatingValue()
         {
             SetHintLayoutToFloatingValue(IsHintInsideOutline());
+        }
+
+        protected void SetClearButtonActive(bool isActive)
+        {
+            if (this == null || !Application.isPlaying || !this.gameObject.scene.IsValid())
+                return;
+
+#if UNITY_IOS && !UNITY_EDITOR && UI_COMMONS_DEFINED
+            if (isActive && Application.isMobilePlatform)
+            {
+                //We must check if is iOS platform because ios native input contains native clear button
+                var nativeInput = inputField as Kyub.Internal.NativeInputPlugin.INativeInputField;
+                if (nativeInput != null && !nativeInput.IsDestroyed() && nativeInput.shouldHideMobileInput)
+                {
+                    isActive = false;
+                }
+            }   
+#endif
+            if (m_ClearButton != null && m_ClearButton.gameObject.activeSelf != isActive)
+                m_ClearButton.gameObject.SetActive(isActive);
         }
 
         protected void SetHintLayoutToFloatingValue(bool isInsideOutline)
