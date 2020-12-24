@@ -39,6 +39,7 @@ namespace KyubEditor.UI
             m_ShowDoneButton = serializedObject.FindProperty("m_ShowDoneButton");
             m_ShowClearButton = serializedObject.FindProperty("m_ShowClearButton");
             m_ReturnKeyType = serializedObject.FindProperty("m_ReturnKeyType");
+
             m_TextComponent = serializedObject.FindProperty("m_TextComponent");
         }
 
