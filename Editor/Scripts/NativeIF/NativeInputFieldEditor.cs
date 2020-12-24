@@ -21,6 +21,8 @@ namespace KyubEditor.UI
         private SerializedProperty m_ShowClearButton;
         private SerializedProperty m_ReturnKeyType;
 
+        private SerializedProperty m_TextComponent;
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -32,6 +34,8 @@ namespace KyubEditor.UI
             m_ShowDoneButton = serializedObject.FindProperty("m_ShowDoneButton");
             m_ShowClearButton = serializedObject.FindProperty("m_ShowClearButton");
             m_ReturnKeyType = serializedObject.FindProperty("m_ReturnKeyType");
+
+            m_TextComponent = serializedObject.FindProperty("m_TextComponent");
         }
 
         public override void OnInspectorGUI()
@@ -39,6 +43,7 @@ namespace KyubEditor.UI
             base.OnInspectorGUI();
 
             serializedObject.Update();
+            EditorGUI.BeginDisabledGroup(m_TextComponent == null || m_TextComponent.objectReferenceValue == null);
 
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Viewport Settings", EditorStyles.boldLabel);
@@ -51,6 +56,7 @@ namespace KyubEditor.UI
             EditorGUILayout.PropertyField(m_PanContent);
 
             OnGUIExtraNativeFields();
+            EditorGUI.EndDisabledGroup();
             serializedObject.ApplyModifiedProperties();
         }
 
