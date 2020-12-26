@@ -209,10 +209,20 @@ namespace Kyub.UI
 
         public override void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.dragging)
+            if (eventData.button != PointerEventData.InputButton.Left)
                 return;
 
-            base.OnPointerClick(eventData);
+            //Check if this component is inside another "DraagHandler" (Probably an ScrollRect).
+            //In this case, cancel the click is eventData.dragging is true
+            if (eventData.dragging &&
+                this.transform.parent != null)
+            {
+                var dragHandler = this.transform.parent.GetComponentInParent<IBeginDragHandler>();
+                if ((dragHandler as Component) != null)
+                    return;
+            }
+
+            ActivateInputField();
         }
 
         public override void OnUpdateSelected(BaseEventData eventData)
@@ -280,6 +290,20 @@ namespace Kyub.UI
 
         protected override void LateUpdate()
         {
+            //Prevent call base.ActivateInputFieldInternal() as we can't override this function
+            if (ShouldActivateNextUpdate)
+            {
+                if (!isFocused)
+                {
+                    SafeActivateInputFieldInternal();
+                    ShouldActivateNextUpdate = false;
+                    return;
+                }
+
+                // Reset as we are already activated.
+                ShouldActivateNextUpdate = false;
+            }
+
             base.LateUpdate();
             CheckAsteriskChar();
         }

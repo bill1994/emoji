@@ -51,7 +51,7 @@ namespace Kyub.Internal.NativeInputPlugin
 
         public static bool IsSupported()
         {
-            return TouchScreenKeyboard.isSupported && !Application.isEditor && Application.isPlaying /*&& Application.platform != RuntimePlatform.IPhonePlayer*/;
+            return TouchScreenKeyboard.isSupported && !Application.isEditor && Application.isPlaying;
         }
 
         #endregion
@@ -105,9 +105,14 @@ namespace Kyub.Internal.NativeInputPlugin
 
         #region Fields
 
-        public bool IsWithDoneButton = true;
-        public bool IsWithClearButton = true;
-        public ReturnKeyType ReturnKey = ReturnKeyType.Done;
+        [SerializeField]
+        bool m_requireRecreate = false;
+        [SerializeField]
+        private bool m_isWithDoneButton = true;
+        [SerializeField]
+        private bool m_isWithClearButton = true;
+        [SerializeField]
+        private ReturnKeyType m_returnKey = ReturnKeyType.Done;
 
         public UnityEvent OnReturnPressedEvent = new UnityEvent();
 
@@ -119,6 +124,8 @@ namespace Kyub.Internal.NativeInputPlugin
         private Graphic _inputObjectText;
         private bool _isFocusOnCreate;
         private bool _isVisibleOnCreate = false;
+        bool _isVisible = false;
+
         //private Rect _lastRect;
 
         /*#if (UNITY_IPHONE) && !UNITY_EDITOR
@@ -148,8 +155,6 @@ namespace Kyub.Internal.NativeInputPlugin
                 return _inputObject;
             }
         }
-
-        bool _isVisible = false;
 
         public bool Visible
         {
@@ -187,6 +192,39 @@ namespace Kyub.Internal.NativeInputPlugin
             }
         }
 
+        public bool IsWithDoneButton 
+        {
+            get
+            {
+                return m_isWithDoneButton;
+            }
+            set
+            {
+                m_isWithDoneButton = value;
+            }
+        }
+        public bool IsWithClearButton
+        {
+            get
+            {
+                return m_isWithClearButton;
+            }
+            set 
+            { 
+                m_isWithClearButton = value; 
+            }
+        }
+        public ReturnKeyType ReturnKey { 
+            get 
+            { 
+                return m_returnKey; 
+            } 
+            set 
+            { 
+                m_returnKey = value; 
+            } 
+        }
+
         #endregion
 
         #region Unity Functions
@@ -204,9 +242,9 @@ namespace Kyub.Internal.NativeInputPlugin
 
         protected virtual void OnEnable()
         {
-            if (_needRecreate && _started)
+            if (m_requireRecreate && _started)
             {
-                _needRecreate = false;
+                m_requireRecreate = false;
                 RecreateNativeEdit(Visible);
             }
         }
@@ -222,15 +260,14 @@ namespace Kyub.Internal.NativeInputPlugin
                 // Wait until the end of frame before initializing to ensure that Unity UI layout has been built. We used to
                 // initialize at Start, but that resulted in an invalid RectTransform position and size on the InputField if it
                 // was instantiated at runtime instead of being built in to the scene.
-                RecreateNativeEdit();
+                if(m_requireRecreate)
+                    RecreateNativeEdit();
             }
             else
             {
-                //Remove NativeEditBox from IOS until fix the bug
                 _isMobileInputCreated = false;
                 if (this != null)
                 {
-                    //TODO FIX NATIVE EDIT BOX IN IOS 
                     Debug.LogWarning("[NATIVE EDITBOX] Not Supported Platform (sender " + name + ")");
                     Component.DestroyImmediate(this);
                 }
@@ -326,7 +363,7 @@ namespace Kyub.Internal.NativeInputPlugin
 
         public void MarkToRecreateNativeEdit()
         {
-            _needRecreate = true;
+            m_requireRecreate = true;
         }
 
         public void RecreateNativeEdit()
@@ -334,20 +371,23 @@ namespace Kyub.Internal.NativeInputPlugin
             RecreateNativeEdit(Visible);
         }
 
-        bool _needRecreate = false;
         public void RecreateNativeEdit(bool isVisible)
         {
+            if (!IsSupported())
+                return;
+
             if (_isMobileInputCreated)
                 RemoveNative();
             if (enabled && gameObject.activeSelf && gameObject.activeInHierarchy)
             {
+                m_requireRecreate = false;
                 StopCoroutine("InitializeOnNextFrame");
                 StartCoroutine("InitializeOnNextFrame", isVisible);
             }
             else
             {
                 Visible = isVisible;
-                _needRecreate = true;
+                m_requireRecreate = true;
             }
         }
 
@@ -360,7 +400,7 @@ namespace Kyub.Internal.NativeInputPlugin
             this.SetTextNative (this._inputObject.text);
 #endif
             SetVisibleAndFocus_Internal(isVisible);
-            _needRecreate = false;
+            m_requireRecreate = false;
         }
 
         public static Rect GetScreenRectFromRectTransform(RectTransform rectTransform)
@@ -652,10 +692,13 @@ namespace Kyub.Internal.NativeInputPlugin
         /// </summary>
         private void RemoveNative()
         {
-            _isMobileInputCreated = false;
-            JsonObject data = new JsonObject();
-            data["msg"] = REMOVE;
-            this.Execute(data);
+            if (_isMobileInputCreated)
+            {
+                _isMobileInputCreated = false;
+                JsonObject data = new JsonObject();
+                data["msg"] = REMOVE;
+                this.Execute(data);
+            }
         }
 
         /// <summary>
@@ -664,19 +707,22 @@ namespace Kyub.Internal.NativeInputPlugin
         /// <param name="inputRect">RectTransform</param>
         public void SetRectNative(RectTransform inputRect)
         {
-            Rect rect = GetScreenRectFromRectTransform(inputRect);
-            //if (_lastRect == rect)
-            //{
-            //    return;
-            //}
-            //_lastRect = rect;
-            JsonObject data = new JsonObject();
-            data["msg"] = SET_RECT;
-            data["x"] = rect.x / Screen.width;
-            data["y"] = rect.y / Screen.height;
-            data["width"] = rect.width / Screen.width;
-            data["height"] = rect.height / Screen.height;
-            this.Execute(data);
+            if (_isMobileInputCreated)
+            {
+                Rect rect = GetScreenRectFromRectTransform(inputRect);
+                //if (_lastRect == rect)
+                //{
+                //    return;
+                //}
+                //_lastRect = rect;
+                JsonObject data = new JsonObject();
+                data["msg"] = SET_RECT;
+                data["x"] = rect.x / Screen.width;
+                data["y"] = rect.y / Screen.height;
+                data["width"] = rect.width / Screen.width;
+                data["height"] = rect.height / Screen.height;
+                this.Execute(data);
+            }
         }
 
         /// <summary>
@@ -722,9 +768,14 @@ namespace Kyub.Internal.NativeInputPlugin
         public void Show()
         {
             var isVisible = true;
-            if (_isMobileInputCreated && (!Mathf.Approximately(GetNativeFontSize(), _config.FontSize) || _needRecreate))
+
+            //Check if we must force recreate
+            if (!m_requireRecreate)
+                m_requireRecreate = !_isMobileInputCreated || !Mathf.Approximately(GetNativeFontSize(), _config.FontSize);
+
+            if (m_requireRecreate)
             {
-                _needRecreate = false;
+                m_requireRecreate = false;
                 RecreateNativeEdit(isVisible);
             }
             else
@@ -804,11 +855,15 @@ namespace Kyub.Internal.NativeInputPlugin
         /// Send android button state
         /// </summary>
         /// <param name="key">Code</param>
-        private void ForceSendKeydownAndroid (string key) {
-            JsonObject data = new JsonObject ();
-            data["msg"] = ANDROID_KEY_DOWN;
-            data["key"] = key;
-            this.Execute (data);
+        private void ForceSendKeydownAndroid (string key) 
+        {
+            if (_isMobileInputCreated)
+            {
+                JsonObject data = new JsonObject ();
+                data["msg"] = ANDROID_KEY_DOWN;
+                data["key"] = key;
+                this.Execute (data);
+            }
         }
 
         /// <summary>
