@@ -233,6 +233,20 @@ namespace Kyub.UI
                 OnDeselect(null);
             }
 #else
+            //Prevent call base.ActivateInputFieldInternal() as we can't override this function
+            if (ShouldActivateNextUpdate)
+            {
+                if (!isFocused)
+                {
+                    SafeActivateInputFieldInternal();
+                    ShouldActivateNextUpdate = false;
+                    return;
+                }
+
+                // Reset as we are already activated.
+                ShouldActivateNextUpdate = false;
+            }
+
             base.LateUpdate();
 #endif
         }

@@ -250,10 +250,20 @@ namespace Kyub.UI
 
         public override void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.dragging)
+            if (eventData.button != PointerEventData.InputButton.Left)
                 return;
 
-            base.OnPointerClick(eventData);
+            //Check if this component is inside another "DraagHandler" (Probably an ScrollRect).
+            //In this case, cancel the click is eventData.dragging is true
+            if (eventData.dragging &&
+                this.transform.parent != null)
+            {
+                var dragHandler = this.transform.parent.GetComponentInParent<IBeginDragHandler>();
+                if((dragHandler as Component) != null)
+                    return;
+            }
+
+            ActivateInputField();
         }
 
         public override void OnUpdateSelected(BaseEventData eventData)
