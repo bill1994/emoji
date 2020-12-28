@@ -56,6 +56,8 @@ namespace MaterialUI
         private SerializedProperty m_ActiveLineTransform;
         private SerializedProperty m_LeftContentTransform;
         private SerializedProperty m_RightContentTransform;
+        private SerializedProperty m_TopContentTransform;
+        private SerializedProperty m_BottomContentTransform;
         private SerializedProperty m_ClearButton;
 
         private SerializedProperty m_LeftContentActiveColor;
@@ -133,6 +135,8 @@ namespace MaterialUI
             m_ActiveLineTransform = serializedObject.FindProperty("m_ActiveLineTransform");
             m_LeftContentTransform = serializedObject.FindProperty("m_LeftContentTransform");
             m_RightContentTransform = serializedObject.FindProperty("m_RightContentTransform");
+            m_TopContentTransform = serializedObject.FindProperty("m_TopContentTransform");
+            m_BottomContentTransform = serializedObject.FindProperty("m_BottomContentTransform");
             m_ClearButton = serializedObject.FindProperty("m_ClearButton");
 
             m_LeftContentActiveColor = serializedObject.FindProperty("m_LeftContentActiveColor");
@@ -388,6 +392,8 @@ namespace MaterialUI
             LayoutStyle_PropertyField(m_LeftContentGraphic);
             LayoutStyle_PropertyField(m_RightContentTransform);
             LayoutStyle_PropertyField(m_RightContentGraphic);
+            LayoutStyle_PropertyField(m_TopContentTransform);
+            LayoutStyle_PropertyField(m_BottomContentTransform);
             EditorGUILayout.Space();
             LayoutStyle_PropertyField(m_ClearButton);
             EditorGUI.indentLevel--;
