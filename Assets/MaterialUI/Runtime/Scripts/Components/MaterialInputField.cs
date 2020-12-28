@@ -25,8 +25,8 @@ namespace MaterialUI
         public enum BackgroundLayoutMode
         {
             TextOnly,
-            TextAndHint,
-            TextAndCounter,
+            TextAndUpperContent,
+            TextAndLowerContent,
             All,
             Manual
         }
@@ -108,6 +108,10 @@ namespace MaterialUI
         private RectTransform m_LeftContentTransform = null;
         [SerializeField]
         private RectTransform m_RightContentTransform = null;
+        [SerializeField]
+        private RectTransform m_TopContentTransform = null;
+        [SerializeField]
+        private RectTransform m_BottomContentTransform = null;
         [SerializeField]
         private RectTransform m_ClearButton = null;
         [SerializeField]
@@ -211,6 +215,9 @@ namespace MaterialUI
         private float m_BottomSectionHeight;
         private float m_LeftSectionWidth;
         private float m_RightSectionWidth;
+
+        float m_BottomContentHeight = 0;
+        float m_TopContentHeight = 0;
 
         private int m_ActiveLinePosTweener;
         private int m_ActiveLineSizeTweener;
@@ -912,6 +919,29 @@ namespace MaterialUI
                 RefreshVisualStyles();
             }
         }
+
+        public RectTransform upperContentTransform
+        {
+            get { return m_TopContentTransform; }
+            set
+            {
+                m_TopContentTransform = value;
+                SetLayoutDirty();
+                RefreshVisualStyles();
+            }
+        }
+
+        public RectTransform bottomContentTransform
+        {
+            get { return m_BottomContentTransform; }
+            set
+            {
+                m_BottomContentTransform = value;
+                SetLayoutDirty();
+                RefreshVisualStyles();
+            }
+        }
+
 
         public RectTransform leftContentTransform
         {
@@ -2187,9 +2217,21 @@ namespace MaterialUI
             TweenManager.EndTween(m_ActiveLineAlphaTweener);
         }
 
-        protected virtual bool IsCounterInsideOutline()
+        protected virtual bool IsBottomContentInsideOutline()
         {
-            var isInsideOutline = m_BackgroundLayoutMode != BackgroundLayoutMode.TextOnly && m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndCounter;
+            var isInsideOutline = m_BackgroundLayoutMode != BackgroundLayoutMode.TextOnly && (m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndLowerContent || m_BackgroundLayoutMode == BackgroundLayoutMode.All);
+            if (isInsideOutline)
+            {
+                //check if background or outline is valid
+                isInsideOutline = (m_OutlineGraphic != null && !HasIgnoreLayout(m_OutlineGraphic) && m_BackgroundGraphic.transform != this.transform && m_OutlineGraphic.gameObject.activeInHierarchy && m_OutlineGraphic.enabled) ||
+                    (m_BackgroundGraphic != null && !HasIgnoreLayout(m_BackgroundGraphic) && m_BackgroundGraphic.transform != this && m_BackgroundGraphic.gameObject.activeInHierarchy && m_BackgroundGraphic.enabled);
+            }
+            return isInsideOutline;
+        }
+
+        protected virtual bool IsTopContentInsideOutline()
+        {
+            var isInsideOutline = m_BackgroundLayoutMode != BackgroundLayoutMode.TextOnly && (m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndUpperContent || m_BackgroundLayoutMode == BackgroundLayoutMode.All);
             if (isInsideOutline)
             {
                 //check if background or outline is valid
@@ -2201,13 +2243,7 @@ namespace MaterialUI
 
         protected virtual bool IsHintInsideOutline()
         {
-            var isInsideOutline = m_FloatingHint && m_BackgroundLayoutMode != BackgroundLayoutMode.TextOnly && m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndHint;
-            if (isInsideOutline)
-            {
-                //check if background or outline is valid
-                isInsideOutline = (m_OutlineGraphic != null && !HasIgnoreLayout(m_OutlineGraphic) && m_BackgroundGraphic.transform != this.transform && m_OutlineGraphic.gameObject.activeInHierarchy && m_OutlineGraphic.enabled) ||
-                    (m_BackgroundGraphic != null && !HasIgnoreLayout(m_BackgroundGraphic) && m_BackgroundGraphic.transform != this && m_BackgroundGraphic.gameObject.activeInHierarchy && m_BackgroundGraphic.enabled);
-            }
+            var isInsideOutline = m_FloatingHint && IsTopContentInsideOutline();
             return isInsideOutline;
         }
 
@@ -2231,7 +2267,7 @@ namespace MaterialUI
 
             if (m_FloatingHint)
             {
-                var hintTopPosition = isInsideOutline ? m_Padding.top : 4;
+                var hintTopPosition = (isInsideOutline ? m_Padding.top : 4) + m_TopContentHeight;
                 m_HintTextTransform.offsetMin = new Vector2(m_LeftSectionWidth, m_BottomSectionHeight);
                 m_HintTextTransform.offsetMax = new Vector2(-m_RightSectionWidth, -Tween.Linear(m_TopSectionHeight, hintTopPosition, hintTextFloatingValue, 1));
                 if (hintTextObject != null)
@@ -2278,12 +2314,12 @@ namespace MaterialUI
                     offsetMin = new Vector2(0, (m_BottomSectionHeight - m_Padding.bottom));
                     offsetMax = new Vector2(0, -(m_TopSectionHeight - m_Padding.top));
                 }
-                else if (m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndCounter)
+                else if (m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndLowerContent)
                 {
                     offsetMin = new Vector2(0, 0);
                     offsetMax = new Vector2(0, -(m_TopSectionHeight - m_Padding.top));
                 }
-                else if (m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndHint)
+                else if (m_BackgroundLayoutMode == BackgroundLayoutMode.TextAndUpperContent)
                 {
                     offsetMin = new Vector2(0, (m_BottomSectionHeight - m_Padding.bottom));
                     offsetMax = new Vector2(0, 0);
@@ -2318,16 +2354,22 @@ namespace MaterialUI
             {
                 if (m_ValidationTextTransform != null || m_CounterTextTransform != null)
                 {
-                    var counterIsInsideBG = IsCounterInsideOutline();
-                    var defaultOffset = 0;//(m_LineLayoutMode == LineLayoutMode.IgnoreContentAndPadding ? 0 : m_Padding.bottom);
+                    var counterIsInsideBG = IsBottomContentInsideOutline();
+                    var defaultOffset = 0;
+
+                    var positionY = (counterIsInsideBG ? m_Padding.bottom : defaultOffset) + m_BottomContentHeight;
+                    if (m_BottomContentHeight > 0)
+                        positionY += 4;
+
                     if (m_ValidationTextTransform != null && validationText != null && !HasIgnoreLayout(m_ValidationTextTransform))
                     {
-                        m_ValidationTextTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, counterIsInsideBG ? m_Padding.bottom : defaultOffset, m_ValidationText != null ? LayoutUtility.GetPreferredHeight(m_ValidationText.rectTransform) : 0);
+                        
+                        m_ValidationTextTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, positionY, m_ValidationText != null ? LayoutUtility.GetPreferredHeight(m_ValidationText.rectTransform) : 0);
                     }
 
                     if (m_CounterTextTransform != null && counterText != null && !HasIgnoreLayout(m_CounterTextTransform))
                     {
-                        m_CounterTextTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, counterIsInsideBG ? m_Padding.bottom : defaultOffset, m_CounterText != null ? LayoutUtility.GetPreferredHeight(m_CounterText.rectTransform) : 0);
+                        m_CounterTextTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, positionY, m_CounterText != null ? LayoutUtility.GetPreferredHeight(m_CounterText.rectTransform) : 0);
                     }
                 }
             }
@@ -2432,6 +2474,33 @@ namespace MaterialUI
                 m_RightContentTransform.anchoredPosition = new Vector2(m_RightContentOffset.x - m_Padding.right, (inputTextTransform.offsetMax.y - (m_InputText.GetGraphicFontSize() / 2) - 2) + m_RightContentOffset.y /*+ (m_Padding.bottom)*/);
             }
 
+            if (m_TopContentTransform != null && !HasIgnoreLayout(m_TopContentTransform))
+            {
+                ILayoutController[] controllers = m_TopContentTransform.GetComponentsInChildren<ILayoutController>();
+                for (int i = 0; i < controllers.Length; i++)
+                {
+                    controllers[i].SetLayoutVertical();
+                }
+
+                var counterIsInsideBG = IsTopContentInsideOutline();
+                m_TopContentTransform.offsetMin = new Vector2(m_Padding.left, -(m_TopContentHeight + (counterIsInsideBG ? m_Padding.bottom : 0)));
+                m_TopContentTransform.offsetMax = new Vector2(-m_Padding.right, -(counterIsInsideBG ? m_Padding.bottom : 0));
+            }
+
+            if (m_BottomContentTransform != null && !HasIgnoreLayout(m_BottomContentTransform))
+            {
+                ILayoutController[] controllers = m_BottomContentTransform.GetComponentsInChildren<ILayoutController>();
+                for (int i = 0; i < controllers.Length; i++)
+                {
+                    controllers[i].SetLayoutVertical();
+                }
+
+                var counterIsInsideBG = IsBottomContentInsideOutline();
+                m_BottomContentTransform.offsetMin = new Vector2(m_Padding.left, (counterIsInsideBG? m_Padding.bottom : 0));
+                m_BottomContentTransform.offsetMax = new Vector2(-m_Padding.right, (counterIsInsideBG ? m_Padding.bottom : 0) + m_BottomContentHeight);
+            }
+
+
             if (m_LineTransform != null && !HasIgnoreLayout(m_LineTransform))
             {
                 m_LineTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, m_BottomSectionHeight - m_Padding.bottom, 1);
@@ -2497,35 +2566,41 @@ namespace MaterialUI
 
         public void CalculateLayoutInputVertical()
         {
-            if (m_FloatingHint)
+            m_TopSectionHeight = m_TopContentHeight = 0;
+            if (m_FloatingHint || m_TopContentTransform != null)
             {
-                m_TopSectionHeight = GetSmallHintTextHeight();
+                m_TopSectionHeight = m_TopContentHeight = m_TopContentTransform != null && !HasIgnoreLayout(m_TopContentTransform) ? Mathf.Max(0, LayoutUtility.GetPreferredHeight(m_TopContentTransform)) : 0;
+                
                 if (m_TopSectionHeight > 0)
                     m_TopSectionHeight += 4;
-            }
-            else
-            {
-                m_TopSectionHeight = 0;
+
+                if (m_FloatingHint)
+                {
+                    m_TopSectionHeight += Mathf.Max(0, GetSmallHintTextHeight());
+                    if (m_TopSectionHeight > 0)
+                        m_TopSectionHeight += 4;
+                }
             }
 
-            if (m_HasCharacterCounter || m_HasValidation)
+            m_BottomSectionHeight = m_BottomContentHeight = 0;
+            if (m_HasCharacterCounter || m_HasValidation || m_BottomContentTransform != null)
             {
-                m_BottomSectionHeight = 0;
+                m_BottomSectionHeight = m_BottomContentHeight = m_BottomContentTransform != null && !HasIgnoreLayout(m_BottomContentTransform)? Mathf.Max(0, LayoutUtility.GetPreferredHeight(m_BottomContentTransform)) : 0;
 
                 if (m_HasCharacterCounter && counterText != null && !HasIgnoreLayout(counterText))
                 {
-                    m_BottomSectionHeight += 4;
-                    m_BottomSectionHeight = counterText != null ? LayoutUtility.GetPreferredHeight(counterText.rectTransform) : 0;
+                    //Spacing between UpperContent
+                    if (m_BottomSectionHeight > 0)
+                        m_BottomSectionHeight += 4;
+                    m_BottomSectionHeight += counterText != null ? Mathf.Max(0, LayoutUtility.GetPreferredHeight(counterText.rectTransform)) : 0;
                 }
                 else if (m_HasValidation && validationText != null && !HasIgnoreLayout(validationText))
                 {
-                    m_BottomSectionHeight += 4;
-                    m_BottomSectionHeight = validationText != null ? LayoutUtility.GetPreferredHeight(validationText.rectTransform) : 0;
+                    //Spacing between UpperContent
+                    if (m_BottomSectionHeight > 0)
+                        m_BottomSectionHeight += 4;
+                    m_BottomSectionHeight += validationText != null ? Mathf.Max(0, LayoutUtility.GetPreferredHeight(validationText.rectTransform)) : 0;
                 }
-            }
-            else
-            {
-                m_BottomSectionHeight = 0;
             }
             SumPaddingVertical();
 

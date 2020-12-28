@@ -65,6 +65,11 @@ PrefabInstance:
       propertyPath: m_Padding.m_Bottom
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 114794828616791146, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
+        type: 3}
+      propertyPath: m_BackgroundLayoutMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 114809534935572574, guid: 269c6e8bfd5d9654b9da49c2ccf39f9b,
         type: 3}
       propertyPath: m_Color.r
