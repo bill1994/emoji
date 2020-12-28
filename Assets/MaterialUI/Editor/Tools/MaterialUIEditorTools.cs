@@ -177,10 +177,22 @@ namespace MaterialUI
             CreateInstance("Components/Buttons/Button", "Button");
         }
 
+        [MenuItem("GameObject/MaterialUI/Buttons/Button Outline", false, 030)]
+        private static void CreateDefaultButtonOutline()
+        {
+            CreateInstance("Components/Buttons/Button Outline", "Button - Outline");
+        }
+
         [MenuItem("GameObject/MaterialUI/Buttons/Icon Button ", false, 030)]
         private static void CreateIconButton()
         {
             CreateInstance("Components/Buttons/Icon Button", "Icon Button");
+        }
+
+        [MenuItem("GameObject/MaterialUI/Buttons/Icon Button Outline ", false, 030)]
+        private static void CreateIconButtonOutline()
+        {
+            CreateInstance("Components/Buttons/Icon Button Outline", "Icon Button Outline");
         }
 
         [MenuItem("GameObject/MaterialUI/Dropdowns/Drowdown", false, 030)]
@@ -204,19 +216,19 @@ namespace MaterialUI
         [MenuItem("GameObject/MaterialUI/Toggles/Checkbox", false, 040)]
         private static void CreateCheckboxText()
         {
-            CreateInstance("Components/Checkbox", "Checkbox");
+            CreateInstance("Components/Toggles/Checkbox", "Checkbox");
         }
 
         [MenuItem("GameObject/MaterialUI/Toggles/Switch", false, 050)]
         private static void CreateSwitchLabel()
         {
-            CreateInstance("Components/Switch", "Switch");
+            CreateInstance("Components/Toggles/Switch", "Switch");
         }
 
         [MenuItem("GameObject/MaterialUI/Toggles/Radio Button", false, 060)]
         private static void CreateRadioButtonsLabel()
         {
-            CreateInstance("Components/RadioButton", "Radio Button");
+            CreateInstance("Components/Toggles/RadioButton", "Radio Button");
         }
 
         [MenuItem("GameObject/MaterialUI/InputFields/Basic", false, 070)]
@@ -225,10 +237,16 @@ namespace MaterialUI
             CreateInstance("Components/InputFields/InputField", "InputField");
         }
 
-        [MenuItem("GameObject/MaterialUI/InputFields/Outiline", false, 070)]
+        [MenuItem("GameObject/MaterialUI/InputFields/Outline", false, 070)]
         private static void CreateSimpleInputFieldOutline()
         {
             CreateInstance("Components/InputFields/InputField Outline", "InputField - Outline");
+        }
+
+        [MenuItem("GameObject/MaterialUI/InputFields/Filled", false, 070)]
+        private static void CreateSimpleInputFieldFilled()
+        {
+            CreateInstance("Components/InputFields/InputField Filled", "InputField - Filled");
         }
 
         [MenuItem("GameObject/MaterialUI/PromptFields/Basic", false, 070)]
@@ -237,10 +255,16 @@ namespace MaterialUI
             CreateInstance("Components/PromptFields/PromptField", "PromptField");
         }
 
-        [MenuItem("GameObject/MaterialUI/PromptFields/Outiline", false, 070)]
+        [MenuItem("GameObject/MaterialUI/PromptFields/Outline", false, 070)]
         private static void CreateSimpleInputPromptFieldOutline()
         {
             CreateInstance("Components/PromptFields/PromptField Outline", "PromptField - Outline");
+        }
+
+        [MenuItem("GameObject/MaterialUI/PromptFields/Filled", false, 070)]
+        private static void CreateSimpleInputPromptFieldFilled()
+        {
+            CreateInstance("Components/PromptFields/PromptField Filled", "PromptField - Filled");
         }
 
         [MenuItem("GameObject/MaterialUI/Slider", false, 080)]

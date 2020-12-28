@@ -96,7 +96,8 @@ namespace MaterialUI
         /// <param name="ripple">The ripple to reset and queue.</param>
         public virtual void ReleaseRipple(Ripple ripple)
         {
-            _ripplesToRelease.Add(ripple);
+            if(this != null)
+                _ripplesToRelease.Add(ripple);
         }
 
         #endregion
@@ -139,10 +140,10 @@ namespace MaterialUI
 
         protected virtual void TryReleaseRipplesStack()
         {
-            foreach (var v_ripple in _ripplesToRelease)
+            foreach (var ripple in _ripplesToRelease)
             {
-                if (v_ripple != null)
-                    ReleaseRippleImmediate(v_ripple);
+                if (ripple != null)
+                    ReleaseRippleImmediate(ripple);
             }
             _ripplesToRelease.Clear();
         }

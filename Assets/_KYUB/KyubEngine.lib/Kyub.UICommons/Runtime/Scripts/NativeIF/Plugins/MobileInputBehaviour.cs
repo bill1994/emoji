@@ -200,7 +200,11 @@ namespace Kyub.Internal.NativeInputPlugin
             }
             set
             {
+                if (m_isWithDoneButton == value)
+                    return;
                 m_isWithDoneButton = value;
+                if(_isMobileInputCreated)
+                    MarkToRecreateNativeEdit();
             }
         }
         public bool IsWithClearButton
@@ -211,17 +215,26 @@ namespace Kyub.Internal.NativeInputPlugin
             }
             set 
             { 
-                m_isWithClearButton = value; 
+                if (m_isWithClearButton == value)
+                    return;
+                m_isWithClearButton = value;
+                if (_isMobileInputCreated)
+                    MarkToRecreateNativeEdit();
             }
         }
-        public ReturnKeyType ReturnKey { 
+        public ReturnKeyType ReturnKey 
+        { 
             get 
             { 
                 return m_returnKey; 
             } 
-            set 
-            { 
-                m_returnKey = value; 
+            set
+            {
+                if (m_returnKey == value)
+                    return;
+                m_returnKey = value;
+                if (_isMobileInputCreated)
+                    MarkToRecreateNativeEdit();
             } 
         }
 
