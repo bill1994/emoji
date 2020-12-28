@@ -43,6 +43,8 @@ namespace Kyub.Internal.NativeInputPlugin
         void DeactivateInputField();
         void ProcessEvent(Event e);
         bool IsDestroyed();
+
+        void ActivateInputWithoutNotify();
     }
 
     public class MobileInputBehaviour : MobileInputReceiver
@@ -122,9 +124,10 @@ namespace Kyub.Internal.NativeInputPlugin
         private bool _isMobileInputCreated = false;
         private INativeInputField _inputObject;
         private Graphic _inputObjectText;
+
         private bool _isFocusOnCreate;
         private bool _isVisibleOnCreate = false;
-        bool _isVisible = false;
+        private bool _isVisible = false;
 
         //private Rect _lastRect;
 
@@ -164,6 +167,8 @@ namespace Kyub.Internal.NativeInputPlugin
                 if (_isVisible == value)
                     return;
                 _isVisible = value;
+                _isFocusOnCreate = value;
+                _isVisibleOnCreate = value;
                 /*#if (UNITY_IPHONE) && !UNITY_EDITOR
                                 if (!_cachedStatusBarHidden)
                                 {
@@ -176,6 +181,22 @@ namespace Kyub.Internal.NativeInputPlugin
                 else
                     UnregisterInputFieldEvents();
 #endif
+            }
+        }
+
+        public bool IsVisibleOnCreate
+        {
+            get
+            {
+                return _isVisibleOnCreate;
+            }
+        }
+
+        public bool IsFocusOnCreate
+        {
+            get
+            {
+                return _isFocusOnCreate;
             }
         }
 
@@ -192,7 +213,7 @@ namespace Kyub.Internal.NativeInputPlugin
             }
         }
 
-        public bool IsWithDoneButton 
+        public bool IsWithDoneButton
         {
             get
             {
@@ -203,7 +224,7 @@ namespace Kyub.Internal.NativeInputPlugin
                 if (m_isWithDoneButton == value)
                     return;
                 m_isWithDoneButton = value;
-                if(_isMobileInputCreated)
+                if (_isMobileInputCreated)
                     MarkToRecreateNativeEdit();
             }
         }
@@ -213,8 +234,8 @@ namespace Kyub.Internal.NativeInputPlugin
             {
                 return m_isWithClearButton;
             }
-            set 
-            { 
+            set
+            {
                 if (m_isWithClearButton == value)
                     return;
                 m_isWithClearButton = value;
@@ -222,12 +243,12 @@ namespace Kyub.Internal.NativeInputPlugin
                     MarkToRecreateNativeEdit();
             }
         }
-        public ReturnKeyType ReturnKey 
-        { 
-            get 
-            { 
-                return m_returnKey; 
-            } 
+        public ReturnKeyType ReturnKey
+        {
+            get
+            {
+                return m_returnKey;
+            }
             set
             {
                 if (m_returnKey == value)
@@ -235,7 +256,7 @@ namespace Kyub.Internal.NativeInputPlugin
                 m_returnKey = value;
                 if (_isMobileInputCreated)
                     MarkToRecreateNativeEdit();
-            } 
+            }
         }
 
         #endregion
@@ -273,7 +294,7 @@ namespace Kyub.Internal.NativeInputPlugin
                 // Wait until the end of frame before initializing to ensure that Unity UI layout has been built. We used to
                 // initialize at Start, but that resulted in an invalid RectTransform position and size on the InputField if it
                 // was instantiated at runtime instead of being built in to the scene.
-                if(m_requireRecreate)
+                if (m_requireRecreate)
                     RecreateNativeEdit();
             }
             else
@@ -393,6 +414,9 @@ namespace Kyub.Internal.NativeInputPlugin
                 RemoveNative();
             if (enabled && gameObject.activeSelf && gameObject.activeInHierarchy)
             {
+                _isVisibleOnCreate = isVisible;
+                _isFocusOnCreate = isVisible;
+
                 m_requireRecreate = false;
                 StopCoroutine("InitializeOnNextFrame");
                 StartCoroutine("InitializeOnNextFrame", isVisible);
@@ -408,12 +432,17 @@ namespace Kyub.Internal.NativeInputPlugin
         {
             yield return null;
             this.PrepareNativeEdit();
+
+            _isVisibleOnCreate = isVisible;
+            _isFocusOnCreate = isVisible;
+
+            m_requireRecreate = false;
 #if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
             this.CreateNativeEdit ();
             this.SetTextNative (this._inputObject.text);
-#endif
+#else
             SetVisibleAndFocus_Internal(isVisible);
-            m_requireRecreate = false;
+#endif
         }
 
         public static Rect GetScreenRectFromRectTransform(RectTransform rectTransform)
@@ -484,8 +513,6 @@ namespace Kyub.Internal.NativeInputPlugin
                 _config.KeyboardType = _inputObject.keyboardType.ToString();
                 _config.InputType = inputField != null ? inputField.inputType.ToString() :
                     (tmpInputField != null ? tmpInputField.inputType.ToString() : "");
-
-                _isVisibleOnCreate = false;
             }
         }
 
@@ -512,8 +539,10 @@ namespace Kyub.Internal.NativeInputPlugin
                 this._inputObject.onValueChanged.Invoke(text);
 
             if (this.Visible)
+            {
                 RegisterInputFieldEvents();
-            CheckUnityFieldsVisibility();
+                CheckUnityFieldsVisibility();
+            }
         }
 
         private void OnTextEditEnd(string text)
@@ -671,20 +700,20 @@ namespace Kyub.Internal.NativeInputPlugin
             }
             Debug.Log("MobileInput CreateNativeEdit " + data.ToJsonString());
             this.Execute(data);
-            Ready();
+            _isMobileInputCreated = true;
+            //Ready();
         }
 
         void Ready()
         {
             _isMobileInputCreated = true;
-            if (!_isVisibleOnCreate)
-            {
-                SetVisible(false);
-            }
-            if (_isFocusOnCreate)
+            SetVisibleAndFocus_Internal(_isVisibleOnCreate, _isFocusOnCreate);
+
+            //SetVisible(_isVisibleOnCreate);
+            /*if (_isFocusOnCreate)
             {
                 SetFocus(true);
-            }
+            }*/
         }
 
         void SetTextNative(string text)
@@ -775,7 +804,6 @@ namespace Kyub.Internal.NativeInputPlugin
                 _isFocusOnCreate = isFocus;
             }
 #endif
-
         }
 
         public void Show()
@@ -795,17 +823,22 @@ namespace Kyub.Internal.NativeInputPlugin
                 SetVisibleAndFocus_Internal(isVisible);
         }
 
-        protected void SetVisibleAndFocus_Internal(bool isVisible)
+        protected void SetVisibleAndFocus_Internal(bool isVisibleAndFocus)
+        {
+            SetVisibleAndFocus_Internal(isVisibleAndFocus, isVisibleAndFocus);
+        }
+
+        protected void SetVisibleAndFocus_Internal(bool isVisible, bool isFocus)
         {
             SetVisible(isVisible);
             if (enabled && gameObject.activeInHierarchy)
             {
                 StopCoroutine("SetFocusRoutine");
-                StartCoroutine("SetFocusRoutine", isVisible);
+                StartCoroutine("SetFocusRoutine", isFocus);
             }
             else
             {
-                SetFocus(isVisible);
+                SetFocus(isFocus);
             }
         }
 
@@ -839,10 +872,18 @@ namespace Kyub.Internal.NativeInputPlugin
         protected virtual void CheckUnityFieldsVisibility()
         {
 #if (UNITY_IPHONE || UNITY_ANDROID) && !UNITY_EDITOR
+            var isVisible = this.Visible && _isMobileInputCreated;
             if (_inputObject != null && _inputObject.placeholder != null)
-                _inputObject.placeholder.gameObject.SetActive(!this.Visible);
-            SetUnityTextEnabled(!this.Visible);
-            _inputObject.enabled = !this.Visible;
+                _inputObject.placeholder.gameObject.SetActive(!isVisible);
+            SetUnityTextEnabled(!isVisible);
+
+            if(_inputObject != null)
+            {
+                var isFocused = _inputObject.isFocused;
+                _inputObject.enabled = !isVisible;
+                if(isFocused && isVisible)
+                    _inputObject.ActivateInputWithoutNotify();
+            }
 #endif
         }
 

@@ -172,6 +172,19 @@ namespace Kyub.UI
             UnregisterEvents();
         }
 
+        public override void OnDeselect(BaseEventData eventData)
+        {
+            //Prevent deselect from LateUpdate while nativebox is opening
+            if (m_Keyboard == null && eventData == null && IsNativeKeyboardSupported())
+            {
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null && nativeBox.IsVisibleOnCreate)
+                    return;
+            }
+
+            base.OnDeselect(eventData);
+        }
+
         public override void OnSelect(BaseEventData eventData)
         {
             HasSelection = true;
@@ -1043,6 +1056,11 @@ namespace Kyub.UI
             {
                 return textComponent;
             }
+        }
+
+        void INativeInputField.ActivateInputWithoutNotify()
+        {
+            AllowInput = true;
         }
 
         #endregion
