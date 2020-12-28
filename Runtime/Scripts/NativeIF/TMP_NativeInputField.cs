@@ -204,6 +204,28 @@ namespace Kyub.UI
             UnregisterEvents();
         }
 
+        public override void OnDeselect(BaseEventData eventData)
+        {
+            //Prevent deselect from LateUpdate while nativebox is opening
+#if TMP_1_4_0_OR_NEWER
+            if (m_SoftKeyboard == null && eventData == null && IsNativeKeyboardSupported())
+            {
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null && nativeBox.IsVisibleOnCreate)
+                    return;
+            }
+#else
+            if (m_Keyboard == null && eventData == null && IsNativeKeyboardSupported())
+            {
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null && nativeBox.IsVisibleOnCreate)
+                    return;
+            }
+#endif
+
+            base.OnDeselect(eventData);
+        }
+
         public override void OnSelect(BaseEventData eventData)
         {
             HasSelection = true;
@@ -545,10 +567,17 @@ namespace Kyub.UI
         {
             // Update the TouchKeyboard's text from edit changes
             // if in-place editing is allowed
+#if TMP_1_4_0_OR_NEWER
             if (m_SoftKeyboard != null && InPlaceEditing())
             {
                 m_SoftKeyboard.text = m_Text;
             }
+#else
+            if (m_Keyboard != null && InPlaceEditing())
+            {
+                m_Keyboard.text = m_Text;
+            }
+#endif
         }
 
         protected virtual bool InPlaceEditing()
@@ -1061,6 +1090,11 @@ namespace Kyub.UI
             {
                 return textComponent;
             }
+        }
+
+        void INativeInputField.ActivateInputWithoutNotify()
+        {
+            AllowInput = true;
         }
 
         #endregion
