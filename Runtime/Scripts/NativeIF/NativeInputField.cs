@@ -317,16 +317,9 @@ namespace Kyub.UI
             MobileInputBehaviour nativeBox = GetComponent<MobileInputBehaviour>();
             if (nativeBox != null)
             {
-                var changed = m_ReturnKeyType != nativeBox.ReturnKey ||
-                    m_ShowClearButton != nativeBox.IsWithClearButton ||
-                    m_ShowDoneButton != nativeBox.IsWithDoneButton;
-
                 nativeBox.ReturnKey = m_ReturnKeyType;
                 nativeBox.IsWithClearButton = m_ShowClearButton;
                 nativeBox.IsWithDoneButton = m_ShowDoneButton;
-
-                if (changed)
-                    MarkToRecreateKeyboard();
             }
         }
 
