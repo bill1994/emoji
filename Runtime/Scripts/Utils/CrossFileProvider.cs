@@ -8,7 +8,6 @@ namespace Kyub.PickerServices
 {
     public static class CrossFileProvider
     {
-
         #region Public Functions
 
         public static void ShareFile(string filePath, string text = "", string subject = "")
