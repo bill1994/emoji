@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Kyub.Async;
+using System.Linq;
 #if UNITY_IOS && !UNITY_EDITOR
 using System.Runtime.InteropServices;
 #endif
@@ -53,14 +54,14 @@ namespace Kyub.PickerServices
                 fileName += extension;
 
             byte[] data = texture != null ? (CrossPickerServices.EncodeOption == CrossPickerServices.TextureEncoderEnum.JPG ? texture.EncodeToJPG() : texture.EncodeToPNG()) : null;
-            NativeGallery.MediaSaveCallback mediaSaveDelegate = (error) =>
+            NativeGallery.MediaSaveCallback mediaSaveDelegate = (success, path) =>
             {
                 if (Instance != null)
                 {
-                    if (string.IsNullOrEmpty(error))
+                    if (success)
                     {
-                        var temporarySavePath = CrossPickerServices.SaveTextureToTemporaryPath(data, System.IO.Path.GetFileName(fileName));
-                        Instance.NativeImageSaveSuccess(temporarySavePath);
+                        //var temporarySavePath = CrossPickerServices.SaveTextureToTemporaryPath(data, System.IO.Path.GetFileName(fileName));
+                        Instance.NativeImageSaveSuccess(path);
                     }
                     else
                         Instance.NativeImageSaveFailed();
@@ -89,9 +90,20 @@ namespace Kyub.PickerServices
 
         public static void OpenFileBrowser(IList<string> allowedFileExtensions, bool multiselect)
         {
-            var nativeFileExtensions = ConvertToMimeType(allowedFileExtensions);
+            if (NativeFilePicker.IsFilePickerBusy())
+            {
+                if (Instance != null)
+                    Instance.NativeFilesPickedEnd(null);
+            }
 
-            if (multiselect)
+            var permission = NativeFilePicker.CheckPermission(true);
+            if (permission == NativeFilePicker.Permission.Denied)
+                NativeFilePicker.OpenSettings();
+            else if (permission == NativeFilePicker.Permission.ShouldAsk)
+                NativeFilePicker.RequestPermission(true);
+
+            var nativeFileExtensions = ConvertToMimeType(allowedFileExtensions);
+            if (multiselect && NativeFilePicker.CanPickMultipleFiles())
             {
                 NativeFilePicker.PickMultipleFiles((files) =>
                 {
@@ -152,12 +164,22 @@ namespace Kyub.PickerServices
         private static string[] ConvertToMimeType(IList<string> fileExtensions)
         {
             //First we must convert file extension to mimetype like (pdf to application/pdf)
-            List<string> nativeFileExtensions = new List<string>();
+            HashSet<string> nativeFileExtensions = new HashSet<string>();
             if (fileExtensions != null && fileExtensions.Count > 0)
             {
                 foreach (var file in fileExtensions)
                 {
-                    string extension = file != null && System.IO.Path.HasExtension(file) ? System.IO.Path.GetExtension(file) : file;
+                    string extension = file;
+                    if (extension == "*" || extension == ".*" || extension == "*.*")
+                    {
+                        nativeFileExtensions.Add("public.content");
+                        nativeFileExtensions.Add("public.data");
+                        continue;
+                    }
+                    else
+                        extension = file != null && System.IO.Path.HasExtension(file) ? System.IO.Path.GetExtension(file) : file;
+
+                    extension = file != null && System.IO.Path.HasExtension(file) ? System.IO.Path.GetExtension(file) : file;
                     if (!string.IsNullOrEmpty(extension))
                     {
                         string nativeExtension = NativeFilePicker.ConvertExtensionToFileType(extension);
@@ -167,6 +189,11 @@ namespace Kyub.PickerServices
                         }
                     }
                 }
+            }
+            else
+            {
+                nativeFileExtensions.Add("public.content");
+                nativeFileExtensions.Add("public.data");
             }
 
             return nativeFileExtensions.ToArray();

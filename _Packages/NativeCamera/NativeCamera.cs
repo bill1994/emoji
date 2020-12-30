@@ -108,6 +108,9 @@ public static class NativeCamera
 	private static extern string _NativeCamera_GetVideoProperties( string path );
 
 	[System.Runtime.InteropServices.DllImport( "__Internal" )]
+	private static extern string _NativeCamera_GetVideoThumbnail( string path, string thumbnailSavePath, int maxSize, double captureTimeInSeconds );
+
+	[System.Runtime.InteropServices.DllImport( "__Internal" )]
 	private static extern string _NativeCamera_LoadImageAtPath( string path, string temporaryFilePath, int maxSize );
 #endif
 
@@ -215,9 +218,14 @@ public static class NativeCamera
 		Permission result = RequestPermission();
 		if( result == Permission.Granted && !IsCameraBusy() )
 		{
-#if !UNITY_EDITOR && UNITY_ANDROID
+#if UNITY_EDITOR
+			string pickedFile = UnityEditor.EditorUtility.OpenFilePanelWithFilters( "Select image", "", new string[] { "Image files", "png,jpg,jpeg", "All files", "*" } );
+
+			if( callback != null )
+				callback( pickedFile != "" ? pickedFile : null );
+#elif UNITY_ANDROID
 			AJC.CallStatic( "TakePicture", Context, new NCCameraCallbackAndroid( callback ), (int) preferredCamera );
-#elif !UNITY_EDITOR && UNITY_IOS
+#elif UNITY_IOS
 			if( maxSize <= 0 )
 				maxSize = SystemInfo.maxTextureSize;
 
@@ -237,9 +245,14 @@ public static class NativeCamera
 		Permission result = RequestPermission();
 		if( result == Permission.Granted && !IsCameraBusy() )
 		{
-#if !UNITY_EDITOR && UNITY_ANDROID
+#if UNITY_EDITOR
+			string pickedFile = UnityEditor.EditorUtility.OpenFilePanelWithFilters( "Select video", "", new string[] { "Video files", "mp4,mov,wav,avi", "All files", "*" } );
+
+			if( callback != null )
+				callback( pickedFile != "" ? pickedFile : null );
+#elif UNITY_ANDROID
 			AJC.CallStatic( "RecordVideo", Context, new NCCameraCallbackAndroid( callback ), (int) preferredCamera, (int) quality, maxDuration, maxSizeBytes );
-#elif !UNITY_EDITOR && UNITY_IOS
+#elif UNITY_IOS
 			NCCameraCallbackiOS.Initialize( callback );
 			_NativeCamera_RecordVideo( (int) quality, maxDuration, (int) preferredCamera );
 #else
@@ -293,7 +306,7 @@ public static class NativeCamera
 		string loadPath = imagePath;
 #endif
 
-		String extension = Path.GetExtension( imagePath ).ToLowerInvariant();
+		string extension = Path.GetExtension( imagePath ).ToLowerInvariant();
 		TextureFormat format = ( extension == ".jpg" || extension == ".jpeg" ) ? TextureFormat.RGB24 : TextureFormat.RGBA32;
 
 		Texture2D result = new Texture2D( 2, 2, format, generateMipmaps, linearColorSpace );
@@ -328,6 +341,25 @@ public static class NativeCamera
 		return result;
 	}
 
+	public static Texture2D GetVideoThumbnail( string videoPath, int maxSize = -1, double captureTimeInSeconds = -1.0, bool markTextureNonReadable = true )
+	{
+		if( maxSize <= 0 )
+			maxSize = SystemInfo.maxTextureSize;
+
+#if !UNITY_EDITOR && UNITY_ANDROID
+		string thumbnailPath = AJC.CallStatic<string>( "GetVideoThumbnail", Context, videoPath, TemporaryImagePath + ".png", false, maxSize, captureTimeInSeconds );
+#elif !UNITY_EDITOR && UNITY_IOS
+		string thumbnailPath = _NativeCamera_GetVideoThumbnail( videoPath, TemporaryImagePath + ".png", maxSize, captureTimeInSeconds );
+#else
+		string thumbnailPath = null;
+#endif
+
+		if( !string.IsNullOrEmpty( thumbnailPath ) )
+			return LoadImageAtPath( thumbnailPath, maxSize, markTextureNonReadable );
+		else
+			return null;
+	}
+
 	public static ImageProperties GetImageProperties( string imagePath )
 	{
 		if( !File.Exists( imagePath ) )
@@ -357,7 +389,7 @@ public static class NativeCamera
 				mimeType = properties[2].Trim();
 				if( mimeType.Length == 0 )
 				{
-					String extension = Path.GetExtension( imagePath ).ToLowerInvariant();
+					string extension = Path.GetExtension( imagePath ).ToLowerInvariant();
 					if( extension == ".png" )
 						mimeType = "image/png";
 					else if( extension == ".jpg" || extension == ".jpeg" )

@@ -287,6 +287,11 @@ namespace Kyub.PickerServices
 #endif
         }
 
+        public static void OpenFileBrowser(bool multiselect, System.Action<string[]> callback = null)
+        {
+            OpenFileBrowser(null, multiselect, callback);
+        }
+
         public static void OpenFileBrowser(IList<string> allowedFileExtensions, bool multiselect, System.Action<string[]> callback = null)
         {
             //AutoRegister/Unregister callback
