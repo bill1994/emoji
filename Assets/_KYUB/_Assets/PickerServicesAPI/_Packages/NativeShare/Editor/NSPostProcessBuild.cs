@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using System.IO;
+﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_IOS
@@ -11,7 +9,7 @@ using UnityEditor.iOS.Xcode;
 public class NSPostProcessBuild 
 {
 	private const bool ENABLED = true;
-	private const string PHOTO_LIBRARY_USAGE_DESCRIPTION = "Save media to Photos";
+	private const string PHOTO_LIBRARY_USAGE_DESCRIPTION = "The app requires access to Photos to save media to it.";
 
 	[InitializeOnLoadMethod]
 	public static void ValidatePlugin()
@@ -49,5 +47,3 @@ public class NSPostProcessBuild
 #pragma warning restore 0162
 #endif
 }
-
-#endif

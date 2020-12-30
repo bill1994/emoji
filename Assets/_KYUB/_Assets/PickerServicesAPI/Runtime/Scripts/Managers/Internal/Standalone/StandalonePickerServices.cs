@@ -133,7 +133,7 @@ namespace Kyub.PickerServices
         private static string[] ConvertToValidExtension(IList<string> fileExtensions)
         {
             //First we must convert file extension to mimetype like (pdf to application/pdf)
-            List<string> nativeFileExtensions = new List<string>();
+            HashSet<string> nativeFileExtensions = new HashSet<string>();
             if (fileExtensions != null && fileExtensions.Count > 0)
             {
                 foreach (var file in fileExtensions)
