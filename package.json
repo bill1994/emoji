@@ -1,0 +1,25 @@
+{
+  "name": "com.kyub.uicommons.experimental",
+  "version": "0.0.1",
+  "displayName": "Kyub UI Commons Experimental",
+  "description": "Contains Experimental UICommons Features",
+  "unity": "2019.1",
+	"dependencies": {
+		"com.unity.ugui": "1.0.0",
+		"com.kyub.inputcompat": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.inputcompat",
+		"com.kyub.uicommons": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.uicommons",
+		"com.unity.textmeshpro": "2.1.0-preview.2"
+	},
+  "keywords": [
+    "UGUI",
+    "Canvas",
+    "UI"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}
