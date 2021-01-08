@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
 using System.Reflection;
+using UnityEngine.Events;
 
 namespace Kyub.UI
 {
@@ -12,10 +13,15 @@ namespace Kyub.UI
     {
         #region Private Variables
 
+        [SerializeField, Range(0, 1), Tooltip("Snap animation duration")]
+        protected float m_SnapToDuration = 0.05f;
         [SerializeField, Tooltip("Support route extra drag movements to parent")]
         protected bool m_NestedDragActive = false;
 
         protected bool _routeToParent = false;
+
+        //Used to animate
+        protected Vector2AnimValue _contentPosition = null;
 
         #endregion
 
@@ -35,6 +41,22 @@ namespace Kyub.UI
             }
         }
 
+        public float snapToDuration
+        {
+            get
+            {
+                return m_SnapToDuration;
+            }
+            set
+            {
+                if (m_SnapToDuration == value)
+                    return;
+                m_SnapToDuration = value;
+                if (_contentPosition != null)
+                    _contentPosition.duration = value;
+            }
+        }
+
         #endregion
 
         #region Constructors
@@ -48,6 +70,18 @@ namespace Kyub.UI
         #endregion
 
         #region Unity Functions
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            StopAnimations();
+        }
+
+        protected override void LateUpdate()
+        {
+            base.LateUpdate();
+            StepAnimations();
+        }
 
         /// <summary>
         /// Always route initialize potential drag event to parents
@@ -175,6 +209,140 @@ namespace Kyub.UI
 
         #endregion
 
+        #region Animation Functions
+
+        public void SnapToImmediate(RectTransform child)
+        {
+            SnapToInternal(child, false);
+        }
+
+        public void SnapToImmediate(Vector3 worldSpacePosition)
+        {
+            SnapToInternal(worldSpacePosition, false);
+        }
+
+        public void SnapToImmediate(Rect childRectInScrollerSpace)
+        {
+            SnapToInternal(childRectInScrollerSpace, false);
+        }
+
+        public void SnapTo(RectTransform child)
+        {
+            SnapToInternal(child, enabled && gameObject.activeInHierarchy);
+        }
+
+        public void SnapTo(Vector3 worldSpacePosition)
+        {
+            SnapToInternal(worldSpacePosition, enabled && gameObject.activeInHierarchy);
+        }
+
+        public void SnapTo(Rect childRectInScrollerSpace)
+        {
+            SnapToInternal(childRectInScrollerSpace, enabled && gameObject.activeInHierarchy);
+        }
+
+        protected virtual void SnapToInternal(RectTransform child, bool animate)
+        {
+            if (this.content == null || !child.IsChildOf(this.content))
+                return;
+
+            var childMin = (Vector2)this.content.transform.InverseTransformPoint(child.TransformPoint(child.rect.min));
+            var childMax = (Vector2)this.content.transform.InverseTransformPoint(child.TransformPoint(child.rect.max));
+
+            var childRectInScrollerSpace = Rect.MinMaxRect(childMin.x, childMin.y, childMax.x, childMax.y);
+            SnapToInternal(childRectInScrollerSpace, animate);
+        }
+
+        protected virtual void SnapToInternal(Vector3 worldSpacePosition, bool animate)
+        {
+            if (this.content == null)
+                return;
+
+            var childMin = (Vector2)this.content.transform.InverseTransformPoint(worldSpacePosition);
+            var childMax = (Vector2)childMin;
+
+            var childRectInScrollerSpace = Rect.MinMaxRect(childMin.x, childMin.y, childMax.x, childMax.y);
+            SnapToInternal(childRectInScrollerSpace, true);
+        }
+
+        protected virtual void SnapToInternal(Rect childRectInScrollerSpace, bool animate)
+        {
+            if (this.content == null)
+                return;
+
+            var view = this.viewRect;
+            var contentMin = (Vector2)this.content.InverseTransformPoint(view.TransformPoint(view.rect.min));
+            var contentMax = (Vector2)this.content.InverseTransformPoint(view.TransformPoint(view.rect.max));
+
+            var contentRectInScroller = Rect.MinMaxRect(contentMin.x, contentMin.y, contentMax.x, contentMax.y);
+
+            var delta = new Vector2(0, 0);
+            if (this.horizontal)
+            {
+                delta.x = childRectInScrollerSpace.xMin < contentRectInScroller.xMin ?
+                    contentRectInScroller.xMin - childRectInScrollerSpace.xMin :
+                    (childRectInScrollerSpace.xMax > contentRectInScroller.xMax ?
+                    contentRectInScroller.xMax - childRectInScrollerSpace.xMax : 0);
+            }
+
+            if (this.vertical)
+            {
+                delta.y = childRectInScrollerSpace.yMin < contentRectInScroller.yMin ?
+                    contentRectInScroller.yMin - childRectInScrollerSpace.yMin :
+                    (childRectInScrollerSpace.yMax > contentRectInScroller.yMax ?
+                    contentRectInScroller.yMax - childRectInScrollerSpace.yMax : 0);
+            }
+
+            //Try initialize content
+            if (_contentPosition == null)
+                InitializeAnimations();
+
+            if (_contentPosition != null)
+            {
+                _contentPosition.duration = Mathf.Max(0, m_SnapToDuration);
+                _contentPosition.value = this.content.anchoredPosition;
+                _contentPosition.target = this.content.anchoredPosition + delta;
+                this.velocity = new Vector2(0, 0);
+
+                if (!animate || _contentPosition.duration <= 0)
+                    _contentPosition.StopAnim(true);
+            }
+            else
+            {
+                this.content.anchoredPosition = this.content.anchoredPosition + delta;
+            }
+        }
+
+        protected virtual void InitializeAnimations()
+        {
+            _contentPosition = null;
+            if (this != null && this.content != null)
+                _contentPosition = new Vector2AnimValue(this.content.anchoredPosition, this.content.anchoredPosition, this.m_SnapToDuration);
+
+            _contentPosition.valueChanged.AddListener(() =>
+            {
+                if (this != null && this.content != null)
+                {
+                    this.content.anchoredPosition = _contentPosition.value;
+                    this.velocity = new Vector2(0, 0);
+                }
+            });
+        }
+
+        protected virtual void StepAnimations()
+        {
+            if (_contentPosition != null && _contentPosition.isAnimating)
+                _contentPosition.Step(Time.unscaledDeltaTime);
+        }
+
+        protected virtual void StopAnimations()
+        {
+            if (_contentPosition != null && _contentPosition.isAnimating)
+                _contentPosition.StopAnim(true);
+        }
+
+        #endregion
+
         #region ScrollRect Hidden Properties
 
         FieldInfo m_HasRebuiltLayoutField = null;
@@ -229,7 +397,7 @@ namespace Kyub.UI
             }
         }
 
-        
+
 
         FieldInfo m_DraggingField = null;
         protected bool Dragging
@@ -274,7 +442,7 @@ namespace Kyub.UI
         {
             if (field == null && !string.IsNullOrEmpty(fieldName))
             {
-                field = typeof(ScrollRect).GetField(fieldName, BindingFlags.NonPublic|BindingFlags.Instance);
+                field = typeof(ScrollRect).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
             }
 
             if (field != null)
@@ -385,7 +553,7 @@ namespace Kyub.UI
 
         #endregion
 
-        #region ÍLayoutElement
+        #region ILayoutElement
 
         protected float _MinWidth = -1;
         protected float _MinHeight = -1;
@@ -452,6 +620,162 @@ namespace Kyub.UI
             _MinHeight = content == null ? -1 : LayoutUtility.GetLayoutProperty(content, e => e.minHeight, -1);
             _PreferredHeight = content == null ? -1 : LayoutUtility.GetLayoutProperty(content, e => e.preferredHeight, -1);
             base.CalculateLayoutInputVertical();
+        }
+
+        #endregion
+
+        #region Internal AnimatedValue
+
+        protected class Vector2AnimValue
+        {
+            #region Private Variables
+
+            Vector2 _initial = default(Vector2);
+            Vector2 _value = default(Vector2);
+            Vector2 _target = default(Vector2);
+
+            float _duration = 0.5f;
+            float _currentTime = 0f;
+
+            #endregion
+
+            #region Callbacks
+
+            public UnityEvent valueChanged = new UnityEvent();
+            public UnityEvent onAnimationEnd = new UnityEvent();
+
+            #endregion
+
+            #region Constructors
+
+            public Vector2AnimValue(Vector2 value, Vector2 target, float duration = 0.5f)
+            {
+                _value = value;
+                _target = target;
+                _duration = duration;
+            }
+
+            #endregion
+
+            #region Properties
+
+            public float currentNormalizedDeltaTime
+            {
+                get
+                {
+                    return _currentTime < 0 || _duration < 0 ? 1 :
+                        (_currentTime == 0 || _duration == 0 ? 0 :
+                            Mathf.Clamp01(_currentTime / _duration));
+                }
+            }
+
+            public float duration
+            {
+                get
+                {
+                    return _duration;
+                }
+                set
+                {
+                    if (Mathf.Approximately(_duration, value))
+                        return;
+                    _duration = value;
+                    BeginAnim();
+                }
+            }
+
+            public Vector2 target
+            {
+                get
+                {
+                    return _target;
+                }
+                set
+                {
+                    if (Vector2.Equals(_target, value))
+                        return;
+                    _target = value;
+                    BeginAnim();
+                }
+            }
+
+            public Vector2 value
+            {
+                get
+                {
+                    return _value;
+                }
+                set
+                {
+                    if (Vector2.Equals(_value, value))
+                        return;
+                    _value = value;
+                    BeginAnim();
+                }
+            }
+
+            public bool isAnimating
+            {
+                get
+                {
+                    return _currentTime >= 0 && _duration >= 0;
+                }
+            }
+
+            #endregion
+
+            #region Functions
+
+            public void BeginAnim()
+            {
+                if (_duration >= 0)
+                {
+                    _currentTime = 0;
+                    _initial = _value;
+                }
+                else
+                {
+                    _initial = _target;
+                }
+            }
+
+            public void Step(float deltaTime)
+            {
+                if (isAnimating)
+                {
+                    _currentTime += deltaTime;
+                    _value = Vector2.Lerp(_initial, _target, currentNormalizedDeltaTime);
+                    valueChanged?.Invoke();
+
+                    if (_currentTime > _duration)
+                        StopAnim(true);
+                }
+            }
+
+            public void StopAnim(bool finalize)
+            {
+                if (isAnimating)
+                {
+                    _currentTime = -1;
+                    if (finalize)
+                    {
+                        _value = _target;
+                        valueChanged?.Invoke();
+                        onAnimationEnd?.Invoke();
+                    }
+                }
+            }
+
+            #endregion
+
+            #region Implicit
+
+            public static implicit operator Vector2AnimValue(Vector2 value)
+            {
+                return new Vector2AnimValue(value, value);
+            }
+
+            #endregion
         }
 
         #endregion
