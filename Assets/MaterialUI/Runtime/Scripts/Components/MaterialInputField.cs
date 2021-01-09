@@ -1666,14 +1666,6 @@ namespace MaterialUI
             Select();
         }
 
-        public virtual void Select()
-        {
-            if (inputField != null)
-            {
-                inputField.Select();
-            }
-        }
-
         public virtual void DeactivateInputField()
         {
             if (inputField != null)
