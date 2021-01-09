@@ -210,7 +210,10 @@ namespace MaterialUI
         {
             var isExpand = IsExpanded();
             if (!isExpand && uiShowTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerClick))
+            {
+                Select();
                 Show();
+            }
             if (isExpand && uiHideTriggerMode.HasFlag(SpinnerUIEventTriggerMode.OnPointerClick))
                 Hide();
 
