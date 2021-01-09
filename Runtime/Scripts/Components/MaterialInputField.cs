@@ -20,7 +20,7 @@ namespace MaterialUI
     [ExecuteInEditMode]
     //[RequireComponent(typeof(CanvasGroup))]
     [AddComponentMenu("MaterialUI/Material Input Field", 100)]
-    public class MaterialInputField : StyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, ISelectHandler, IDeselectHandler, ISerializationCallbackReceiver
+    public class MaterialInputField : SelectableStyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, IDeselectHandler, ISerializationCallbackReceiver
     {
         public enum BackgroundLayoutMode
         {
@@ -235,6 +235,9 @@ namespace MaterialUI
         #endregion
 
         #region InputField Callbacks
+
+        public UnityEvent onActivate = new UnityEvent();
+        public UnityEvent onDeactivate = new UnityEvent();
 
         //Events when inputfield is null and text is not null
         public InputField.OnChangeEvent onValueChanged = new InputField.OnChangeEvent();
@@ -1493,7 +1496,7 @@ namespace MaterialUI
             }
         }
 
-        public void OnSelect(BaseEventData eventData)
+        public override void OnSelect(BaseEventData eventData)
         {
             m_HasBeenSelected = true;
             var canSelect = (m_InputField == null || isFocused);
@@ -1507,10 +1510,15 @@ namespace MaterialUI
                 RefreshVisualStyles();
 
                 ValidateText();
+
+                SnapTo();
+
+                if (onActivate != null)
+                    onActivate.Invoke();
             }
         }
 
-        public void OnDeselect(BaseEventData eventData)
+        public virtual void OnDeselect(BaseEventData eventData)
         {
             m_HasBeenSelected = false;
             m_LastFocussedState = false;
@@ -1519,6 +1527,9 @@ namespace MaterialUI
             RefreshVisualStyles();
 
             ValidateText();
+
+            if (onDeactivate != null)
+                onDeactivate.Invoke();
         }
 
         #endregion
@@ -1529,7 +1540,6 @@ namespace MaterialUI
         {
             OnTextChangedInternal(value, false);
         }
-
 
         protected virtual void HandleOnGraphicTextChanged()
         {

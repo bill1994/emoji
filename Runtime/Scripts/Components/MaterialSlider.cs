@@ -12,7 +12,7 @@ namespace MaterialUI
 {
     [ExecuteInEditMode]
     [AddComponentMenu("MaterialUI/Material Slider", 100)]
-    public class MaterialSlider : StyleElement<MaterialSlider.SliderStyleProperty>, ISelectHandler, IDeselectHandler, IPointerDownHandler, IPointerUpHandler, ILayoutGroup, ILayoutElement
+    public class MaterialSlider : SelectableStyleElement<MaterialSlider.SliderStyleProperty>, IDeselectHandler, IPointerDownHandler, IPointerUpHandler, ILayoutGroup, ILayoutElement
     {
         #region Private Variables
 
@@ -625,8 +625,9 @@ namespace MaterialUI
             AnimateOff();
         }
 
-        public void OnSelect(BaseEventData eventData)
+        public override void OnSelect(BaseEventData eventData)
         {
+            SnapTo();
             AnimateOn();
             m_IsSelected = true;
         }

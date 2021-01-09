@@ -21,7 +21,7 @@ namespace MaterialUI
     [RequireComponent(typeof(RectTransform))]
     //[RequireComponent(typeof(CanvasGroup))]
     [AddComponentMenu("MaterialUI/Material Button", 100)]
-    public class MaterialButton : StyleElement<MaterialButton.ButtonStyleProperty>, ILayoutGroup, ILayoutElement, ILayoutSelfController, IPointerDownHandler, IPointerClickHandler
+    public class MaterialButton : SelectableStyleElement<MaterialButton.ButtonStyleProperty>, ILayoutGroup, ILayoutElement, ILayoutSelfController, IPointerDownHandler, IPointerClickHandler
     {
         #region Consts
 
@@ -446,6 +446,26 @@ namespace MaterialUI
         #endregion
 
         #region Other Functions
+
+        /// <summary>
+        /// Used to simulate Press/Click Action
+        /// </summary>
+        public virtual void Press()
+        {
+            if (!IsActive() || !IsInteractable())
+                return;
+
+            if (onPress != null)
+                onPress.Invoke();
+
+            UISystemProfilerApi.AddMarker("Button.onClick", this);
+
+            if (buttonObject != null && buttonObject.onClick != null)
+                buttonObject.onClick.Invoke();
+
+            if (onClick != null)
+                onClick.Invoke();
+        }
 
         public void SetButtonBackgroundColor(Color color, bool animate = true)
         {
