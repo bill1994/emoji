@@ -21,6 +21,14 @@ namespace MaterialUI
 
         #region Public Functions
 
+        public virtual void Select()
+        {
+            if (EventSystem.current == null || EventSystem.current.alreadySelecting)
+                return;
+
+            EventSystem.current.SetSelectedGameObject(gameObject);
+        }
+
         public virtual void SnapTo()
         {
 #if UI_COMMONS_DEFINED
