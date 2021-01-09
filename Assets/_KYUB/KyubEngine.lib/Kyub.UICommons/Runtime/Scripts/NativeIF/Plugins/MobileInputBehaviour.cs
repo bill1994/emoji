@@ -14,6 +14,7 @@ using UnityEngine.EventSystems;
 
 namespace Kyub.Internal.NativeInputPlugin
 {
+    public enum NativeInputPluginMaskModeEnum { Manual = 0, Auto = 1 }
     public interface INativeInputField
     {
         char asteriskChar { get; set; }
@@ -32,6 +33,9 @@ namespace Kyub.Internal.NativeInputPlugin
 
         //Used as reference to PAN all screen
         RectTransform panContent { get; set; }
+
+        //Used as clip rect while update native rect position
+        RectTransform rectMaskContent { get; set; }
 
         UnityEvent<string> onValueChanged { get; }
         UnityEvent<string> onEndEdit { get; }
@@ -352,7 +356,7 @@ namespace Kyub.Internal.NativeInputPlugin
 
             if (Visible && this._inputObject != null && _isMobileInputCreated)
             {
-                SetRectNative(this._inputObject.textViewport);
+                SetRectNative(this._inputObject.textViewport, this._inputObject.rectMaskContent);
             }
             //Set Visible false when click out of rect
             if (Application.isMobilePlatform && input.touchCount > 0)
@@ -445,11 +449,38 @@ namespace Kyub.Internal.NativeInputPlugin
 #endif
         }
 
-        public static Rect GetScreenRectFromRectTransform(RectTransform rectTransform)
+        public static Rect GetScreenRectFromRectTransform(RectTransform rectTransform, RectTransform clipRectTransform = null)
         {
+            if (rectTransform == null)
+                return Rect.zero;
+
             Vector3[] corners = new Vector3[4];
 
-            rectTransform.GetWorldCorners(corners);
+            if (clipRectTransform == null)
+                rectTransform.GetWorldCorners(corners);
+
+            //Intersect Rect
+            else
+            {
+                
+                Vector2 clipperMin = clipRectTransform.rect.min;
+                Vector2 clipperMax = clipRectTransform.rect.max;
+
+                Vector2 rectTransformMin = clipRectTransform.InverseTransformPoint(rectTransform.TransformPoint(rectTransform.rect.min));
+                Vector2 rectTransformMax = clipRectTransform.InverseTransformPoint(rectTransform.TransformPoint(rectTransform.rect.max));
+
+                //Intersect element rect with ClipRect
+                var intersectRect = Rect.MinMaxRect(Mathf.Clamp(rectTransformMin.x, clipperMin.x, clipperMax.x),
+                                                   Mathf.Clamp(rectTransformMin.y, clipperMin.y, clipperMax.y),
+                                                   Mathf.Clamp(rectTransformMax.x, clipperMin.x, clipperMax.x),
+                                                   Mathf.Clamp(rectTransformMax.y, clipperMin.y, clipperMax.y));
+
+                //Convert interset to world space
+                corners[0] = clipRectTransform.TransformPoint(new Vector2(intersectRect.xMin, intersectRect.yMin));
+                corners[1] = clipRectTransform.TransformPoint(new Vector2(intersectRect.xMin, intersectRect.yMax));
+                corners[2] = clipRectTransform.TransformPoint(new Vector2(intersectRect.xMax, intersectRect.yMax));
+                corners[3] = clipRectTransform.TransformPoint(new Vector2(intersectRect.xMax, intersectRect.yMin));
+            }
 
             float xMin = float.PositiveInfinity;
             float xMax = float.NegativeInfinity;
@@ -646,7 +677,7 @@ namespace Kyub.Internal.NativeInputPlugin
         /// </summary>
         private void CreateNativeEdit()
         {
-            Rect rect = GetScreenRectFromRectTransform(this._inputObjectText.rectTransform);
+            Rect rect = GetScreenRectFromRectTransform(this._inputObject.textViewport);
             Rect panContentRect = GetScreenRectFromRectTransform(this._inputObject.panContent);
             JsonObject data = new JsonObject();
             data["msg"] = CREATE;
@@ -747,11 +778,11 @@ namespace Kyub.Internal.NativeInputPlugin
         /// Set new size and position
         /// </summary>
         /// <param name="inputRect">RectTransform</param>
-        public void SetRectNative(RectTransform inputRect)
+        public void SetRectNative(RectTransform inputRect, RectTransform clipperRect)
         {
             if (_isMobileInputCreated)
             {
-                Rect rect = GetScreenRectFromRectTransform(inputRect);
+                Rect rect = GetScreenRectFromRectTransform(inputRect, clipperRect);
                 //if (_lastRect == rect)
                 //{
                 //    return;

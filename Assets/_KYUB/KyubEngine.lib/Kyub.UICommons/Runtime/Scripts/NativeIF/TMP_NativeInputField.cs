@@ -19,6 +19,10 @@ namespace Kyub.UI
         //protected float m_MonospacePassDistEm = 0;
         [SerializeField]
         protected RectTransform m_PanContent = null;
+        [SerializeField]
+        protected NativeInputPluginMaskModeEnum m_RectMaskMode = NativeInputPluginMaskModeEnum.Manual;
+        [SerializeField]
+        protected RectTransform m_RectMaskContent = null;
 
         [SerializeField]
         protected bool m_ShowDoneButton = true;
@@ -58,6 +62,37 @@ namespace Kyub.UI
                 if (m_PanContent == value)
                     return;
                 m_PanContent = value;
+            }
+        }
+
+        public NativeInputPluginMaskModeEnum rectMaskMode
+        {
+            get
+            {
+                return m_RectMaskMode;
+            }
+            set
+            {
+                if (m_RectMaskMode == value)
+                    return;
+                m_RectMaskMode = value;
+                UpdateRectMaskContent(false);
+            }
+        }
+
+        public RectTransform rectMaskContent
+        {
+            get
+            {
+                return m_RectMaskContent;
+            }
+            set
+            {
+                if (m_RectMaskMode == NativeInputPluginMaskModeEnum.Auto)
+                    Debug.LogWarning("[NativeInputField] Can only change RectMaskContent when RectMaskMode is Manual");
+                if (m_RectMaskContent == value)
+                    return;
+                m_RectMaskContent = value;
             }
         }
 
@@ -130,6 +165,7 @@ namespace Kyub.UI
         {
             base.OnEnable();
             CheckAsteriskChar();
+            UpdateRectMaskContent(false);
 
             MobileInputBehaviour nativeBox = GetComponent<MobileInputBehaviour>();
             if (MobileInputBehaviour.IsSupported())
@@ -378,9 +414,25 @@ namespace Kyub.UI
         }
 #endif
 
+        protected override void OnTransformParentChanged()
+        {
+            base.OnTransformParentChanged();
+            UpdateRectMaskContent(false);
+        }
+
         #endregion
 
         #region Helper Functions
+
+        protected virtual void UpdateRectMaskContent(bool force)
+        {
+            //Update RectMaskContent to pick clipper
+            if (force || m_RectMaskMode == NativeInputPluginMaskModeEnum.Auto)
+            {
+                var clipperBehaviour = this.GetComponentInParent<IClipper>() as MonoBehaviour;
+                m_RectMaskContent = clipperBehaviour != null ? clipperBehaviour.transform as RectTransform : null;
+            }
+        }
 
         protected virtual void ApplyNativeKeyboardParams()
         {

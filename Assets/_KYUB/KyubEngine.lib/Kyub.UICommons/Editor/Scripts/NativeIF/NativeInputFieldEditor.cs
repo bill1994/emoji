@@ -16,7 +16,9 @@ namespace KyubEditor.UI
         private SerializedProperty m_OnReturnPressed;
         private SerializedProperty m_TextViewport;
         private SerializedProperty m_PanContent;
-
+        private SerializedProperty m_RectMaskMode;
+        private SerializedProperty m_RectMaskContent;
+        
         private SerializedProperty m_ShowDoneButton;
         private SerializedProperty m_ShowClearButton;
         private SerializedProperty m_ReturnKeyType;
@@ -29,6 +31,8 @@ namespace KyubEditor.UI
             m_TextViewport = serializedObject.FindProperty("m_TextViewport");
             m_AsteriskChar = serializedObject.FindProperty("m_AsteriskChar");
             m_PanContent = serializedObject.FindProperty("m_PanContent");
+            m_RectMaskMode = serializedObject.FindProperty("m_RectMaskMode");
+            m_RectMaskContent = serializedObject.FindProperty("m_RectMaskContent");
             m_OnReturnPressed = serializedObject.FindProperty("OnReturnPressed");
 
             m_ShowDoneButton = serializedObject.FindProperty("m_ShowDoneButton");
@@ -54,6 +58,12 @@ namespace KyubEditor.UI
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Virtual Keyboard Layout Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(m_PanContent);
+            EditorGUILayout.PropertyField(m_RectMaskMode);
+            //Only show RectMaskContent when RectMaskMode == Manual
+            EditorGUI.BeginDisabledGroup(m_RectMaskMode.enumValueIndex != 0);
+            EditorGUILayout.PropertyField(m_RectMaskContent);
+            EditorGUI.EndDisabledGroup();
+
 
             OnGUIExtraNativeFields();
             EditorGUI.EndDisabledGroup();
