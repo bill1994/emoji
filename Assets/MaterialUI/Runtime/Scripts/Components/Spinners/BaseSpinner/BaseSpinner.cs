@@ -24,7 +24,7 @@ namespace MaterialUI
         bool IsDestroyed();
     }
 
-    public abstract class BaseSpinner<T> : StyleElement<MaterialStylePanel.PanelStyleProperty>, 
+    public abstract class BaseSpinner<T> : SelectableStyleElement<MaterialStylePanel.PanelStyleProperty>, 
         IBaseSpinner, 
         IPointerClickHandler, 
         IPointerEnterHandler,

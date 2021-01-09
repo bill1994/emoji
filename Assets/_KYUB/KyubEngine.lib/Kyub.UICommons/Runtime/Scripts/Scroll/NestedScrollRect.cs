@@ -297,12 +297,13 @@ namespace Kyub.UI
             if (_contentPosition == null)
                 InitializeAnimations();
 
+            this.velocity = new Vector2(0, 0);
             if (_contentPosition != null)
             {
                 _contentPosition.duration = Mathf.Max(0, m_SnapToDuration);
                 _contentPosition.value = this.content.anchoredPosition;
                 _contentPosition.target = this.content.anchoredPosition + delta;
-                this.velocity = new Vector2(0, 0);
+                _contentPosition.BeginAnim();
 
                 if (!animate || _contentPosition.duration <= 0)
                     _contentPosition.StopAnim(true);
