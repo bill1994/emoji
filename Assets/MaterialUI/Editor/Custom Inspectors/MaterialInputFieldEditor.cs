@@ -86,6 +86,9 @@ namespace MaterialUI
         private SerializedProperty onEndEdit;
         private SerializedProperty onReturnPressed;
 
+        private SerializedProperty onActivate;
+        private SerializedProperty onDeactivate;
+
         protected override void OnEnable()
         {
             OnBaseEnable();
@@ -165,6 +168,9 @@ namespace MaterialUI
             onValueChanged = serializedObject.FindProperty("onValueChanged");
             onEndEdit = serializedObject.FindProperty("onEndEdit");
             onReturnPressed = serializedObject.FindProperty("onReturnPressed");
+
+            onActivate = serializedObject.FindProperty("onActivate");
+            onDeactivate = serializedObject.FindProperty("onDeactivate");
 
             foreach (var target in targets)
             {
@@ -340,6 +346,10 @@ namespace MaterialUI
 
             EditorGUILayout.Space();
 
+            EditorGUILayout.PropertyField(onActivate);
+            EditorGUILayout.PropertyField(onDeactivate);
+
+            EditorGUILayout.Space();
             EditorGUILayout.PropertyField(onValueChanged);
             EditorGUILayout.PropertyField(onEndEdit);
             EditorGUILayout.PropertyField(onReturnPressed);

@@ -8,6 +8,34 @@ using MaterialUI.Reflection;
 
 namespace MaterialUI
 {
+    public abstract class SelectableStyleElement<T> : StyleElement<T>, ISelectHandler where T : StyleProperty, new()
+    {
+        #region Unity Functions
+
+        public virtual void OnSelect(BaseEventData eventData)
+        {
+            SnapTo();
+        }
+
+        #endregion
+
+        #region Public Functions
+
+        public virtual void SnapTo()
+        {
+#if UI_COMMONS_DEFINED
+            if (enabled && gameObject.activeInHierarchy)
+            {
+                var nestedRect = GetComponentInParent<Kyub.UI.NestedScrollRect>();
+                if (nestedRect != null)
+                    nestedRect.SnapTo(this.transform as RectTransform);
+            }
+#endif
+        }
+
+        #endregion
+    }
+
     public abstract class StyleElement<T> : BaseStyleElement where T : StyleProperty, new()
     {
         #region Private Variables

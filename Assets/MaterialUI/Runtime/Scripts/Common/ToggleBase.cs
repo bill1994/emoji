@@ -12,7 +12,7 @@ using UnityEngine.UI;
 namespace MaterialUI
 {
     [ExecuteInEditMode]
-    public class ToggleBase : StyleElement<ToggleBase.ToggleBaseStyleProperty>
+    public class ToggleBase : SelectableStyleElement<ToggleBase.ToggleBaseStyleProperty>
     {
         #region Private Variables
 
