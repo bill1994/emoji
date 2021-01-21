@@ -101,22 +101,6 @@ namespace Kyub.PickerServices
             base.Hide();
         }
 
-        public bool IsEventRegistered<ActionType>(ActionType eventHandler, ActionType eventToCheck) where ActionType : System.Delegate
-        {
-            if (eventHandler != null)
-            {
-                var registedEvents = eventHandler.GetInvocationList();
-                foreach (System.Delegate existingHandler in registedEvents)
-                {
-                    if (existingHandler == eventToCheck)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
         protected virtual void RegisterEvents()
         {
             UnregisterEvents();
@@ -130,6 +114,26 @@ namespace Kyub.PickerServices
             CrossPickerServices.OnPickerFinish -= HandleOnPickerFinish;
             if (m_CancelButton != null && m_CancelButton.onClick != null)
                 m_CancelButton.onClick.RemoveListener(Hide);
+        }
+
+        #endregion
+
+        #region Static Events
+
+        public static bool IsEventRegistered<ActionType>(ActionType eventHandler, ActionType eventToCheck) where ActionType : System.Delegate
+        {
+            if (eventHandler != null)
+            {
+                var registedEvents = eventHandler.GetInvocationList();
+                foreach (System.Delegate existingHandler in registedEvents)
+                {
+                    if (existingHandler == eventToCheck)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         #endregion

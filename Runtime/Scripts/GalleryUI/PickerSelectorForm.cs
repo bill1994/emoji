@@ -31,8 +31,8 @@ namespace Kyub.PickerServices
 
         [SerializeField]
         protected ExternalImage m_externalImage = null;
-        [SerializeField]
-        protected MaterialButton m_pickerSelectorButton = null;
+        //[SerializeField]
+        //protected MaterialButton m_pickerSelectorButton = null;
         //[SerializeField]
         //protected CrossImagePickerSelectorDialog m_customPickerDialog = null;
         [SerializeField]
@@ -128,6 +128,7 @@ namespace Kyub.PickerServices
 
         public override void Show()
         {
+            CrossPickerServices.OnPickerFinish -= HandleOnPickerReturn;
             CrossPickerServices.OnPickerFinish += HandleOnPickerReturn;
             if (m_pickerMode == PickerModeEnum.Gallery)
                 CrossPickerServices.DeserializeAlbumImage();
@@ -144,7 +145,13 @@ namespace Kyub.PickerServices
                 ShowFrameActivity(_CachedDialog, IMAGE_PICKER_DIALOG, (dialog, isDialog) =>
                 {
                     dialog.destroyOnHide = true;
-                    dialog.Initialize(m_cameraMode, HandleOnPickerReturn, HandleOnHide);
+                    dialog.Initialize(m_cameraMode,
+                        (file) => {
+                            //Prevent call event two times
+                            if (!BaseDialogImagePicker.IsEventRegistered(CrossPickerServices.OnPickerFinish, HandleOnPickerReturn))
+                                return;
+                            HandleOnPickerReturn(file);
+                        }, HandleOnHide);
                 });
             }
         }
@@ -168,6 +175,8 @@ namespace Kyub.PickerServices
                     OnPickerSucessCallback.Invoke(p_file != null ? p_file.Url : "");
             }
         }
+
+
 
         #endregion
     }
