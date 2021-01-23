@@ -111,6 +111,18 @@ namespace MaterialUI
 
         #endregion
 
+        #region Unity Functions
+
+        protected override void OnRectTransformDimensionsChange()
+        {
+            base.OnRectTransformDimensionsChange();
+
+            if(enabled && gameObject.activeInHierarchy)
+                UpdateColorToggleState(false);
+        }
+
+        #endregion
+
         #region Other Functions
 
         public override void TurnOn()
@@ -160,7 +172,12 @@ namespace MaterialUI
                 backImage.color = Tween.QuintOut(m_CurrentBackColor, !canUseDisabledColor || isInteractable ? backOnColor : backDisabledColor, m_AnimDeltaTime, m_AnimationDuration);
 
             if (slideSwitch)
+            {
                 switchRectTransform.anchoredPosition = Tween.SeptSoftOut(switchRectTransform.anchoredPosition, GetSlideAnchoredPosition(true), m_AnimDeltaTime, m_AnimationDuration);
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(switchRectTransform);
+#endif
+            }
         }
 
         protected override void AnimOff()
@@ -176,7 +193,12 @@ namespace MaterialUI
                 backImage.color = Tween.QuintOut(m_CurrentBackColor, !canUseDisabledColor || isInteractable ? backOffColor : backDisabledColor, m_AnimDeltaTime, m_AnimationDuration);
 
             if (slideSwitch)
+            {
                 switchRectTransform.anchoredPosition = Tween.SeptSoftOut(switchRectTransform.anchoredPosition, GetSlideAnchoredPosition(false), m_AnimDeltaTime, m_AnimationDuration);
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(switchRectTransform);
+#endif
+            }
         }
 
         protected override void SetOnColor()
@@ -192,7 +214,12 @@ namespace MaterialUI
                 backImage.color = !canUseDisabledColor || isInteractable ? backOnColor : backDisabledColor;
 
             if (slideSwitch)
+            {
                 switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(true);
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(switchRectTransform);
+#endif
+            }
         }
 
         protected override void SetOffColor()
@@ -208,7 +235,12 @@ namespace MaterialUI
                 backImage.color = !canUseDisabledColor || isInteractable ? backOffColor : backDisabledColor;
 
             if (slideSwitch)
+            {
                 switchRectTransform.anchoredPosition = GetSlideAnchoredPosition(false);
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(switchRectTransform);
+#endif
+            }
         }
 
         protected Vector2 GetSlideAnchoredPosition(bool isOn)
