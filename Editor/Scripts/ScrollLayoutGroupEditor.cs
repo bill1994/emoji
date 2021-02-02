@@ -22,14 +22,14 @@ namespace KyubEditor.UI
                 if (GUILayout.Button("Recalculate Elements Layout", GUILayout.Width(200)))
                 {
                     serializedObject.Update();
-                    foreach (var v_target in targets)
+                    foreach (var target in targets)
                     {
-                        ScrollLayoutGroup v_castedTarget = v_target as ScrollLayoutGroup;
-                        if (v_castedTarget != null)
+                        ScrollLayoutGroup castedTarget = target as ScrollLayoutGroup;
+                        if (castedTarget != null)
                         {
-                            v_castedTarget.SetCachedElementsLayoutDirty(true);
-                            v_castedTarget.TryRecalculateLayout(true);
-                            UnityEditor.EditorUtility.SetDirty(v_castedTarget);
+                            castedTarget.SetCachedElementsLayoutDirty(true);
+                            castedTarget.TryRecalculateLayout(true);
+                            UnityEditor.EditorUtility.SetDirty(castedTarget);
                         }
                     }
                     serializedObject.ApplyModifiedProperties();
@@ -43,11 +43,11 @@ namespace KyubEditor.UI
 
             if (GUI.changed)
             {
-                foreach (var v_target in targets)
+                foreach (var target in targets)
                 {
-                    ScrollLayoutGroup v_castedTarget = v_target as ScrollLayoutGroup;
-                    if (v_castedTarget != null)
-                        v_castedTarget.SetCachedElementsLayoutDirty();
+                    ScrollLayoutGroup castedTarget = target as ScrollLayoutGroup;
+                    if (castedTarget != null)
+                        castedTarget.SetCachedElementsLayoutDirty();
                 }
             }
         }

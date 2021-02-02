@@ -181,32 +181,32 @@ namespace Kyub.UI
 
         #region Receivers
 
-        protected virtual void HandleOnBecameInvisible(GameObject p_object, int p_index)
+        protected virtual void HandleOnBecameInvisible(GameObject element, int index)
         {
-            if (p_object == this.gameObject)
+            if (element == this.gameObject)
             {
                 _isVisible = false;
-                LayoutElementIndex = p_index;
+                LayoutElementIndex = index;
                 if (OnBecameInvisible != null)
                     OnBecameInvisible.Invoke();
             }
-            else if (LayoutElementIndex >= 0 && p_index == LayoutElementIndex)
+            else if (LayoutElementIndex >= 0 && index == LayoutElementIndex)
             {
                 _isVisible = false;
                 LayoutElementIndex = -1;
             }
         }
 
-        protected virtual void HandleOnBecameVisible(GameObject p_object, int p_index)
+        protected virtual void HandleOnBecameVisible(GameObject element, int index)
         {
-            if (p_object == this.gameObject)
+            if (element == this.gameObject)
             {
                 _isVisible = true;
-                LayoutElementIndex = p_index;
+                LayoutElementIndex = index;
                 if (OnBecameVisible != null)
                     OnBecameVisible.Invoke();
             }
-            else if (LayoutElementIndex >= 0 && p_index == LayoutElementIndex)
+            else if (LayoutElementIndex >= 0 && index == LayoutElementIndex)
             {
                 _isVisible = false;
                 LayoutElementIndex = -1;

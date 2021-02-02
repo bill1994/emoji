@@ -57,15 +57,15 @@ namespace KyubEditor.UI
 
         protected virtual void DrawConstraintProperties()
         {
-            var v_oldGui = GUI.enabled;
-            var v_target = target as ScrollGridLayoutGroup;
-                var v_isVertical = v_target.IsVertical();
+            var oldGui = GUI.enabled;
+            var castedTarget = target as ScrollGridLayoutGroup;
+                var isVertical = castedTarget.IsVertical();
                 EditorGUILayout.PropertyField(m_constraintType);
                 EditorGUILayout.PropertyField(m_constraintAlign, new GUIContent("Align"));
-                if (v_target.ConstraintType == ScrollGridLayoutGroup.GridConstraintTypeEnum.FixedWithFlexibleCells)
+                if (castedTarget.ConstraintType == ScrollGridLayoutGroup.GridConstraintTypeEnum.FixedWithFlexibleCells)
                 {
-                    var v_newValue = EditorGUILayout.FloatField(new GUIContent(v_isVertical ? "Cell Y" : "Cell X"), v_isVertical ? v_target.CellSize.y : v_target.CellSize.x);
-                    m_cellSize.vector2Value = v_isVertical ? new Vector2(m_cellSize.vector2Value.x, v_newValue) : new Vector2(v_newValue, m_cellSize.vector2Value.y);
+                    var newValue = EditorGUILayout.FloatField(new GUIContent(isVertical ? "Cell Y" : "Cell X"), isVertical ? castedTarget.CellSize.y : castedTarget.CellSize.x);
+                    m_cellSize.vector2Value = isVertical ? new Vector2(m_cellSize.vector2Value.x, newValue) : new Vector2(newValue, m_cellSize.vector2Value.y);
                 }
                 else
                 {
@@ -73,16 +73,16 @@ namespace KyubEditor.UI
                 }
 
 
-                var v_constraintGuiContent = new GUIContent(v_isVertical ? "Amount of Collumns" : "Amount of Rows");
+                var constraintGuiContent = new GUIContent(isVertical ? "Amount of Collumns" : "Amount of Rows");
                 //Only show real constraint if is not flexible mode
-                GUI.enabled = v_target.ConstraintType != ScrollGridLayoutGroup.GridConstraintTypeEnum.Flexible;
+                GUI.enabled = castedTarget.ConstraintType != ScrollGridLayoutGroup.GridConstraintTypeEnum.Flexible;
                 if (GUI.enabled)
-                    EditorGUILayout.PropertyField(m_defaultConstraintCount, v_constraintGuiContent);
+                    EditorGUILayout.PropertyField(m_defaultConstraintCount, constraintGuiContent);
                 else
-                    EditorGUILayout.IntField(v_constraintGuiContent, v_target.CachedConstraintCount);
-                GUI.enabled = v_oldGui;
+                    EditorGUILayout.IntField(constraintGuiContent, castedTarget.CachedConstraintCount);
+                GUI.enabled = oldGui;
 
-                EditorGUILayout.PropertyField(m_constraintSpacing, new GUIContent(v_isVertical ? "Collumn Spacing" : "Row Spacing"));
+                EditorGUILayout.PropertyField(m_constraintSpacing, new GUIContent(isVertical ? "Collumn Spacing" : "Row Spacing"));
             }
     }
 }

@@ -396,17 +396,17 @@ namespace Kyub.UI
         }
 
         protected Vector2 _lastScrollValue = new Vector2(-1, -1);
-        protected virtual void OnPotentialScrollValueChanged(Vector2 p_delta)
+        protected virtual void OnPotentialScrollValueChanged(Vector2 delta)
         {
-            var v_contentSize = new Vector2(GetLocalWidth(Content), GetLocalHeight(Content));
-            var v_currentDeltaDistance = new Vector2(Mathf.Abs(_lastScrollValue.x - p_delta.x) * v_contentSize.x, Mathf.Abs(_lastScrollValue.y - p_delta.y) * v_contentSize.y);
-            if (v_currentDeltaDistance.x < m_scrollMinDeltaDistanceToCallEvent && v_currentDeltaDistance.y < m_scrollMinDeltaDistanceToCallEvent)
+            var contentSize = new Vector2(GetLocalWidth(Content), GetLocalHeight(Content));
+            var currentDeltaDistance = new Vector2(Mathf.Abs(_lastScrollValue.x - delta.x) * contentSize.x, Mathf.Abs(_lastScrollValue.y - delta.y) * contentSize.y);
+            if (currentDeltaDistance.x < m_scrollMinDeltaDistanceToCallEvent && currentDeltaDistance.y < m_scrollMinDeltaDistanceToCallEvent)
                 return;
 
-            _lastScrollValue = p_delta;
+            _lastScrollValue = delta;
 
             if (OnScrollValueChanged != null)
-                OnScrollValueChanged.Invoke(p_delta);
+                OnScrollValueChanged.Invoke(delta);
 
             if (m_elements == null)
                 return;
@@ -436,11 +436,11 @@ namespace Kyub.UI
             if (Application.isPlaying)
             {
                 base.OnRectTransformDimensionsChange();
-                var v_newDimension = new Vector2(GetLocalWidth(this.transform as RectTransform), GetLocalHeight(this.transform as RectTransform));
-                if ((v_newDimension.x == 0 || Mathf.Abs(_oldDimension.x - v_newDimension.x) > Mathf.Epsilon) ||
-                    (v_newDimension.y == 0 || Mathf.Abs(_oldDimension.y - v_newDimension.y) > Mathf.Epsilon))
+                var newDimension = new Vector2(GetLocalWidth(this.transform as RectTransform), GetLocalHeight(this.transform as RectTransform));
+                if ((newDimension.x == 0 || Mathf.Abs(_oldDimension.x - newDimension.x) > Mathf.Epsilon) ||
+                    (newDimension.y == 0 || Mathf.Abs(_oldDimension.y - newDimension.y) > Mathf.Epsilon))
                 {
-                    _oldDimension = v_newDimension;
+                    _oldDimension = newDimension;
                     SetCachedElementsLayoutDirty();
                 }
             }
@@ -481,81 +481,81 @@ namespace Kyub.UI
             ReplaceElements(m_elements);
         }
 
-        public void ReplaceElements(IList<GameObject> p_elements)
+        public void ReplaceElements(IList<GameObject> elements)
         {
             _objectsToSendToInvisibleContentParent.Clear();
-            m_elements = p_elements != null ? new List<GameObject>(p_elements) : new List<GameObject>();
+            m_elements = elements != null ? new List<GameObject>(elements) : new List<GameObject>();
             _objectsToSendToInvisibleContentParent.Clear();
             SetCachedElementsLayoutDirty(true);
             if (OnAllElementsReplaced != null)
                 OnAllElementsReplaced.Invoke();
         }
 
-        public bool AddRangeElements(IList<GameObject> p_elements)
+        public bool AddRangeElements(IList<GameObject> elements)
         {
-            return InsertRangeElements(ElementsCount, p_elements);
+            return InsertRangeElements(ElementsCount, elements);
         }
 
-        public bool InsertRangeElements(int p_index, IList<GameObject> p_elements)
+        public bool InsertRangeElements(int index, IList<GameObject> elements)
         {
-            if (p_elements != null && p_elements.Count > 0)
+            if (elements != null && elements.Count > 0)
             {
-                p_index = Mathf.Clamp(p_index, 0, m_elements.Count - 1);
-                var v_currentIndex = p_index;
-                List<int> v_addIndexes = new List<int>();
-                foreach (var v_element in p_elements)
+                index = Mathf.Clamp(index, 0, m_elements.Count - 1);
+                var currentIndex = index;
+                List<int> addIndexes = new List<int>();
+                foreach (var element in elements)
                 {
-                    m_elements.Insert(v_currentIndex, v_element);
-                    v_addIndexes.Add(v_currentIndex);
-                    v_currentIndex++;
+                    m_elements.Insert(currentIndex, element);
+                    addIndexes.Add(currentIndex);
+                    currentIndex++;
                 }
                 SetCachedElementsLayoutDirty(true);
                 if (OnElementsAdded != null)
-                    OnElementsAdded.Invoke(v_addIndexes.ToArray());
+                    OnElementsAdded.Invoke(addIndexes.ToArray());
                 return true;
             }
             return false;
         }
 
-        public void AddElement(GameObject p_element)
+        public void AddElement(GameObject element)
         {
-            InsertElement(ElementsCount, p_element);
+            InsertElement(ElementsCount, element);
         }
 
-        public int InsertElement(int p_index, GameObject p_element)
+        public int InsertElement(int index, GameObject element)
         {
-            p_index = Mathf.Clamp(p_index, 0, m_elements.Count - 1);
-            m_elements.Insert(p_index, p_element);
+            index = Mathf.Clamp(index, 0, m_elements.Count - 1);
+            m_elements.Insert(index, element);
             SetCachedElementsLayoutDirty(true);
             if (OnElementsAdded != null)
-                OnElementsAdded.Invoke(new int[] { p_index });
-            return p_index;
+                OnElementsAdded.Invoke(new int[] { index });
+            return index;
         }
 
-        public bool RemoveElementAt(int p_index)
+        public bool RemoveElementAt(int index)
         {
-            if (p_index >= 0 && p_index < m_elements.Count)
+            if (index >= 0 && index < m_elements.Count)
             {
-                if (m_elements[p_index] != null)
-                    _objectsToSendToInvisibleContentParent.Remove(m_elements[p_index]);
-                m_elements.RemoveAt(p_index);
+                if (m_elements[index] != null)
+                    _objectsToSendToInvisibleContentParent.Remove(m_elements[index]);
+                m_elements.RemoveAt(index);
                 SetCachedElementsLayoutDirty(true);
                 if (OnElementsRemoved != null)
-                    OnElementsRemoved.Invoke(new int[] { p_index });
+                    OnElementsRemoved.Invoke(new int[] { index });
                 return true;
             }
             return false;
         }
 
-        public bool RemoveElement(GameObject p_object)
+        public bool RemoveElement(GameObject element)
         {
-            var v_index = FindElementIndex(p_object);
-            return RemoveElementAt(v_index);
+            var index = FindElementIndex(element);
+            return RemoveElementAt(index);
         }
 
-        public int FindElementIndex(GameObject p_object)
+        public int FindElementIndex(GameObject element)
         {
-            return m_elements.IndexOf(p_object);
+            return m_elements.IndexOf(element);
         }
 
         #endregion
@@ -576,13 +576,13 @@ namespace Kyub.UI
 
         public GameObject[] GetVisibleElements()
         {
-            List<GameObject> v_visibleElements = new List<GameObject>();
+            List<GameObject> visibleElements = new List<GameObject>();
             for (int i = _cachedMinMaxIndex.x; i <= _cachedMinMaxIndex.y; i++)
             {
                 if (i >= 0 && m_elements.Count > i && m_elements[i] != null)
-                    v_visibleElements.Add(m_elements[i]);
+                    visibleElements.Add(m_elements[i]);
             }
-            return v_visibleElements.ToArray();
+            return visibleElements.ToArray();
         }
 
         public bool IsVertical()
@@ -610,45 +610,45 @@ namespace Kyub.UI
 
         #region Public Layout Functions
 
-        public virtual void SetCachedElementSize(int p_index, float p_itemSize)
+        public virtual void SetCachedElementSize(int index, float itemSize)
         {
             FixLayoutInconsistencies();
-            if (_scrollElementsCachedSize.Count > p_index && p_index >= 0)
+            if (_scrollElementsCachedSize.Count > index && index >= 0)
             {
-                var v_itemSize = _scrollElementsCachedSize[p_index];
-                if (v_itemSize != p_itemSize)
+                var elementItemSize = _scrollElementsCachedSize[index];
+                if (elementItemSize != itemSize)
                 {
-                    v_itemSize = p_itemSize;
-                    _scrollElementsCachedSize[p_index] = v_itemSize;
+                    elementItemSize = itemSize;
+                    _scrollElementsCachedSize[index] = itemSize;
                     SetCachedElementsLayoutDirty();
                     if (OnElementCachedSizeChanged != null)
-                        OnElementCachedSizeChanged.Invoke(p_index);
+                        OnElementCachedSizeChanged.Invoke(index);
                 }
             }
         }
 
-        public float GetCachedElementPosition(int p_index)
+        public float GetCachedElementPosition(int index)
         {
-            return _elementsLayoutPosition.Count > p_index && p_index >= 0 ? _elementsLayoutPosition[p_index] : 0;
+            return _elementsLayoutPosition.Count > index && index >= 0 ? _elementsLayoutPosition[index] : 0;
         }
 
-        public float GetCachedElementSize(int p_index)
+        public float GetCachedElementSize(int index)
         {
             FixLayoutInconsistencies();
-            float v_itemSize = -1;
-            if (_scrollElementsCachedSize.Count > p_index && p_index >= 0)
+            float itemSize = -1;
+            if (_scrollElementsCachedSize.Count > index && index >= 0)
             {
-                v_itemSize = _scrollElementsCachedSize[p_index];
-                _scrollElementsCachedSize[p_index] = v_itemSize;
+                itemSize = _scrollElementsCachedSize[index];
+                _scrollElementsCachedSize[index] = itemSize;
             }
-            var v_elementTransform = p_index >= 0 && m_elements.Count > p_index && m_elements[p_index] != null ? m_elements[p_index].transform as RectTransform : null;
-            var v_elementSize = v_elementTransform != null ? (IsVertical() ? GetLocalHeight(v_elementTransform) : GetLocalWidth(v_elementTransform)) : 0;
-            return v_itemSize >= 0 ? v_itemSize : v_elementSize;
+            var elementTransform = index >= 0 && m_elements.Count > index && m_elements[index] != null ? m_elements[index].transform as RectTransform : null;
+            var elementSize = elementTransform != null ? (IsVertical() ? GetLocalHeight(elementTransform) : GetLocalWidth(elementTransform)) : 0;
+            return itemSize >= 0 ? itemSize : elementSize;
         }
 
-        public virtual void SetCachedElementsLayoutDirty(bool p_performFullRecalc = false)
+        public virtual void SetCachedElementsLayoutDirty(bool performFullRecalc = false)
         {
-            if (p_performFullRecalc)
+            if (performFullRecalc)
             {
                 _lastFrameVisibleElementIndexes = new Vector2Int(-1, -1);
                 _cachedMinMaxIndex = new Vector2Int(-1, -1);
@@ -675,7 +675,7 @@ namespace Kyub.UI
             }
         }*/
 
-        public virtual void TryRecalculateLayout(bool p_force = false)
+        public virtual void TryRecalculateLayout(bool force = false)
         {
             if (_elementsLayoutPosition.Count != _scrollElementsCachedSize.Count || _scrollElementsCachedSize.Count != m_elements.Count)
                 _layoutDirty = true;
@@ -686,10 +686,10 @@ namespace Kyub.UI
                     _cachedMinMaxIndex = new Vector2Int(-1, -1);
                 RecalculateLayout();
 
-                var v_contentSize = GetContentSize();
+                var contentSize = GetContentSize();
                 if (ScrollRect != null &&
-                    ((IsVertical() && Mathf.Abs(Content.anchoredPosition.y) > v_contentSize) ||
-                    (!IsVertical() && Mathf.Abs(Content.anchoredPosition.x) > v_contentSize))
+                    ((IsVertical() && Mathf.Abs(Content.anchoredPosition.y) > contentSize) ||
+                    (!IsVertical() && Mathf.Abs(Content.anchoredPosition.x) > contentSize))
                    )
                 {
                     ScrollRect.Rebuild(CanvasUpdate.PostLayout);
@@ -713,10 +713,10 @@ namespace Kyub.UI
         }
 
         //Element RectTransform Size
-        protected float GetElementSize(int p_index)
+        protected float GetElementSize(int index)
         {
-            var v_elementTransform = p_index >= 0 && m_elements.Count > p_index && m_elements[p_index] != null ? m_elements[p_index].transform : null;
-            return CalculateElementSize(v_elementTransform, IsVertical());
+            var elementTransform = index >= 0 && m_elements.Count > index && m_elements[index] != null ? m_elements[index].transform : null;
+            return CalculateElementSize(elementTransform, IsVertical());
         }
 
         protected virtual void FixLayoutInconsistencies()
@@ -737,8 +737,8 @@ namespace Kyub.UI
                     _elementsLayoutPosition.RemoveAt(_elementsLayoutPosition.Count - 1);
                 else
                 {
-                    var v_value = GetElementSize(_elementsLayoutPosition.Count);
-                    _elementsLayoutPosition.Add(v_value);
+                    var value = GetElementSize(_elementsLayoutPosition.Count);
+                    _elementsLayoutPosition.Add(value);
                 }
             }
         }
@@ -758,59 +758,59 @@ namespace Kyub.UI
             }
         }
 
-        protected virtual float SetContentSize(float p_size)
+        protected virtual float SetContentSize(float size)
         {
-            bool v_isVertical = IsVertical();
+            bool isVertical = IsVertical();
 
-            var v_minContentSize = m_autoMinContentSize ? GetParentContentSize() : m_minContentSize;
-            bool v_sizeChanged = true;
-            var v_newSize = Mathf.Max(0, v_minContentSize, p_size);
-            if (Mathf.Abs(v_newSize - p_size) <= SIZE_ERROR)
+            var minContentSize = m_autoMinContentSize ? GetParentContentSize() : m_minContentSize;
+            bool sizeChanged = true;
+            var newSize = Mathf.Max(0, minContentSize, size);
+            if (Mathf.Abs(newSize - size) <= SIZE_ERROR)
             {
-                v_sizeChanged = false;
-                v_newSize = p_size;
+                sizeChanged = false;
+                newSize = size;
             }
 
             //Recalculate Total Content Size
-            if (v_isVertical)
-                SetLocalHeight(Content, v_newSize);
+            if (isVertical)
+                SetLocalHeight(Content, newSize);
             else
-                SetLocalWidth(Content, v_newSize);
+                SetLocalWidth(Content, newSize);
 
             //Recalculate every Element Layout based in Delta Diff
-            if (v_sizeChanged)
+            if (sizeChanged)
             {
-                float v_deltaDiff = 0;
+                float deltaDiff = 0;
                 //Recalculate Delta Diff based in align
                 if (m_minContentSizeAlign == MinContentSizeAlign.Middle)
-                    v_deltaDiff = Mathf.Max(0, v_newSize - p_size) / 2.0f;
+                    deltaDiff = Mathf.Max(0, newSize - size) / 2.0f;
                 else if (m_minContentSizeAlign == MinContentSizeAlign.InverseScrollDirection)
-                    v_deltaDiff = Mathf.Max(0, v_newSize - p_size);
+                    deltaDiff = Mathf.Max(0, newSize - size);
 
-                if (v_deltaDiff > SIZE_ERROR)
+                if (deltaDiff > SIZE_ERROR)
                 {
                     //Apply DeltaDiff in any Element Position
                     for (int i = 0; i < _scrollElementsCachedSize.Count; i++)
                     {
-                        _elementsLayoutPosition[i] += v_deltaDiff;
+                        _elementsLayoutPosition[i] += deltaDiff;
                     }
                 }
             }
-            return v_newSize;
+            return newSize;
         }
 
         #endregion
 
         #region Internal Helper Functions
 
-        protected virtual bool IsElementVisible(GameObject p_element)
+        protected virtual bool IsElementVisible(GameObject element)
         {
-            return p_element != null && p_element.transform.parent == Content;
+            return element != null && element.transform.parent == Content;
         }
 
-        protected bool IsElementVisible(int p_index)
+        protected bool IsElementVisible(int index)
         {
-            return m_elements != null && m_elements.Count > p_index && p_index >= 0 ? IsElementVisible(m_elements[p_index]) : false;
+            return m_elements != null && m_elements.Count > index && index >= 0 ? IsElementVisible(m_elements[index]) : false;
         }
 
         protected virtual void RegisterScrollRectEvents()
@@ -840,18 +840,18 @@ namespace Kyub.UI
             TryRecalculateLayout();
             if (Content != null)
             {
-                var v_group = Content.GetComponent<LayoutGroup>();
-                if (v_group != null)
-                    v_group.enabled = false;
-                //var v_fitter = Content.GetComponent<ContentSizeFitter>();
-                //if (v_fitter != null)
-                //    v_fitter.enabled = false;
+                var group = Content.GetComponent<LayoutGroup>();
+                if (group != null)
+                    group.enabled = false;
+                //var fitter = Content.GetComponent<ContentSizeFitter>();
+                //if (fitter != null)
+                //    fitter.enabled = false;
             }
         }
 
         protected virtual void UpdateContentPivotAndAnchor()
         {
-            var v_content = Content;
+            var content = Content;
             if (Content != null)
             {
                 if (ScrollAxis == ScrollDirectionTypeEnum.TopToBottom)
@@ -896,24 +896,24 @@ namespace Kyub.UI
                     //Pick Elements
                     for (int i = 0; i < m_elements.Count; i++)
                     {
-                        var v_element = m_elements[i];
-                        if (v_element != null)
+                        var element = m_elements[i];
+                        if (element != null)
                         {
-                            if (v_element.transform.parent != Content)
-                                v_element.transform.SetParent(Content, false);
-                            v_element.transform.SetSiblingIndex(i + m_startingSibling);
+                            if (element.transform.parent != Content)
+                                element.transform.SetParent(Content, false);
+                            element.transform.SetSiblingIndex(i + m_startingSibling);
                         }
                     }
 
                     //Now we must pick non-mapped objects (Templates?)
                     for (int i = 0; i < _invisibleElementsContent.childCount; i++)
                     {
-                        var v_element = _invisibleElementsContent.GetChild(i);
-                        if (v_element != null)
+                        var element = _invisibleElementsContent.GetChild(i);
+                        if (element != null)
                         {
-                            if (v_element.transform.parent != Content)
-                                v_element.transform.SetParent(Content, false);
-                            v_element.transform.SetSiblingIndex(i);
+                            if (element.transform.parent != Content)
+                                element.transform.SetParent(Content, false);
+                            element.transform.SetSiblingIndex(i);
                         }
                     }
                 }
@@ -924,24 +924,24 @@ namespace Kyub.UI
         {
             if (_invisibleElementsContent == null && Application.isPlaying)
             {
-                var v_invisibleContainerObj = new GameObject("[AUTO_GEN] Invisible Content");
-                v_invisibleContainerObj.transform.SetParent(this.transform);
-                v_invisibleContainerObj.transform.localPosition = Vector3.zero;
-                v_invisibleContainerObj.transform.localScale = Vector3.one;
-                v_invisibleContainerObj.transform.localRotation = Quaternion.identity;
-                var v_canvas = v_invisibleContainerObj.GetComponent<Canvas>();
-                if (v_canvas == null)
-                    v_canvas = v_invisibleContainerObj.AddComponent<Canvas>();
-                v_canvas.enabled = false;
+                var invisibleContainerObj = new GameObject("[AUTO_GEN] Invisible Content");
+                invisibleContainerObj.transform.SetParent(this.transform);
+                invisibleContainerObj.transform.localPosition = Vector3.zero;
+                invisibleContainerObj.transform.localScale = Vector3.one;
+                invisibleContainerObj.transform.localRotation = Quaternion.identity;
+                var canvas = invisibleContainerObj.GetComponent<Canvas>();
+                if (canvas == null)
+                    canvas = invisibleContainerObj.AddComponent<Canvas>();
+                canvas.enabled = false;
 
-                var v_layoutElement = v_invisibleContainerObj.GetComponent<LayoutElement>();
-                if (v_layoutElement == null)
-                    v_layoutElement = v_invisibleContainerObj.AddComponent<LayoutElement>();
-                v_layoutElement.ignoreLayout = true;
+                var layoutElement = invisibleContainerObj.GetComponent<LayoutElement>();
+                if (layoutElement == null)
+                    layoutElement = invisibleContainerObj.AddComponent<LayoutElement>();
+                layoutElement.ignoreLayout = true;
 
-                _invisibleElementsContent = v_invisibleContainerObj.transform as RectTransform;
+                _invisibleElementsContent = invisibleContainerObj.transform as RectTransform;
                 if (_invisibleElementsContent == null)
-                    _invisibleElementsContent = v_invisibleContainerObj.AddComponent<RectTransform>();
+                    _invisibleElementsContent = invisibleContainerObj.AddComponent<RectTransform>();
             }
             if (_invisibleElementsContent != null && _invisibleElementsContent.gameObject.activeSelf != !m_disableNonVisibleElements)
                 _invisibleElementsContent.gameObject.SetActive(!m_disableNonVisibleElements);
@@ -1027,7 +1027,7 @@ namespace Kyub.UI
             return cachedNewMinMaxIndex;
         }
 
-        protected virtual void ReloadAll_Internal(bool p_fullRecalc)
+        protected virtual void ReloadAll_Internal(bool fullRecalc)
         {
             //Unregister events when scroll is not active
             if (GetContentSize() < GetParentContentSize())
@@ -1051,8 +1051,8 @@ namespace Kyub.UI
                 {
                     if (i >= 0 && i < m_elements.Count && m_elements[i] != null && (i < _cachedMinMaxIndex.x || i > _cachedMinMaxIndex.y))
                     {
-                        var v_element = m_elements[i];
-                        Reload(v_element, i);
+                        var element = m_elements[i];
+                        Reload(element, i);
                     }
                 }
             }
@@ -1060,11 +1060,11 @@ namespace Kyub.UI
             for (int i = _cachedMinMaxIndex.x; i <= _cachedMinMaxIndex.y; i++)
             {
                 if (i >= 0 && i < m_elements.Count && m_elements[i] != null &&
-                    (p_fullRecalc || i < _lastFrameVisibleElementIndexes.x || i > _lastFrameVisibleElementIndexes.y) // in 'p_fullRecalc == false' we only reload elements that was not previous loaded in last roll
+                    (fullRecalc || i < _lastFrameVisibleElementIndexes.x || i > _lastFrameVisibleElementIndexes.y) // in 'fullRecalc == false' we only reload elements that was not previous loaded in last roll
                    )
                 {
-                    var v_element = m_elements[i];
-                    Reload(v_element, i);
+                    var element = m_elements[i];
+                    Reload(element, i);
                 }
             }
             _lastFrameVisibleElementIndexes = _cachedMinMaxIndex;
@@ -1073,21 +1073,21 @@ namespace Kyub.UI
         }
 
         protected internal const float SIZE_ERROR = 0.01f;
-        protected abstract void Reload(GameObject p_obj, int p_indexReload);
+        protected abstract void Reload(GameObject obj, int indexReload);
 
-        /*protected virtual void SetLayoutElementPreferredSize(LayoutElement p_layout, Vector2 p_preferredSize)
+        /*protected virtual void SetLayoutElementPreferredSize(LayoutElement layout, Vector2 preferredSize)
         {
-            if (p_layout != null)
+            if (layout != null)
             {
-                var v_fitter = p_layout.GetComponent<ContentSizeFitter>();
-                if(v_fitter == null)
-                    v_fitter = GetComponent<ContentSizeFitter>();
-                if (v_fitter != null && v_fitter.enabled)
-                    p_preferredSize = new Vector2(-1, -1);
-                if (p_layout.preferredWidth >= 0)
-                    p_layout.preferredWidth = p_preferredSize.x;
-                if (p_layout.preferredHeight >= 0)
-                    p_layout.preferredHeight = p_preferredSize.y;
+                var fitter = layout.GetComponent<ContentSizeFitter>();
+                if(fitter == null)
+                    fitter = GetComponent<ContentSizeFitter>();
+                if (fitter != null && fitter.enabled)
+                    preferredSize = new Vector2(-1, -1);
+                if (layout.preferredWidth >= 0)
+                    layout.preferredWidth = preferredSize.x;
+                if (layout.preferredHeight >= 0)
+                    layout.preferredHeight = preferredSize.y;
             }
         }*/
 
@@ -1096,55 +1096,55 @@ namespace Kyub.UI
         {
             if (_invisibleElementsContent != null)
             {
-                foreach (var v_object in _objectsToSendToInvisibleContentParent)
+                foreach (var element in _objectsToSendToInvisibleContentParent)
                 {
-                    if (v_object != null)
-                        v_object.transform.SetParent(_invisibleElementsContent, false);
+                    if (element != null)
+                        element.transform.SetParent(_invisibleElementsContent, false);
                 }
             }
             _objectsToSendToInvisibleContentParent.Clear();
         }
 
-        protected virtual void RegisterVisibleElement(int p_index)
+        protected virtual void RegisterVisibleElement(int index)
         {
-            GameObject v_object = p_index >= 0 && m_elements.Count > p_index ? m_elements[p_index] : null;
-            if (v_object != null)
+            GameObject element = index >= 0 && m_elements.Count > index ? m_elements[index] : null;
+            if (element != null)
             {
                 if (Content != null)
                 {
-                    var v_rectTransform = v_object.transform as RectTransform;
+                    var rectTransform = element.transform as RectTransform;
                     //Setup pivots
-                    if (v_rectTransform != null)
+                    if (rectTransform != null)
                     {
-                        v_rectTransform.pivot = Content.pivot;
-                        v_rectTransform.anchorMin = Content.anchorMin;
-                        v_rectTransform.anchorMax = Content.anchorMax;
+                        rectTransform.pivot = Content.pivot;
+                        rectTransform.anchorMin = Content.anchorMin;
+                        rectTransform.anchorMax = Content.anchorMax;
                     }
-                    if (v_object.transform != Content)
-                        v_object.transform.SetParent(Content, false);
+                    if (element.transform != Content)
+                        element.transform.SetParent(Content, false);
                     if (!m_optimizeDeepHierarchy || m_spacing < 0)
-                        v_object.transform.SetSiblingIndex(Mathf.Clamp(p_index - _cachedMinMaxIndex.x + m_startingSibling, 0, Content.childCount - 1));
+                        element.transform.SetSiblingIndex(Mathf.Clamp(index - _cachedMinMaxIndex.x + m_startingSibling, 0, Content.childCount - 1));
                 }
-                _objectsToSendToInvisibleContentParent.Remove(v_object);
-                //if (!v_object.activeSelf)
-                //    v_object.SetActive(true);
-                if (v_object.activeSelf && OnElementBecameVisible != null)
-                    OnElementBecameVisible.Invoke(v_object, p_index);
+                _objectsToSendToInvisibleContentParent.Remove(element);
+                //if (!object.activeSelf)
+                //    object.SetActive(true);
+                if (element.activeSelf && OnElementBecameVisible != null)
+                    OnElementBecameVisible.Invoke(element, index);
             }
         }
 
-        protected virtual void UnregisterVisibleElement(int p_index)
+        protected virtual void UnregisterVisibleElement(int index)
         {
-            GameObject v_object = p_index >= 0 && m_elements.Count > p_index ? m_elements[p_index] : null;
-            if (v_object != null)
+            GameObject element = index >= 0 && m_elements.Count > index ? m_elements[index] : null;
+            if (element != null)
             {
                 if (_invisibleElementsContent != null && Application.isPlaying)
                 {
-                    _objectsToSendToInvisibleContentParent.Add(v_object);
-                    //v_object.transform.SetParent(_invisibleElementsContent, false);
+                    _objectsToSendToInvisibleContentParent.Add(element);
+                    //object.transform.SetParent(_invisibleElementsContent, false);
                 }
                 if (OnElementBecameInvisible != null)
-                    OnElementBecameInvisible.Invoke(v_object, p_index);
+                    OnElementBecameInvisible.Invoke(element, index);
             }
         }
 
@@ -1152,19 +1152,19 @@ namespace Kyub.UI
         {
             if (Content != null)
             {
-                List<GameObject> v_filledObjects = new List<GameObject>();
-                foreach (var v_obj in Content)
+                List<GameObject> filledObjects = new List<GameObject>();
+                foreach (var obj in Content)
                 {
-                    var v_transform = v_obj as Transform;
-                    if (v_transform != null)
+                    var transform = obj as Transform;
+                    if (transform != null)
                     {
-                        var v_layoutElement = v_transform.GetComponent<LayoutElement>();
-                        if (v_layoutElement == null || !v_layoutElement.ignoreLayout)
-                            v_filledObjects.Add(v_transform.gameObject);
+                        var layoutElement = transform.GetComponent<LayoutElement>();
+                        if (layoutElement == null || !layoutElement.ignoreLayout)
+                            filledObjects.Add(transform.gameObject);
                     }
 
                 }
-                ReplaceElements(v_filledObjects);
+                ReplaceElements(filledObjects);
             }
             else
                 ClearElements();
@@ -1175,33 +1175,33 @@ namespace Kyub.UI
         protected virtual int GetCurrentIndex()
         {
             //Try Find index based in Layout
-            int v_index = _cachedMinMaxIndex.x < 0 ? 0 : _cachedMinMaxIndex.x;
+            int index = _cachedMinMaxIndex.x < 0 ? 0 : _cachedMinMaxIndex.x;
             FixLayoutInconsistencies();
 
             if (Content != null)
             {
-                float v_anchoredPosition = -1;
+                float anchoredPosition = -1;
                 if (IsVertical())
                 {
                     if (m_scrollAxis == ScrollDirectionTypeEnum.TopToBottom)
                     {
-                        v_anchoredPosition = Content.anchoredPosition.y;
+                        anchoredPosition = Content.anchoredPosition.y;
                     }
                     else
                     {
-                        v_anchoredPosition = -Content.anchoredPosition.y;
+                        anchoredPosition = -Content.anchoredPosition.y;
                     }
                 }
                 else
                 {
                     if (m_scrollAxis == ScrollDirectionTypeEnum.LeftToRight)
                     {
-                        v_anchoredPosition = -Content.anchoredPosition.x;
+                        anchoredPosition = -Content.anchoredPosition.x;
 
                     }
                     else
                     {
-                        v_anchoredPosition = Content.anchoredPosition.x;
+                        anchoredPosition = Content.anchoredPosition.x;
                     }
                 }
 
@@ -1218,58 +1218,58 @@ namespace Kyub.UI
 
                     return 0;
                 };
-                var v_delta = m_spacing < 0 ? -m_spacing : 0; // we must do it to prevent bug when spacing is negative
+                var delta = m_spacing < 0 ? -m_spacing : 0; // we must do it to prevent bug when spacing is negative
                 //Find current index based in old cachedIndex (Optimized Search)
-                if (v_index < _elementsLayoutPosition.Count)
+                if (index < _elementsLayoutPosition.Count)
                 {
-                    var v_initialLoopIndex = _cachedMinMaxIndex.x;
-                    if (v_anchoredPosition < (_elementsLayoutPosition[v_index] + v_delta))
+                    var initialLoopIndex = _cachedMinMaxIndex.x;
+                    if (anchoredPosition < (_elementsLayoutPosition[index] + delta))
                     {
-                        for (int i = Mathf.Max(0, v_initialLoopIndex); i >= 0; i--)
+                        for (int i = Mathf.Max(0, initialLoopIndex); i >= 0; i--)
                         {
                             //Search first valid element
-                            var elementPosition = (_elementsLayoutPosition[i] + v_delta);
-                            if (v_anchoredPosition >= elementPosition)
+                            var elementPosition = (_elementsLayoutPosition[i] + delta);
+                            if (anchoredPosition >= elementPosition)
                             {
                                 break;
                             }
-                            v_index--;
+                            index--;
                         }
                     }
                     else
                     {
-                        for (int i = Mathf.Max(0, v_initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
+                        for (int i = Mathf.Max(0, initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
                         {
                             //Search first valid element
-                            var elementPosition = (_elementsLayoutPosition[i] + v_delta);
-                            if (v_anchoredPosition < elementPosition ||
-                                v_anchoredPosition < (elementPosition + getElementSize(i)))
+                            var elementPosition = (_elementsLayoutPosition[i] + delta);
+                            if (anchoredPosition < elementPosition ||
+                                anchoredPosition < (elementPosition + getElementSize(i)))
                             {
                                 break;
                             }
-                            v_index++;
+                            index++;
                         }
                     }
                 }
             }
-            v_index = Mathf.Clamp(v_index, 0, m_elements.Count - 1);
-            return v_index;
+            index = Mathf.Clamp(index, 0, m_elements.Count - 1);
+            return index;
         }
 
         protected virtual int GetLastIndex(int currentIndex)
         {
             if (currentIndex < 0)
                 currentIndex = GetCurrentIndex();
-            var v_lastIndex = currentIndex;
-            var v_contentTransform = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform : this.transform) as RectTransform;
+            var lastIndex = currentIndex;
+            var contentTransform = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform : this.transform) as RectTransform;
 
-            var v_contentMaxSize = IsVertical() ? GetLocalHeight(v_contentTransform) : GetLocalWidth(v_contentTransform);
+            var contentMaxSize = IsVertical() ? GetLocalHeight(contentTransform) : GetLocalWidth(contentTransform);
             if (Content != null)
             {
-                v_contentMaxSize += Mathf.Abs(IsVertical() ? Content.anchoredPosition.y : Content.anchoredPosition.x);
+                contentMaxSize += Mathf.Abs(IsVertical() ? Content.anchoredPosition.y : Content.anchoredPosition.x);
             }
 
-            var v_initialLoopIndex = currentIndex;
+            var initialLoopIndex = currentIndex;
             Func<int, float> getElementSize = (i) => {
 
                 var isInsideRange = i >= 0 && i < _scrollElementsCachedSize.Count;
@@ -1283,23 +1283,23 @@ namespace Kyub.UI
 
                 return 0;
             };
-            for (int i = Mathf.Max(0, v_initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
+            for (int i = Mathf.Max(0, initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
             {
                 //Search first invalid element
-                if (_elementsLayoutPosition[i] > v_contentMaxSize &&
-                    (_elementsLayoutPosition[i] + getElementSize(i)) > v_contentMaxSize)
+                if (_elementsLayoutPosition[i] > contentMaxSize &&
+                    (_elementsLayoutPosition[i] + getElementSize(i)) > contentMaxSize)
                 {
                     //Revert to previous valid element
-                    v_lastIndex--;
+                    lastIndex--;
                     break;
                 }
-                v_lastIndex++;
+                lastIndex++;
             }
-            v_lastIndex = Mathf.Clamp(v_lastIndex, currentIndex, m_elements.Count - 1);
-            return v_lastIndex;
+            lastIndex = Mathf.Clamp(lastIndex, currentIndex, m_elements.Count - 1);
+            return lastIndex;
         }
 
-        protected abstract Vector3 GetElementPosition(int p_index);
+        protected abstract Vector3 GetElementPosition(int index);
 
         public virtual float GetContentSize()
         {
@@ -1308,8 +1308,8 @@ namespace Kyub.UI
 
         public float GetParentContentSize()
         {
-            var v_target = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform as RectTransform : null);
-            return IsVertical() ? GetLocalHeight(v_target) : GetLocalWidth(v_target);
+            var target = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform as RectTransform : null);
+            return IsVertical() ? GetLocalHeight(target) : GetLocalWidth(target);
         }
 
         #endregion
@@ -1348,9 +1348,9 @@ namespace Kyub.UI
                 }
             }
 
-            internal ScrollLayoutGroupEnumerator(ScrollLayoutGroup p_outer)
+            internal ScrollLayoutGroupEnumerator(ScrollLayoutGroup outer)
             {
-                this.m_outer = p_outer;
+                this.m_outer = outer;
             }
 
             public bool MoveNext()
@@ -1372,73 +1372,73 @@ namespace Kyub.UI
 
         #region Static Helper Functions
 
-        public static T GetComponentInParent<T>(Component p_component, bool p_includeInactive)
+        public static T GetComponentInParent<T>(Component component, bool includeInactive)
         {
-            if (p_component != null)
+            if (component != null)
             {
-                if (p_includeInactive)
+                if (includeInactive)
                 {
-                    var v_return = p_component.GetComponent<T>();
-                    if (v_return == null)
+                    var result = component.GetComponent<T>();
+                    if (result == null)
                     {
-                        var v_parent = p_component.transform.parent;
-                        if (v_parent != null)
-                            v_return = GetComponentInParent<T>(v_parent, p_includeInactive);
+                        var parent = component.transform.parent;
+                        if (parent != null)
+                            result = GetComponentInParent<T>(parent, includeInactive);
                     }
-                    return v_return;
+                    return result;
                 }
                 else
                 {
-                    return p_component.GetComponentInParent<T>();
+                    return component.GetComponentInParent<T>();
                 }
             }
             return default(T);
         }
 
-        public static Vector2 GetLocalSize(RectTransform p_rectTransform)
+        public static Vector2 GetLocalSize(RectTransform rectTransform)
         {
-            if (p_rectTransform != null)
-                return p_rectTransform.rect.size;
+            if (rectTransform != null)
+                return rectTransform.rect.size;
             return Vector2.zero;
         }
 
-        public static float GetLocalWidth(RectTransform p_rectTransform)
+        public static float GetLocalWidth(RectTransform rectTransform)
         {
-            if (p_rectTransform != null)
-                return p_rectTransform.rect.width;
+            if (rectTransform != null)
+                return rectTransform.rect.width;
             return 0;
         }
 
-        public static float GetLocalHeight(RectTransform p_rectTransform)
+        public static float GetLocalHeight(RectTransform rectTransform)
         {
-            if (p_rectTransform != null)
-                return p_rectTransform.rect.height;
+            if (rectTransform != null)
+                return rectTransform.rect.height;
             return 0;
         }
 
-        public static void SetLocalSize(RectTransform p_rectTransform, Vector2 p_newSize)
+        public static void SetLocalSize(RectTransform rectTransform, Vector2 newSize)
         {
-            Vector2 v_oldSize = p_rectTransform.rect.size;
-            Vector2 v_deltaSize = p_newSize - v_oldSize;
-            p_rectTransform.offsetMin = p_rectTransform.offsetMin - new Vector2(v_deltaSize.x * p_rectTransform.pivot.x, v_deltaSize.y * p_rectTransform.pivot.y);
-            p_rectTransform.offsetMax = p_rectTransform.offsetMax + new Vector2(v_deltaSize.x * (1f - p_rectTransform.pivot.x), v_deltaSize.y * (1f - p_rectTransform.pivot.y));
+            Vector2 oldSize = rectTransform.rect.size;
+            Vector2 deltaSize = newSize - oldSize;
+            rectTransform.offsetMin = rectTransform.offsetMin - new Vector2(deltaSize.x * rectTransform.pivot.x, deltaSize.y * rectTransform.pivot.y);
+            rectTransform.offsetMax = rectTransform.offsetMax + new Vector2(deltaSize.x * (1f - rectTransform.pivot.x), deltaSize.y * (1f - rectTransform.pivot.y));
         }
 
-        public static void SetLocalWidth(RectTransform p_rectTransform, float p_newSize)
+        public static void SetLocalWidth(RectTransform rectTransform, float newSize)
         {
-            SetLocalSize(p_rectTransform, new Vector2(p_newSize, p_rectTransform.rect.size.y));
+            SetLocalSize(rectTransform, new Vector2(newSize, rectTransform.rect.size.y));
             //MarkLayoutForRebuild();
         }
 
-        public static void SetLocalHeight(RectTransform p_rectTransform, float p_newSize)
+        public static void SetLocalHeight(RectTransform rectTransform, float newSize)
         {
-            SetLocalSize(p_rectTransform, new Vector2(p_rectTransform.rect.size.x, p_newSize));
+            SetLocalSize(rectTransform, new Vector2(rectTransform.rect.size.x, newSize));
             //MarkLayoutForRebuild();
         }
 
-        public static float CalculateElementSize(Component p_object, bool p_isVerticalLayout)
+        public static float CalculateElementSize(Component component, bool isVerticalLayout)
         {
-            var elementTransform = p_object != null ? p_object.transform as RectTransform : null;
+            var elementTransform = component != null ? component.transform as RectTransform : null;
             var ignoreLayouts = elementTransform != null ? elementTransform.GetComponents<ILayoutIgnorer>() : null;
             if (ignoreLayouts != null)
             {
@@ -1446,16 +1446,16 @@ namespace Kyub.UI
                 {
                     if (ignoreLayout.ignoreLayout)
                     {
-                        float elementSize = elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(elementTransform) : GetLocalWidth(elementTransform)) : 100;
+                        float elementSize = elementTransform != null ? (isVerticalLayout ? GetLocalHeight(elementTransform) : GetLocalWidth(elementTransform)) : 100;
                         return elementSize;
                     }
                 }
             }
 
-            float preferredSize = LayoutUtilityEx.GetPreferredSize(elementTransform, p_isVerticalLayout ? 1 : 0, -1);
+            float preferredSize = LayoutUtilityEx.GetPreferredSize(elementTransform, isVerticalLayout ? 1 : 0, -1);
             if (preferredSize < 0)
             {
-                var elementSize = elementTransform != null ? (p_isVerticalLayout ? GetLocalHeight(elementTransform) : GetLocalWidth(elementTransform)) : 100;
+                var elementSize = elementTransform != null ? (isVerticalLayout ? GetLocalHeight(elementTransform) : GetLocalWidth(elementTransform)) : 100;
                 return elementSize;
             }
 
