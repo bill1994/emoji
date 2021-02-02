@@ -1205,7 +1205,19 @@ namespace Kyub.UI
                     }
                 }
 
-                Func<int, float> getElementSize = (i) => { return i >= 0 && i < _scrollElementsCachedSize.Count ? _scrollElementsCachedSize[i] : 0; };
+                Func<int, float> getElementSize = (i) => {
+
+                    var isInsideRange = i >= 0 && i < _scrollElementsCachedSize.Count;
+                    if (isInsideRange)
+                    {
+                        if (_scrollElementsCachedSize[i] < 0)
+                            _scrollElementsCachedSize[i] = Mathf.Max(0, GetElementSize(i));
+
+                        return _scrollElementsCachedSize[i];
+                    }
+
+                    return 0;
+                };
                 var v_delta = m_spacing < 0 ? -m_spacing : 0; // we must do it to prevent bug when spacing is negative
                 //Find current index based in old cachedIndex (Optimized Search)
                 if (v_index < _elementsLayoutPosition.Count)
@@ -1258,7 +1270,19 @@ namespace Kyub.UI
             }
 
             var v_initialLoopIndex = currentIndex;
-            Func<int, float> getElementSize = (i) => { return i >= 0 && i < _scrollElementsCachedSize.Count ? _scrollElementsCachedSize[i] : 0; };
+            Func<int, float> getElementSize = (i) => {
+
+                var isInsideRange = i >= 0 && i < _scrollElementsCachedSize.Count;
+                if (isInsideRange)
+                {
+                    if (_scrollElementsCachedSize[i] < 0)
+                        _scrollElementsCachedSize[i] = Mathf.Max(0, GetElementSize(i));
+
+                    return _scrollElementsCachedSize[i];
+                }
+
+                return 0;
+            };
             for (int i = Mathf.Max(0, v_initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
             {
                 //Search first invalid element
