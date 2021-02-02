@@ -40,16 +40,25 @@ namespace MaterialUI
         public static void ShowCustomScreenAsync<T>(string screenPrefabPath, ScreenView screenView, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true, float delay = 0.5f) where T : MaterialScreen
         {
             T screenWithSameName = null;
+            var partialNamePath = screenPrefabPath != null ? System.IO.Path.GetFileName(screenPrefabPath) : string.Empty;
             if (screenView != null)
             {
                 if (p_searchForScreensWithSameName)
                 {
                     foreach (var screen in screenView.materialScreen)
                     {
-                        if (screen != null && screen is T && screen.name == screenPrefabPath)
+                        if (screen != null && screen is T)
                         {
-                            screenWithSameName = screen as T;
-                            break;
+                            var fullFind = screen.name == screenPrefabPath;
+                            var partialFind = !fullFind && screenWithSameName == null && screenPrefabPath != null && screen.name == partialNamePath;
+                            if (fullFind || partialFind)
+                            {
+                                screenWithSameName = screen as T;
+
+                                //We only stop match if screen.name exactly equals screenPrefabPath
+                                if (fullFind)
+                                    break;
+                            }
                         }
                     }
                 }

@@ -645,16 +645,24 @@ namespace MaterialUI
 
         #region Public Helper Functions
 
-        public MaterialScreen GetScreenWithName(string name)
+        public MaterialScreen GetScreenWithName(string screenPrefabPath)
         {
+            MaterialScreen screenWithSameName = null;
+            var partialNamePath = screenPrefabPath != null ? System.IO.Path.GetFileName(screenPrefabPath) : string.Empty;
             foreach (var screen in materialScreen)
             {
-                if (screen != null && screen.name == name)
+                var fullFind = screen.name == screenPrefabPath;
+                var partialFind = !fullFind && screenWithSameName == null && screenPrefabPath != null && screen.name == partialNamePath;
+                if (fullFind || partialFind)
                 {
-                    return screen;
+                    screenWithSameName = screen;
+
+                    //We only stop match if screen.name exactly equals screenPrefabPath
+                    if (fullFind)
+                        break;
                 }
             }
-            return null;
+            return screenWithSameName;
         }
 
         public virtual void BackToScreen(int screenIndex)
