@@ -163,17 +163,17 @@ namespace Kyub.UI
                 SetCachedElementsLayoutDirty(true);
         }
 
-        protected override void OnPotentialScrollValueChanged(Vector2 p_delta)
+        protected override void OnPotentialScrollValueChanged(Vector2 delta)
         {
-            var v_contentSize = new Vector2(GetLocalWidth(Content), GetLocalHeight(Content));
-            var v_currentDeltaDistance = new Vector2(Mathf.Abs(_lastScrollValue.x - p_delta.x) * v_contentSize.x, Mathf.Abs(_lastScrollValue.y - p_delta.y) * v_contentSize.y);
-            if (v_currentDeltaDistance.x < m_scrollMinDeltaDistanceToCallEvent && v_currentDeltaDistance.y < m_scrollMinDeltaDistanceToCallEvent)
+            var contentSize = new Vector2(GetLocalWidth(Content), GetLocalHeight(Content));
+            var currentDeltaDistance = new Vector2(Mathf.Abs(_lastScrollValue.x - delta.x) * contentSize.x, Mathf.Abs(_lastScrollValue.y - delta.y) * contentSize.y);
+            if (currentDeltaDistance.x < m_scrollMinDeltaDistanceToCallEvent && currentDeltaDistance.y < m_scrollMinDeltaDistanceToCallEvent)
                 return;
 
-            _lastScrollValue = p_delta;
+            _lastScrollValue = delta;
 
             if (OnScrollValueChanged != null)
-                OnScrollValueChanged.Invoke(p_delta);
+                OnScrollValueChanged.Invoke(delta);
 
             Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             if (m_elements == null)
@@ -193,7 +193,7 @@ namespace Kyub.UI
 
         #region Overriden Internal Helper Functions
 
-        protected override void ReloadAll_Internal(bool p_fullRecalc)
+        protected override void ReloadAll_Internal(bool fullRecalc)
         {
             if (m_elements == null)
                 return;
@@ -210,22 +210,22 @@ namespace Kyub.UI
                 {
                     if (i >= 0 && i < m_elements.Count && m_elements[i] != null && (i < _cachedMinMaxIndex.x || i > _cachedMinMaxIndex.y))
                     {
-                        var v_element = m_elements[i];
-                        Reload(v_element, i);
+                        var element = m_elements[i];
+                        Reload(element, i);
                     }
                 }
             }
             //Reload current Elements
             for (int i = _cachedMinMaxIndex.x; i <= _cachedMinMaxIndex.y; i++)
             {
-                var v_element = m_elements.Count > i && i >= 0 ? m_elements[i] : null;
-                //in 'p_fullRecalc == false' we only reload elements that was not previous loaded in last roll
-                if (i >= 0 && i < m_elements.Count && v_element != null &&
-                    (p_fullRecalc || i < _lastFrameVisibleElementIndexes.x || i > _lastFrameVisibleElementIndexes.y ||
-                    (v_element.transform.parent != Content && !IsOutOfConstraintBounds(i)))
+                var element = m_elements.Count > i && i >= 0 ? m_elements[i] : null;
+                //in 'fullRecalc == false' we only reload elements that was not previous loaded in last roll
+                if (i >= 0 && i < m_elements.Count && element != null &&
+                    (fullRecalc || i < _lastFrameVisibleElementIndexes.x || i > _lastFrameVisibleElementIndexes.y ||
+                    (element.transform.parent != Content && !IsOutOfConstraintBounds(i)))
                    )
                 {
-                    Reload(v_element, i);
+                    Reload(element, i);
                 }
             }
             _lastFrameVisibleElementIndexes = _cachedMinMaxIndex;
@@ -242,51 +242,51 @@ namespace Kyub.UI
                     ForcePickElements();
                 FixLayoutInconsistencies();
                 ApplyContentConstraintSize();
-                bool v_isVertical = IsVertical();
+                bool isVertical = IsVertical();
                 //Begin calculate Cache location
-                float initialPadding = v_isVertical ? (m_scrollAxis == ScrollDirectionTypeEnum.TopToBottom ? m_padding.top : m_padding.bottom) : (m_scrollAxis == ScrollDirectionTypeEnum.LeftToRight ? m_padding.left : m_padding.right);
-                float v_currentAccumulatedLocation = initialPadding;
+                float initialPadding = isVertical ? (m_scrollAxis == ScrollDirectionTypeEnum.TopToBottom ? m_padding.top : m_padding.bottom) : (m_scrollAxis == ScrollDirectionTypeEnum.LeftToRight ? m_padding.left : m_padding.right);
+                float currentAccumulatedLocation = initialPadding;
                 //Recalculate Cached Constraint Properties
                 _cachedConstraintCount = GetCurrentConstraintCount();
                 _cachedConstraintSize = GetCurrentConstraintSize();
                 _cachedConstraintCellSize = GetCurrentConstraintCellSize();
                 _cachedAlignOffset = GetAlignOffset();
 
-                var v_invalidIndexCounter = 0;
+                var invalidIndexCounter = 0;
                 //Recalculate Layout Positions
                 for (int i = 0; i < _scrollElementsCachedSize.Count; i++)
                 {
                     //We must recalcula index of scroll element to use
-                    var v_index = Mathf.Max(0, i - v_invalidIndexCounter);
-                    float v_currentSize = 0;
-                    float v_spacing = 0;
+                    var index = Mathf.Max(0, i - invalidIndexCounter);
+                    float currentSize = 0;
+                    float spacing = 0;
 
                     //We only calculate the element size when we change the line (mod(i) == 0)
-                    var v_isFirstInConstraint = (v_index % _cachedConstraintCount) == 0;
-                    _elementsLayoutPosition[i] = v_isFirstInConstraint ? v_currentAccumulatedLocation : _elementsLayoutPosition[i - 1];
+                    var isFirstInConstraint = (index % _cachedConstraintCount) == 0;
+                    _elementsLayoutPosition[i] = isFirstInConstraint ? currentAccumulatedLocation : _elementsLayoutPosition[i - 1];
 
                     //We only calculate the element size when we change the line (mod(i) == 0) and when element is active
-                    var v_elementGameObject = v_index >= 0 && m_elements.Count > v_index ? m_elements[v_index] : null;
-                    var v_validElement = v_elementGameObject == null || v_elementGameObject.activeSelf;
-                    if (v_validElement)
+                    var elementGameObject = index >= 0 && m_elements.Count > index ? m_elements[index] : null;
+                    var validElement = elementGameObject == null || elementGameObject.activeSelf;
+                    if (validElement)
                     {
-                        if (v_isFirstInConstraint)
+                        if (isFirstInConstraint)
                         {
-                            v_currentSize = v_isVertical ? m_cellSize.y : m_cellSize.x;
-                            v_spacing = m_spacing;
+                            currentSize = isVertical ? m_cellSize.y : m_cellSize.x;
+                            spacing = m_spacing;
                         }
-                        v_currentAccumulatedLocation += (v_currentSize + v_spacing);
+                        currentAccumulatedLocation += (currentSize + spacing);
                     }
                     else
-                        v_invalidIndexCounter++;
+                        invalidIndexCounter++;
                 }
                 //Recalculate Total Content Size
-                float v_contentSize = 0;
-                if (v_isVertical)
-                    v_contentSize = (m_padding.top + m_padding.bottom - initialPadding) + v_currentAccumulatedLocation;
+                float contentSize = 0;
+                if (isVertical)
+                    contentSize = (m_padding.top + m_padding.bottom - initialPadding) + currentAccumulatedLocation;
                 else
-                    v_contentSize = (m_padding.left + m_padding.right - initialPadding) + v_currentAccumulatedLocation;
-                SetContentSize(v_contentSize);
+                    contentSize = (m_padding.left + m_padding.right - initialPadding) + currentAccumulatedLocation;
+                SetContentSize(contentSize);
                 ReloadAll();
                 if (OnReloadCachedElementsLayout != null)
                     OnReloadCachedElementsLayout.Invoke();
@@ -301,27 +301,27 @@ namespace Kyub.UI
                 //Special case when we can activate vertical and horizontal scroll
                 if (IsVertical())
                 {
-                    var v_parentWidth = GetLocalWidth(Content.parent as RectTransform);
-                    var v_newWidth = Mathf.Max(
+                    var parentWidth = GetLocalWidth(Content.parent as RectTransform);
+                    var newWidth = Mathf.Max(
                         m_padding.left + m_padding.right + ((m_cellSize.x + m_constraintSpacing) * m_defaultConstraintCount) - m_constraintSpacing,
-                        v_parentWidth);
-                    ScrollRect.horizontal = ScrollRect != null && Mathf.Abs(v_newWidth - v_parentWidth) > SIZE_ERROR;
+                        parentWidth);
+                    ScrollRect.horizontal = ScrollRect != null && Mathf.Abs(newWidth - parentWidth) > SIZE_ERROR;
                     //Apply size larger than content.parent size
                     if (ScrollRect.horizontal)
-                        SetLocalWidth(Content, v_newWidth);
+                        SetLocalWidth(Content, newWidth);
                     else
                         base.ApplyContentConstraintSize();
 
                 }
                 else
                 {
-                    var v_parentHeight = GetLocalHeight(Content.parent as RectTransform);
-                    var v_newHeight = Mathf.Max(
+                    var parentHeight = GetLocalHeight(Content.parent as RectTransform);
+                    var newHeight = Mathf.Max(
                         m_padding.top + m_padding.bottom + ((m_cellSize.y + m_constraintSpacing) * m_defaultConstraintCount) - m_constraintSpacing,
-                        v_parentHeight);
-                    ScrollRect.vertical = ScrollRect != null && Mathf.Abs(v_newHeight - v_parentHeight) > SIZE_ERROR;
+                        parentHeight);
+                    ScrollRect.vertical = ScrollRect != null && Mathf.Abs(newHeight - parentHeight) > SIZE_ERROR;
                     if (ScrollRect.vertical)
-                        SetLocalHeight(Content, v_newHeight);
+                        SetLocalHeight(Content, newHeight);
                     else
                         base.ApplyContentConstraintSize();
                 }
@@ -330,60 +330,60 @@ namespace Kyub.UI
                 base.ApplyContentConstraintSize();
         }
 
-        protected override void Reload(GameObject p_obj, int p_indexReload)
+        protected override void Reload(GameObject obj, int indexReload)
         {
-            if (p_obj == null) return;
+            if (obj == null) return;
 
-            Vector3 v_elementPosition = GetElementPosition(p_indexReload);
+            Vector3 elementPosition = GetElementPosition(indexReload);
             //Unregister or Register Index
             if (Application.isPlaying)
             {
                 //Check if index is out of bounds or position is out of constraint bounds
-                var v_isOutOfBounds = p_indexReload < _cachedMinMaxIndex.x || p_indexReload > _cachedMinMaxIndex.y || IsOutOfConstraintBounds(v_elementPosition);
-                if (v_isOutOfBounds)
-                    UnregisterVisibleElement(p_indexReload);
+                var isOutOfBounds = indexReload < _cachedMinMaxIndex.x || indexReload > _cachedMinMaxIndex.y || IsOutOfConstraintBounds(elementPosition);
+                if (isOutOfBounds)
+                    UnregisterVisibleElement(indexReload);
                 else
-                    RegisterVisibleElement(p_indexReload);
+                    RegisterVisibleElement(indexReload);
                 if (Application.isEditor)
-                    p_obj.transform.name = "[" + p_indexReload + "] " + System.Text.RegularExpressions.Regex.Replace(p_obj.transform.name, @"^\[[0-9]+\] ", "");
+                    obj.transform.name = "[" + indexReload + "] " + System.Text.RegularExpressions.Regex.Replace(obj.transform.name, @"^\[[0-9]+\] ", "");
             }
 
             //apply element local position
-            p_obj.transform.localPosition = v_elementPosition;
+            obj.transform.localPosition = elementPosition;
 
-            var v_fitter = p_obj.GetComponent<ContentSizeFitter>();
-            if (v_fitter != null)
-                v_fitter.enabled = false;
+            var fitter = obj.GetComponent<ContentSizeFitter>();
+            if (fitter != null)
+                fitter.enabled = false;
             //Recalculate Item Size
             if (Content != null)
             {
-                RectTransform v_rectTransform = p_obj.transform as RectTransform;
-                float v_itemSize = GetCachedElementSize(p_indexReload);
-                if (v_rectTransform != null)
+                RectTransform rectTransform = obj.transform as RectTransform;
+                float itemSize = GetCachedElementSize(indexReload);
+                if (rectTransform != null)
                 {
-                    //var v_layout = v_rectTransform.GetComponent<LayoutElement>();
-                    v_rectTransform.pivot = Content.pivot;
+                    //var layout = rectTransform.GetComponent<LayoutElement>();
+                    rectTransform.pivot = Content.pivot;
                     if (IsVertical())
                     {
-                        v_itemSize = m_cellSize.y;
-                        if (Mathf.Abs(GetLocalHeight(v_rectTransform) - v_itemSize) > SIZE_ERROR)
-                            SetLocalHeight(v_rectTransform, v_itemSize);
+                        itemSize = m_cellSize.y;
+                        if (Mathf.Abs(GetLocalHeight(rectTransform) - itemSize) > SIZE_ERROR)
+                            SetLocalHeight(rectTransform, itemSize);
 
-                        //SetLayoutElementPreferredSize(v_layout, new Vector2(-1, v_itemSize));
+                        //SetLayoutElementPreferredSize(layout, new Vector2(-1, itemSize));
                         //Apply Padding Horizontal
-                        if (Mathf.Abs(GetLocalWidth(v_rectTransform) - _cachedConstraintCellSize) > SIZE_ERROR)
-                            SetLocalWidth(v_rectTransform, _cachedConstraintCellSize);
+                        if (Mathf.Abs(GetLocalWidth(rectTransform) - _cachedConstraintCellSize) > SIZE_ERROR)
+                            SetLocalWidth(rectTransform, _cachedConstraintCellSize);
                     }
                     else
                     {
-                        v_itemSize = m_cellSize.x;
-                        if (Mathf.Abs(GetLocalWidth(v_rectTransform) - v_itemSize) > SIZE_ERROR)
-                            SetLocalWidth(v_rectTransform, v_itemSize);
+                        itemSize = m_cellSize.x;
+                        if (Mathf.Abs(GetLocalWidth(rectTransform) - itemSize) > SIZE_ERROR)
+                            SetLocalWidth(rectTransform, itemSize);
 
-                        //SetLayoutElementPreferredSize(v_layout, new Vector2(v_itemSize, -1));
+                        //SetLayoutElementPreferredSize(layout, new Vector2(itemSize, -1));
                         //Apply Padding Vertical
-                        if (Mathf.Abs(GetLocalHeight(v_rectTransform) - _cachedConstraintCellSize) > SIZE_ERROR)
-                            SetLocalHeight(v_rectTransform, _cachedConstraintCellSize);
+                        if (Mathf.Abs(GetLocalHeight(rectTransform) - _cachedConstraintCellSize) > SIZE_ERROR)
+                            SetLocalHeight(rectTransform, _cachedConstraintCellSize);
                     }
                 }
             }
@@ -392,138 +392,138 @@ namespace Kyub.UI
         protected override int GetCurrentIndex()
         {
             //Try Find index based in Layout
-            int v_index = _cachedMinMaxIndex.x < 0 ? 0 : _cachedMinMaxIndex.x;
+            int index = _cachedMinMaxIndex.x < 0 ? 0 : _cachedMinMaxIndex.x;
             FixLayoutInconsistencies();
 
             if (Content != null)
             {
-                float v_anchoredPosition = -1;
+                float anchoredPosition = -1;
                 if (IsVertical())
                 {
                     if (m_scrollAxis == ScrollDirectionTypeEnum.TopToBottom)
                     {
-                        v_anchoredPosition = Content.anchoredPosition.y;
+                        anchoredPosition = Content.anchoredPosition.y;
                     }
                     else
                     {
-                        v_anchoredPosition = -Content.anchoredPosition.y;
+                        anchoredPosition = -Content.anchoredPosition.y;
                     }
                 }
                 else
                 {
                     if (m_scrollAxis == ScrollDirectionTypeEnum.LeftToRight)
                     {
-                        v_anchoredPosition = -Content.anchoredPosition.x;
+                        anchoredPosition = -Content.anchoredPosition.x;
 
                     }
                     else
                     {
-                        v_anchoredPosition = Content.anchoredPosition.x;
+                        anchoredPosition = Content.anchoredPosition.x;
                     }
                 }
 
                 var elementSize = IsVertical() ? m_cellSize.y : m_cellSize.x;
                 //Func<int, float> getElementSize = (i) => { return i >= 0 && i < _scrollElementsCachedSize.Count ? _scrollElementsCachedSize[i] : 0; };
-                var v_delta = m_spacing < 0 ? -m_spacing : 0; // we must do it to prevent bug when spacing is negative
+                var delta = m_spacing < 0 ? -m_spacing : 0; // we must do it to prevent bug when spacing is negative
                 //Find current index based in old cachedIndex (Optimized Search)
-                if (v_index < _elementsLayoutPosition.Count)
+                if (index < _elementsLayoutPosition.Count)
                 {
-                    var v_initialLoopIndex = _cachedMinMaxIndex.x - (_cachedMinMaxIndex.x % _cachedConstraintCount);
-                    if (v_anchoredPosition < (_elementsLayoutPosition[v_index] + v_delta))
+                    var initialLoopIndex = _cachedMinMaxIndex.x - (_cachedMinMaxIndex.x % _cachedConstraintCount);
+                    if (anchoredPosition < (_elementsLayoutPosition[index] + delta))
                     {
-                        for (int i = v_initialLoopIndex; i >= 0; i -= _cachedConstraintCount)
+                        for (int i = initialLoopIndex; i >= 0; i -= _cachedConstraintCount)
                         {
                             //Search first valid element
-                            var elementPosition = (_elementsLayoutPosition[i] + v_delta);
-                            if (v_anchoredPosition >= elementPosition)
+                            var elementPosition = (_elementsLayoutPosition[i] + delta);
+                            if (anchoredPosition >= elementPosition)
                             {
                                 break;
                             }
-                            v_index -= _cachedConstraintCount;
+                            index -= _cachedConstraintCount;
                         }
                     }
                     else
                     {
-                        for (int i = v_initialLoopIndex; i < _elementsLayoutPosition.Count; i += _cachedConstraintCount)
+                        for (int i = initialLoopIndex; i < _elementsLayoutPosition.Count; i += _cachedConstraintCount)
                         {
                             //Search first valid element
-                            var elementPosition = (_elementsLayoutPosition[i] + v_delta);
-                            if (v_anchoredPosition < elementPosition ||
-                                v_anchoredPosition < (elementPosition + elementSize))
+                            var elementPosition = (_elementsLayoutPosition[i] + delta);
+                            if (anchoredPosition < elementPosition ||
+                                anchoredPosition < (elementPosition + elementSize))
                             {
                                 break;
                             }
-                            v_index += _cachedConstraintCount;
+                            index += _cachedConstraintCount;
                         }
                     }
                 }
             }
-            v_index = Mathf.Clamp(v_index, 0, m_elements.Count);
-            return v_index;
+            index = Mathf.Clamp(index, 0, m_elements.Count);
+            return index;
         }
 
         protected override int GetLastIndex(int currentIndex)
         {
             if (currentIndex < 0)
                 currentIndex = GetCurrentIndex();
-            var v_lastIndex = currentIndex;
-            var v_contentTransform = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform : this.transform) as RectTransform;
+            var lastIndex = currentIndex;
+            var contentTransform = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform : this.transform) as RectTransform;
 
-            var v_contentMaxSize = IsVertical() ? GetLocalHeight(v_contentTransform) : GetLocalWidth(v_contentTransform);
+            var contentMaxSize = IsVertical() ? GetLocalHeight(contentTransform) : GetLocalWidth(contentTransform);
             if (Content != null)
             {
-                v_contentMaxSize += Mathf.Abs(IsVertical() ? Content.anchoredPosition.y : Content.anchoredPosition.x);
+                contentMaxSize += Mathf.Abs(IsVertical() ? Content.anchoredPosition.y : Content.anchoredPosition.x);
             }
 
-            var v_initialLoopIndex = currentIndex;
+            var initialLoopIndex = currentIndex;
             var elementSize = IsVertical() ? m_cellSize.y : m_cellSize.x;
-            for (int i = Mathf.Max(0, v_initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
+            for (int i = Mathf.Max(0, initialLoopIndex); i < _elementsLayoutPosition.Count; i++)
             {
                 //Search first invalid element
-                if (_elementsLayoutPosition[i] > v_contentMaxSize &&
-                    (_elementsLayoutPosition[i] + elementSize) > v_contentMaxSize)
+                if (_elementsLayoutPosition[i] > contentMaxSize &&
+                    (_elementsLayoutPosition[i] + elementSize) > contentMaxSize)
                 {
                     //Revert to previous valid element
-                    v_lastIndex--;
+                    lastIndex--;
                     break;
                 }
-                v_lastIndex++;
+                lastIndex++;
             }
-            v_lastIndex = Mathf.Clamp(v_lastIndex, currentIndex, m_elements.Count - 1);
-            return v_lastIndex;
+            lastIndex = Mathf.Clamp(lastIndex, currentIndex, m_elements.Count - 1);
+            return lastIndex;
         }
 
-        protected override Vector3 GetElementPosition(int p_index)
+        protected override Vector3 GetElementPosition(int index)
         {
             FixLayoutInconsistencies();
-            Vector3 v_position = Vector2.zero;
-            var v_cachedLocation = _elementsLayoutPosition.Count > p_index && p_index >= 0 ? _elementsLayoutPosition[p_index] : 0;
-            var v_isVertical = IsVertical();
-            var v_deltaConstraintIndex = (p_index % _cachedConstraintCount);
-            var v_extraConstraintSpacing = (_cachedConstraintCellSize + m_constraintSpacing) * v_deltaConstraintIndex;
-            if (v_isVertical)
+            Vector3 position = Vector2.zero;
+            var cachedLocation = _elementsLayoutPosition.Count > index && index >= 0 ? _elementsLayoutPosition[index] : 0;
+            var isVertical = IsVertical();
+            var deltaConstraintIndex = (index % _cachedConstraintCount);
+            var extraConstraintSpacing = (_cachedConstraintCellSize + m_constraintSpacing) * deltaConstraintIndex;
+            if (isVertical)
             {
                 if (m_scrollAxis == ScrollDirectionTypeEnum.TopToBottom)
                 {
-                    v_position = new Vector3(v_position.x + m_padding.left + v_extraConstraintSpacing + _cachedAlignOffset, -v_cachedLocation, 0);
+                    position = new Vector3(position.x + m_padding.left + extraConstraintSpacing + _cachedAlignOffset, -cachedLocation, 0);
                 }
                 else
                 {
-                    v_position = new Vector3(v_position.x + m_padding.left + v_extraConstraintSpacing + _cachedAlignOffset, v_cachedLocation, 0);
+                    position = new Vector3(position.x + m_padding.left + extraConstraintSpacing + _cachedAlignOffset, cachedLocation, 0);
                 }
             }
             else
             {
                 if (m_scrollAxis == ScrollDirectionTypeEnum.LeftToRight)
                 {
-                    v_position = new Vector3(v_cachedLocation, v_position.y + m_padding.bottom + v_extraConstraintSpacing + _cachedAlignOffset, 0);
+                    position = new Vector3(cachedLocation, position.y + m_padding.bottom + extraConstraintSpacing + _cachedAlignOffset, 0);
                 }
                 else
                 {
-                    v_position = new Vector3(-v_cachedLocation, v_position.y + m_padding.bottom + v_extraConstraintSpacing + _cachedAlignOffset, 0);
+                    position = new Vector3(-cachedLocation, position.y + m_padding.bottom + extraConstraintSpacing + _cachedAlignOffset, 0);
                 }
             }
-            return v_position;
+            return position;
         }
 
         #endregion
@@ -535,50 +535,50 @@ namespace Kyub.UI
             return ScrollRect != null && ScrollRect.vertical && ScrollRect.horizontal;
         }
 
-        protected virtual bool IsOutOfConstraintBounds(int p_index)
+        protected virtual bool IsOutOfConstraintBounds(int index)
         {
-            return IsOutOfConstraintBounds(GetElementPosition(p_index));
+            return IsOutOfConstraintBounds(GetElementPosition(index));
         }
 
-        protected virtual bool IsOutOfConstraintBounds(Vector3 p_elementPosition)
+        protected virtual bool IsOutOfConstraintBounds(Vector3 elementPosition)
         {
             if (IsConstraintScrollActive())
             {
-                var v_isVertical = IsVertical();
-                var v_contentTransform = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform : this.transform) as RectTransform;
-                var v_contentConstraintMaxPosition = v_isVertical ? GetLocalWidth(v_contentTransform) : GetLocalHeight(v_contentTransform);
+                var isVertical = IsVertical();
+                var contentTransform = Viewport != null ? Viewport : (ScrollRect != null ? ScrollRect.transform : this.transform) as RectTransform;
+                var contentConstraintMaxPosition = isVertical ? GetLocalWidth(contentTransform) : GetLocalHeight(contentTransform);
                 if (Content != null)
-                    v_contentConstraintMaxPosition += Mathf.Abs(v_isVertical ? Content.anchoredPosition.x : Content.anchoredPosition.y);
-                return v_isVertical ? v_contentConstraintMaxPosition < p_elementPosition.x : v_contentConstraintMaxPosition < p_elementPosition.y;
+                    contentConstraintMaxPosition += Mathf.Abs(isVertical ? Content.anchoredPosition.x : Content.anchoredPosition.y);
+                return isVertical ? contentConstraintMaxPosition < elementPosition.x : contentConstraintMaxPosition < elementPosition.y;
             }
             return false;
         }
 
         protected virtual int GetCurrentConstraintCount()
         {
-            int v_currentConstraintCount = m_defaultConstraintCount;
+            int currentConstraintCount = m_defaultConstraintCount;
             //In case of being flexible layout we must calculate the constraint
             if (m_constraintType == GridConstraintTypeEnum.Flexible)
             {
-                v_currentConstraintCount = (int)(IsVertical() ?
+                currentConstraintCount = (int)(IsVertical() ?
                     ((m_cellSize.x + m_constraintSpacing) == 0 ? 0 : (GetLocalWidth(Content) - (m_padding.left + m_padding.right) + m_constraintSpacing) / (m_cellSize.x + m_constraintSpacing)) :
                     ((m_cellSize.y + m_constraintSpacing) == 0 ? 0 : (GetLocalHeight(Content) - (m_padding.top + m_padding.bottom) + m_constraintSpacing) / (m_cellSize.y + m_constraintSpacing)));
             }
-            return Mathf.Max(1, v_currentConstraintCount);
+            return Mathf.Max(1, currentConstraintCount);
         }
 
         protected virtual float GetCurrentConstraintCellSize()
         {
-            var v_isVertical = IsVertical();
+            var isVertical = IsVertical();
             if (m_constraintType == GridConstraintTypeEnum.FixedWithFlexibleCells)
             {
-                var v_currentConstraintSize = GetCurrentConstraintSize();
-                var v_currentConstraint = GetCurrentConstraintCount();
-                return (v_currentConstraintSize - m_constraintSpacing * (v_currentConstraint - 1)) / v_currentConstraint;
+                var currentConstraintSize = GetCurrentConstraintSize();
+                var currentConstraint = GetCurrentConstraintCount();
+                return (currentConstraintSize - m_constraintSpacing * (currentConstraint - 1)) / currentConstraint;
             }
             else
             {
-                return v_isVertical ? m_cellSize.x : m_cellSize.y;
+                return isVertical ? m_cellSize.x : m_cellSize.y;
             }
         }
 
@@ -591,9 +591,9 @@ namespace Kyub.UI
 
         protected virtual float GetAlignOffset()
         {
-            var v_constraintSizeDelta = _cachedConstraintSize - ((_cachedConstraintCellSize + m_constraintSpacing) * _cachedConstraintCount - m_constraintSpacing); // Ex: ContainerSize.Width - CellSize*AmountOfCollumns
-            var v_alignOffset = m_constraintAlign == ConstraintAlignEnum.Middle ? v_constraintSizeDelta / 2 : (m_constraintAlign == ConstraintAlignEnum.End ? v_constraintSizeDelta : 0);
-            return v_alignOffset;
+            var constraintSizeDelta = _cachedConstraintSize - ((_cachedConstraintCellSize + m_constraintSpacing) * _cachedConstraintCount - m_constraintSpacing); // Ex: ContainerSize.Width - CellSize*AmountOfCollumns
+            var alignOffset = m_constraintAlign == ConstraintAlignEnum.Middle ? constraintSizeDelta / 2 : (m_constraintAlign == ConstraintAlignEnum.End ? constraintSizeDelta : 0);
+            return alignOffset;
         }
 
         #endregion
