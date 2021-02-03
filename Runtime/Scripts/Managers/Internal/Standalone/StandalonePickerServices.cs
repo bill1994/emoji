@@ -119,9 +119,9 @@ namespace Kyub.PickerServices
 
             StandaloneFileBrowser.OpenFilePanelAsync("Select Files", "", extensions, multiselect, (result) =>
             {
-                var path = result != null && result.Length > 0 ? result.First() : "";
+                var path = result;
                 if (Instance != null)
-                    Instance.NativeImagePickedEnd(path);
+                    Instance.NativeFilesPickedEnd(path);
             });
 #endif
         }
