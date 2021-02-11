@@ -1,7 +1,4 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
-
-using Kyub.UI;
+﻿using Kyub.UI;
 using System;
 using System.Linq;
 #if UNITY_EDITOR
@@ -783,7 +780,7 @@ namespace MaterialUI
 
             if (spriteImage != null)
             {
-                if (imageData.imageDataType == ImageDataType.Sprite)
+                if (imageData != null && imageData.imageDataType == ImageDataType.Sprite)
                     spriteImage.sprite = imageData.sprite;
                 else
                     spriteImage.sprite = null;
@@ -792,7 +789,7 @@ namespace MaterialUI
             ExternalImage externalImage = graphic != null ? graphic.GetComponent<ExternalImage>() : null;
             if (externalImage != null)
             {
-                if (imageData.imageDataType == ImageDataType.Sprite)
+                if (imageData != null && imageData.imageDataType == ImageDataType.Sprite)
                 {
                     externalImage.Key = imageData.imgUrl;
                     externalImage.DefaultSprite = imageData.sprite;

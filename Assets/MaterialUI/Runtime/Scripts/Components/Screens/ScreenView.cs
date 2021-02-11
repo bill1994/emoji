@@ -895,9 +895,9 @@ namespace MaterialUI
 
         public void NextScreen(bool wrap = true)
         {
-            var v_nextScreenIndex = GetNextScreenIndex(wrap);
-            if (v_nextScreenIndex >= 0)
-                Transition(v_nextScreenIndex);
+            var nextScreenIndex = GetNextScreenIndex(wrap);
+            if (nextScreenIndex >= 0)
+                Transition(nextScreenIndex);
         }
 
         public void PreviousScreen(bool wrap = true)

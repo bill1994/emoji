@@ -31,19 +31,19 @@ namespace MaterialUI
 
         #region Custom Screen
 
-        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, Transform parent, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true, float delay = 0.5f) where T : MaterialScreen
+        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, Transform parent, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool searchForScreensWithSameName = true, float delay = 0.5f) where T : MaterialScreen
         {
             var screenView = parent != null ? parent.GetComponentInParent<ScreenView>() : null;
-            ShowCustomScreenAsync(screenPrefabPath, screenView, initializeCallback, progressIndicator, p_searchForScreensWithSameName, delay);
+            ShowCustomScreenAsync(screenPrefabPath, screenView, initializeCallback, progressIndicator, searchForScreensWithSameName, delay);
         }
 
-        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, ScreenView screenView, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool p_searchForScreensWithSameName = true, float delay = 0.5f) where T : MaterialScreen
+        public static void ShowCustomScreenAsync<T>(string screenPrefabPath, ScreenView screenView, System.Action<T> initializeCallback, DialogProgress progressIndicator = null, bool searchForScreensWithSameName = true, float delay = 0.5f) where T : MaterialScreen
         {
             T screenWithSameName = null;
             var partialNamePath = screenPrefabPath != null ? System.IO.Path.GetFileName(screenPrefabPath) : string.Empty;
             if (screenView != null)
             {
-                if (p_searchForScreensWithSameName)
+                if (searchForScreensWithSameName)
                 {
                     foreach (var screen in screenView.materialScreen)
                     {
