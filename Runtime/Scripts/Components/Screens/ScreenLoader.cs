@@ -117,7 +117,7 @@ namespace MaterialUI
             LoadAndShowScreen_Internal(screenResourcesName, true, onStackScreen);
         }
 
-        protected void LoadAndShowScreen_Internal(string screenResourcesName, bool p_searchForScreensWithSameName, System.Action<MaterialScreen> onStackScreen)
+        protected void LoadAndShowScreen_Internal(string screenResourcesName, bool searchForScreensWithSameName, System.Action<MaterialScreen> onStackScreen)
         {
             if (ScreenView == null)
             {
@@ -126,7 +126,7 @@ namespace MaterialUI
             }
             else
             {
-                MaterialScreen screenWithSameName = p_searchForScreensWithSameName ? ScreenView.GetScreenWithName(screenResourcesName) : null;
+                MaterialScreen screenWithSameName = searchForScreensWithSameName ? ScreenView.GetScreenWithName(screenResourcesName) : null;
                 if (screenWithSameName == null)
                 {
                     ScreenManager.ShowCustomScreenAsync<MaterialScreen>(screenResourcesName,
