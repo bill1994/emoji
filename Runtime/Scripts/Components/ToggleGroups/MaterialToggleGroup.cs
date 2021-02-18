@@ -53,7 +53,8 @@ namespace MaterialUI
                 if (selectedIndexInternal == value)
                     return;
 
-                selectedIndexInternal = value;
+                //selectedIndexInternal = value;
+                SetSelectedIndexInternal(value);
                 _indexIsDirty = true;
 
                 if (gameObject.activeInHierarchy && enabled && !IsInvoking("TryApplyIndexDirty"))
