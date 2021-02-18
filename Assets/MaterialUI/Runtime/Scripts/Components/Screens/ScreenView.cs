@@ -200,7 +200,16 @@ namespace MaterialUI
         public int currentScreenIndex
         {
             get { return m_CurrentScreenIndex; }
-            set { m_CurrentScreenIndex = value; }
+            set
+            {
+                if (m_CurrentScreenIndex == value)
+                    return;
+
+                if (Application.isPlaying)
+                    TransitionImmediate(value);
+                else
+                    m_CurrentScreenIndex = value;
+            }
         }
 
         public MaterialScreen currentScreen
@@ -619,7 +628,7 @@ namespace MaterialUI
         public MaterialScreen RemoveFromScreenStack(int screenIndex)
         {
             var materialScreen = m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null;
-            return RemoveFromScreenStack(materialScreen)? materialScreen : null;
+            return RemoveFromScreenStack(materialScreen) ? materialScreen : null;
         }
 
         public virtual bool RemoveFromScreenStack(MaterialScreen screen)
