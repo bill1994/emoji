@@ -229,24 +229,30 @@ namespace MaterialUI
                 }
             }
 
-            canvasGroup.blocksRaycasts = m_Interactable;
-            canvasGroup.interactable = m_Interactable;
+            if (canvasGroup != null)
+            {
+                canvasGroup.blocksRaycasts = m_Interactable;
+                canvasGroup.interactable = m_Interactable;
+            }
             ApplyCanvasGroupAlpha(false);
         }
 
         protected void ApplyCanvasGroupAlpha(bool animate)
         {
-            if (Application.isPlaying)
+            if (canvasGroup != null)
             {
-                var targetAlpha = (m_TabView != null && !m_ChangeIconColor && !m_ChangeGraphicColor && !isOn) ? (interactable ? 0.5f : 0.15f) : (interactable ? 1f : 0.5f);
-                if (animate)
-                    canvasGroup.alpha = Tween.QuintOut(canvasGroup.alpha, targetAlpha, m_AnimDeltaTime, m_AnimationDuration);
+                if (Application.isPlaying)
+                {
+                    var targetAlpha = (m_TabView != null && !m_ChangeIconColor && !m_ChangeGraphicColor && !isOn) ? (interactable ? 0.5f : 0.15f) : (interactable ? 1f : 0.5f);
+                    if (animate)
+                        canvasGroup.alpha = Tween.QuintOut(canvasGroup.alpha, targetAlpha, m_AnimDeltaTime, m_AnimationDuration);
+                    else
+                        canvasGroup.alpha = targetAlpha;
+                }
                 else
-                    canvasGroup.alpha = targetAlpha;
-            }
-            else
-            {
-                canvasGroup.alpha = interactable ? 1f : 0.5f;
+                {
+                    canvasGroup.alpha = interactable ? 1f : 0.5f;
+                }
             }
         }
 
