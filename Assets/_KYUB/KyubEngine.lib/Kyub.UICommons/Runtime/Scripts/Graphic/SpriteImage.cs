@@ -40,9 +40,12 @@ namespace Kyub.UI
 
         protected override void OnPopulateMesh(VertexHelper toFill)
         {
+            var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
+            var preserveAspectMode = GetAspectRatioMode(size);
+
             if (sprite != null && 
-                preserveAspect && 
-                m_PreserveAspectMode == PreserveAspectRatioModeEnum.Envelop && 
+                preserveAspect &&
+                preserveAspectMode == PreserveAspectRatioModeEnum.Envelop && 
                 type == Type.Simple)
             {
                 GenerateSimpleMesh(toFill, preserveAspect);
@@ -63,9 +66,10 @@ namespace Kyub.UI
         protected virtual void GenerateSimpleMesh(VertexHelper vh, bool shouldPreserveAspect)
         {
             var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
+            var preserveAspectMode = GetAspectRatioMode(size);
 
-            Vector4 v = GetDrawingDimensions(shouldPreserveAspect);
-            var uv = GetDrawingUV(size, shouldPreserveAspect);
+            Vector4 v = GetDrawingDimensions(shouldPreserveAspect, preserveAspectMode);
+            var uv = GetDrawingUV(size, shouldPreserveAspect, preserveAspectMode);
 
             var color32 = color;
             vh.Clear();
@@ -78,9 +82,30 @@ namespace Kyub.UI
             vh.AddTriangle(2, 3, 0);
         }
 
+        protected virtual PreserveAspectRatioModeEnum GetAspectRatioMode(Vector2 size)
+        {
+            var preserveAspectMode = m_PreserveAspectMode;
+
+            //We adjust to envolop when image and drawing space has same orientation (Portrait/ Widescreen/ Square)
+            if (preserveAspectMode == PreserveAspectRatioModeEnum.Auto)
+            {
+                var drawingRect = GetPixelAdjustedRect();
+                if ((size.x > size.y && drawingRect.size.x >= drawingRect.size.y) ||
+                    (size.x < size.y && drawingRect.size.x < drawingRect.size.y))
+                {
+                    preserveAspectMode = PreserveAspectRatioModeEnum.Envelop;
+                }
+                else
+                {
+                    preserveAspectMode = PreserveAspectRatioModeEnum.Default;
+                }
+            }
+
+            return preserveAspectMode;
+        }
 
         /// Image's dimensions used for drawing. X = left, Y = bottom, Z = right, W = top.
-        protected virtual Vector4 GetDrawingDimensions(bool shouldPreserveAspect)
+        protected virtual Vector4 GetDrawingDimensions(bool shouldPreserveAspect, PreserveAspectRatioModeEnum aspectMode)
         {
             var padding = sprite == null ? Vector4.zero : UnityEngine.Sprites.DataUtility.GetPadding(sprite);
             var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
@@ -97,7 +122,7 @@ namespace Kyub.UI
                 (spriteW - padding.z) / spriteW,
                 (spriteH - padding.w) / spriteH);
 
-            if (shouldPreserveAspect && size.sqrMagnitude > 0.0f && m_PreserveAspectMode == PreserveAspectRatioModeEnum.Default)
+            if (shouldPreserveAspect && size.sqrMagnitude > 0.0f && aspectMode == PreserveAspectRatioModeEnum.Default)
             {
                 PreserveRectAspectRatio(ref r, size);
             }
@@ -112,11 +137,11 @@ namespace Kyub.UI
             return v;
         }
 
-        protected virtual Vector4 GetDrawingUV(Vector2 textureSize, bool shouldPreserveAspect)
+        protected virtual Vector4 GetDrawingUV(Vector2 textureSize, bool shouldPreserveAspect, PreserveAspectRatioModeEnum aspectMode)
         {
             var uv = (sprite != null) ? UnityEngine.Sprites.DataUtility.GetOuterUV(sprite) : Vector4.zero;
 
-            if (shouldPreserveAspect && m_PreserveAspectMode == PreserveAspectRatioModeEnum.Envelop && textureSize.sqrMagnitude > 0)
+            if (shouldPreserveAspect && aspectMode == PreserveAspectRatioModeEnum.Envelop && textureSize.sqrMagnitude > 0)
             {
                 var localRect = new Rect(Vector2.zero, new Vector2(Mathf.Abs(rectTransform.rect.width), Mathf.Abs(rectTransform.rect.height)));
                 var minMaxRect = Rect.MinMaxRect(uv.x, uv.y, uv.z, uv.w);
