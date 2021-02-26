@@ -281,7 +281,7 @@ namespace Kyub.UI.Experimental
                 childSize += flexible * itemFlexibleMultiplier;
 
                 //Fit in current group
-                if (pos + childSize <= innerSize)
+                if (pos + childSize <= (startPos + innerSize))
                 {
                     currentGroup.Children.Add(child);
                     pos += childSize * scaleFactor + spacing;
@@ -340,11 +340,12 @@ namespace Kyub.UI.Experimental
                 LinearGroup group = _Groups[i];
                 CalcAlongGroupAxis(axis, isVertical, group);
 
-                float min = group.GetTotalMinSize(axis);
+                //float min = group.GetTotalMinSize(axis);
                 float preferred = group.GetTotalPreferredSize(axis);
                 float flexible = group.GetTotalFlexibleSize(axis);
 
-                totalMin += min + axisSpacing;
+                //TODO: FIX MIN SIZE - We removed TotalMin size as a bug found in our logic
+                //totalMin += min + axisSpacing;
                 totalPreferred += preferred + axisSpacing;
 
                 // Increment flexible size with element's flexible size.
@@ -353,7 +354,8 @@ namespace Kyub.UI.Experimental
 
             if (!alongOtherAxis && children.Count > 0)
             {
-                totalMin -= axisSpacing;
+                //TODO: FIX MIN SIZE - We removed TotalMin size as a bug found in our logic
+                //totalMin -= axisSpacing;
                 totalPreferred -= axisSpacing;
             }
             totalPreferred = Mathf.Max(totalMin, totalPreferred);
@@ -426,12 +428,14 @@ namespace Kyub.UI.Experimental
             float pos = (axis == 0 ? padding.left : padding.top);
             float surplusSpace = size - GetTotalPreferredSize(axis);
 
-            if (surplusSpace > 0)
+            if (surplusSpace > 0 && alongOtherAxis)
             {
                 if (GetTotalFlexibleSize(axis) == 0)
                 {
                     if (!controlSize || !childForceExpandSize)
+                    {
                         pos = GetStartOffset(axis, GetTotalPreferredSize(axis) - (axis == 0 ? padding.horizontal : padding.vertical));
+                    }
                 }
             }
 
@@ -497,7 +501,9 @@ namespace Kyub.UI.Experimental
                     if (group.GetTotalFlexibleSize(axis) == 0)
                     {
                         if (!controlSize || !childForceExpandSize)
+                        {
                             pos += group.GetStartOffset(axis, group.GetTotalPreferredSize(axis), alignmentOnAxis);
+                        }
                         else
                             useFlexibleSpacing = true;
                     }
