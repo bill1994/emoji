@@ -1637,7 +1637,10 @@ namespace MaterialUI
             ForceLabelUpdate();
             if (inputField != null)
             {
-                var method = inputField.GetType().GetMethod("RecreateKeyboard", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                var method = inputField.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).Single(m =>
+                            m.Name == "RecreateKeyboard" &&
+                            m.GetParameters().Length == 0);
+
                 if (method != null)
                 {
                     var parameters = method.GetParameters();
@@ -1670,7 +1673,9 @@ namespace MaterialUI
         {
             if (inputField != null)
             {
-                var method = inputField.GetType().GetMethod("DeactivateInputField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                var method = inputField.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).Single(m =>
+                            m.Name == "DeactivateInputField" &&
+                            m.GetParameters().Length == 0);
                 if (method != null)
                 {
                     var parameters = method.GetParameters();
