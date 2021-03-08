@@ -1871,6 +1871,8 @@ namespace MaterialUI
             }
             if (m_HasValidation && m_ValidationText != null && string.IsNullOrEmpty(m_ValidationText.GetGraphicText()))
                 m_ValidationText.SetGraphicText("\u200B");
+
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
         }
 
         private void UpdateCounter()
