@@ -96,4 +96,7 @@ public class Plugin {
         });
     }
 
+    /*public static boolean hasActiveSelection(final int id) {
+        return MobileInput.hasSelectionActive(id);
+    }*/
 }

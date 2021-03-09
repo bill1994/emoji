@@ -17,6 +17,7 @@ namespace KyubEditor.UI
         private SerializedProperty m_AsteriskChar;
         private SerializedProperty m_OnReturnPressed;
         private SerializedProperty m_PanContent;
+        private SerializedProperty m_ScrollFriendlyMode;
         private SerializedProperty m_RectMaskMode;
         private SerializedProperty m_RectMaskContent;
 
@@ -35,6 +36,7 @@ namespace KyubEditor.UI
             base.OnEnable();
             m_AsteriskChar = serializedObject.FindProperty("m_AsteriskChar");
             m_PanContent = serializedObject.FindProperty("m_PanContent");
+            m_ScrollFriendlyMode = serializedObject.FindProperty("m_ScrollFriendlyMode");
             m_RectMaskMode = serializedObject.FindProperty("m_RectMaskMode");
             m_RectMaskContent = serializedObject.FindProperty("m_RectMaskContent");
 
@@ -78,6 +80,7 @@ namespace KyubEditor.UI
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Virtual Keyboard Layout Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(m_PanContent);
+            EditorGUILayout.PropertyField(m_ScrollFriendlyMode);
             EditorGUILayout.PropertyField(m_RectMaskMode);
             //Only show RectMaskContent when RectMaskMode == Manual
             EditorGUI.BeginDisabledGroup(m_RectMaskMode.enumValueIndex != 0);

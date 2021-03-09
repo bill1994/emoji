@@ -12,7 +12,7 @@ namespace MaterialUI
         #region Private Variables
 
         [SerializeField]
-        MaterialActivity m_activity = null;
+        protected MaterialActivity m_activity = null;
 
         #endregion
 

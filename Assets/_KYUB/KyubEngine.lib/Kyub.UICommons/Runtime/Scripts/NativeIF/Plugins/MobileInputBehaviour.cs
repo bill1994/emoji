@@ -449,7 +449,7 @@ namespace Kyub.Internal.NativeInputPlugin
 #endif
         }
 
-        public static Rect GetScreenRectFromRectTransform(RectTransform rectTransform, RectTransform clipRectTransform = null)
+        public static Rect GetScreenRectFromRectTransform(RectTransform rectTransform, RectTransform clipRectTransform = null, bool invertY = true)
         {
             if (rectTransform == null)
                 return Rect.zero;
@@ -512,7 +512,7 @@ namespace Kyub.Internal.NativeInputPlugin
                 if (screenCoord.y > yMax)
                     yMax = screenCoord.y;
             }
-            Rect result = new Rect(xMin, Screen.height - yMax, xMax - xMin, yMax - yMin);
+            Rect result = new Rect(xMin, invertY? (Screen.height - yMax) : yMax, xMax - xMin, yMax - yMin);
             return result;
         }
 
@@ -664,10 +664,22 @@ namespace Kyub.Internal.NativeInputPlugin
             }
             else if (msg.Equals(ON_FOCUS))
             {
+                /*var isVisible = true;
+                if (this.Visible != isVisible)
+                {
+                    this.Visible = isVisible;
+                    CheckUnityFieldsVisibility();
+                }*/
                 OnFocusChanged(true);
             }
             else if (msg.Equals(ON_UNFOCUS))
             {
+                /*var isVisible = false;
+                if (this.Visible != isVisible)
+                {
+                    this.Visible = isVisible;
+                    CheckUnityFieldsVisibility();
+                }*/
                 OnFocusChanged(false);
             }
         }

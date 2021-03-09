@@ -19,6 +19,8 @@ namespace Kyub.UI
         //protected float m_MonospacePassDistEm = 0;
         [SerializeField]
         protected RectTransform m_PanContent = null;
+        [SerializeField, Tooltip("Always try drag scrollview content even when inputfield is selected")]
+        protected bool m_ScrollFriendlyMode = true;
         [SerializeField]
         protected NativeInputPluginMaskModeEnum m_RectMaskMode = NativeInputPluginMaskModeEnum.Manual;
         [SerializeField]
@@ -77,6 +79,20 @@ namespace Kyub.UI
                     return;
                 m_RectMaskMode = value;
                 UpdateRectMaskContent(false);
+            }
+        }
+
+        public bool scrollFriendlyMode
+        {
+            get
+            {
+                return m_ScrollFriendlyMode;
+            }
+            set
+            {
+                if (m_ScrollFriendlyMode == value)
+                    return;
+                m_ScrollFriendlyMode = value;
             }
         }
 
@@ -276,34 +292,45 @@ namespace Kyub.UI
 
         public override void OnScroll(PointerEventData eventData)
         {
-            if (!isFocused && transform.parent != null)
+            if (transform.parent != null /*&& !isFocused*/)
                 ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.scrollHandler);
             else
                 base.OnScroll(eventData);
         }
 
+        bool _dragWhenHasFocus = false;
         public override void OnBeginDrag(PointerEventData eventData)
         {
-            if (!isFocused && transform.parent != null)
-                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
-            else
-                base.OnBeginDrag(eventData);
+            //When using keyboard we always want to drag when focuses.. only in PC that we need special cases
+            _dragWhenHasFocus = false;
+            base.OnBeginDrag(eventData);
         }
 
         public override void OnDrag(PointerEventData eventData)
         {
-            if (!isFocused && transform.parent != null)
-                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
-            else
-                base.OnDrag(eventData);
+            base.OnDrag(eventData);
+            if (transform.parent != null && (!isFocused || m_ScrollFriendlyMode))
+            {
+                if (!_dragWhenHasFocus &&
+                    (!isFocused || IsNativeKeyboardSupported() || !RectTransformUtility.RectangleContainsScreenPoint((RectTransform)this.transform, eventData.position, eventData.pressEventCamera)))
+                {
+                    _dragWhenHasFocus = true;
+                    ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
+                }
+                if (_dragWhenHasFocus)
+                    ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
+            }
         }
 
         public override void OnEndDrag(PointerEventData eventData)
         {
-            if (!isFocused && transform.parent != null)
+
+            base.OnEndDrag(eventData);
+            if (_dragWhenHasFocus)
+            {
+                _dragWhenHasFocus = false;
                 ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
-            else
-                base.OnEndDrag(eventData);
+            }
         }
 
         public override void OnPointerClick(PointerEventData eventData)
@@ -423,6 +450,81 @@ namespace Kyub.UI
         #endregion
 
         #region Helper Functions
+
+        public static Rect GetScreenRectFromRectTransform(RectTransform rectTransform, RectTransform clipRectTransform = null)
+        {
+            if (rectTransform == null)
+                return Rect.zero;
+
+            Vector3[] corners = new Vector3[4];
+
+            if (clipRectTransform == null)
+                rectTransform.GetWorldCorners(corners);
+
+            //Intersect Rect
+            else
+            {
+
+                Vector2 clipperMin = clipRectTransform.rect.min;
+                Vector2 clipperMax = clipRectTransform.rect.max;
+
+                Vector2 rectTransformMin = clipRectTransform.InverseTransformPoint(rectTransform.TransformPoint(rectTransform.rect.min));
+                Vector2 rectTransformMax = clipRectTransform.InverseTransformPoint(rectTransform.TransformPoint(rectTransform.rect.max));
+
+                //Intersect element rect with ClipRect
+                var intersectRect = Rect.MinMaxRect(Mathf.Clamp(rectTransformMin.x, clipperMin.x, clipperMax.x),
+                                                   Mathf.Clamp(rectTransformMin.y, clipperMin.y, clipperMax.y),
+                                                   Mathf.Clamp(rectTransformMax.x, clipperMin.x, clipperMax.x),
+                                                   Mathf.Clamp(rectTransformMax.y, clipperMin.y, clipperMax.y));
+
+                //Convert interset to world space
+                corners[0] = clipRectTransform.TransformPoint(new Vector2(intersectRect.xMin, intersectRect.yMin));
+                corners[1] = clipRectTransform.TransformPoint(new Vector2(intersectRect.xMin, intersectRect.yMax));
+                corners[2] = clipRectTransform.TransformPoint(new Vector2(intersectRect.xMax, intersectRect.yMax));
+                corners[3] = clipRectTransform.TransformPoint(new Vector2(intersectRect.xMax, intersectRect.yMin));
+            }
+
+            float xMin = float.PositiveInfinity;
+            float xMax = float.NegativeInfinity;
+            float yMin = float.PositiveInfinity;
+            float yMax = float.NegativeInfinity;
+
+            var canvas = rectTransform.GetComponentInParent<Canvas>();
+            var camera = canvas != null && canvas.worldCamera != null ? canvas.worldCamera : null;
+            if (canvas != null)
+            {
+                if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                    camera = null;
+                else if (camera == null && canvas.renderMode == RenderMode.WorldSpace)
+                    camera = Camera.main;
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                // For Canvas mode Screen Space - Overlay there is no Camera; best solution I've found
+                // is to use RectTransformUtility.WorldToScreenPoint) with a null camera.
+                Vector3 screenCoord = RectTransformUtility.WorldToScreenPoint(camera, corners[i]);
+
+                if (screenCoord.x < xMin)
+                    xMin = screenCoord.x;
+                if (screenCoord.x > xMax)
+                    xMax = screenCoord.x;
+                if (screenCoord.y < yMin)
+                    yMin = screenCoord.y;
+                if (screenCoord.y > yMax)
+                    yMax = screenCoord.y;
+            }
+            Rect result = new Rect(xMin, Screen.height - yMax, xMax - xMin, yMax - yMin);
+            return result;
+        }
+
+        protected virtual bool ScreenPointInsideRect(Vector2 screenPoint)
+        {
+            var camera = GetComponentInParent<Canvas>().rootCanvas.worldCamera;
+            var isInside = RectTransformUtility.RectangleContainsScreenPoint((RectTransform)this.transform, screenPoint, camera);
+
+            return isInside;
+        }
 
         protected virtual void UpdateRectMaskContent(bool force)
         {

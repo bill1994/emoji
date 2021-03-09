@@ -14,6 +14,8 @@ namespace Kyub.UI
 
         [SerializeField]
         protected RectTransform m_PanContent = null;
+        [SerializeField, Tooltip("Always try drag scrollview content even when inputfield is selected")]
+        protected bool m_ScrollFriendlyMode = true;
         [SerializeField]
         protected NativeInputPluginMaskModeEnum m_RectMaskMode = NativeInputPluginMaskModeEnum.Manual;
         [SerializeField]
@@ -60,6 +62,20 @@ namespace Kyub.UI
                     return;
                 m_RectMaskMode = value;
                 UpdateRectMaskContent(false);
+            }
+        }
+
+        public bool scrollFriendlyMode
+        {
+            get
+            {
+                return m_ScrollFriendlyMode;
+            }
+            set
+            {
+                if (m_ScrollFriendlyMode == value)
+                    return;
+                m_ScrollFriendlyMode = value;
             }
         }
 
@@ -232,28 +248,39 @@ namespace Kyub.UI
                 ActivateInputField();
         }
 
+        bool _dragWhenHasFocus = false;
         public override void OnBeginDrag(PointerEventData eventData)
         {
-            if (!isFocused && transform.parent != null)
-                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
-            else
-                base.OnBeginDrag(eventData);
+            //When using keyboard we always want to drag when focuses.. only in PC that we need special cases
+            _dragWhenHasFocus = false;
+            base.OnBeginDrag(eventData);
         }
 
         public override void OnDrag(PointerEventData eventData)
         {
-            if (!isFocused && transform.parent != null)
-                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
-            else
-                base.OnDrag(eventData);
+            base.OnDrag(eventData);
+            if (transform.parent != null && (!isFocused || m_ScrollFriendlyMode))
+            {
+                if (!_dragWhenHasFocus &&
+                    (!isFocused || IsNativeKeyboardSupported() || !RectTransformUtility.RectangleContainsScreenPoint((RectTransform)this.transform, eventData.position, eventData.pressEventCamera)))
+                {
+                    _dragWhenHasFocus = true;
+                    ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
+                }
+                if (_dragWhenHasFocus)
+                    ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
+            }
         }
 
         public override void OnEndDrag(PointerEventData eventData)
         {
-            if (!isFocused && transform.parent != null)
+
+            base.OnEndDrag(eventData);
+            if (_dragWhenHasFocus)
+            {
+                _dragWhenHasFocus = false;
                 ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
-            else
-                base.OnEndDrag(eventData);
+            }
         }
 
         public override void OnPointerClick(PointerEventData eventData)
@@ -366,6 +393,14 @@ namespace Kyub.UI
         #endregion
 
         #region Helper Functions
+
+        protected virtual bool ScreenPointInsideRect(Vector2 screenPoint)
+        {
+            var camera = GetComponentInParent<Canvas>().rootCanvas.worldCamera;
+            var isInside = RectTransformUtility.RectangleContainsScreenPoint((RectTransform)this.transform, screenPoint, camera);
+
+            return isInside;
+        }
 
         protected virtual void UpdateRectMaskContent(bool force)
         {

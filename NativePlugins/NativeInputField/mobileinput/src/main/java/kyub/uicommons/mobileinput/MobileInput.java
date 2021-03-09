@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
+import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -54,6 +55,20 @@ public class MobileInput {
         layout = parentLayout;
         edit = null;
     }
+	
+	/*public static boolean hasSelectionActive(int id) {
+        if (mobileInputList == null) {
+            mobileInputList = new SparseArray<>();
+        }
+        MobileInput input = mobileInputList.get(id);
+        if (input != null && input.edit != null) {
+            int selectionStart = input.edit.getSelectionStart();
+            int selectionEnd = input.edit.getSelectionEnd();
+
+            return selectionStart != selectionEnd;
+        }
+        return false;
+    }*/
 
     // Handler to process all messages for MobileInput
     public static void processMessage(int id, final String data) {
@@ -380,6 +395,19 @@ public class MobileInput {
                     return false;
                 }
             });
+
+            /*edit.setOnDragListener(new TextView.OnDragListener(){
+
+                public boolean onDrag(View view, DragEvent drag)
+                {
+                    SetVisible(false);
+                    if(isFocused())
+                    {
+                        SetFocus(false);
+                    }
+                    return false;
+                }
+            });*/
 
             layout.addView(edit);
             data = new JSONObject();
