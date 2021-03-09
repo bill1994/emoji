@@ -108,7 +108,7 @@ NSString *plugin;
 //			}
 //		}
 //	}
-	return false;
+//	return false;
 //}
 
 + (void)destroy {
