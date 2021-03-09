@@ -1664,6 +1664,24 @@ namespace MaterialUI
                 promptInputField.ForceLabelUpdate();
         }
 
+        public override void SnapTo()
+        {
+#if UI_COMMONS_DEFINED
+            if (enabled && gameObject.activeInHierarchy)
+            {
+                var nestedRect = GetComponentInParent<Kyub.UI.NestedScrollRect>();
+                if (nestedRect != null)
+                {
+                    var keyboardSupported = TouchScreenKeyboard.isSupported;
+                    if (keyboardSupported)
+                        nestedRect.SnapToImmediate(this.transform as RectTransform);
+                    else
+                        nestedRect.SnapTo(this.transform as RectTransform);
+                }
+            }
+#endif
+        }
+
         public virtual void ActivateInputField()
         {
             Select();

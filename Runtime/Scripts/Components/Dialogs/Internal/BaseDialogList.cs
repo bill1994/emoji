@@ -8,8 +8,10 @@ using System.Linq;
 
 namespace MaterialUI
 {
-    public abstract class BaseDialogList : MaterialDialogCompat
+    public abstract class BaseDialogList : MaterialDialogCompat, ILayoutElement
     {
+        public enum SearchInputFieldVisibilityMode { Manual, Auto }
+
         #region Private Variables
 
         [SerializeField]
@@ -23,6 +25,10 @@ namespace MaterialUI
         protected DialogClickableOption m_OptionTemplate = null;
         [SerializeField]
         protected MaterialInputField m_SearchInputField = null;
+        [SerializeField]
+        protected SearchInputFieldVisibilityMode m_SearchVisibilityMode = SearchInputFieldVisibilityMode.Manual;
+        [SerializeField]
+        protected int m_MinAmountOfElementsToShowSearch = 20;
 
         protected IList<OptionData> _Options;
 
@@ -31,6 +37,38 @@ namespace MaterialUI
         #endregion
 
         #region Properties
+
+        public SearchInputFieldVisibilityMode searchInputFieldVisiblityMode
+        {
+            get { return m_SearchVisibilityMode; }
+            set
+            {
+                if (m_SearchVisibilityMode == value)
+                    return;
+                m_SearchVisibilityMode = value;
+
+                var optionsCount = _Options != null ? _Options.Count : 0;
+                if (m_SearchInputField != null && m_SearchVisibilityMode == SearchInputFieldVisibilityMode.Auto)
+                    m_SearchInputField.gameObject.SetActive(optionsCount >= m_MinAmountOfElementsToShowSearch);
+                ClearCachedLayoutValues();
+            }
+        }
+
+        public int minAmountOfElementsToShowSearch
+        {
+            get { return m_MinAmountOfElementsToShowSearch; }
+            set {
+
+                if (m_MinAmountOfElementsToShowSearch == value)
+                    return;
+                m_MinAmountOfElementsToShowSearch = value;
+
+                var optionsCount = _Options != null ? _Options.Count : 0;
+                if (m_SearchInputField != null && m_SearchVisibilityMode == SearchInputFieldVisibilityMode.Auto)
+                    m_SearchInputField.gameObject.SetActive(optionsCount >= m_MinAmountOfElementsToShowSearch);
+                ClearCachedLayoutValues();
+            }
+        }
 
         public bool isSearchFilterActive
         {
@@ -95,7 +133,7 @@ namespace MaterialUI
                 if (m_ScrollDataView != null)
                 {
                     m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
-                    var filteredOption = options == null? null : new List<OptionData>(options);
+                    var filteredOption = options == null ? null : new List<OptionData>(options);
                     ApplyFilterInList(filteredOption, m_SearchInputField != null ? m_SearchInputField.text : string.Empty);
                     m_ScrollDataView.Setup(filteredOption);
                 }
@@ -134,6 +172,12 @@ namespace MaterialUI
 
             _Options = options is IList<OptionData> || options == null ? (IList<OptionData>)options : options.ToArray<OptionData>();
 
+            var optionsCount = _Options != null ? _Options.Count : 0;
+            if (m_SearchInputField != null && m_SearchVisibilityMode == SearchInputFieldVisibilityMode.Auto)
+            {
+                ClearCachedLayoutValues();
+                m_SearchInputField.gameObject.SetActive(optionsCount >= m_MinAmountOfElementsToShowSearch);
+            }
 
             if (m_ScrollDataView != null)
             {
@@ -322,6 +366,63 @@ namespace MaterialUI
                     return false;
             }
             return true;
+        }
+
+        #endregion
+
+        #region ILayout Implementations
+
+        public float minWidth { get { return -1; } }
+
+        public float preferredWidth
+        {
+            get
+            {
+                return m_SearchInputField != null && 
+                    m_SearchVisibilityMode == SearchInputFieldVisibilityMode.Auto && 
+                    m_activity is MaterialDialogActivity ? _cachedPreferredWidth : -1;
+            }
+        }
+
+        public float flexibleWidth { get { return -1; } }
+
+        public float minHeight { get { return -1; } }
+
+        public float preferredHeight
+        {
+            get
+            {
+                return m_SearchInputField != null && 
+                    m_SearchVisibilityMode == SearchInputFieldVisibilityMode.Auto && 
+                    m_activity is MaterialDialogActivity ? _cachedPreferredHeight : -1;
+            }
+        }
+
+        public float flexibleHeight { get { return -1; } }
+
+        public int layoutPriority { get { return 0; } }
+
+        float _cachedPreferredWidth = -1;
+        float _cachedPreferredHeight = -1;
+        public void CalculateLayoutInputHorizontal()
+        {
+            float oldValue = _cachedPreferredWidth;
+            var newValue = Kyub.UI.LayoutUtilityEx.GetPreferredWidth(this.rectTransform, -1);
+            _cachedPreferredWidth = Mathf.Max(oldValue, newValue);
+        }
+
+        public void CalculateLayoutInputVertical()
+        {
+            float oldValue = _cachedPreferredHeight;
+            var newValue = Kyub.UI.LayoutUtilityEx.GetPreferredHeight(this.rectTransform, -1);
+            _cachedPreferredHeight = Mathf.Max(oldValue, newValue);
+        }
+
+        public void ClearCachedLayoutValues()
+        {
+            _cachedPreferredWidth = -1;
+            _cachedPreferredHeight = -1;
+            LayoutRebuilder.MarkLayoutForRebuild(this.rectTransform);
         }
 
         #endregion
