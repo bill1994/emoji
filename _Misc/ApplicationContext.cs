@@ -161,7 +161,7 @@ namespace Kyub
 
             private static void EditorStateChanged(PlayModeStateChange state)
             {
-                _isPlaying = state == PlayModeStateChange.EnteredPlayMode || state == PlayModeStateChange.ExitingPlayMode;
+                _isPlaying = state == PlayModeStateChange.ExitingEditMode || state == PlayModeStateChange.EnteredPlayMode || state == PlayModeStateChange.ExitingPlayMode;
             }
 
             private static void EditorUpdate()
@@ -186,6 +186,11 @@ namespace Kyub
             #endregion
 
             #region Unity Functions
+
+            private void Awake()
+            {
+                _isPlaying = true;
+            }
 
             private void Update()
             {
@@ -268,9 +273,11 @@ namespace Kyub
             #region Private Variables
 
             int? m_guid = 0;
-            volatile float m_remainingTime = 0;
+            float m_remainingTime = 0;
             Action m_action = null;
             bool m_scheduledWhenPlaying = false;
+
+            object _objectLock = new object();
 
             #endregion
 
@@ -354,22 +361,25 @@ namespace Kyub
 
             public bool TryExecute(float deltaTime, bool isPlaying)
             {
+                lock (_objectLock)
+                {
 #if UNITY_EDITOR
-                //Cancel Action
-                if (m_scheduledWhenPlaying != isPlaying)
-                    m_remainingTime = 1;
+                    //Cancel Action
+                    if (m_scheduledWhenPlaying != isPlaying)
+                        m_remainingTime = 1;
 #endif
-                if (m_remainingTime <= 0)
-                {
-                    if (m_remainingTime == 0 && m_action != null)
-                        m_action.Invoke();
+                    if (m_remainingTime <= 0)
+                    {
+                        if (m_remainingTime == 0 && m_action != null)
+                            m_action.Invoke();
+                    }
+                    else
+                    {
+                        m_remainingTime = Mathf.Max(0, m_remainingTime - deltaTime);
+                        return false;
+                    }
+                    return true;
                 }
-                else
-                {
-                    m_remainingTime = Mathf.Max(0, m_remainingTime - deltaTime);
-                    return false;
-                }
-                return true;
             }
 
             public bool TryCancel(int guid)
