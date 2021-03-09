@@ -125,6 +125,12 @@ namespace Kyub.Internal.NativeInputPlugin {
         private static extern void inputExecute (int id, string json);
 
         /// <summary>
+        /// Check if selection is active
+        /// </summary>
+        //[DllImport ("__Internal")]
+        //private static extern bool inputHasActiveSelection (int id);
+
+        /// <summary>
         /// Init MobileInput plugin
         /// </summary>
         [DllImport ("__Internal")]
@@ -280,6 +286,21 @@ namespace Kyub.Internal.NativeInputPlugin {
             inputExecute (id, json);
 #endif
         }
+
+        /*public static bool HasActiveSelection(int id)
+        {
+            var result = false;
+#if UNITY_EDITOR
+            Debug.Log("MobileInput hasActiveSelection " + result);
+#elif UNITY_ANDROID
+            using (AndroidJavaClass plugin = new AndroidJavaClass (string.Format (Plugins.ANDROID_CLASS_MASK, _instance.Name))) {
+                result = plugin.CallStatic<bool> ("hasActiveSelection", id);
+            }
+#elif UNITY_IOS
+            result = inputHasActiveSelection (id);
+#endif
+            return result;
+        }*/
 
         /// <summary>
         /// Init plugin

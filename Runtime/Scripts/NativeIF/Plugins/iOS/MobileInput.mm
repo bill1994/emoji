@@ -48,6 +48,8 @@ NSString *plugin;
 
 + (void)processMessage:(int)inputId data:(NSString *)data;
 
+//+ (BOOL)hasActiveSelection:(int)inputId;
+
 + (void)destroy;
 
 - (id)initWith:(UIViewController *)controller andTag:(int)inputId;
@@ -82,6 +84,32 @@ NSString *plugin;
         }
     }
 }
+
+//+ (BOOL)hasActiveSelection:(int)inputId {
+//	
+//	if(mobileInputList != nil)
+//	{
+//		MobileInput *input = [mobileInputList objectForKey:[NSNumber numberWithInt:inputId]];
+//		if(input) 
+//		{
+//			UIView* editView = input.editView;
+//			UITextView* textView = editView != nil && [editView isKindOfClass:[UITextView class]]? (UITextView*) editView : nil;
+//			if(textView != nil)
+//			{
+//				UITextRange *selectedRange = [textView selectedTextRange];
+//				return selectedRange == nil || [selectedRange empty];
+//			}
+//			
+//			UITextField* textField = editView != nil && [editView isKindOfClass:[UITextField class]]? (UITextField*) editView : nil;
+//			if(textField != nil)
+//			{
+//				UITextRange *selectedRange = [textField selectedTextRange];
+//				return selectedRange == nil || [selectedRange empty];
+//			}
+//		}
+//	}
+	return false;
+//}
 
 + (void)destroy {
     NSArray *list = [mobileInputList allValues];
@@ -533,6 +561,10 @@ extern "C" {
 void inputExecute(int inputId, const char *data) {
     [MobileInput processMessage:inputId data:[NSString stringWithUTF8String:data]];
 }
+
+//BOOL inputHasActiveSelection(int inputId) {
+//    return [MobileInput hasActiveSelection:inputId]];
+//}
 
 void inputDestroy() {
     [MobileInput destroy];
