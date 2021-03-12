@@ -291,12 +291,6 @@ namespace MaterialUI
             CreateInstance("Components/PromptFields/PromptField Filled PermaHint", "PromptField - Filled PermaHint");
         }
 
-        [MenuItem("GameObject/MaterialUI/Slider", false, 080)]
-        private static void CreateSlider()
-        {
-            CreateInstance("Components/Slider", "Slider");
-        }
-
         [MenuItem("GameObject/MaterialUI/Progress Indicators/Circle", false, 082)]
         private static void CreateProgressCircle()
         {
