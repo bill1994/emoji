@@ -1888,12 +1888,13 @@ namespace MaterialUI
             }
             return supportPrompt;
         }
-        protected virtual void CheckInputPromptDisplayModeVisibility()
+
+        protected virtual void CheckInputPromptDisplayModeVisibility(bool force = false)
         {
             if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
             {
                 var supportPrompt = SupportCustomPrompt();
-                if (_CachedSupportPromptStatus == null || _CachedSupportPromptStatus.Value != supportPrompt)
+                if (force || _CachedSupportPromptStatus == null || _CachedSupportPromptStatus.Value != supportPrompt)
                 {
                     _CachedSupportPromptStatus = supportPrompt;
                     var displayer = GetComponent<InputPromptDisplayer>();
