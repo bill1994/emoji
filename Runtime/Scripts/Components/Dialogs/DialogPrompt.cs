@@ -235,6 +235,8 @@ namespace MaterialUI
             private char m_AsteriskChar = '•';
             [SerializeField]
             private bool m_HideMobileInput = false;
+            [SerializeField]
+            ITextValidator m_CustomTextValidator = null;
 
             [SerializeField]
             Dictionary<string, object> m_extraProperties = new Dictionary<string, object>();
@@ -309,6 +311,12 @@ namespace MaterialUI
                 set { m_extraProperties = value; }
             }
 
+            public ITextValidator customTextValidator
+            {
+                get { return m_CustomTextValidator; }
+                set { m_CustomTextValidator = value; }
+            }
+
             #endregion
 
             #region Helper Functions
@@ -324,6 +332,7 @@ namespace MaterialUI
                     else if (materialInput.inputField is InputPromptField)
                         Apply_Internal(materialInput.inputField as InputPromptField);
                     materialInput.hintText = m_HintText;
+                    materialInput.customTextValidator = m_CustomTextValidator;
 
                     //Try Apply Extra Properties
                     if (m_extraProperties != null)
@@ -415,6 +424,7 @@ namespace MaterialUI
                         config = materialInput.inputField as InputPromptField;
 
                     config.m_HintText = materialInput.hintText;
+                    config.m_CustomTextValidator = materialInput.customTextValidator != null ? materialInput.customTextValidator.Clone() : null;
 
                     var stylesDict = materialInput.ExtraStylePropertiesMap;
 

@@ -475,6 +475,9 @@ namespace MaterialUI.Internal
                                     value = string.IsNullOrEmpty(value) ? string.Empty : value;
                                     var willChange = text != value;
 
+                                    if (materialInputField != null)
+                                        EventSystem.current.SetSelectedGameObject(materialInputField.gameObject);
+
                                     this.text = value;
                                     if (willChange && onEndEdit != null)
                                         onEndEdit.Invoke(text);
@@ -515,9 +518,17 @@ namespace MaterialUI.Internal
                 {
                     if (this != null)
                     {
+                        value = string.IsNullOrEmpty(value) ? string.Empty : value;
+                        var willChange = text != value;
+
+                        if (materialInputField != null)
+                            EventSystem.current.SetSelectedGameObject(materialInputField.gameObject);
+
                         this.text = value;
-                        if (onReturnPressed != null)
-                            onReturnPressed.Invoke();
+                        if (willChange && onEndEdit != null)
+                            onEndEdit.Invoke(text);
+                        if (onPromptSubmit != null)
+                            onPromptSubmit.Invoke();
                     }
                 },
                 "OK",
@@ -801,16 +812,14 @@ namespace MaterialUI.Internal
 
                 return unityInputField != null ? unityInputField.layoutPriority : (tmpInputField != null ? tmpInputField.layoutPriority : 0);
             }
-
-            
         }
 
         public virtual void CalculateLayoutInputHorizontal()
-        { 
+        {
         }
 
         public virtual void CalculateLayoutInputVertical()
-        { 
+        {
         }
 
         #endregion
