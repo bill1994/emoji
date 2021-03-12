@@ -1654,7 +1654,7 @@ namespace MaterialUI
         {
             UnregisterEvents();
             base.OnDestroy();
-            ForceDisableDisplayer(Application.isPlaying);
+            ForceDisableDisplayer(true);
         }
 
         protected override void OnRectTransformDimensionsChange()
@@ -1897,15 +1897,9 @@ namespace MaterialUI
             var displayer = GetComponent<InputPromptDisplayer>();
             if (displayer != null)
             {
+                displayer.enabled = false;
                 if (canDestroy && displayer.hideFlags != HideFlags.None)
-                {
-                    if (Application.isPlaying)
-                        Component.Destroy(displayer);
-                    else
-                        Component.DestroyImmediate(displayer);
-                }
-                else
-                    displayer.enabled = false;
+                    displayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
             }
         }
 
