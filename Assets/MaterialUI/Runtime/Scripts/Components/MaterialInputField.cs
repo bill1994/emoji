@@ -255,6 +255,8 @@ namespace MaterialUI
         private Vector2 m_LastRectSize;
         private Vector2 m_LayoutSize;
 
+        bool? _CachedSupportPromptStatus = null;
+
         //#if UNITY_EDITOR
         //        private string m_LastHintText;
         //#endif
@@ -1886,31 +1888,44 @@ namespace MaterialUI
             }
             return supportPrompt;
         }
-
         protected virtual void CheckInputPromptDisplayModeVisibility()
         {
             if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
             {
-                var displayer = GetComponent<InputPromptDisplayer>();
-
                 var supportPrompt = SupportCustomPrompt();
-                if (inputField != null)
-                    inputField.enabled = !supportPrompt;
+                if (_CachedSupportPromptStatus == null || _CachedSupportPromptStatus.Value != supportPrompt)
+                {
+                    _CachedSupportPromptStatus = supportPrompt;
+                    var displayer = GetComponent<InputPromptDisplayer>();
 
-                if (supportPrompt && displayer == null)
-                {
-                    displayer = gameObject.AddComponent<InputPromptDisplayer>();
-                    displayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
-                }
-                else if (displayer != null)
-                {
-                    if (!supportPrompt)
+                    var editNativeInputEnable = false;
+                    if (supportPrompt && displayer == null)
                     {
-                        ForceDisableDisplayer(true);
+                        editNativeInputEnable = true;
+                        displayer = gameObject.AddComponent<InputPromptDisplayer>();
+                        displayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
                     }
-                    else if (!displayer.enabled)
+                    else if (displayer != null)
                     {
-                        displayer.enabled = true;
+                        editNativeInputEnable = true;
+                        if (!supportPrompt)
+                        {
+                            ForceDisableDisplayer(true);
+                        }
+                        else if (!displayer.enabled)
+                        {
+                            displayer.enabled = true;
+                        }
+                    }
+
+                    //Special case when we must change inputField Visibility... If is focused we must wait to leave focus to change status
+                    if (inputField != null && editNativeInputEnable)
+                    {
+                        editNativeInputEnable = false;
+                        if (!isFocused)
+                            inputField.enabled = !supportPrompt;
+                        else
+                            _CachedSupportPromptStatus = null;
                     }
                 }
             }
