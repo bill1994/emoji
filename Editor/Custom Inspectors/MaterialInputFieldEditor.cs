@@ -3,13 +3,22 @@
 
 using UnityEditor;
 using UnityEngine;
+using static MaterialUI.MaterialInputField;
 
 namespace MaterialUI
 {
+    [CustomPropertyDrawer(typeof(DialogPromptAddress), true)]
+    public class DialogPromptAddressDrawer : GenericAssetAddressDrawer<DialogPrompt>
+    {
+    }
+
     [CustomEditor(typeof(MaterialInputField), true)]
     [CanEditMultipleObjects]
     public class MaterialInputFieldEditor : BaseStyleElementEditor
     {
+        SerializedProperty m_InputPromptDisplayOption;
+        SerializedProperty m_CustomPromptDialogAddress;
+
         //  Fields
         private SerializedProperty m_Interactable;
 
@@ -92,6 +101,9 @@ namespace MaterialUI
         protected override void OnEnable()
         {
             OnBaseEnable();
+
+            m_InputPromptDisplayOption = serializedObject.FindProperty("m_InputPromptDisplayOption");
+            m_CustomPromptDialogAddress = serializedObject.FindProperty("m_CustomPromptDialogAddress");
 
             //  Fields
             m_Interactable = serializedObject.FindProperty("m_Interactable");
@@ -341,6 +353,9 @@ namespace MaterialUI
             LayoutStyle_PropertyField(m_Padding, true);
             EditorGUILayout.Space();
 
+            DrawFoldoutCustom1("Prompt Behaviour", PromptSection);
+            EditorGUILayout.Space();
+
             DrawFoldoutColors(ColorsSection);
             DrawFoldoutComponents(ComponentsSection);
 
@@ -357,6 +372,21 @@ namespace MaterialUI
             DrawStyleGUIFolder();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private bool PromptSection()
+        {
+            EditorGUI.indentLevel++;
+            EditorGUILayout.HelpBox("This property controls when MaterialInputField should diplay an DialogPrompt onClick/onActivateInputField/onSelect", MessageType.Info);
+            LayoutStyle_PropertyField(m_InputPromptDisplayOption);
+            var oldEnableStatus = GUI.enabled;
+            GUI.enabled = m_InputPromptDisplayOption.enumValueIndex != 0;
+            LayoutStyle_PropertyField(m_CustomPromptDialogAddress);
+            GUI.enabled = oldEnableStatus;
+
+            EditorGUI.indentLevel--;
+
+            return true;
         }
 
         private void ColorsSection()

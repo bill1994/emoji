@@ -7,10 +7,10 @@ using UnityEngine;
 namespace MaterialUI
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(MaterialSlider))]
-    public class MaterialSliderEditor : BaseStyleElementEditor
+    [CustomEditor(typeof(MaterialRangeSlider))]
+    public class MaterialRangeSliderEditor : BaseStyleElementEditor
     {
-        private MaterialSlider m_MaterialSlider;
+        private MaterialRangeSlider m_MaterialRangeSlider;
 
         private SerializedProperty m_AnimationScale;
         private SerializedProperty m_Interactable;
@@ -23,13 +23,17 @@ namespace MaterialUI
         private SerializedProperty m_DisabledColor;
         private SerializedProperty m_BackgroundColor;
 
-        private SerializedProperty m_HandleGraphic;
+        private SerializedProperty m_HandleLowGraphic;
+        private SerializedProperty m_PopupLowTransform;
+        private SerializedProperty m_PopupLowText;
+        private SerializedProperty m_ValueLowText;
+        private SerializedProperty m_InputFieldLow;
 
-        private SerializedProperty m_PopupTransform;
-        private SerializedProperty m_PopupText;
-
-        private SerializedProperty m_ValueText;
-        private SerializedProperty m_InputField;
+        private SerializedProperty m_HandleHighGraphic;
+        private SerializedProperty m_PopupHighTransform;
+        private SerializedProperty m_PopupHighText;
+        private SerializedProperty m_ValueHighText;
+        private SerializedProperty m_InputFieldHigh;
 
         private SerializedProperty m_BackgroundGraphic;
 
@@ -41,7 +45,7 @@ namespace MaterialUI
         {
             OnBaseEnable();
 
-            m_MaterialSlider = (MaterialSlider)target;
+            m_MaterialRangeSlider = (MaterialRangeSlider)target;
 
             m_AnimationScale = serializedObject.FindProperty("m_AnimationScale");
             m_Interactable = serializedObject.FindProperty("m_Interactable");
@@ -52,11 +56,19 @@ namespace MaterialUI
             m_EnabledColor = serializedObject.FindProperty("m_EnabledColor");
             m_DisabledColor = serializedObject.FindProperty("m_DisabledColor");
             m_BackgroundColor = serializedObject.FindProperty("m_BackgroundColor");
-            m_HandleGraphic = serializedObject.FindProperty("m_HandleGraphic");
-            m_PopupTransform = serializedObject.FindProperty("m_PopupTransform");
-            m_PopupText = serializedObject.FindProperty("m_PopupText");
-            m_ValueText = serializedObject.FindProperty("m_ValueText");
-            m_InputField = serializedObject.FindProperty("m_InputField");
+
+            m_HandleLowGraphic = serializedObject.FindProperty("m_HandleLowGraphic");
+            m_PopupLowTransform = serializedObject.FindProperty("m_PopupLowTransform");
+            m_PopupLowText = serializedObject.FindProperty("m_PopupLowText");
+            m_ValueLowText = serializedObject.FindProperty("m_ValueLowText");
+            m_InputFieldLow = serializedObject.FindProperty("m_InputFieldLow");
+
+            m_HandleHighGraphic = serializedObject.FindProperty("m_HandleHighGraphic");
+            m_PopupHighTransform = serializedObject.FindProperty("m_PopupHighTransform");
+            m_PopupHighText = serializedObject.FindProperty("m_PopupHighText");
+            m_ValueHighText = serializedObject.FindProperty("m_ValueHighText");
+            m_InputFieldHigh = serializedObject.FindProperty("m_InputFieldHigh");
+
             m_BackgroundGraphic = serializedObject.FindProperty("m_BackgroundGraphic");
             m_SliderContentTransform = serializedObject.FindProperty("m_SliderContentTransform");
             m_DotTemplateIcon = serializedObject.FindProperty("m_DotTemplateIcon");
@@ -78,7 +90,7 @@ namespace MaterialUI
             }
             if (EditorGUI.EndChangeCheck())
             {
-                m_MaterialSlider.interactable = m_Interactable.boolValue;
+                m_MaterialRangeSlider.interactable = m_Interactable.boolValue;
             }
             else
             {
@@ -92,7 +104,7 @@ namespace MaterialUI
 
             LayoutStyle_PropertyField(m_HasPopup);
 
-            using (new DisabledScope(!m_MaterialSlider.slider.wholeNumbers))
+            using (new DisabledScope(!m_MaterialRangeSlider.slider.wholeNumbers))
             {
                 LayoutStyle_PropertyField(m_HasDots);
             }
@@ -117,11 +129,18 @@ namespace MaterialUI
         private void ComponentsSection()
         {
             EditorGUI.indentLevel++;
-            LayoutStyle_PropertyField(m_HandleGraphic);
-            LayoutStyle_PropertyField(m_PopupTransform);
-            LayoutStyle_PropertyField(m_PopupText);
-            LayoutStyle_PropertyField(m_ValueText);
-            LayoutStyle_PropertyField(m_InputField);
+            LayoutStyle_PropertyField(m_HandleLowGraphic);
+            LayoutStyle_PropertyField(m_PopupLowTransform);
+            LayoutStyle_PropertyField(m_PopupLowText);
+            LayoutStyle_PropertyField(m_ValueLowText);
+            LayoutStyle_PropertyField(m_InputFieldLow);
+
+            EditorGUILayout.Space();
+            LayoutStyle_PropertyField(m_HandleHighGraphic);
+            LayoutStyle_PropertyField(m_PopupHighTransform);
+            LayoutStyle_PropertyField(m_PopupHighText);
+            LayoutStyle_PropertyField(m_ValueHighText);
+            LayoutStyle_PropertyField(m_InputFieldHigh);
 
             EditorGUILayout.Space();
             LayoutStyle_PropertyField(m_BackgroundGraphic);

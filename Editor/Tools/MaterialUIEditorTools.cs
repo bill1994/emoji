@@ -165,6 +165,18 @@ namespace MaterialUI
 
         #region CreateObjects
 
+        [MenuItem("GameObject/MaterialUI/Sliders/Slider", false, 030)]
+        private static void CreateDefaultSlider()
+        {
+            CreateInstance("Components/Sliders/Slider", "Slider");
+        }
+
+        [MenuItem("GameObject/MaterialUI/Sliders/Range Slider", false, 030)]
+        private static void CreateRangeSlider()
+        {
+            CreateInstance("Components/Sliders/RangeSlider", "Range Slider");
+        }
+
         [MenuItem("GameObject/MaterialUI/Vector Image", false, 014)]
         private static void CreateVectorImage()
         {

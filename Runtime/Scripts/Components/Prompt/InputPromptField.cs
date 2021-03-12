@@ -75,16 +75,16 @@ namespace MaterialUI
         {
             get
             {
-                MaterialInputField v_materialInputField = GetComponent<MaterialInputField>();
+                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
 
-                return v_materialInputField != null ? v_materialInputField.hintText : "";
+                return materialInputField != null ? materialInputField.hintText : "";
             }
             set
             {
-                MaterialInputField v_materialInputField = GetComponent<MaterialInputField>();
+                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
 
-                if (v_materialInputField != null)
-                    v_materialInputField.hintText = value;
+                if (materialInputField != null)
+                    materialInputField.hintText = value;
             }
         }
 
@@ -405,13 +405,16 @@ namespace MaterialUI
             }
             else
             {
+                var materialInputField = this.GetComponent<MaterialInputField>();
+                var configData = materialInputField != null ? (DialogPrompt.InputFieldConfigData)materialInputField : this;
                 DialogManager.ShowCustomDialogAsync<DialogPrompt>(m_CustomDialogPath, (dialog) =>
                 {
                     _dialogPrompt = dialog;
                     if (_dialogPrompt != null)
                     {
                         _dialogPrompt.destroyOnHide = true;
-                        _dialogPrompt.Initialize(this,
+                        
+                        _dialogPrompt.Initialize(configData,
                             (value) =>
                             {
                                 if (this != null)
@@ -443,7 +446,9 @@ namespace MaterialUI
             if (!IsActive() || !IsInteractable())
                 return;
 
-            DialogManager.ShowPromptAsync(this,
+            var materialInputField = this.GetComponent<MaterialInputField>();
+            var configData = materialInputField != null ? (DialogPrompt.InputFieldConfigData)materialInputField : this;
+            DialogManager.ShowPromptAsync(configData,
                 (value) =>
                 {
                     if (this != null)
