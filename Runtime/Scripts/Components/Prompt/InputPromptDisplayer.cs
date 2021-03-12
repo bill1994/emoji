@@ -451,16 +451,12 @@ namespace MaterialUI.Internal
             if (!IsActive() || !IsInteractable())
                 return;
 
-            var prefabAddress = customDialogAddress == null || customDialogAddress.IsEmpty() || !customDialogAddress.IsResources() ? null : customDialogAddress;
-            if (prefabAddress == null)
-            {
-                OpenDefaultPromptDialog();
-            }
-            else
+            var prefabAddress = customDialogAddress == null || customDialogAddress.IsEmpty() || !customDialogAddress.IsResources() ? PrefabManager.ResourcePrefabs.dialogPrompt : (PrefabAddress) customDialogAddress;
+            if (prefabAddress != null)
             {
                 var materialInputField = this.GetComponent<MaterialInputField>();
                 var configData = materialInputField != null ? (DialogPrompt.InputFieldConfigData)materialInputField : null;
-                DialogManager.ShowCustomDialogAsync<DialogPrompt>(customDialogAddress, (dialog) =>
+                DialogManager.ShowCustomDialog<DialogPrompt>(prefabAddress, (dialog) =>
                 {
                     _dialogPrompt = dialog;
                     if (_dialogPrompt != null)
@@ -491,8 +487,6 @@ namespace MaterialUI.Internal
                             null,
                             "Cancel");
                     }
-                    else
-                        OpenDefaultPromptDialog();
                 });
             }
         }
@@ -504,44 +498,6 @@ namespace MaterialUI.Internal
                 return materialInputField.IsInteractable();
 
             return false;
-        }
-
-        protected virtual void OpenDefaultPromptDialog()
-        {
-            if (!IsActive() || !IsInteractable())
-                return;
-
-            var materialInputField = this.GetComponent<MaterialInputField>();
-            var configData = materialInputField != null ? (DialogPrompt.InputFieldConfigData)materialInputField : null;
-            DialogManager.ShowPromptAsync(configData,
-                (value) =>
-                {
-                    if (this != null)
-                    {
-                        value = string.IsNullOrEmpty(value) ? string.Empty : value;
-                        var willChange = text != value;
-
-                        if (materialInputField != null)
-                            EventSystem.current.SetSelectedGameObject(materialInputField.gameObject);
-
-                        this.text = value;
-                        if (willChange && onEndEdit != null)
-                            onEndEdit.Invoke(text);
-                        if (onPromptSubmit != null)
-                            onPromptSubmit.Invoke();
-                    }
-                },
-                "OK",
-                this.hintText,
-                null,
-                null,
-                "Cancel",
-                (dialog) =>
-                {
-                    _dialogPrompt = dialog;
-                    if (_dialogPrompt != null)
-                        _dialogPrompt.destroyOnHide = true;
-                });
         }
 
         protected virtual void SetToCustomIfContentTypeIsNot(params InputField.ContentType[] allowedContentTypes)
