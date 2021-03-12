@@ -1896,7 +1896,6 @@ namespace MaterialUI
                 var supportPrompt = SupportCustomPrompt();
                 if (force || _CachedSupportPromptStatus == null || _CachedSupportPromptStatus.Value != supportPrompt)
                 {
-                    _CachedSupportPromptStatus = supportPrompt;
                     var displayer = GetComponent<InputPromptDisplayer>();
 
                     var editNativeInputEnable = false;
@@ -1920,14 +1919,22 @@ namespace MaterialUI
                         }
                     }
 
-                    //Special case when we must change inputField Visibility... If is focused we must wait to leave focus to change status
+                    //Apply last support prompt result to prevent enter in this checking again
+                    _CachedSupportPromptStatus = supportPrompt;
+
+                    //Special case when we must change inputField Visibility
                     if (inputField != null && editNativeInputEnable)
                     {
                         editNativeInputEnable = false;
                         if (!isFocused)
+                        {
                             inputField.enabled = !supportPrompt;
+                        }
+                        // If focused we must wait to leave focus to change status, to do it we must clear SupportPromptStatus
                         else
+                        {
                             _CachedSupportPromptStatus = null;
+                        }
                     }
                 }
             }
@@ -1938,6 +1945,7 @@ namespace MaterialUI
             var displayer = GetComponent<InputPromptDisplayer>();
             if (displayer != null)
             {
+                _CachedSupportPromptStatus = null;
                 displayer.enabled = false;
                 if (canDestroy && displayer.hideFlags != HideFlags.None)
                     displayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
