@@ -89,13 +89,13 @@ namespace MaterialUI
 
         #region Helper Functions Functions
 
-        public bool TryGetExtraCastedStyleProperty(string p_name, out T p_styleProperty)
+        public bool TryGetExtraCastedStyleProperty(string name, out T styleProperty)
         {
-            StyleProperty v_property = null;
-            var v_sucess = ExtraStylePropertiesMap.TryGetValue(p_name, out v_property);
-            p_styleProperty = v_property as T;
+            StyleProperty property = null;
+            var sucess = ExtraStylePropertiesMap.TryGetValue(name, out property);
+            styleProperty = property as T;
 
-            return v_sucess;
+            return sucess;
         }
 
         protected virtual void Optimize()
@@ -106,11 +106,11 @@ namespace MaterialUI
                 _extraStylePropertiesMap.Clear();
 
             //Add Style Properties
-            foreach (var v_property in ExtraStylePropertiesInternalList)
+            foreach (var property in ExtraStylePropertiesInternalList)
             {
-                var v_styleProp = v_property as T;
-                if (v_styleProp != null && !string.IsNullOrEmpty(v_styleProp.Name) && !_extraStylePropertiesMap.ContainsKey(v_styleProp.Name))
-                    _extraStylePropertiesMap.Add(v_styleProp.Name, v_styleProp);
+                var styleProp = property as T;
+                if (styleProp != null && !string.IsNullOrEmpty(styleProp.Name) && !_extraStylePropertiesMap.ContainsKey(styleProp.Name))
+                    _extraStylePropertiesMap.Add(styleProp.Name, styleProp);
             }
         }
 
@@ -304,17 +304,17 @@ namespace MaterialUI
             return RegisterToStyleGroup(true);
         }
 
-        protected internal bool RegisterToStyleGroup(bool p_force = false)
+        protected internal bool RegisterToStyleGroup(bool force = false)
         {
             if (SupportStyleGroup)
             {
-                if (m_styleGroup == null || p_force)
+                if (m_styleGroup == null || force)
                 {
-                    var v_styleGroup = GetComponentInParent<CanvasStyleGroup>();
+                    var styleGroup = GetComponentInParent<CanvasStyleGroup>();
                     _styleData = null;
                     if (m_styleGroup != null)
                         UnregisterFromStyleGroup();
-                    m_styleGroup = v_styleGroup;
+                    m_styleGroup = styleGroup;
                 }
 
                 if (m_styleGroup != null)
@@ -330,9 +330,9 @@ namespace MaterialUI
             if (m_styleGroup != null)
             {
                 _styleData = null;
-                var v_sucess = m_styleGroup.UnregisterStyleBehaviour(this);
+                var sucess = m_styleGroup.UnregisterStyleBehaviour(this);
                 m_styleGroup = null;
-                return v_sucess;
+                return sucess;
             }
             return false;
         }
@@ -340,24 +340,24 @@ namespace MaterialUI
 
         #region Style Property Helper Functions
 
-        public bool TryGetExtraStyleProperty(string p_name, out StyleProperty p_styleProperty)
+        public bool TryGetExtraStyleProperty(string name, out StyleProperty styleProperty)
         {
-            return ExtraStylePropertiesMap.TryGetValue(p_name, out p_styleProperty);
+            return ExtraStylePropertiesMap.TryGetValue(name, out styleProperty);
         }
 
         #endregion
 
         #region Public StyleData Functions
 
-        public virtual void RefreshVisualStyles(bool p_canAnimate = true)
+        public virtual void RefreshVisualStyles(bool canAnimate = true)
         {
-            SetStylePropertyColorsActive_Internal(p_canAnimate, 0.25f);
+            SetStylePropertyColorsActive_Internal(canAnimate, 0.25f);
         }
 
-        public virtual StyleData GetStyleDataTemplate(bool p_force = false)
+        public virtual StyleData GetStyleDataTemplate(bool force = false)
         {
             if (m_styleGroup != null && 
-                (_styleData == null || p_force || 
+                (_styleData == null || force || 
                 (!string.IsNullOrEmpty(m_styleDataName) && _styleData.Name != m_styleDataName)))
             {
                 if (m_supportStyleGroup)
@@ -387,37 +387,37 @@ namespace MaterialUI
 
         public bool LoadStyles()
         {
-            var v_styleData = GetStyleDataTemplate();
-            return m_supportStyleGroup && IsSupportedStyleData(v_styleData) ? OnLoadStyles(v_styleData) : false;
+            var styleData = GetStyleDataTemplate();
+            return m_supportStyleGroup && IsSupportedStyleData(styleData) ? OnLoadStyles(styleData) : false;
         }
 
         public System.Type GetSupportedStyleAssetType()
         {
-            var v_type = GetSupportedStyleAssetType_Internal();
-            var v_validationType = typeof(BaseStyleElement);
-            if (v_type != null && (v_type == v_validationType || v_type.IsSubclassOf(v_validationType)))
-                return v_type;
+            var type = GetSupportedStyleAssetType_Internal();
+            var validationType = typeof(BaseStyleElement);
+            if (type != null && (type == validationType || type.IsSubclassOf(validationType)))
+                return type;
             else
-                return v_validationType;
+                return validationType;
         }
 
         #endregion
 
         #region Internal Apply StyleData Functions
 
-        protected virtual void SetStylePropertyColorsActive_Internal(bool p_canAnimate, float p_animationDuration)
+        protected virtual void SetStylePropertyColorsActive_Internal(bool canAnimate, float animationDuration)
         {
             Kyub.Performance.SustainedPerformanceManager.Refresh(this);
-            Dictionary<string, StyleProperty>[] v_styleMaps = new Dictionary<string, StyleProperty>[] { ExtraStylePropertiesMap };
+            Dictionary<string, StyleProperty>[] styleMaps = new Dictionary<string, StyleProperty>[] { ExtraStylePropertiesMap };
 
-            for (int i = 0; i < v_styleMaps.Length; i++)
+            for (int i = 0; i < styleMaps.Length; i++)
             {
                 //Apply Style Properties
-                foreach (var v_pair in v_styleMaps[i])
+                foreach (var pair in styleMaps[i])
                 {
-                    var v_styleProperty = v_pair.Value;
-                    if (v_styleProperty != null)
-                        v_styleProperty.Tween(this, p_canAnimate, p_animationDuration);
+                    var styleProperty = pair.Value;
+                    if (styleProperty != null)
+                        styleProperty.Tween(this, canAnimate, animationDuration);
                 }
             }
         }
@@ -427,22 +427,22 @@ namespace MaterialUI
             return GetType();
         }
 
-        protected internal bool IsSupportedStyleData(StyleData p_styleData)
+        protected internal bool IsSupportedStyleData(StyleData styleData)
         {
-            if (p_styleData != null && p_styleData.Asset != null)
+            if (styleData != null && styleData.Asset != null)
             {
-                return IsSupportedStyleElement(p_styleData.Asset);
+                return IsSupportedStyleElement(styleData.Asset);
             }
             return false;
         }
 
-        protected internal bool IsSupportedStyleElement(BaseStyleElement p_styleElement)
+        protected internal bool IsSupportedStyleElement(BaseStyleElement styleElement)
         {
-            if (p_styleElement != null)
+            if (styleElement != null)
             {
-                var v_supportedType = GetSupportedStyleAssetType();
-                var v_templateType = p_styleElement.GetType();
-                if (v_supportedType == v_templateType || v_templateType.IsSubclassOf(v_supportedType))
+                var supportedType = GetSupportedStyleAssetType();
+                var templateType = styleElement.GetType();
+                if (supportedType == templateType || templateType.IsSubclassOf(supportedType))
                 {
                     return true;
                 }
@@ -450,48 +450,48 @@ namespace MaterialUI
             return false;
         }
 
-        protected virtual bool OnLoadStyles(StyleData p_styleData)
+        protected virtual bool OnLoadStyles(StyleData styleData)
         {
-            return LoadGenericStyles(p_styleData);
+            return LoadGenericStyles(styleData);
         }
 
-        protected virtual bool LoadGenericStyles(StyleData p_styleData)
+        protected virtual bool LoadGenericStyles(StyleData styleData)
         {
             //Cache StyleData Asset
-            _styleData = p_styleData;
+            _styleData = styleData;
 
-            var v_template = p_styleData != null ? p_styleData.Asset : null;
-            if (v_template != null)
+            var template = styleData != null ? styleData.Asset : null;
+            if (template != null)
             {
-                Dictionary<string, StyleProperty>[] v_otherStyleMaps = new Dictionary<string, StyleProperty>[] { v_template.ExtraStylePropertiesMap };
-                Dictionary<string, StyleProperty>[] v_selfStyleMaps = new Dictionary<string, StyleProperty>[] { ExtraStylePropertiesMap };
+                Dictionary<string, StyleProperty>[] otherStyleMaps = new Dictionary<string, StyleProperty>[] { template.ExtraStylePropertiesMap };
+                Dictionary<string, StyleProperty>[] selfStyleMaps = new Dictionary<string, StyleProperty>[] { ExtraStylePropertiesMap };
 
-                for (int i = 0; i < v_otherStyleMaps.Length; i++)
+                for (int i = 0; i < otherStyleMaps.Length; i++)
                 {
                     //Apply Style Properties
-                    foreach (var v_pair in v_otherStyleMaps[i])
+                    foreach (var pair in otherStyleMaps[i])
                     {
-                        StyleProperty v_selfStyleProperty = null;
-                        v_selfStyleMaps[i].TryGetValue(v_pair.Key, out v_selfStyleProperty);
-                        if (v_selfStyleProperty != null && v_pair.Value != null)
+                        StyleProperty selfStyleProperty = null;
+                        selfStyleMaps[i].TryGetValue(pair.Key, out selfStyleProperty);
+                        if (selfStyleProperty != null && pair.Value != null)
                         {
-                            var v_otherStyleProperty = v_pair.Value;
-                            v_selfStyleProperty.LoadStyles(v_otherStyleProperty);
+                            var otherStyleProperty = pair.Value;
+                            selfStyleProperty.LoadStyles(otherStyleProperty);
 
                             
                             //Disable/Enable GameObject based in Template (prevent apply if selfStyleProperty.Target is self transform)
-                            if (v_selfStyleProperty.Target != this.transform && v_selfStyleProperty.Target != null && v_otherStyleProperty.Target != null)
-                                StyleUtils.ApplyObjectActive(v_selfStyleProperty.Target, v_otherStyleProperty.Target);
+                            if (selfStyleProperty.Target != this.transform && selfStyleProperty.Target != null && otherStyleProperty.Target != null)
+                                StyleUtils.ApplyObjectActive(selfStyleProperty.Target, otherStyleProperty.Target);
 
                             //Apply Graphic if Supported
-                            if (v_selfStyleProperty.UseStyleGraphic)
-                                StyleUtils.ApplyGraphic(v_selfStyleProperty.Target, v_otherStyleProperty.Target);
+                            if (selfStyleProperty.UseStyleGraphic)
+                                StyleUtils.ApplyGraphic(selfStyleProperty.Target, otherStyleProperty.Target);
                         }
                     }
                 }
 
-                var v_metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
-                v_metaType.ApplyStyleDataToTarget(this, p_styleData);
+                var metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
+                metaType.ApplyStyleDataToTarget(this, styleData);
 
 #if UNITY_EDITOR
                 UnityEditor.EditorUtility.SetDirty(this);
@@ -507,100 +507,100 @@ namespace MaterialUI
         #region Style Resouces Functions
 
         //Only add Color or Graphic Assets (Sprite/Font/TMP_Font/VectorImageData/ Texture2D)
-        public virtual HashSet<object> CollectStyleResources(HashSet<BaseStyleElement> p_excludedElements = null)
+        public virtual HashSet<object> CollectStyleResources(HashSet<BaseStyleElement> excludedElements = null)
         {
-            if (p_excludedElements == null)
-                p_excludedElements = new HashSet<BaseStyleElement>();
+            if (excludedElements == null)
+                excludedElements = new HashSet<BaseStyleElement>();
 
             //Get Self Resources
-            var v_metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
-            var v_mainResources = v_metaType.CollectStyleResources(this, p_excludedElements);
+            var metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
+            var mainResources = metaType.CollectStyleResources(this, excludedElements);
 
             //Get StyleProperties Dicts
-            Dictionary<string, StyleProperty>[] v_styleMaps = new Dictionary<string, StyleProperty>[] { ExtraStylePropertiesMap };
+            Dictionary<string, StyleProperty>[] styleMaps = new Dictionary<string, StyleProperty>[] { ExtraStylePropertiesMap };
 
-            for (int i = 0; i < v_styleMaps.Length; i++)
+            for (int i = 0; i < styleMaps.Length; i++)
             {
                 //Interate over all style properties
-                foreach (var v_pair in v_styleMaps[i])
+                foreach (var pair in styleMaps[i])
                 {
-                    var v_styleProperty = v_pair.Value;
+                    var styleProperty = pair.Value;
 
-                    if (v_styleProperty != null)
+                    if (styleProperty != null)
                     {
-                        var v_propResources = v_styleProperty.CollectStyleResources(p_excludedElements);
+                        var propResources = styleProperty.CollectStyleResources(excludedElements);
                         //Add all resources in MainResources
-                        foreach (var v_resource in v_propResources)
+                        foreach (var resource in propResources)
                         {
-                            v_mainResources.Add(v_resource);
+                            mainResources.Add(resource);
                         }
                     }
                 }
             }
 
-            return v_mainResources;
+            return mainResources;
         }
 
-        public bool TryReplaceStyleResource(object p_oldResource, object p_newResource)
+        public bool TryReplaceStyleResource(object oldResource, object newResource)
         {
-            return TryReplaceStyleResources(new List<KeyValuePair<object, object>>() { new KeyValuePair<object, object>(p_oldResource, p_newResource) });
+            return TryReplaceStyleResources(new List<KeyValuePair<object, object>>() { new KeyValuePair<object, object>(oldResource, newResource) });
         }
 
-        public virtual bool TryReplaceStyleResources(IList<KeyValuePair<object, object>> p_oldNewResoucesList)
+        public virtual bool TryReplaceStyleResources(IList<KeyValuePair<object, object>> oldNewResoucesList)
         {
-            var v_metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
-            var v_sucess = v_metaType.TryReplaceStyleResources(this, p_oldNewResoucesList);
+            var metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
+            var sucess = metaType.TryReplaceStyleResources(this, oldNewResoucesList);
 
             //Get StyleProperties Dicts
-            List<StyleProperty> v_styleProperties = new List<StyleProperty>(ExtraStylePropertiesMap.Values);
+            List<StyleProperty> styleProperties = new List<StyleProperty>(ExtraStylePropertiesMap.Values);
 
             //Interate over all style properties
-            for (int i = 0; i < v_styleProperties.Count; i++)
+            for (int i = 0; i < styleProperties.Count; i++)
             {
-                var v_styleProperty = v_styleProperties[i];
+                var styleProperty = styleProperties[i];
                 //Replace Resource in StyleProperty
-                if (v_styleProperty != null)
+                if (styleProperty != null)
                 {
-                    if (v_styleProperty.TryReplaceStyleResources(p_oldNewResoucesList))
+                    if (styleProperty.TryReplaceStyleResources(oldNewResoucesList))
                     {
-                        v_sucess = true;
+                        sucess = true;
                         //Prevent to check this member again (when trying to replace the second resource)
-                        v_styleProperties.RemoveAt(i);
+                        styleProperties.RemoveAt(i);
                         i--;
                     }
                 }
             }
 
 #if UNITY_EDITOR
-            if(v_sucess)
+            if(sucess)
                 UnityEditor.EditorUtility.SetDirty(this);
 #endif
 
-            return v_sucess;
+            return sucess;
         }
 
         #endregion
 
         #region Style Exclude Fields
 
-        public void SetFieldStyleActive(string p_fieldName, bool p_active)
+        public void SetFieldStyleActive(string fieldName, bool active)
         {
-            if (!p_active)
+            if (!active)
             {
-                if (!m_disabledFieldStyles.Contains(p_fieldName))
-                    m_disabledFieldStyles.Add(p_fieldName);
+                if (!m_disabledFieldStyles.Contains(fieldName))
+                    m_disabledFieldStyles.Add(fieldName);
             }
             else
             {
-                var v_index = m_disabledFieldStyles.IndexOf(p_fieldName);
-                if (v_index >= 0)
-                    m_disabledFieldStyles.RemoveAt(v_index);
+                var index = m_disabledFieldStyles.IndexOf(fieldName);
+                if (index >= 0)
+                    m_disabledFieldStyles.RemoveAt(index);
             }
         }
 
-        public bool GetFieldStyleActive(string p_fieldName)
+        public bool GetFieldStyleActive(string fieldName)
         {
-            return !m_disabledFieldStyles.Contains(p_fieldName);
+            return !m_disabledFieldStyles.Contains(fieldName);
         }
 
         #endregion
@@ -610,7 +610,7 @@ namespace MaterialUI
 
     public class EmptyStyleProperty : StyleProperty
     {
-        public override void Tween(BaseStyleElement p_sender, bool p_canAnimate, float p_animationDuration)
+        public override void Tween(BaseStyleElement sender, bool canAnimate, float animationDuration)
         {
             TweenManager.EndTween(_tweenId);
         }
@@ -694,12 +694,12 @@ namespace MaterialUI
             TweenManager.EndTween(_tweenId);
         }
 
-        public abstract void Tween(BaseStyleElement p_sender, bool p_canAnimate, float p_animationDuration);
+        public abstract void Tween(BaseStyleElement sender, bool canAnimate, float animationDuration);
 
-        public virtual bool LoadStyles(StyleProperty p_styleProperty)
+        public virtual bool LoadStyles(StyleProperty styleProperty)
         {
-            var v_metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
-            return v_metaType.ApplyTemplateToTarget(this, p_styleProperty);
+            var metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
+            return metaType.ApplyTemplateToTarget(this, styleProperty);
         }
 
         #endregion
@@ -707,22 +707,22 @@ namespace MaterialUI
         #region Style Resources Functions
 
         //Only add Color or Graphic Assets (Sprite/Font/TMP_Font/VectorImageData/ Texture2D)
-        public virtual HashSet<object> CollectStyleResources(HashSet<BaseStyleElement> p_excludedElements = null)
+        public virtual HashSet<object> CollectStyleResources(HashSet<BaseStyleElement> excludedElements = null)
         {
-            var v_metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
+            var metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
             
-            return v_metaType.CollectStyleResources(this, p_excludedElements);
+            return metaType.CollectStyleResources(this, excludedElements);
         }
 
-        public bool TryReplaceStyleResource(object p_oldResource, object p_newResource)
+        public bool TryReplaceStyleResource(object oldResource, object newResource)
         {
-            return TryReplaceStyleResources(new List<KeyValuePair<object, object>>() { new KeyValuePair<object, object>(p_oldResource, p_newResource) });
+            return TryReplaceStyleResources(new List<KeyValuePair<object, object>>() { new KeyValuePair<object, object>(oldResource, newResource) });
         }
 
-        public virtual bool TryReplaceStyleResources(IList<KeyValuePair<object, object>> p_oldNewResoucesList)
+        public virtual bool TryReplaceStyleResources(IList<KeyValuePair<object, object>> oldNewResoucesList)
         {
-            var v_metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
-            return v_metaType.TryReplaceStyleResources(this, p_oldNewResoucesList);
+            var metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
+            return metaType.TryReplaceStyleResources(this, oldNewResoucesList);
         }
 
         #endregion

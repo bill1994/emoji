@@ -56,10 +56,10 @@ namespace MaterialUI
         public override void OnInspectorGUI()
         {
             //Script Field
-            var v_oldGuiEnabled = GUI.enabled;
+            var oldGuiEnabled = GUI.enabled;
             GUI.enabled = false;
             EditorGUILayout.PropertyField(m_script);
-            GUI.enabled = v_oldGuiEnabled;
+            GUI.enabled = oldGuiEnabled;
 
             //Other Properties
             serializedObject.Update();
@@ -112,8 +112,8 @@ namespace MaterialUI
             m_styleDataName = serializedObject.FindProperty("m_styleDataName");
             
             //Styles Folder
-            string v_prefKey = GetType().Name;
-            m_StylesPrefKey = v_prefKey + "_Show_Styles";
+            string prefKey = GetType().Name;
+            m_StylesPrefKey = prefKey + "_Show_Styles";
             m_ShowStyles = EditorPrefs.GetBool(m_StylesPrefKey, true);
 
             //Reset Important Properties
@@ -122,40 +122,40 @@ namespace MaterialUI
             StyleControledByStyleGroup(true);
         }
 
-        protected bool StyleControledByStyleGroup(bool p_recalculate = false)
+        protected bool StyleControledByStyleGroup(bool recalculate = false)
         {
-            if (p_recalculate)
+            if (recalculate)
             {
                 if (m_supportStyleGroup.boolValue)
                 {
                     serializedObject.ApplyModifiedProperties();
-                    var v_force = false;
+                    var force = false;
                     if (m_styleGroup.objectReferenceValue == null)
                     {
-                        v_force = true;
-                        foreach (var v_target in targets)
+                        force = true;
+                        foreach (var target in targets)
                         {
-                            var v_styleBehaviour = v_target as BaseStyleElement;
-                            if (v_styleBehaviour != null)
+                            var styleBehaviour = target as BaseStyleElement;
+                            if (styleBehaviour != null)
                             {
-                                v_styleBehaviour.ForceRegisterToStyleGroup();
-                                v_styleBehaviour.LoadStyles();
-                                v_force = v_force && v_styleBehaviour.StyleGroup && v_styleBehaviour.StyleData.Asset != null;
+                                styleBehaviour.ForceRegisterToStyleGroup();
+                                styleBehaviour.LoadStyles();
+                                force = force && styleBehaviour.StyleGroup && styleBehaviour.StyleData.Asset != null;
                             }
                             else
-                                v_force = false;
+                                force = false;
                         }
                     }
                     serializedObject.Update();
-                    if (v_force || m_styleGroup.objectReferenceValue != null)
+                    if (force || m_styleGroup.objectReferenceValue != null)
                     {
                         _cachedStyleControledByStyleGroup = true;
-                        foreach (var v_target in targets)
+                        foreach (var target in targets)
                         {
-                            var v_styleBehaviour = v_target as BaseStyleElement;
-                            if(!v_force)
-                                v_styleBehaviour.LoadStyles();
-                            if (v_styleBehaviour.StyleData == null || v_styleBehaviour.StyleData.Asset == null)
+                            var styleBehaviour = target as BaseStyleElement;
+                            if(!force)
+                                styleBehaviour.LoadStyles();
+                            if (styleBehaviour.StyleData == null || styleBehaviour.StyleData.Asset == null)
                             {
                                 _cachedStyleControledByStyleGroup = false;
                                 return _cachedStyleControledByStyleGroup;
@@ -171,38 +171,38 @@ namespace MaterialUI
 
         protected virtual void DrawOtherStyleDataProperties()
         {
-            bool v_oldGuiEnabled = GUI.enabled;
-            var v_controlledByStyleGroup = StyleControledByStyleGroup();
-            if (v_controlledByStyleGroup)
+            bool oldGuiEnabled = GUI.enabled;
+            var controlledByStyleGroup = StyleControledByStyleGroup();
+            if (controlledByStyleGroup)
             {
                 EditorGUILayout.HelpBox("Some values driven by CanvasStyleGroup", MessageType.None);
                 GUI.enabled = false;
                 EditorGUILayout.PropertyField(m_styleGroup);
-                GUI.enabled = v_oldGuiEnabled;
+                GUI.enabled = oldGuiEnabled;
                 EditorGUILayout.Space();
             }
 
-            var v_target = target as BaseStyleElement;
-            var v_oldValue = m_supportStyleGroup.boolValue;
+            var castedTarget = target as BaseStyleElement;
+            var oldValue = m_supportStyleGroup.boolValue;
             EditorGUILayout.PropertyField(m_supportStyleGroup);
 
             //Property to control reset of cached initial values
-            var v_needResetCachedValues = v_oldValue != m_supportStyleGroup.boolValue;
+            var needResetCachedValues = oldValue != m_supportStyleGroup.boolValue;
 
             //Draw Style Data Picker
-            GUI.enabled = v_target.SupportStyleGroup;
-            if (v_target.StyleGroup != null)
+            GUI.enabled = castedTarget.SupportStyleGroup;
+            if (castedTarget.StyleGroup != null)
             {
                 EditorGUI.showMixedValue = m_styleDataName.hasMultipleDifferentValues;
-                var v_validNames = GetAllValidStyleDataNamesWithType(v_target.StyleGroup.StyleAsset, v_target.GetSupportedStyleAssetType(), false);
-                var v_index = Mathf.Max(0, System.Array.IndexOf(v_validNames, m_styleDataName.stringValue));
-                v_validNames[0] = "<Empty>"; // We must set first position to empty after find index (to prevent that has a property with empty name)
-                var v_newIndex = Mathf.Max(0, EditorGUILayout.Popup("Style Data Name", v_index, v_validNames));
-                if (v_index != v_newIndex || 
-                    (v_validNames.Length > 1 && m_styleDataName.stringValue != v_validNames[v_newIndex] && v_newIndex > 0))
+                var validNames = GetAllValidStyleDataNamesWithType(castedTarget.StyleGroup.StyleAsset, castedTarget.GetSupportedStyleAssetType(), false);
+                var index = Mathf.Max(0, System.Array.IndexOf(validNames, m_styleDataName.stringValue));
+                validNames[0] = "<Empty>"; // We must set first position to empty after find index (to prevent that has a property with empty name)
+                var newIndex = Mathf.Max(0, EditorGUILayout.Popup("Style Data Name", index, validNames));
+                if (index != newIndex || 
+                    (validNames.Length > 1 && m_styleDataName.stringValue != validNames[newIndex] && newIndex > 0))
                 {
-                    m_styleDataName.stringValue = v_validNames.Length > v_newIndex ? v_validNames[v_newIndex] : "";
-                    v_needResetCachedValues = true;
+                    m_styleDataName.stringValue = validNames.Length > newIndex ? validNames[newIndex] : "";
+                    needResetCachedValues = true;
                 }
                 EditorGUI.showMixedValue = false;
             }
@@ -210,29 +210,29 @@ namespace MaterialUI
             {
                 EditorGUILayout.PropertyField(m_styleDataName);
             }
-            GUI.enabled = v_oldGuiEnabled;
+            GUI.enabled = oldGuiEnabled;
 
-            if (v_needResetCachedValues)
+            if (needResetCachedValues)
             {
                 _cachedAsset = null;
                 _allValidStyleBehaviours = null;
-                v_controlledByStyleGroup = StyleControledByStyleGroup(true);
+                controlledByStyleGroup = StyleControledByStyleGroup(true);
             }
         }
 
 
-        protected virtual string[] GetAllValidStyleDataNamesWithType(StyleSheetAsset p_asset, System.Type p_validType, bool p_recalculate)
+        protected virtual string[] GetAllValidStyleDataNamesWithType(StyleSheetAsset asset, System.Type validType, bool recalculate)
         {
-            if (_cachedAsset != p_asset || _allValidStyleBehaviours == null || p_recalculate)
+            if (_cachedAsset != asset || _allValidStyleBehaviours == null || recalculate)
             {
-                _cachedAsset = p_asset;
-                var v_styleDatas = p_asset != null? p_asset.GetAllStyleDatasFromType(p_validType) : new List<StyleData>();
-                List<string> v_validNames = new List<string>() { "" };
-                foreach (var v_styleData in v_styleDatas)
+                _cachedAsset = asset;
+                var styleDatas = asset != null? asset.GetAllStyleDatasFromType(validType) : new List<StyleData>();
+                List<string> validNames = new List<string>() { "" };
+                foreach (var styleData in styleDatas)
                 {
-                    v_validNames.Add(v_styleData.Name);
+                    validNames.Add(styleData.Name);
                 }
-                _allValidStyleBehaviours = v_validNames.ToArray();
+                _allValidStyleBehaviours = validNames.ToArray();
             }
 
             return _allValidStyleBehaviours;
@@ -252,28 +252,28 @@ namespace MaterialUI
             }
         }
 
-        protected virtual void DrawStylePropertiesListInternal(ReorderableList p_stylePropertiesList)
+        protected virtual void DrawStylePropertiesListInternal(ReorderableList stylePropertiesList)
         {
             //Force Create DefaultBehaviour
             if (ReorderableList.defaultBehaviours == null)
-                p_stylePropertiesList.DoList(Rect.zero);
+                stylePropertiesList.DoList(Rect.zero);
 
-            if (p_stylePropertiesList.serializedProperty.isExpanded)
+            if (stylePropertiesList.serializedProperty.isExpanded)
             {
-                p_stylePropertiesList.DoLayoutList();
+                stylePropertiesList.DoLayoutList();
             }
             else
             {
-                GUILayout.Label("", GUILayout.ExpandWidth(true), GUILayout.Height(p_stylePropertiesList.headerHeight));
-                var v_lastRect = GUILayoutUtility.GetLastRect();
+                GUILayout.Label("", GUILayout.ExpandWidth(true), GUILayout.Height(stylePropertiesList.headerHeight));
+                var lastRect = GUILayoutUtility.GetLastRect();
 
                 if (Event.current.type == EventType.Repaint)
-                    ReorderableList.defaultBehaviours.headerBackground.Draw(v_lastRect, false, false, false, false);
-                v_lastRect.x += 6;
-                v_lastRect.width += 6;
-                v_lastRect.y += 1;
-                v_lastRect.height -= 1;
-                p_stylePropertiesList.drawHeaderCallback.Invoke(v_lastRect);
+                    ReorderableList.defaultBehaviours.headerBackground.Draw(lastRect, false, false, false, false);
+                lastRect.x += 6;
+                lastRect.width += 6;
+                lastRect.y += 1;
+                lastRect.height -= 1;
+                stylePropertiesList.drawHeaderCallback.Invoke(lastRect);
                 GUILayout.Space(5);
             }
             GUILayout.Space(2);
@@ -285,161 +285,161 @@ namespace MaterialUI
             InitPropertyStylesInternal(ref m_extraStylePropertiesList, "m_extraStyleProperties", false);
         }
 
-        protected virtual void InitPropertyStylesInternal(ref ReorderableList p_reordableList, string p_propertyName, bool p_isMainProperties)
+        protected virtual void InitPropertyStylesInternal(ref ReorderableList reordableList, string propertyName, bool isMainProperties)
         {
-            var v_names = new HashSet<string>();
-            var v_styleProperties = serializedObject.FindProperty(p_propertyName);
-            p_reordableList = new ReorderableList(serializedObject, v_styleProperties);
-            var v_reordableList = p_reordableList;
+            var names = new HashSet<string>();
+            var styleProperties = serializedObject.FindProperty(propertyName);
+            var internalReordableList = new ReorderableList(serializedObject, styleProperties);
+            reordableList = internalReordableList;
 
-            p_reordableList.drawHeaderCallback += (rect) =>
+            internalReordableList.drawHeaderCallback += (rect) =>
             {
                 rect.x += 10;
-                v_styleProperties.isExpanded = EditorGUI.Foldout(rect, v_styleProperties.isExpanded, v_styleProperties.displayName);
+                styleProperties.isExpanded = EditorGUI.Foldout(rect, styleProperties.isExpanded, styleProperties.displayName);
             };
-            p_reordableList.displayAdd = !p_isMainProperties;
-            p_reordableList.displayRemove = !p_isMainProperties;
-            p_reordableList.onAddCallback += (list) => { ReorderableList.defaultBehaviours.DoAddButton(list); };
-            p_reordableList.onRemoveCallback += (list) => { ReorderableList.defaultBehaviours.DoRemoveButton(list); };
-            p_reordableList.elementHeightCallback += (index) =>
+            internalReordableList.displayAdd = !isMainProperties;
+            internalReordableList.displayRemove = !isMainProperties;
+            internalReordableList.onAddCallback += (list) => { ReorderableList.defaultBehaviours.DoAddButton(list); };
+            internalReordableList.onRemoveCallback += (list) => { ReorderableList.defaultBehaviours.DoRemoveButton(list); };
+            internalReordableList.elementHeightCallback += (index) =>
             {
-                var v_arrayElement = v_styleProperties.GetArrayElementAtIndex(index);
-                var v_isExpanded = v_arrayElement.isExpanded;
-                var v_singlePropertyHeight = EditorGUIUtility.singleLineHeight;
-                var v_extraSpace = EditorGUIUtility.standardVerticalSpacing;
-                if (v_isExpanded)
+                var arrayElement = styleProperties.GetArrayElementAtIndex(index);
+                var isExpanded = arrayElement.isExpanded;
+                var singlePropertyHeight = EditorGUIUtility.singleLineHeight;
+                var extraSpace = EditorGUIUtility.standardVerticalSpacing;
+                if (isExpanded)
                 {
-                    return EditorGUI.GetPropertyHeight(v_arrayElement, true) - v_singlePropertyHeight + v_extraSpace;
+                    return EditorGUI.GetPropertyHeight(arrayElement, true) - singlePropertyHeight + extraSpace;
                 }
-                return v_singlePropertyHeight + v_extraSpace + 1;
+                return singlePropertyHeight + extraSpace + 1;
             };
             
-            p_reordableList.drawElementCallback += (Rect rect, int index, bool isActive, bool isFocused) =>
+            internalReordableList.drawElementCallback += (Rect rect, int index, bool isActive, bool isFocused) =>
             {
-                DrawStyleProperty(v_reordableList, rect, index, v_styleProperties.GetArrayElementAtIndex(index), !p_isMainProperties, ref v_names);
+                DrawStyleProperty(internalReordableList, rect, index, styleProperties.GetArrayElementAtIndex(index), !isMainProperties, ref names);
             };
         }
 
-        protected virtual bool IsType<T>(SerializedProperty p_mainProperty, int p_index) where T : Object
+        protected virtual bool IsType<T>(SerializedProperty mainProperty, int index) where T : Object
         {
-            var v_arrayElement = p_mainProperty.GetArrayElementAtIndex(p_index);
-            if (v_arrayElement != null)
+            var arrayElement = mainProperty.GetArrayElementAtIndex(index);
+            if (arrayElement != null)
             {
-                var v_targetElement = v_arrayElement.FindPropertyRelative("m_target");
-                return v_targetElement.objectReferenceValue == null ||
-                    (v_targetElement.objectReferenceValue is Transform && ((Transform)v_targetElement.objectReferenceValue).GetComponent<T>() != null);
+                var targetElement = arrayElement.FindPropertyRelative("m_target");
+                return targetElement.objectReferenceValue == null ||
+                    (targetElement.objectReferenceValue is Transform && ((Transform)targetElement.objectReferenceValue).GetComponent<T>() != null);
             }
             return false;
         }
 
-        protected virtual void DrawStyleProperty(ReorderableList p_reordableList, Rect p_rect, int p_index, SerializedProperty p_property, bool p_canEditName, ref HashSet<string> p_names)
+        protected virtual void DrawStyleProperty(ReorderableList reordableList, Rect rect, int index, SerializedProperty property, bool canEditName, ref HashSet<string> names)
         {
-            p_rect = new Rect(p_rect.x + 10, p_rect.y, p_rect.width - 10, EditorGUIUtility.singleLineHeight);
+            rect = new Rect(rect.x + 10, rect.y, rect.width - 10, EditorGUIUtility.singleLineHeight);
 
-            if (p_index == 0)
-                p_names.Clear();
+            if (index == 0)
+                names.Clear();
 
-            var v_oldGuiEnabled = GUI.enabled;
-            var v_nameProperty = p_property.FindPropertyRelative("m_name");
-            var v_targetProperty = p_property.FindPropertyRelative("m_target");
-            var v_endProperty = p_property.GetEndProperty();
+            var oldGuiEnabled = GUI.enabled;
+            var nameProperty = property.FindPropertyRelative("m_name");
+            var targetProperty = property.FindPropertyRelative("m_target");
+            var endProperty = property.GetEndProperty();
 
-            var v_foldoutRect = new Rect(p_rect.x, p_rect.y, 10, p_rect.height);
-            EditorGUI.PropertyField(v_foldoutRect, p_property, new GUIContent(""), false);
-            DrawStyleTarget(p_rect, p_index, v_targetProperty, new GUIContent(p_index + ": " + v_nameProperty.stringValue));
-            if (p_property.isExpanded)
+            var foldoutRect = new Rect(rect.x, rect.y, 10, rect.height);
+            EditorGUI.PropertyField(foldoutRect, property, new GUIContent(""), false);
+            DrawStyleTarget(rect, index, targetProperty, new GUIContent(index + ": " + nameProperty.stringValue));
+            if (property.isExpanded)
             {
-                p_property.NextVisible(true); // force enter in child
-                //p_rect = EditorGUI.IndentedRect(p_rect);
-                p_rect.y += EditorGUIUtility.standardVerticalSpacing;
-                p_rect.x += 10;
-                p_rect.width -= 10;
+                property.NextVisible(true); // force enter in child
+                //rect = EditorGUI.IndentedRect(rect);
+                rect.y += EditorGUIUtility.standardVerticalSpacing;
+                rect.x += 10;
+                rect.width -= 10;
 
                 do
                 {
-                    if (SerializedProperty.EqualContents(p_property, v_endProperty))
+                    if (SerializedProperty.EqualContents(property, endProperty))
                         break;
-                    p_rect.y += EditorGUIUtility.singleLineHeight;
-                    if (p_property.name == v_nameProperty.name)
-                        DrawStyleName(p_rect, p_property, p_canEditName);
-                    else if (p_property.name == v_targetProperty.name)
-                        p_rect.y -= EditorGUIUtility.singleLineHeight;
+                    rect.y += EditorGUIUtility.singleLineHeight;
+                    if (property.name == nameProperty.name)
+                        DrawStyleName(rect, property, canEditName);
+                    else if (property.name == targetProperty.name)
+                        rect.y -= EditorGUIUtility.singleLineHeight;
                     else
-                        EditorGUI.PropertyField(p_rect, p_property);
+                        EditorGUI.PropertyField(rect, property);
                 }
-                while (p_property.NextVisible(false));
+                while (property.NextVisible(false));
             }
 
-            CheckHashNames(p_index, v_nameProperty, v_targetProperty.objectReferenceValue != null ? v_targetProperty.objectReferenceValue.name : "", ref p_names);
+            CheckHashNames(index, nameProperty, targetProperty.objectReferenceValue != null ? targetProperty.objectReferenceValue.name : "", ref names);
             // Add to Hash to prevent same name
-            if (!string.IsNullOrEmpty(v_nameProperty.stringValue) && !p_names.Contains(v_nameProperty.stringValue))
-                p_names.Add(v_nameProperty.stringValue);
+            if (!string.IsNullOrEmpty(nameProperty.stringValue) && !names.Contains(nameProperty.stringValue))
+                names.Add(nameProperty.stringValue);
         }
 
-        protected void DrawStyleTarget(Rect rect, int index, SerializedProperty p_property, GUIContent p_displayName)
+        protected void DrawStyleTarget(Rect rect, int index, SerializedProperty property, GUIContent displayName)
         {
-            if (p_property != null)
+            if (property != null)
             {
-                var v_displayName = p_displayName != null ? p_displayName : new GUIContent(p_property.displayName);
-                var v_oldGUiEnabled = GUI.enabled;
+                displayName = displayName != null ? displayName : new GUIContent(property.displayName);
+                var oldGUiEnabled = GUI.enabled;
 
-                var v_styleElement = p_property.objectReferenceValue is Transform ? ((Transform)p_property.objectReferenceValue).GetComponent<BaseStyleElement>() : null;
-                if (v_styleElement != null)
+                var styleElement = property.objectReferenceValue is Transform ? ((Transform)property.objectReferenceValue).GetComponent<BaseStyleElement>() : null;
+                if (styleElement != null)
                 {
-                    EditorGUI.showMixedValue = p_property.hasMultipleDifferentValues;
-                    var v_newStyleElement = EditorGUI.ObjectField(rect, v_displayName, v_styleElement, typeof(BaseStyleElement), true) as BaseStyleElement;
-                    if (v_styleElement != v_newStyleElement)
+                    EditorGUI.showMixedValue = property.hasMultipleDifferentValues;
+                    var newStyleElement = EditorGUI.ObjectField(rect, displayName, styleElement, typeof(BaseStyleElement), true) as BaseStyleElement;
+                    if (styleElement != newStyleElement)
                     {
-                        p_property.objectReferenceValue = v_newStyleElement != null ? v_newStyleElement.transform : null;
+                        property.objectReferenceValue = newStyleElement != null ? newStyleElement.transform : null;
                     }
                     EditorGUI.showMixedValue = false;
                 }
                 else
                 {
-                    var v_graphic = p_property.objectReferenceValue is Transform ? ((Transform)p_property.objectReferenceValue).GetComponent<Graphic>() : null;
-                    if (v_graphic != null)
+                    var graphic = property.objectReferenceValue is Transform ? ((Transform)property.objectReferenceValue).GetComponent<Graphic>() : null;
+                    if (graphic != null)
                     {
-                        EditorGUI.showMixedValue = p_property.hasMultipleDifferentValues;
-                        var v_newGraphic = EditorGUI.ObjectField(rect, v_displayName, v_graphic, typeof(Graphic), true) as Graphic;
-                        if (v_graphic != v_newGraphic)
+                        EditorGUI.showMixedValue = property.hasMultipleDifferentValues;
+                        var newGraphic = EditorGUI.ObjectField(rect, displayName, graphic, typeof(Graphic), true) as Graphic;
+                        if (graphic != newGraphic)
                         {
-                            p_property.objectReferenceValue = v_newGraphic != null ? v_newGraphic.transform : null;
+                            property.objectReferenceValue = newGraphic != null ? newGraphic.transform : null;
                         }
                         EditorGUI.showMixedValue = false;
                     }
                     else
                     {
-                        EditorGUI.PropertyField(rect, p_property, v_displayName, false);
+                        EditorGUI.PropertyField(rect, property, displayName, false);
                     }
                 }
             }
         }
 
-        protected void DrawStyleName(Rect rect, SerializedProperty p_property, bool p_canEditName)
+        protected void DrawStyleName(Rect rect, SerializedProperty property, bool canEditName)
         {
-            if (p_property != null)
+            if (property != null)
             {
-                var v_oldGUiEnabled = GUI.enabled;
-                GUI.enabled = p_canEditName;
-                EditorGUI.PropertyField(rect, p_property);
-                GUI.enabled = v_oldGUiEnabled;
+                var oldGUiEnabled = GUI.enabled;
+                GUI.enabled = canEditName;
+                EditorGUI.PropertyField(rect, property);
+                GUI.enabled = oldGUiEnabled;
             }
         }
 
-        protected void CheckHashNames(int index, SerializedProperty p_property, string p_baseName, ref HashSet<string> p_names)
+        protected void CheckHashNames(int index, SerializedProperty property, string baseName, ref HashSet<string> names)
         {
             //Set Object Key Name
-            if ((!string.IsNullOrEmpty(p_baseName) && string.IsNullOrEmpty(p_property.stringValue)) || p_names.Contains(p_property.stringValue))
+            if ((!string.IsNullOrEmpty(baseName) && string.IsNullOrEmpty(property.stringValue)) || names.Contains(property.stringValue))
             {
-                var v_counter = 0;
-                var v_baseName = string.IsNullOrEmpty(p_property.stringValue) ? p_baseName : p_property.stringValue;
-                var v_name = v_baseName;
-                while (p_names.Contains(v_name))
+                var counter = 0;
+                baseName = string.IsNullOrEmpty(property.stringValue) ? baseName : property.stringValue;
+                var name = baseName;
+                while (names.Contains(name))
                 {
-                    v_counter++;
-                    v_name = v_baseName + " (" + v_counter + ")";
+                    counter++;
+                    name = baseName + " (" + counter + ")";
                 }
-                p_property.stringValue = v_name;
+                property.stringValue = name;
             }
         }
 
@@ -449,45 +449,45 @@ namespace MaterialUI
 
         protected void LayoutStyle_DrawPropertiesExcluding(SerializedObject obj, IList<string> propertyToExclude)
         {
-            var v_property = obj.GetIterator();
-            v_property.NextVisible(true); //Force pick first property
+            var property = obj.GetIterator();
+            property.NextVisible(true); //Force pick first property
 
             do
             {
-                if (propertyToExclude == null || !propertyToExclude.Contains(v_property.name))
-                    LayoutStyle_PropertyField(v_property);
+                if (propertyToExclude == null || !propertyToExclude.Contains(property.name))
+                    LayoutStyle_PropertyField(property);
             }
-            while (v_property.NextVisible(false));
+            while (property.NextVisible(false));
         }
 
         static GUIStyle s_miniLabelStyle = null;
         static GUIContent s_mssGuiContent = new GUIContent("mss", "Click to enable/disable Material Style Property of this field");
         static Color s_proSkinMiniButton = new Color(0, 0.7f, 0);
         static Color s_proSkinMixedMiniButton = new Color(0.9f, 0.7f, 0.3f);
-        protected void LayoutStyle_PropertyField(SerializedProperty p_property, params GUILayoutOption[] options)
+        protected void LayoutStyle_PropertyField(SerializedProperty property, params GUILayoutOption[] options)
         {
-            LayoutStyle_PropertyField(p_property, null, true, options);
+            LayoutStyle_PropertyField(property, null, true, options);
         }
 
-        protected void LayoutStyle_PropertyField(SerializedProperty p_property, bool p_includeChildren, params GUILayoutOption[] options)
+        protected void LayoutStyle_PropertyField(SerializedProperty property, bool includeChildren, params GUILayoutOption[] options)
         {
-            LayoutStyle_PropertyField(p_property, null, p_includeChildren, options);
+            LayoutStyle_PropertyField(property, null, includeChildren, options);
         }
 
-        protected void LayoutStyle_PropertyField(SerializedProperty p_property, GUIContent p_content, params GUILayoutOption[] options)
+        protected void LayoutStyle_PropertyField(SerializedProperty property, GUIContent content, params GUILayoutOption[] options)
         {
-            LayoutStyle_PropertyField(p_property, p_content, false, options);
+            LayoutStyle_PropertyField(property, content, false, options);
         }
 
-        protected void LayoutStyle_PropertyField(SerializedProperty p_property, GUIContent p_content, bool p_includeChildren, params GUILayoutOption[] options)
+        protected void LayoutStyle_PropertyField(SerializedProperty property, GUIContent content, bool includeChildren, params GUILayoutOption[] options)
         {
-            LayoutStyle_PropertyField(p_property, p_property, p_content, p_includeChildren, options);
+            LayoutStyle_PropertyField(property, property, content, includeChildren, options);
         }
 
-        protected void LayoutStyle_PropertyField(SerializedProperty p_property, SerializedProperty p_mssProperty, GUIContent p_content, bool p_includeChildren, params GUILayoutOption[] options)
+        protected void LayoutStyle_PropertyField(SerializedProperty property, SerializedProperty mssProperty, GUIContent content, bool includeChildren, params GUILayoutOption[] options)
         {
-            if (p_mssProperty == null)
-                p_mssProperty = p_property;
+            if (mssProperty == null)
+                mssProperty = property;
 
             //Cache Style
             if (s_miniLabelStyle == null)
@@ -495,67 +495,67 @@ namespace MaterialUI
                 s_miniLabelStyle = new GUIStyle(EditorStyles.miniLabel);
                 s_miniLabelStyle.normal.textColor = Color.white;
             }
-            var v_oldGui = GUI.enabled;
-            var v_oldShowMixedValue = EditorGUI.showMixedValue;
-            var v_oldColor = GUI.color;
+            var oldGui = GUI.enabled;
+            var oldShowMixedValue = EditorGUI.showMixedValue;
+            var oldColor = GUI.color;
 
-            var v_styleMetaType = MaterialUI.Reflection.StyleMetaType.GetOrCreateStyleMetaType(p_mssProperty.serializedObject.targetObject.GetType());
+            var styleMetaType = MaterialUI.Reflection.StyleMetaType.GetOrCreateStyleMetaType(mssProperty.serializedObject.targetObject.GetType());
             using (new EditorGUILayout.HorizontalScope())
             {
-                var v_target = p_mssProperty.serializedObject.targetObject as BaseStyleElement;
-                var v_isMSS = v_styleMetaType.DeclaredMembers.ContainsKey(p_mssProperty.name) || v_styleMetaType.GetMembers().ContainsKey(p_mssProperty.name);
+                var target = mssProperty.serializedObject.targetObject as BaseStyleElement;
+                var isMSS = styleMetaType.DeclaredMembers.ContainsKey(mssProperty.name) || styleMetaType.GetMembers().ContainsKey(mssProperty.name);
 
                 //Find if this property has MSS enabled (or with mixed value)
-                var v_styleControledByStyleGroup = StyleControledByStyleGroup();
-                var v_mssEnabled = v_isMSS && v_target.GetFieldStyleActive(p_mssProperty.name);
-                var v_showMixedValue = false;
-                if (v_isMSS)
+                var styleControledByStyleGroup = StyleControledByStyleGroup();
+                var mssEnabled = isMSS && target.GetFieldStyleActive(mssProperty.name);
+                var showMixedValue = false;
+                if (isMSS)
                 {
                     for (int i = 1; i < targets.Length; i++)
                     {
                         var baseStyleTarget = targets[i] as BaseStyleElement;
-                        if (v_mssEnabled != baseStyleTarget.GetFieldStyleActive(p_mssProperty.name))
+                        if (mssEnabled != baseStyleTarget.GetFieldStyleActive(mssProperty.name))
                         {
-                            v_showMixedValue = true;
-                            v_mssEnabled = true;
+                            showMixedValue = true;
+                            mssEnabled = true;
                             break;
                         }
                     }
                 }
                 
                 //Draw Original Field
-                GUI.enabled = !v_styleControledByStyleGroup || p_mssProperty.propertyType == SerializedPropertyType.ObjectReference || !v_mssEnabled;
-                EditorGUILayout.PropertyField(p_property, p_content, p_includeChildren, options);
+                GUI.enabled = oldGui && (!styleControledByStyleGroup || mssProperty.propertyType == SerializedPropertyType.ObjectReference || !mssEnabled);
+                EditorGUILayout.PropertyField(property, content, includeChildren, options);
 
-                GUI.enabled = v_oldGui;
-                var v_mssButtonSize = 30;
+                GUI.enabled = oldGui;
+                var mssButtonSize = 30;
                 //Draw MSS Toggle Field
-                if (v_isMSS)
+                if (isMSS)
                 {
                     //Draw Toggle
-                    GUI.color = v_showMixedValue ? s_proSkinMixedMiniButton : (v_mssEnabled ? EditorGUIUtility.isProSkin ? s_proSkinMiniButton : Color.green : Color.red);
-                    var v_newValue = EditorGUILayout.Toggle(v_mssEnabled, EditorStyles.miniButton, GUILayout.Width(v_mssButtonSize));
-                    if (v_newValue != v_mssEnabled)
+                    GUI.color = showMixedValue ? s_proSkinMixedMiniButton : (mssEnabled ? EditorGUIUtility.isProSkin ? s_proSkinMiniButton : Color.green : Color.red);
+                    var newValue = EditorGUILayout.Toggle(mssEnabled, EditorStyles.miniButton, GUILayout.Width(mssButtonSize));
+                    if (newValue != mssEnabled)
                     {
-                        v_mssEnabled = v_newValue;
+                        mssEnabled = newValue;
                         for (int i = 0; i < targets.Length; i++)
                         {
                             var baseStyleTarget = targets[i] as BaseStyleElement;
-                            baseStyleTarget.SetFieldStyleActive(p_mssProperty.name, v_mssEnabled);
+                            baseStyleTarget.SetFieldStyleActive(mssProperty.name, mssEnabled);
                         }
                     }
-                    GUI.color = v_oldColor;
+                    GUI.color = oldColor;
 
                     //Draw Label
-                    var v_lastRect = GUILayoutUtility.GetLastRect();
-                    v_lastRect.x -= (-2 + EditorGUI.indentLevel * 14);
-                    v_lastRect.width += 10;
-                    EditorGUI.LabelField(v_lastRect, s_mssGuiContent, s_miniLabelStyle);
+                    var lastRect = GUILayoutUtility.GetLastRect();
+                    lastRect.x -= (-2 + EditorGUI.indentLevel * 14);
+                    lastRect.width += 10;
+                    EditorGUI.LabelField(lastRect, s_mssGuiContent, s_miniLabelStyle);
                 }
                 else
-                    GUILayout.Space(v_mssButtonSize + 4);
+                    GUILayout.Space(mssButtonSize + 4);
 
-                EditorGUI.showMixedValue = v_oldShowMixedValue;
+                EditorGUI.showMixedValue = oldShowMixedValue;
             }
         }
 

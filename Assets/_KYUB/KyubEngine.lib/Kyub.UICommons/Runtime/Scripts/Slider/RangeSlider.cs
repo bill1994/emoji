@@ -18,7 +18,7 @@ namespace Kyub.UI
         #region Helper Classes
 
         [Serializable]
-        public class RangeSliderEvent : UnityEvent<float, float> { }
+        public class RangeSliderEvent : UnityEvent<Vector2> { }
 
         /// <summary>
         /// An Enum that says in what state we and interacting with the slider
@@ -198,6 +198,7 @@ namespace Kyub.UI
         {
             m_Tracker.Clear();
             base.OnDisable();
+            CancelInvoke();
         }
 
         /// <summary>
@@ -234,29 +235,53 @@ namespace Kyub.UI
             if (!MayDrag(eventData))
                 return;
 
-
             //HANDLE DRAG EVENTS
             m_LowOffset = m_HighOffset = Vector2.zero;
-            Vector2 localMousePos;
-            if (m_HighHandleRect != null && RectTransformUtility.RectangleContainsScreenPoint(m_HighHandleRect, eventData.position, eventData.enterEventCamera))
+            Vector2 lowLocalMousePos = Vector2.zero;
+            Vector2 highLocalMousePos = Vector2.zero;
+
+            if (m_LowHandleRect != null)
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(m_LowHandleRect, eventData.position, eventData.pressEventCamera, out lowLocalMousePos);
+            if(m_HighHandleRect != null)
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(m_HighHandleRect, eventData.position, eventData.pressEventCamera, out highLocalMousePos);
+
+            var isHighHandleClicked = m_HighHandleRect != null && RectTransformUtility.RectangleContainsScreenPoint(m_HighHandleRect, eventData.position, eventData.enterEventCamera);
+            var isLowHandleClicked = m_LowHandleRect != null && RectTransformUtility.RectangleContainsScreenPoint(m_LowHandleRect, eventData.position, eventData.enterEventCamera);
+            
+            var isHighClick = m_HighHandleRect != null && 
+                (isHighHandleClicked || 
+                (!isLowHandleClicked && highLocalMousePos.magnitude < lowLocalMousePos.magnitude));
+
+            if (isHighClick)
             {
                 //dragging the high value handle
-                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(m_HighHandleRect, eventData.position, eventData.pressEventCamera, out localMousePos))
+                if (isHighHandleClicked)
                 {
-                    m_HighOffset = localMousePos;
+                    m_HighOffset = highLocalMousePos;
                 }
+                else
+                {
+                    m_HighOffset = Vector2.zero;
+                    normalizedHighValue = CalculateDrag(eventData, eventData.enterEventCamera, m_HighHandleContainerRect, m_HighOffset);
+                }
+
                 _interactionState = InteractionStateEnum.High;
                 if (transition == Transition.ColorTint)
                 {
                     targetGraphic = m_HighHandleRect.GetComponent<Graphic>();
                 }
             }
-            else if (m_LowHandleRect != null && RectTransformUtility.RectangleContainsScreenPoint(m_LowHandleRect, eventData.position, eventData.enterEventCamera))
+            else if (m_LowHandleRect != null && !isHighClick)
             {
                 //dragging the low value handle
-                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(m_LowHandleRect, eventData.position, eventData.pressEventCamera, out localMousePos))
+                if (isLowHandleClicked)
                 {
-                    m_LowOffset = localMousePos;
+                    m_LowOffset = lowLocalMousePos;
+                }
+                else
+                {
+                    m_LowOffset = Vector2.zero;
+                    normalizedLowValue = CalculateDrag(eventData, eventData.enterEventCamera, m_LowHandleContainerRect, m_LowOffset);
                 }
                 _interactionState = InteractionStateEnum.Low;
                 if (transition == Transition.ColorTint)
@@ -316,8 +341,8 @@ namespace Kyub.UI
             if (IsActive())
             {
                 UpdateCachedReferences();
-                SetLow(m_LowValue, false);
-                SetHigh(m_HighValue, false);
+                if(!IsInvoking("ReapplyLowAndHighInternal"))
+                    Invoke("ReapplyLowAndHighInternal", 0);
                 //Update rects since other things might affect them even if value didn't change
                 m_DelayedUpdateVisuals = true;
             }
@@ -404,6 +429,12 @@ namespace Kyub.UI
             }
         }
 
+        void ReapplyLowAndHighInternal()
+        {
+            SetLow(m_LowValue, false);
+            SetHigh(m_HighValue, false);
+        }
+
         void SetLow(float input)
         {
             SetLow(input, true);
@@ -428,7 +459,7 @@ namespace Kyub.UI
             {
                 UISystemProfilerApi.AddMarker("RangeSlider.lowValue", this);
                 if(m_OnValueChanged != null)
-                    m_OnValueChanged.Invoke(newValue, highValue);
+                    m_OnValueChanged.Invoke(new Vector2(newValue, highValue));
                 if (m_OnLowValueChanged != null)
                     m_OnLowValueChanged.Invoke(newValue);
             }
@@ -458,7 +489,7 @@ namespace Kyub.UI
             {
                 UISystemProfilerApi.AddMarker("RangeSlider.highValue", this);
                 if(m_OnValueChanged != null)
-                    m_OnValueChanged.Invoke(lowValue, newValue);
+                    m_OnValueChanged.Invoke(new Vector2(lowValue, newValue));
                 if (m_OnHighValueChanged != null)
                     m_OnHighValueChanged.Invoke(newValue);
             }
@@ -524,10 +555,38 @@ namespace Kyub.UI
             switch (_interactionState)
             {
                 case InteractionStateEnum.Low:
-                    normalizedLowValue = CalculateDrag(eventData, cam, m_LowHandleContainerRect, m_LowOffset);
+                    
+                    var lowValue = CalculateDrag(eventData, cam, m_LowHandleContainerRect, m_LowOffset);
+                    normalizedLowValue = lowValue;
+
+                    if (lowValue > normalizedHighValue)
+                    {
+                        _interactionState = InteractionStateEnum.High;
+                        m_HighOffset = m_LowOffset;
+
+                        //Invert Handles
+                        var newHighHandleRect = m_LowHandleRect;
+                        m_LowHandleRect = m_HighHandleRect;
+                        m_HighHandleRect = newHighHandleRect;
+                        UpdateCachedReferences();
+                    }
                     break;
                 case InteractionStateEnum.High:
-                    normalizedHighValue = CalculateDrag(eventData, cam, m_HighHandleContainerRect, m_HighOffset);
+
+                    var highValue = CalculateDrag(eventData, cam, m_HighHandleContainerRect, m_HighOffset);
+                    normalizedHighValue = highValue;
+
+                    if (highValue < normalizedLowValue)
+                    {
+                        _interactionState = InteractionStateEnum.Low;
+                        m_LowOffset = m_HighOffset;
+
+                        //Invert Handles
+                        var newHighHandleRect = m_LowHandleRect;
+                        m_LowHandleRect = m_HighHandleRect;
+                        m_HighHandleRect = newHighHandleRect;
+                        UpdateCachedReferences();
+                    }
                     break;
                 case InteractionStateEnum.Bar:
                     //special case
@@ -610,7 +669,7 @@ namespace Kyub.UI
 #if UNITY_EDITOR
             if (executing == CanvasUpdate.Prelayout)
             {
-                onValueChanged.Invoke(lowValue, highValue);
+                onValueChanged.Invoke(new Vector2(lowValue, highValue));
             }
 #endif
         }

@@ -7,9 +7,9 @@ namespace MaterialUI
 {
     public class MaterialStylePanel : StyleElement<MaterialStylePanel.PanelStyleProperty>
     {
-        public override void RefreshVisualStyles(bool p_canAnimate = true)
+        public override void RefreshVisualStyles(bool canAnimate = true)
         {
-            SetStylePropertyColorsActive_Internal(p_canAnimate, 0);
+            SetStylePropertyColorsActive_Internal(canAnimate, 0);
         }
 
         #region BaseStyleElement Helper Classes
@@ -47,42 +47,42 @@ namespace MaterialUI
             {
             }
 
-            public PanelStyleProperty(string p_name, Component p_target, Color p_color, bool p_useStyleGraphic)
+            public PanelStyleProperty(string name, Component target, Color color, bool useStyleGraphic)
             {
-                m_target = p_target != null ? p_target.transform : null;
-                m_name = p_name;
-                m_color = p_color;
-                m_useStyleGraphic = p_useStyleGraphic;
+                m_target = target != null ? target.transform : null;
+                m_name = name;
+                m_color = color;
+                m_useStyleGraphic = useStyleGraphic;
             }
 
             #endregion
 
             #region Helper Functions
 
-            public override void Tween(BaseStyleElement p_sender, bool p_canAnimate, float p_animationDuration)
+            public override void Tween(BaseStyleElement sender, bool canAnimate, float animationDuration)
             {
                 TweenManager.EndTween(_tweenId);
 
-                var v_graphic = GetTarget<Graphic>();
-                if (v_graphic != null)
+                var graphic = GetTarget<Graphic>();
+                if (graphic != null)
                 {
-                    var v_endColor = m_color;
-                    if (p_canAnimate && Application.isPlaying)
+                    var endColor = m_color;
+                    if (canAnimate && Application.isPlaying)
                     {
                         _tweenId = TweenManager.TweenColor(
                                 (color) =>
                                 {
-                                    if (v_graphic != null)
-                                        v_graphic.color = color;
+                                    if (graphic != null)
+                                        graphic.color = color;
                                 },
-                                v_graphic.color,
-                                v_endColor,
-                                p_animationDuration
+                                graphic.color,
+                                endColor,
+                                animationDuration
                             );
                     }
                     else
                     {
-                        v_graphic.color = v_endColor;
+                        graphic.color = endColor;
                     }
                 }
             }

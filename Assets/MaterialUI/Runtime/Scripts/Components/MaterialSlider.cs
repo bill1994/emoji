@@ -1,7 +1,4 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
-
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -12,16 +9,20 @@ namespace MaterialUI
 {
     [ExecuteInEditMode]
     [AddComponentMenu("MaterialUI/Material Slider", 100)]
-    public class MaterialSlider : SelectableStyleElement<MaterialSlider.SliderStyleProperty>, IDeselectHandler, IPointerDownHandler, IPointerUpHandler, ILayoutGroup, ILayoutElement
+    public class MaterialSlider : SelectableStyleElement<MaterialSlider.SliderStyleProperty>, IDeselectHandler, IPointerDownHandler, IPointerUpHandler
     {
         #region Private Variables
 
+        [SerializeField]
+        private bool m_Interactable = true;
+        [SerializeField]
+        float m_AnimationScale = 1.25f;
         [SerializeField, SerializeStyleProperty]
         float m_AnimationDuration = 0.25f;
         [SerializeField]
         private bool m_HasPopup = true;
         [SerializeField]
-        private bool m_HasDots = true;
+        private bool m_HasDots = false;
 
         [SerializeField, SerializeStyleProperty]
         private Color m_EnabledColor;
@@ -40,69 +41,112 @@ namespace MaterialUI
         private Graphic m_BackgroundGraphic;
 
         [SerializeField]
-        private RectTransform m_SliderHandleTransform = null;
-        [SerializeField]
         private RectTransform m_PopupTransform = null;
 
         [SerializeField]
         private MaterialInputField m_InputField = null;
         [SerializeField]
-        private RectTransform m_FillTransform = null;
-        [SerializeField]
-        private RectTransform m_LeftContentTransform = null;
-        [SerializeField]
-        private RectTransform m_RightContentTransform = null;
-        [SerializeField]
         private RectTransform m_SliderContentTransform = null;
-        [SerializeField]
-        private RectTransform m_RectTransform = null;
         [SerializeField]
         private VectorImageData m_DotTemplateIcon = null;
         [SerializeField]
         private Graphic[] m_DotGraphics = new Graphic[0];
         [SerializeField]
         private int m_NumberOfDots = 0;
-        [SerializeField]
-        private bool m_HasManualPreferredWidth = false;
-        [SerializeField]
-        private float m_ManualPreferredWidth = 200f;
-        [SerializeField]
-        private bool m_Interactable = true;
-        [SerializeField]
-        private bool m_LowLeftDisabledOpacity = false;
-        [SerializeField]
-        private bool m_LowRightDisabledOpacity = false;
-        [SerializeField]
-        private CanvasGroup m_LeftCanvasGroup = null;
-        [SerializeField]
-        private CanvasGroup m_RightCanvasGroup = null;
 
-        private RectTransform m_HandleGraphicTransform;
-        private RectTransform m_FillAreaTransform;
         private Slider m_Slider;
         private CanvasGroup m_CanvasGroup;
         private Canvas m_RootCanvas;
         private bool m_IsSelected;
 
-        private int m_HandleSizeTweener;
+        private int m_HandleScaleTweener;
         private int m_PopupScaleTweener;
-        private int m_HandleAnchorMinTweener;
-        private int m_HandleAnchorMaxTweener;
-        private int m_HandlePositionYTweener;
         private int m_PopupTextColorTweener;
 
-        private DrivenRectTransformTracker m_Tracker = new DrivenRectTransformTracker();
+        #endregion
 
-        private float m_Width;
-        private float m_Height;
-        private float m_LeftWidth;
-        private float m_RightWidth;
-        private float m_LastSliderValue;
-        private float m_CurrentInputValue;
+        #region Callbacks
+
+        public Slider.SliderEvent m_OnValueChanged = new Slider.SliderEvent();
 
         #endregion
 
         #region Properties
+
+        public float value
+        {
+            get { return slider != null ? slider.value : 0; }
+            set
+            {
+                if (slider != null)
+                    slider.value = value;
+            }
+        }
+
+        public float normalizedValue
+        {
+            get { return slider != null ? slider.normalizedValue : 0; }
+            set
+            {
+                if (slider != null)
+                    slider.normalizedValue = value;
+            }
+        }
+
+        public float maxValue
+        {
+            get { return slider != null ? slider.maxValue : 0; }
+            set
+            {
+                if (slider != null)
+                    slider.maxValue = value;
+            }
+        }
+
+        public float minValue
+        {
+            get { return slider != null ? slider.minValue : 0; }
+            set
+            {
+                if (slider != null)
+                    slider.minValue = value;
+            }
+        }
+
+        public bool wholeNumbers
+        {
+            get { return slider != null ? slider.wholeNumbers : false; }
+            set
+            {
+                if (slider != null)
+                    slider.wholeNumbers = value;
+            }
+        }
+
+        public Slider.SliderEvent onValueChanged 
+        { 
+            get 
+            { 
+                return m_OnValueChanged; 
+            } 
+            set 
+            { 
+                m_OnValueChanged = value; 
+            } 
+        }
+
+        public float animationScale
+        {
+            get
+            {
+                return m_AnimationScale;
+            }
+
+            set
+            {
+                m_AnimationScale = value;
+            }
+        }
 
         public float animationDuration
         {
@@ -134,26 +178,11 @@ namespace MaterialUI
             get { return m_EnabledColor; }
             set
             {
+                if (m_EnabledColor == value)
+                    return;
                 m_EnabledColor = value;
 
-                if (m_HandleGraphic)
-                {
-                    m_HandleGraphic.color = m_Interactable ? m_EnabledColor : m_DisabledColor;
-                }
-
-                for (int i = 0; i < m_DotGraphics.Length; i++)
-                {
-                    if (m_DotGraphics[i] == null) continue;
-
-                    if (slider.value > i)
-                    {
-                        m_DotGraphics[i].color = m_Interactable ? m_EnabledColor : m_DisabledColor;
-                    }
-                    else
-                    {
-                        m_DotGraphics[i].color = m_BackgroundColor;
-                    }
-                }
+                UpdateColors();
             }
         }
 
@@ -162,26 +191,11 @@ namespace MaterialUI
             get { return m_DisabledColor; }
             set
             {
+                if (m_DisabledColor == value)
+                    return;
                 m_DisabledColor = value;
 
-                if (m_HandleGraphic)
-                {
-                    m_HandleGraphic.color = m_Interactable ? m_EnabledColor : m_DisabledColor;
-                }
-
-                for (int i = 0; i < m_DotGraphics.Length; i++)
-                {
-                    if (m_DotGraphics[i] == null) continue;
-
-                    if (slider.value > i)
-                    {
-                        m_DotGraphics[i].color = m_Interactable ? m_EnabledColor : m_DisabledColor;
-                    }
-                    else
-                    {
-                        m_DotGraphics[i].color = m_BackgroundColor;
-                    }
-                }
+                UpdateColors();
             }
         }
 
@@ -200,18 +214,21 @@ namespace MaterialUI
             }
             set
             {
+                if (m_BackgroundColor == value)
+                    return;
                 m_BackgroundColor = value;
-                if (m_BackgroundGraphic != null)
-                {
-                    m_BackgroundGraphic.color = m_BackgroundColor;
-                }
+                UpdateColors();
             }
         }
 
         public RectTransform sliderHandleTransform
         {
-            get { return m_SliderHandleTransform; }
-            set { m_SliderHandleTransform = value; }
+            get { return slider != null? slider.handleRect : null; }
+            set 
+            { 
+                if(slider != null)
+                    slider.handleRect = value; 
+            }
         }
 
         public Graphic handleGraphic
@@ -219,11 +236,10 @@ namespace MaterialUI
             get { return m_HandleGraphic; }
             set
             {
+                if (m_HandleGraphic == value)
+                    return;
                 m_HandleGraphic = value;
-                if (m_HandleGraphic)
-                {
-                    m_HandleGraphic.color = m_Interactable ? m_EnabledColor : m_DisabledColor;
-                }
+                UpdateColors();
             }
         }
 
@@ -231,14 +247,7 @@ namespace MaterialUI
         {
             get
             {
-                if (m_HandleGraphicTransform == null)
-                {
-                    if (m_HandleGraphic != null)
-                    {
-                        m_HandleGraphicTransform = m_HandleGraphic.rectTransform;
-                    }
-                }
-                return m_HandleGraphicTransform;
+                return m_HandleGraphic != null? m_HandleGraphic.rectTransform : null;
             }
         }
 
@@ -266,10 +275,14 @@ namespace MaterialUI
             set { m_InputField = value; }
         }
 
-        public RectTransform fillTransform
+        public RectTransform fillRect
         {
-            get { return m_FillTransform; }
-            set { m_FillTransform = value; }
+            get { return slider != null? slider.fillRect : null; }
+            set 
+            {
+                if(slider != null)
+                    slider.fillRect = value; 
+            }
         }
 
         public Graphic backgroundGraphic
@@ -277,24 +290,11 @@ namespace MaterialUI
             get { return m_BackgroundGraphic; }
             set
             {
+                if (m_BackgroundGraphic == value)
+                    return;
                 m_BackgroundGraphic = value;
-                if (m_BackgroundGraphic != null)
-                {
-                    m_BackgroundGraphic.color = m_BackgroundColor;
-                }
+                UpdateColors();
             }
-        }
-
-        public RectTransform leftContentTransform
-        {
-            get { return m_LeftContentTransform; }
-            set { m_LeftContentTransform = value; }
-        }
-
-        public RectTransform rightContentTransform
-        {
-            get { return m_RightContentTransform; }
-            set { m_RightContentTransform = value; }
         }
 
         public RectTransform sliderContentTransform
@@ -305,8 +305,7 @@ namespace MaterialUI
 
         public RectTransform rectTransform
         {
-            get { return m_RectTransform; }
-            set { m_RectTransform = value; }
+            get { return transform as RectTransform; }
         }
 
         [SerializeStyleProperty]
@@ -314,22 +313,6 @@ namespace MaterialUI
         {
             get { return m_DotTemplateIcon; }
             set { m_DotTemplateIcon = value; }
-        }
-
-        public RectTransform fillAreaTransform
-        {
-            get
-            {
-                if (m_FillAreaTransform == null)
-                {
-                    if (m_FillTransform != null)
-                    {
-                        m_FillAreaTransform = m_FillTransform.parent as RectTransform;
-                    }
-                }
-
-                return m_FillAreaTransform;
-            }
         }
 
         public Slider slider
@@ -375,98 +358,20 @@ namespace MaterialUI
             get { return m_IsSelected; }
         }
 
-        public bool hasManualPreferredWidth
-        {
-            get { return m_HasManualPreferredWidth; }
-            set
-            {
-                m_HasManualPreferredWidth = value;
-                CalculateLayoutInputHorizontal();
-                SetLayoutHorizontal();
-            }
-        }
-
-        public float manualPreferredWidth
-        {
-            get { return m_ManualPreferredWidth; }
-            set
-            {
-                m_ManualPreferredWidth = value;
-                CalculateLayoutInputHorizontal();
-                SetLayoutHorizontal();
-            }
-        }
-
         public bool interactable
         {
             get { return m_Interactable; }
             set
             {
                 m_Interactable = value;
-                slider.interactable = value;
-                canvasGroup.interactable = value;
-                canvasGroup.blocksRaycasts = value;
-                if (m_InputField)
-                {
-                    m_InputField.GetComponent<MaterialInputField>().interactable = value;
-                }
-            }
-        }
-        public bool lowLeftDisabledOpacity
-        {
-            get { return m_LowLeftDisabledOpacity; }
-            set
-            {
-                m_LowLeftDisabledOpacity = value;
+                if (slider != null)
+                    slider.interactable = value;
 
-                if (m_LeftContentTransform)
+                if (canvasGroup != null)
                 {
-                    leftCanvasGroup.alpha = m_LowLeftDisabledOpacity ? (m_Interactable ? 1f : 0.5f) : 1f;
+                    canvasGroup.interactable = value;
+                    canvasGroup.blocksRaycasts = value;
                 }
-            }
-        }
-
-        public bool lowRightDisabledOpacity
-        {
-            get { return m_LowRightDisabledOpacity; }
-            set
-            {
-                m_LowRightDisabledOpacity = value;
-
-                if (m_RightContentTransform)
-                {
-                    rightCanvasGroup.alpha = m_LowRightDisabledOpacity ? (m_Interactable ? 1f : 0.5f) : 1f;
-                }
-            }
-        }
-
-        public CanvasGroup leftCanvasGroup
-        {
-            get
-            {
-                if (m_LeftCanvasGroup == null)
-                {
-                    if (m_LeftContentTransform != null)
-                    {
-                        m_LeftCanvasGroup = m_LeftContentTransform.gameObject.GetAddComponent<CanvasGroup>();
-                    }
-                }
-                return m_LeftCanvasGroup;
-            }
-        }
-
-        public CanvasGroup rightCanvasGroup
-        {
-            get
-            {
-                if (m_RightCanvasGroup == null)
-                {
-                    if (m_RightContentTransform != null)
-                    {
-                        m_RightCanvasGroup = m_RightContentTransform.gameObject.GetAddComponent<CanvasGroup>();
-                    }
-                }
-                return m_RightCanvasGroup;
             }
         }
 
@@ -474,155 +379,75 @@ namespace MaterialUI
 
         #region Unity Functions
 
-        protected override void Awake()
-        {
-            if(slider != null)
-                RegisterEvents();
-            base.Awake();
-        }
-
         protected override void OnEnable()
         {
-            SetTracker();
-
-            var scaler = rootCanvas != null? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
-
-            if (scaler != null)
-            {
-                scaler.onCanvasAreaChanged.AddListener(OnCanvasChanged);
-            }
+            base.OnEnable();
+            RegisterEvents();
         }
 
         protected override void OnDisable()
         {
-            var scaler = rootCanvas != null ? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
-
-            if (scaler != null)
-            {
-                scaler.onCanvasAreaChanged.RemoveListener(OnCanvasChanged);
-            }
-
-            m_Tracker.Clear();
-        }
-
-        private void OnCanvasChanged(bool scaleChanged, bool orientationChanged)
-        {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
-            OnSliderValueChanged(slider.value);
+            base.OnDisable();
+            UnregisterEvents();
+            CancelInvoke();
+            if(Application.isPlaying)
+                AnimateOff();
         }
 
         protected override void Start()
         {
-            if (!Application.isPlaying)
-            {
-                SetTracker();
-            }
-
-            if (m_InputField != null)
-            {
-                if (slider.wholeNumbers)
-                {
-                    m_InputField.contentType = InputField.ContentType.IntegerNumber;
-                }
-                else
-                {
-                    m_InputField.contentType = InputField.ContentType.DecimalNumber;
-                }
-            }
-
-#if UNITY_EDITOR
-            m_LastSliderValue = slider.value;
-#endif
-        }
-
-        protected override void OnDestroy()
-        {
-            UnregisterEvents();
-            base.OnDestroy();
+            base.Start();
+            ValidateContent();
         }
 
         protected virtual void Update()
         {
-            if (TweenManager.TweenIsActive(m_HandleAnchorMinTweener))
-            {
-                m_FillTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, 0, fillAreaTransform.rect.width * handleGraphicTransform.anchorMin.x);
-            }
+            ValidateContent();
+        }
 
-            if (m_InputField != null)
-            {
-                if (slider.wholeNumbers)
-                {
-                    m_InputField.contentType = InputField.ContentType.IntegerNumber;
-                }
-                else
-                {
-                    m_InputField.contentType = InputField.ContentType.DecimalNumber;
-                }
-            }
+        protected virtual void OnCanvasChanged(bool scaleChanged, bool orientationChanged)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+            HandleOnSliderValueChanged(slider.value);
+        }
 
-            if (slider.wholeNumbers && m_HasDots)
+        protected bool _isChangingCanvasGroup = false;
+        protected override void OnCanvasGroupChanged()
+        {
+            if (!_isChangingCanvasGroup)
             {
-                if (m_NumberOfDots != SliderValueRange())
+                try
                 {
-                    RebuildDots();
+                    _isChangingCanvasGroup = true;
+                    base.OnCanvasGroupChanged();
+                    UpdateColors();
                 }
-                for (int i = 0; i < m_DotGraphics.Length; i++)
+                finally
                 {
-                    if (slider.value > i)
-                    {
-                        m_DotGraphics[i].color = m_Interactable ? m_EnabledColor : m_DisabledColor;
-                    }
-                    else
-                    {
-                        m_DotGraphics[i].color = m_BackgroundColor;
-                    }
+                    _isChangingCanvasGroup = false;
                 }
             }
-            else
-            {
-                DestroyDots();
-            }
-
-            if (m_HandleGraphic)
-            {
-                m_HandleGraphic.color = m_Interactable ? m_EnabledColor : m_DisabledColor;
-            }
-
-#if UNITY_EDITOR
-            if (Application.isPlaying) return;
-
-            OnSliderValueChanged(m_LastSliderValue);
-            m_LastSliderValue = slider.value;
-#endif
         }
 
 #if UNITY_EDITOR
         protected override void OnValidateDelayed()
         {
             LayoutRebuilder.MarkLayoutForRebuild(GetComponent<RectTransform>());
+            ValidateContent();
+            UpdateColors();
         }
 #endif
 
-        protected override void OnRectTransformDimensionsChange()
-        {
-            base.OnRectTransformDimensionsChange();
-
-            SetLayoutHorizontal();
-        }
-        protected override void OnTransformParentChanged()
-        {
-            base.OnTransformParentChanged();
-
-            SetLayoutHorizontal();
-        }
         public void OnPointerDown(PointerEventData eventData)
         {
-            AnimateOn();
+            if (!IsInvoking("AnimateOn"))
+                Invoke("AnimateOn", 0);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            AnimateOff();
+            if (!IsInvoking("AnimateOff"))
+                Invoke("AnimateOff", 0);
         }
 
         public override void OnSelect(BaseEventData eventData)
@@ -640,40 +465,68 @@ namespace MaterialUI
 
         #endregion
 
-        #region Receivers
-
-        protected virtual void HandleOnSliderValueChanged(float value)
-        {
-            OnSliderValueChanged(value);
-        }
-
-        #endregion
-
         #region Other Functions
 
-        public void UnregisterEvents()
+        protected virtual void ValidateContent()
+        {
+            if (m_InputField != null && slider != null)
+            {
+                if (slider.wholeNumbers)
+                {
+                    m_InputField.contentType = InputField.ContentType.IntegerNumber;
+                }
+                else
+                {
+                    m_InputField.contentType = InputField.ContentType.DecimalNumber;
+                }
+            }
+
+            //Force Upgrade Dots
+            if (slider != null && slider.wholeNumbers && m_HasDots)
+            {
+                if (m_NumberOfDots != GetSliderValueRange())
+                {
+                    RebuildDots();
+                }
+            }
+            else if (m_NumberOfDots > 0)
+            {
+                DestroyDots();
+            }
+        }
+
+        protected virtual void UnregisterEvents()
         {
             if (m_Slider != null)
                 m_Slider.onValueChanged.RemoveListener(HandleOnSliderValueChanged);
+
+            if (m_InputField != null)
+                m_InputField.onEndEdit.RemoveListener(HandleOnInputEnd);
+
+            var scaler = rootCanvas != null ? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
+            if (scaler != null)
+            {
+                scaler.onCanvasAreaChanged.RemoveListener(OnCanvasChanged);
+            }
         }
 
-        public void RegisterEvents()
+        protected virtual void RegisterEvents()
         {
             UnregisterEvents();
             if (m_Slider != null)
                 m_Slider.onValueChanged.AddListener(HandleOnSliderValueChanged);
+
+            if (m_InputField != null)
+                m_InputField.onEndEdit.AddListener(HandleOnInputEnd);
+
+            var scaler = rootCanvas != null ? rootCanvas.GetComponent<MaterialCanvasScaler>() : null;
+            if (scaler != null)
+            {
+                scaler.onCanvasAreaChanged.AddListener(OnCanvasChanged);
+            }
         }
 
-        private void SetTracker()
-        {
-            m_Tracker.Clear();
-            m_Tracker.Add(this, m_SliderContentTransform, DrivenTransformProperties.AnchorMinX);
-            m_Tracker.Add(this, m_SliderContentTransform, DrivenTransformProperties.AnchorMaxX);
-            m_Tracker.Add(this, m_SliderContentTransform, DrivenTransformProperties.AnchoredPositionX);
-            m_Tracker.Add(this, m_SliderContentTransform, DrivenTransformProperties.SizeDeltaX);
-        }
-
-        private void DestroyDots()
+        protected virtual void DestroyDots()
         {
             for (int i = 0; i < m_DotGraphics.Length; i++)
             {
@@ -695,32 +548,26 @@ namespace MaterialUI
             m_DotGraphics = new Graphic[0];
         }
 
-        private void RebuildDots()
+        protected virtual void RebuildDots()
         {
-            DestroyDots();
-
-            m_NumberOfDots = SliderValueRange();
+            m_NumberOfDots = GetSliderValueRange();
             float dotDistance = 1 / (float)m_NumberOfDots;
 
+            var previousDots = m_DotGraphics;
             m_DotGraphics = new Graphic[m_NumberOfDots + 1];
 
             for (int i = 0; i < m_DotGraphics.Length; i++)
             {
-                m_DotGraphics[i] = CreateDot();
+                m_DotGraphics[i] = previousDots != null && previousDots.Length > i ? previousDots[i] : null;
+                if(m_DotGraphics[i] == null)
+                    m_DotGraphics[i] = CreateDot();
                 m_DotGraphics[i].rectTransform.SetAnchorX(dotDistance * i, dotDistance * i);
-
-                if (slider.value > i)
-                {
-                    m_DotGraphics[i].color = m_Interactable ? m_EnabledColor : m_DisabledColor;
-                }
-                else
-                {
-                    m_DotGraphics[i].color = m_BackgroundColor;
-                }
             }
+
+            UpdateColors();
         }
 
-        private int SliderValueRange()
+        protected virtual int GetSliderValueRange()
         {
             return Mathf.RoundToInt(slider.maxValue - slider.minValue);
         }
@@ -734,346 +581,205 @@ namespace MaterialUI
             return dot.GetComponent<Graphic>();
         }
 
-        private void AnimateOn()
+        protected virtual void AnimateOn()
         {
-            TweenManager.EndTween(m_HandleSizeTweener);
+            TweenManager.EndTween(m_HandleScaleTweener);
             TweenManager.EndTween(m_PopupScaleTweener);
-            TweenManager.EndTween(m_HandlePositionYTweener);
             TweenManager.EndTween(m_PopupTextColorTweener);
 
             if (m_HasPopup)
             {
-                m_HandleSizeTweener = TweenManager.TweenVector2(vector2 => handleGraphicTransform.sizeDelta = vector2,
-                    handleGraphicTransform.sizeDelta, new Vector2(38, 38), m_AnimationDuration, 0f, null, false,
-                    Tween.TweenType.SoftEaseOutQuint);
-
-                m_HandlePositionYTweener = TweenManager.TweenFloat(
-                    f => m_HandleGraphicTransform.anchoredPosition = new Vector2(m_HandleGraphicTransform.anchoredPosition.x, f),
-                        m_HandleGraphicTransform.anchoredPosition.y, slider.wholeNumbers && m_HasDots ? 36 : 30,
-                        m_AnimationDuration, 0, null, false, Tween.TweenType.EaseOutSept);
-
-                m_PopupScaleTweener = TweenManager.TweenVector3(vector3 => m_PopupTransform.localScale = vector3,
-                    m_PopupTransform.localScale, Vector3.one, m_AnimationDuration, 0, null, false, Tween.TweenType.EaseOutSept);
-            }
-            else
-            {
-                m_HandleSizeTweener = TweenManager.TweenVector2(vector2 => handleGraphicTransform.sizeDelta = vector2,
-                    handleGraphicTransform.sizeDelta, new Vector2(24, 24), m_AnimationDuration, 0, null, false, Tween.TweenType.SoftEaseOutQuint);
-            }
-
-            m_PopupTextColorTweener = TweenManager.TweenColor(color => m_PopupText.color = color, () => m_PopupText.color,
-               () => m_PopupText.color.WithAlpha(1f), m_AnimationDuration * 0.66f, m_AnimationDuration * 0.33f);
-        }
-
-        private void AnimateOff()
-        {
-            TweenManager.EndTween(m_HandleSizeTweener);
-            TweenManager.EndTween(m_PopupScaleTweener);
-            TweenManager.EndTween(m_HandlePositionYTweener);
-            TweenManager.EndTween(m_PopupTextColorTweener);
-
-            if (m_HasPopup)
-            {
-                m_HandlePositionYTweener =
-                    TweenManager.TweenFloat(
-                        f => m_HandleGraphicTransform.anchoredPosition = new Vector2(m_HandleGraphicTransform.anchoredPosition.x, f),
-                        m_HandleGraphicTransform.anchoredPosition.y,
-                        rootCanvas.pixelPerfect ? 1f : 0f, m_AnimationDuration, 0, null, false, Tween.TweenType.EaseOutCubed);
-
-                m_PopupScaleTweener = TweenManager.TweenVector3(vector3 => m_PopupTransform.localScale = vector3,
-                    m_PopupTransform.localScale, Vector3.zero, m_AnimationDuration);
-            }
-
-            m_HandleSizeTweener = TweenManager.TweenVector2(vector2 => handleGraphicTransform.sizeDelta = vector2,
-                    handleGraphicTransform.sizeDelta, new Vector2(16, 16), m_AnimationDuration, 0, null, false,
-                    Tween.TweenType.EaseOutSept);
-
-            m_PopupTextColorTweener = TweenManager.TweenColor(color => m_PopupText.color = color, m_PopupText.color,
-                    m_PopupText.color.WithAlpha(0f), m_AnimationDuration * 0.25f);
-        }
-
-        public void OnInputChange(string value)
-        {
-            float floatValue;
-            if (float.TryParse(value, out floatValue))
-            {
-                m_CurrentInputValue = floatValue;
-                if (floatValue >= slider.minValue && floatValue <= slider.maxValue)
+                if (m_PopupTransform != null)
                 {
-                    slider.value = floatValue;
+                    m_PopupScaleTweener = TweenManager.TweenVector3(
+                        vector3 =>
+                        {
+                            if (m_PopupTransform != null)
+                                m_PopupTransform.localScale = vector3;
+                        },
+                        m_PopupTransform.localScale,
+                        Vector3.one,
+                        m_AnimationDuration,
+                        0,
+                        null,
+                        false,
+                        Tween.TweenType.EaseOutSept);
                 }
             }
-        }
 
-        public void OnInputEnd()
-        {
-            if (m_InputField != null)
+            if (handleGraphicTransform != null)
             {
-                slider.value = m_CurrentInputValue;
-                m_InputField.text = slider.value.ToString();
+                var extendedScale = Vector3.one * m_AnimationScale;
+                m_HandleScaleTweener = TweenManager.TweenVector3(
+                    vector3 =>
+                    {
+                        if (handleGraphicTransform != null)
+                            handleGraphicTransform.localScale = vector3;
+                    },
+                    handleGraphicTransform.localScale,
+                    extendedScale,
+                    m_AnimationDuration,
+                    0,
+                    null,
+                    false,
+                    Tween.TweenType.SoftEaseOutQuint);
+            }
+
+            if (m_PopupText != null)
+            {
+                m_PopupTextColorTweener = TweenManager.TweenColor(
+                    color =>
+                    {
+                        if (m_PopupText != null)
+                            m_PopupText.color = color;
+                    },
+                    m_PopupText.color,
+                    m_PopupText.color.WithAlpha(1f),
+                    m_AnimationDuration * 0.66f,
+                    m_AnimationDuration * 0.33f);
             }
         }
 
-        public void OnSliderValueChanged(float value)
+        protected virtual void AnimateOff()
         {
-            TweenManager.EndTween(m_HandleAnchorMinTweener);
-            TweenManager.EndTween(m_HandleAnchorMaxTweener);
+            TweenManager.EndTween(m_HandleScaleTweener);
+            TweenManager.EndTween(m_PopupScaleTweener);
+            TweenManager.EndTween(m_PopupTextColorTweener);
 
-            if (slider.wholeNumbers && SliderValueRange() < 100 && Application.isPlaying)
+            if (m_HasPopup)
             {
-                m_HandleAnchorMinTweener = TweenManager.TweenFloat(
-                        f => handleGraphicTransform.anchorMin = new Vector2(f, handleGraphicTransform.anchorMin.y),
-                        handleGraphicTransform.anchorMin.x, m_Slider.handleRect.anchorMin.x, m_AnimationDuration * 0.5f,
-                        0, null, false, Tween.TweenType.EaseOutSept);
-
-                m_HandleAnchorMaxTweener = TweenManager.TweenFloat(
-                        f => handleGraphicTransform.anchorMax = new Vector2(f, handleGraphicTransform.anchorMax.y),
-                        handleGraphicTransform.anchorMax.x, m_Slider.handleRect.anchorMax.x, m_AnimationDuration * 0.5f,
-                        0, null, false, Tween.TweenType.EaseOutSept);
-            }
-            else
-            {
-                Vector2 anchor = handleGraphicTransform.anchorMin;
-                anchor.x = m_Slider.handleRect.anchorMin.x;
-                handleGraphicTransform.anchorMin = anchor;
-
-                anchor = handleGraphicTransform.anchorMax;
-                anchor.x = m_Slider.handleRect.anchorMax.x;
-                handleGraphicTransform.anchorMax = anchor;
-                handleGraphicTransform.anchoredPosition = new Vector2(0f, handleGraphicTransform.anchoredPosition.y);
+                if (m_PopupTransform != null)
+                {
+                    m_PopupScaleTweener = TweenManager.TweenVector3(
+                        vector3 =>
+                        {
+                            if (m_PopupTransform != null)
+                                m_PopupTransform.localScale = vector3;
+                        },
+                        m_PopupTransform.localScale,
+                        Vector3.zero,
+                        m_AnimationDuration);
+                }
             }
 
-            m_FillTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, 0, fillAreaTransform.rect.width * m_HandleGraphicTransform.anchorMin.x);
-
-            m_PopupText.SetGraphicText(slider.value.ToString("#0.#"));
-
-            if (m_ValueText != null)
+            if (handleGraphicTransform != null)
             {
-                m_ValueText.SetGraphicText(slider.value.ToString("#0.##"));
+                m_HandleScaleTweener = TweenManager.TweenVector3(
+                    vector3 =>
+                    {
+                        if(handleGraphicTransform != null)
+                            handleGraphicTransform.localScale = vector3;
+                    },
+                    handleGraphicTransform.localScale,
+                    Vector3.one,
+                    m_AnimationDuration,
+                    0,
+                    null,
+                    false,
+                    Tween.TweenType.EaseOutSept);
             }
 
-            if (m_InputField != null)
+            if (m_PopupText != null)
             {
-                m_InputField.text = slider.value.ToString("#0.##");
+                m_PopupTextColorTweener = TweenManager.TweenColor(
+                    color =>
+                    {
+                        if (m_PopupText != null)
+                            m_PopupText.color = color;
+                    },
+                    m_PopupText.color,
+                    m_PopupText.color.WithAlpha(0f),
+                    m_AnimationDuration * 0.25f);
             }
         }
 
-        public void OnBeforeValidate()
+        public virtual void UpdateColors()
         {
-            if (m_BackgroundGraphic)
-            {
-                m_BackgroundColor = m_BackgroundGraphic.color;
-            }
-        }
-
-        public void UpdateColors()
-        {
+            var isInteractable = IsInteractable();
             if (m_BackgroundGraphic)
             {
                 m_BackgroundGraphic.color = m_BackgroundColor;
             }
             if (m_HandleGraphic)
             {
-                m_HandleGraphic.color = m_Interactable ? m_EnabledColor : m_DisabledColor;
+                m_HandleGraphic.color = isInteractable ? m_EnabledColor : m_DisabledColor;
             }
 
+            var sliderDeltaRange = GetSliderValueRange();
+            var sliderRange = (int)(sliderDeltaRange * slider.normalizedValue);
             for (int i = 0; i < m_DotGraphics.Length; i++)
             {
                 if (m_DotGraphics[i] == null) continue;
 
-                if (slider.value > i)
+                if (sliderRange >= i)
                 {
-                    m_DotGraphics[i].color = m_Interactable ? m_EnabledColor : m_DisabledColor;
+                    m_DotGraphics[i].color = isInteractable ? m_EnabledColor : m_DisabledColor;
                 }
                 else
                 {
                     m_DotGraphics[i].color = m_BackgroundColor;
                 }
             }
-
-            if (m_LeftContentTransform)
-            {
-                leftCanvasGroup.alpha = m_LowLeftDisabledOpacity ? (m_Interactable ? 1f : 0.5f) : 1f;
-            }
-            if (m_RightContentTransform)
-            {
-                rightCanvasGroup.alpha = m_LowRightDisabledOpacity ? (m_Interactable ? 1f : 0.5f) : 1f;
-            }
+            RefreshVisualStyles(false);
         }
 
-        public override void RefreshVisualStyles(bool p_canAnimate = true)
+        public override void RefreshVisualStyles(bool canAnimate = true)
         {
-            SetStylePropertyColorsActive_Internal(p_canAnimate, m_AnimationDuration);
+            SetStylePropertyColorsActive_Internal(canAnimate, m_AnimationDuration);
+        }
+
+        public virtual bool IsInteractable()
+        {
+            bool interactable = m_Interactable;
+            if (interactable)
+            {
+                var allCanvas = GetComponentsInParent<CanvasGroup>();
+                for (int i = 0; i < allCanvas.Length; i++)
+                {
+                    var canvas = allCanvas[i];
+
+                    interactable = interactable && canvas.interactable;
+                    if (!interactable || canvas.ignoreParentGroups)
+                        break;
+                }
+            }
+            return interactable;
         }
 
         #endregion
 
-        #region Layout Functions
+        #region Receivers
 
-        public void CalculateLayoutInputHorizontal()
+        protected virtual void HandleOnInputEnd(string value)
         {
-            if (m_LeftContentTransform)
+            if (m_InputField != null && slider != null)
             {
-                ILayoutElement[] leftElements = m_LeftContentTransform.GetComponentsInChildren<ILayoutElement>();
+                float floatValue;
+                if (float.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out floatValue))
+                    slider.value = floatValue;
 
-                leftElements = leftElements.Reverse().ToArray();
-
-                for (int i = 0; i < leftElements.Length; i++)
-                {
-                    leftElements[i].CalculateLayoutInputHorizontal();
-                }
-
-                m_LeftWidth = LayoutUtility.GetPreferredWidth(m_LeftContentTransform) + 16;
-            }
-
-            if (m_RightContentTransform)
-            {
-                ILayoutElement[] rightElements = m_RightContentTransform.GetComponentsInChildren<ILayoutElement>();
-
-                rightElements = rightElements.Reverse().ToArray();
-
-                for (int i = 0; i < rightElements.Length; i++)
-                {
-                    rightElements[i].CalculateLayoutInputHorizontal();
-                }
-
-                m_RightWidth = LayoutUtility.GetPreferredWidth(m_RightContentTransform) + 16;
-            }
-            else
-            {
-                m_RightWidth = 0f;
-            }
-
-            m_Width = Mathf.Max(m_ManualPreferredWidth, m_LeftWidth + m_RightWidth + ((slider.wholeNumbers && m_HasDots) ? 6f : 0f));
-        }
-
-        /// <summary>
-        /// Sets the layout horizontal.
-        /// </summary>
-        public void SetLayoutHorizontal()
-        {
-            SetTracker();
-            if (m_LeftContentTransform)
-            {
-                ILayoutController[] leftControllers = m_LeftContentTransform.GetComponentsInChildren<ILayoutController>();
-
-                for (int i = 0; i < leftControllers.Length; i++)
-                {
-                    leftControllers[i].SetLayoutHorizontal();
-                }
-            }
-
-            if (m_RightContentTransform)
-            {
-                ILayoutController[] rightControllers = m_RightContentTransform.GetComponentsInChildren<ILayoutController>();
-
-                for (int i = 0; i < rightControllers.Length; i++)
-                {
-                    rightControllers[i].SetLayoutHorizontal();
-                }
-            }
-
-            m_SliderContentTransform.anchorMin = new Vector2(0, m_SliderContentTransform.anchorMin.y);
-            m_SliderContentTransform.anchorMax = new Vector2(1, m_SliderContentTransform.anchorMax.y);
-
-            m_SliderContentTransform.anchoredPosition = new Vector2(m_LeftWidth + ((slider.wholeNumbers && m_HasDots) ? 3f : 0f), m_SliderContentTransform.anchoredPosition.y);
-            m_SliderContentTransform.sizeDelta = new Vector2(-(m_LeftWidth + m_RightWidth) - ((slider.wholeNumbers && m_HasDots) ? 6f : 0f), m_SliderContentTransform.sizeDelta.y);
-        }
-
-        public void CalculateLayoutInputVertical()
-        {
-            float leftHeight = 0;
-            float rightHeight = 0;
-
-            if (m_LeftContentTransform)
-            {
-                ILayoutElement[] elements = m_LeftContentTransform.GetComponentsInChildren<ILayoutElement>();
-                elements = elements.Reverse().ToArray();
-                for (int i = 0; i < elements.Length; i++)
-                {
-                    elements[i].CalculateLayoutInputVertical();
-                }
-
-                leftHeight = LayoutUtility.GetPreferredHeight(m_LeftContentTransform);
-            }
-
-            if (m_RightContentTransform)
-            {
-                ILayoutElement[] elements = m_RightContentTransform.GetComponentsInChildren<ILayoutElement>();
-                elements = elements.Reverse().ToArray();
-                for (int i = 0; i < elements.Length; i++)
-                {
-                    elements[i].CalculateLayoutInputVertical();
-                }
-
-                rightHeight = LayoutUtility.GetPreferredHeight(m_RightContentTransform);
-            }
-
-            m_Height = Mathf.Max(LayoutUtility.GetPreferredHeight(m_SliderContentTransform), Mathf.Max(leftHeight, rightHeight));
-            m_Height = Mathf.Max(m_Height, 24f);
-        }
-
-        public void SetLayoutVertical()
-        {
-            if (m_LeftContentTransform)
-            {
-                ILayoutController[] controllers = m_LeftContentTransform.GetComponentsInChildren<ILayoutController>();
-                for (int i = 0; i < controllers.Length; i++)
-                {
-                    controllers[i].SetLayoutVertical();
-                }
-            }
-
-            if (m_RightContentTransform)
-            {
-                ILayoutController[] controllers = m_RightContentTransform.GetComponentsInChildren<ILayoutController>();
-                for (int i = 0; i < controllers.Length; i++)
-                {
-                    controllers[i].SetLayoutVertical();
-                }
-            }
-
-            if (rootCanvas != null && !m_IsSelected)
-            {
-                Vector2 tempVector2 = m_HandleGraphic.rectTransform.anchoredPosition;
-                tempVector2.y = (rootCanvas.pixelPerfect) ? 1f : 0f;
-                m_HandleGraphic.rectTransform.anchoredPosition = tempVector2;
+                m_InputField.text = slider.value.ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
         }
 
-        public float minWidth
+        protected virtual void HandleOnSliderValueChanged(float value)
         {
-            get { return -1; }
-        }
+            if (m_OnValueChanged != null)
+                m_OnValueChanged.Invoke(value);
 
-        public float preferredWidth
-        {
-            get { return m_HasManualPreferredWidth ? m_Width : -1; }
-        }
+            var popupText = slider.value.ToString("#0.#", System.Globalization.CultureInfo.InvariantCulture);
+            var valueText = slider.value.ToString("#0.##", System.Globalization.CultureInfo.InvariantCulture);
 
-        public float flexibleWidth
-        {
-            get { return -1; }
-        }
+            if(m_PopupText != null)
+                m_PopupText.SetGraphicText(popupText);
 
-        public float minHeight
-        {
-            get { return -1; }
-        }
+            if (m_ValueText != null)
+                m_ValueText.SetGraphicText(valueText);
 
-        public float preferredHeight
-        {
-            get { return m_Height; }
-        }
+            if (m_InputField != null)
+                m_InputField.text = valueText;
 
-        public float flexibleHeight
-        {
-            get { return -1; }
-        }
-
-        public int layoutPriority
-        {
-            get { return -1; }
+            UpdateColors();
         }
 
         #endregion
@@ -1129,46 +835,46 @@ namespace MaterialUI
             {
             }
 
-            public SliderStyleProperty(string p_name, Component p_target, Color p_colorEnabled, Color p_colorDisabled, bool p_useStyleGraphic)
+            public SliderStyleProperty(string name, Component target, Color colorEnabled, Color colorDisabled, bool useStyleGraphic)
             {
-                m_target = p_target != null ? p_target.transform : null;
-                m_name = p_name;
-                m_colorEnabled = p_colorEnabled;
-                m_colorDisabled = p_colorDisabled;
-                m_useStyleGraphic = p_useStyleGraphic;
+                m_target = target != null ? target.transform : null;
+                m_name = name;
+                m_colorEnabled = colorEnabled;
+                m_colorDisabled = colorDisabled;
+                m_useStyleGraphic = useStyleGraphic;
             }
 
             #endregion
 
             #region Helper Functions
 
-            public override void Tween(BaseStyleElement p_sender, bool p_canAnimate, float p_animationDuration)
+            public override void Tween(BaseStyleElement sender, bool canAnimate, float animationDuration)
             {
                 TweenManager.EndTween(_tweenId);
 
-                var v_graphic = GetTarget<Graphic>();
-                if (v_graphic != null)
+                var graphic = GetTarget<Graphic>();
+                if (graphic != null)
                 {
-                    var v_slider = p_sender as MaterialSlider;
-                    var v_isInteractable = v_slider != null ? v_slider.m_Interactable : true;
+                    var slider = sender as MaterialSlider;
+                    var isInteractable = slider != null ? slider.IsInteractable() : true;
 
-                    var v_endColor = !v_isInteractable ? m_colorDisabled : m_colorEnabled;
-                    if (p_canAnimate && Application.isPlaying)
+                    var endColor = !isInteractable ? m_colorDisabled : m_colorEnabled;
+                    if (canAnimate && Application.isPlaying)
                     {
                         _tweenId = TweenManager.TweenColor(
                                 (color) =>
                                 {
-                                    if (v_graphic != null)
-                                        v_graphic.color = color;
+                                    if (graphic != null)
+                                        graphic.color = color;
                                 },
-                                v_graphic.color,
-                                v_endColor,
-                                p_animationDuration
+                                graphic.color,
+                                endColor,
+                                animationDuration
                             );
                     }
                     else
                     {
-                        v_graphic.color = v_endColor;
+                        graphic.color = endColor;
                     }
                 }
             }

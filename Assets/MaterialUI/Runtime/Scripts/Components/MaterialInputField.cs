@@ -11,6 +11,7 @@ using System;
 using TMPro;
 using UnityEngine.Events;
 using Kyub;
+using MaterialUI.Internal;
 
 namespace MaterialUI
 {
@@ -22,6 +23,15 @@ namespace MaterialUI
     [AddComponentMenu("MaterialUI/Material Input Field", 100)]
     public class MaterialInputField : SelectableStyleElement<MaterialInputField.InputFieldStyleProperty>, ILayoutGroup, ILayoutElement, IDeselectHandler, ISerializationCallbackReceiver
     {
+        [System.Serializable]
+        public class DialogPromptAddress : ComponentPrefabAddress<DialogPrompt>
+        {
+            public static explicit operator DialogPromptAddress(string s)
+            {
+                return new DialogPromptAddress() { AssetPath = s };
+            }
+        }
+
         public enum BackgroundLayoutMode
         {
             TextOnly,
@@ -29,6 +39,14 @@ namespace MaterialUI
             TextAndLowerContent,
             All,
             Manual
+        }
+
+        public enum InputPromptDisplayMode
+        {
+            None,
+            WhenCanShowMobileInput,
+            WhenSupportTouchScreen,
+            Always
         }
 
         public enum LineLayoutMode
@@ -53,6 +71,12 @@ namespace MaterialUI
         }
 
         #region Private Varibles
+
+        //This is used to override default "Unity Input Prompt" to a custom dialog
+        [SerializeField]
+        InputPromptDisplayMode m_InputPromptDisplayOption = (InputPromptDisplayMode)0;
+        [SerializeField]
+        DialogPromptAddress m_CustomPromptDialogAddress = null;
 
         [SerializeField, SerializeStyleProperty, UnityEngine.Serialization.FormerlySerializedAs("m_BackgroundSizeMode")]
         BackgroundLayoutMode m_BackgroundLayoutMode = BackgroundLayoutMode.TextOnly;
@@ -288,6 +312,36 @@ namespace MaterialUI
 
         #region Properties
 
+        public DialogPromptAddress customPromptDialogAddress
+        {
+            get
+            {
+                return m_CustomPromptDialogAddress;
+            }
+            set
+            {
+                if (m_CustomPromptDialogAddress == value)
+                    return;
+                m_CustomPromptDialogAddress = value;
+            }
+        }
+
+        public InputPromptDisplayMode inputPromptDisplayOption
+        {
+            get
+            {
+                return m_InputPromptDisplayOption;
+            }
+            set
+            {
+                if (m_InputPromptDisplayOption == value)
+                    return;
+                m_InputPromptDisplayOption = value;
+                if(enabled && gameObject.activeInHierarchy)
+                    CheckInputPromptDisplayModeVisibility();
+            }
+        }
+
         protected BaseInput input
         {
             get
@@ -391,6 +445,154 @@ namespace MaterialUI
                 else if (promptInputField != null)
                 {
                     promptInputField.contentType = value;
+                    ForceUpdateAll();
+                }
+            }
+        }
+
+        public InputField.CharacterValidation characterValidation
+        {
+            get
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                InputField.CharacterValidation enumValue;
+                if (tmpInputField == null || !Enum.TryParse(tmpInputField.characterValidation.ToString(), true, out enumValue))
+                {
+                    enumValue = unityInputField != null ? unityInputField.characterValidation :
+                        (tmpInputField != null ? (InputField.CharacterValidation)((int)tmpInputField.characterValidation) :
+                        (promptInputField != null ? promptInputField.characterValidation : InputField.CharacterValidation.None));
+                }
+                return enumValue;
+            }
+            set
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                {
+                    unityInputField.characterValidation = value;
+                    ForceUpdateAll();
+                }
+                else if (tmpInputField != null)
+                {
+                    TMP_InputField.CharacterValidation enumValue;
+                    if (!Enum.TryParse(tmpInputField.characterValidation.ToString(), true, out enumValue))
+                    {
+                        enumValue = (TMP_InputField.CharacterValidation)((int)value);
+                    }
+                    tmpInputField.characterValidation = enumValue;
+                    ForceUpdateAll();
+                }
+                else if (promptInputField != null)
+                {
+                    promptInputField.characterValidation = value;
+                    ForceUpdateAll();
+                }
+            }
+        }
+
+        public UnityEngine.UI.InputField.InputType inputType
+        {
+            get
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.inputType : (tmpInputField != null ? (InputField.InputType)((int)tmpInputField.inputType) : (promptInputField != null ? promptInputField.inputType : InputField.InputType.Standard));
+            }
+            set
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                {
+                    unityInputField.inputType = value;
+                    ForceUpdateAll();
+                }
+                else if (tmpInputField != null)
+                {
+                    tmpInputField.inputType = (TMP_InputField.InputType)((int)value);
+                    ForceUpdateAll();
+                }
+                else if (promptInputField != null)
+                {
+                    promptInputField.inputType = value;
+                    ForceUpdateAll();
+                }
+            }
+        }
+
+        public UnityEngine.UI.InputField.LineType lineType
+        {
+            get
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.lineType : (tmpInputField != null ? (InputField.LineType)((int)tmpInputField.lineType) : (promptInputField != null ? promptInputField.lineType : InputField.LineType.SingleLine));
+            }
+            set
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                {
+                    unityInputField.lineType = value;
+                    ForceUpdateAll();
+                }
+                else if (tmpInputField != null)
+                {
+                    tmpInputField.lineType = (TMP_InputField.LineType)((int)value);
+                    ForceUpdateAll();
+                }
+                else if (promptInputField != null)
+                {
+                    promptInputField.lineType = value;
+                    ForceUpdateAll();
+                }
+            }
+        }
+
+        public TouchScreenKeyboardType keyboardType
+        {
+            get
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.keyboardType : (tmpInputField != null ? tmpInputField.keyboardType : (promptInputField != null ? promptInputField.keyboardType : TouchScreenKeyboardType.Default));
+            }
+            set
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                {
+                    unityInputField.keyboardType = value;
+                    ForceUpdateAll();
+                }
+                else if (tmpInputField != null)
+                {
+                    tmpInputField.keyboardType = value;
+                    ForceUpdateAll();
+                }
+                else if (promptInputField != null)
+                {
+                    promptInputField.keyboardType = value;
                     ForceUpdateAll();
                 }
             }
@@ -505,6 +707,31 @@ namespace MaterialUI
                     tmpInputField.asteriskChar = value;
                 else if (promptInputField != null)
                     promptInputField.asteriskChar = value;
+            }
+        }
+
+        public bool shouldHideMobileInput
+        {
+            get
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                return unityInputField != null ? unityInputField.shouldHideMobileInput : (tmpInputField != null ? tmpInputField.shouldHideMobileInput : (promptInputField != null ? promptInputField.shouldHideMobileInput : true));
+            }
+            set
+            {
+                var unityInputField = inputField as InputField;
+                var tmpInputField = m_InputField as TMP_InputField;
+                var promptInputField = m_InputField as InputPromptField;
+
+                if (unityInputField != null)
+                    unityInputField.shouldHideMobileInput = value;
+                else if (tmpInputField != null)
+                    tmpInputField.shouldHideMobileInput = value;
+                else if (promptInputField != null)
+                    promptInputField.shouldHideMobileInput = value;
             }
         }
 
@@ -1413,12 +1640,14 @@ namespace MaterialUI
             RefreshVisualStyles();
             OnTextChangedInternal(text);
             SetLayoutDirty();
+            CheckInputPromptDisplayModeVisibility();
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             SetLayoutDirty();
+            ForceDestroyDisplayer();
         }
 
         protected override void OnDestroy()
@@ -1454,6 +1683,7 @@ namespace MaterialUI
         protected override void OnValidateDelayed()
         {
             base.OnValidateDelayed();
+            CheckInputPromptDisplayModeVisibility();
             if (!Application.isPlaying)
             {
                 OnTextChangedInternal(text);
@@ -1473,6 +1703,7 @@ namespace MaterialUI
         {
             if (Application.isPlaying)
             {
+                CheckInputPromptDisplayModeVisibility();
                 var changed = m_LastFocussedState != isFocused;
                 if (isFocused)
                 {
@@ -1616,6 +1847,60 @@ namespace MaterialUI
 
         #region Other Functions
 
+        public virtual bool SupportCustomPrompt()
+        {
+            var supportPrompt = false;
+            if (m_InputPromptDisplayOption == InputPromptDisplayMode.Always)
+                supportPrompt = true;
+            else if (m_InputPromptDisplayOption == InputPromptDisplayMode.WhenCanShowMobileInput)
+                supportPrompt = !shouldHideMobileInput;
+            else if (m_InputPromptDisplayOption == InputPromptDisplayMode.WhenSupportTouchScreen)
+                supportPrompt = TouchScreenKeyboard.isSupported;
+
+            return supportPrompt;
+        }
+
+        protected virtual void CheckInputPromptDisplayModeVisibility()
+        {
+            if (Application.isPlaying && enabled && gameObject.activeInHierarchy)
+            {
+                var displayer = GetComponent<InputPromptDisplayer>();
+
+                var supportPrompt = SupportCustomPrompt();
+                if (inputField != null)
+                    inputField.enabled = !supportPrompt;
+
+                if (supportPrompt && displayer == null)
+                {
+                    displayer = gameObject.AddComponent<InputPromptDisplayer>();
+                    displayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
+                }
+                else if (displayer != null)
+                {
+                    if (!supportPrompt)
+                    {
+                        ForceDestroyDisplayer();
+                    }
+                    else if (!displayer.enabled)
+                    {
+                        displayer.enabled = true;
+                    }
+                }
+            }
+        }
+
+        protected virtual void ForceDestroyDisplayer()
+        {
+            var displayer = GetComponent<InputPromptDisplayer>();
+            if (displayer != null)
+            {
+                if (displayer.hideFlags != HideFlags.None)
+                    Component.DestroyImmediate(displayer);
+                else
+                    displayer.enabled = false;
+            }
+        }
+
         public void SetTextWithoutNotify(string text)
         {
             text = string.IsNullOrEmpty(text) ? string.Empty : text;
@@ -1637,7 +1922,7 @@ namespace MaterialUI
             ForceLabelUpdate();
             if (inputField != null)
             {
-                var method = inputField.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).Single(m =>
+                var method = inputField.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).FirstOrDefault(m =>
                             m.Name == "RecreateKeyboard" &&
                             m.GetParameters().Length == 0);
 
@@ -1691,7 +1976,7 @@ namespace MaterialUI
         {
             if (inputField != null)
             {
-                var method = inputField.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).Single(m =>
+                var method = inputField.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).FirstOrDefault(m =>
                             m.Name == "DeactivateInputField" &&
                             m.GetParameters().Length == 0);
                 if (method != null)

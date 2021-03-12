@@ -2,6 +2,7 @@
 //  Please see license file for terms and conditions of use, and more information.
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -69,23 +70,23 @@ namespace MaterialUI
 
         #region Helper Functions
 
-        protected override void ValidateKeyTriggers(MaterialFocusGroup p_materialKeyFocus)
+        protected override void ValidateKeyTriggers(MaterialFocusGroup materialKeyFocus)
         {
-            if (p_materialKeyFocus != null)
+            if (materialKeyFocus != null)
             {
-                var v_affirmativeTrigger = new MaterialFocusGroup.KeyTriggerData();
-                v_affirmativeTrigger.Name = "Return KeyDown";
-                v_affirmativeTrigger.Key = KeyCode.Return;
-                v_affirmativeTrigger.TriggerType = MaterialFocusGroup.KeyTriggerData.KeyTriggerType.KeyDown;
-                MaterialActivity.AddEventListener(v_affirmativeTrigger.OnCallTrigger, AffirmativeButtonClickedConditional);
+                var affirmativeTrigger = new MaterialFocusGroup.KeyTriggerData();
+                affirmativeTrigger.Name = "Return KeyDown";
+                affirmativeTrigger.Key = KeyCode.Return;
+                affirmativeTrigger.TriggerType = MaterialFocusGroup.KeyTriggerData.KeyTriggerType.KeyDown;
+                MaterialActivity.AddEventListener(affirmativeTrigger.OnCallTrigger, AffirmativeButtonClickedConditional);
 
-                var v_cancelTrigger = new MaterialFocusGroup.KeyTriggerData();
-                v_cancelTrigger.Name = "Escape KeyDown";
-                v_cancelTrigger.Key = KeyCode.Escape;
-                v_cancelTrigger.TriggerType = MaterialFocusGroup.KeyTriggerData.KeyTriggerType.KeyDown;
-                MaterialActivity.AddEventListener(v_cancelTrigger.OnCallTrigger, DismissiveButtonClicked);
+                var cancelTrigger = new MaterialFocusGroup.KeyTriggerData();
+                cancelTrigger.Name = "Escape KeyDown";
+                cancelTrigger.Key = KeyCode.Escape;
+                cancelTrigger.TriggerType = MaterialFocusGroup.KeyTriggerData.KeyTriggerType.KeyDown;
+                MaterialActivity.AddEventListener(cancelTrigger.OnCallTrigger, DismissiveButtonClicked);
 
-                p_materialKeyFocus.KeyTriggers = new System.Collections.Generic.List<MaterialFocusGroup.KeyTriggerData> { v_affirmativeTrigger, v_cancelTrigger };
+                materialKeyFocus.KeyTriggers = new System.Collections.Generic.List<MaterialFocusGroup.KeyTriggerData> { affirmativeTrigger, cancelTrigger };
             }
         }
 
@@ -124,14 +125,14 @@ namespace MaterialUI
             {
                 if (firstFieldConfig != null)
                     firstFieldConfig.Apply(m_FirstInputField);
-                //m_FirstInputField.customTextValidator = new EmptyTextValidator();
+                m_FirstInputField.inputPromptDisplayOption = (MaterialInputField.InputPromptDisplayMode)0;
             }
             if (m_SecondInputField)
             {
                 if (secondFieldConfig != null)
                     secondFieldConfig.Apply(m_SecondInputField);
-                //m_SecondInputField.customTextValidator = new EmptyTextValidator();
 
+                m_SecondInputField.inputPromptDisplayOption = (MaterialInputField.InputPromptDisplayMode)0;
                 m_SecondInputField.gameObject.SetActive(secondFieldConfig != null);
             }
 
@@ -228,6 +229,9 @@ namespace MaterialUI
             [SerializeField]
             private bool m_HideMobileInput = false;
 
+            [SerializeField]
+            Dictionary<string, object> m_extraProperties = new Dictionary<string, object>();
+
             #endregion
 
             #region Properties
@@ -292,6 +296,12 @@ namespace MaterialUI
                 set { m_HideMobileInput = value; }
             }
 
+            public Dictionary<string, object> extraProperties
+            {
+                get { return m_extraProperties; }
+                set { m_extraProperties = value; }
+            }
+
             #endregion
 
             #region Helper Functions
@@ -307,6 +317,24 @@ namespace MaterialUI
                     else if (materialInput.inputField is InputPromptField)
                         Apply_Internal(materialInput.inputField as InputPromptField);
                     materialInput.hintText = m_HintText;
+
+                    //Try Apply Extra Properties
+                    if (m_extraProperties != null)
+                    {
+                        var stylesToApplyDict = materialInput.ExtraStylePropertiesMap;
+
+                        foreach (var pair in stylesToApplyDict)
+                        {
+                            var key = pair.Key;
+                            var style = pair.Value;
+
+                            object data;
+                            if (!string.IsNullOrEmpty(key) && m_extraProperties.TryGetValue(key, out data))
+                            {
+                                StyleUtils.ApplyGraphicData(style.Target, data);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -369,80 +397,95 @@ namespace MaterialUI
 
             public static implicit operator InputFieldConfigData(MaterialInputField materialInput)
             {
-                InputFieldConfigData v_config = new InputFieldConfigData();
+                InputFieldConfigData config = new InputFieldConfigData();
                 if (materialInput != null)
                 {
                     if (materialInput.inputField is InputField)
-                        v_config = materialInput.inputField as InputField;
+                        config = materialInput.inputField as InputField;
                     else if (materialInput.inputField is TMPro.TMP_InputField)
-                        v_config =  materialInput.inputField as TMPro.TMP_InputField;
+                        config =  materialInput.inputField as TMPro.TMP_InputField;
                     else if (materialInput.inputField is InputPromptField)
-                        v_config =  materialInput.inputField as InputPromptField;
+                        config =  materialInput.inputField as InputPromptField;
 
-                    v_config.m_HintText = materialInput.hintText;
+                    config.m_HintText = materialInput.hintText;
+
+                    var stylesDict = materialInput.ExtraStylePropertiesMap;
+
+                    config.m_extraProperties = new Dictionary<string, object>();
+                    foreach (var pair in stylesDict)
+                    {
+                        var key = pair.Key;
+                        var style = pair.Value;
+
+                        if (!string.IsNullOrEmpty(key) && style != null && style.Target != null)
+                        {
+                            var data = StyleUtils.GetGraphicData(style.Target);
+                            config.m_extraProperties[key] = data;
+                        }
+                    }
                 }
 
-                return v_config;
+                return config;
             }
 
             public static implicit operator InputFieldConfigData(InputPromptField input)
             {
-                var v_config = new InputFieldConfigData();
+                var config = new InputFieldConfigData();
                 if (input != null)
                 {
-                    v_config.m_Text = input.text;
-                    v_config.m_InputType = input.inputType;
-                    v_config.m_LineType = input.lineType;
-                    v_config.m_ContentType = input.contentType;
-                    v_config.m_CharacterValidation = input.characterValidation;
-                    v_config.m_KeyboardType = input.keyboardType;
-                    v_config.m_CharacterLimit = input.characterLimit;
-                    v_config.m_AsteriskChar = input.asteriskChar;
-                    v_config.m_HideMobileInput = input.shouldHideMobileInput;
-                    v_config.m_HintText = input.hintText;
+                    config.m_Text = input.text;
+                    config.m_InputType = input.inputType;
+                    config.m_LineType = input.lineType;
+                    config.m_ContentType = input.contentType;
+                    config.m_CharacterValidation = input.characterValidation;
+                    config.m_KeyboardType = input.keyboardType;
+                    config.m_CharacterLimit = input.characterLimit;
+                    config.m_AsteriskChar = input.asteriskChar;
+                    config.m_HideMobileInput = input.shouldHideMobileInput;
+                    config.m_HintText = input.hintText;
                 }
 
-                return v_config;
+                return config;
             }
 
             public static implicit operator InputFieldConfigData(InputField input)
             {
-                var v_config = new InputFieldConfigData();
+                var config = new InputFieldConfigData();
                 if (input != null)
                 {
-                    v_config.m_Text = input.text;
-                    v_config.m_InputType = input.inputType;
-                    v_config.m_LineType = input.lineType;
-                    v_config.m_ContentType = input.contentType;
-                    v_config.m_CharacterValidation = input.characterValidation;
-                    v_config.m_KeyboardType = input.keyboardType;
-                    v_config.m_CharacterLimit = input.characterLimit;
-                    v_config.m_AsteriskChar = input.asteriskChar;
-                    v_config.m_HideMobileInput = input.shouldHideMobileInput;
-                    v_config.m_HintText = input.placeholder != null? input.placeholder.GetGraphicText() : "";
+                    config.m_Text = input.text;
+                    config.m_InputType = input.inputType;
+                    config.m_LineType = input.lineType;
+                    config.m_ContentType = input.contentType;
+                    config.m_CharacterValidation = input.characterValidation;
+                    config.m_KeyboardType = input.keyboardType;
+                    config.m_CharacterLimit = input.characterLimit;
+                    config.m_AsteriskChar = input.asteriskChar;
+                    config.m_HideMobileInput = input.shouldHideMobileInput;
+                    config.m_HintText = input.placeholder != null? input.placeholder.GetGraphicText() : "";
                 }
 
-                return v_config;
+                return config;
             }
 
             public static implicit operator InputFieldConfigData(TMPro.TMP_InputField input)
             {
-                var v_config = new InputFieldConfigData();
+                var config = new InputFieldConfigData();
                 if (input != null)
                 {
-                    v_config.m_Text = input.text;
-                    v_config.m_InputType = (InputField.InputType)Enum.ToObject(typeof(InputField.InputType), (int)input.inputType);
-                    v_config.m_LineType = (InputField.LineType)Enum.ToObject(typeof(InputField.LineType), (int)input.lineType);
-                    v_config.m_ContentType = (InputField.ContentType)Enum.ToObject(typeof(InputField.ContentType), (int)input.contentType);
-                    v_config.m_CharacterValidation = (InputField.CharacterValidation)Enum.Parse(typeof(InputField.CharacterValidation), Enum.GetName(typeof(TMPro.TMP_InputField.CharacterValidation), input.characterValidation));
-                    v_config.m_KeyboardType = input.keyboardType;
-                    v_config.m_CharacterLimit = input.characterLimit;
-                    v_config.m_AsteriskChar = input.asteriskChar;
-                    v_config.m_HideMobileInput = input.shouldHideMobileInput;
-                    v_config.m_HintText = input.placeholder != null ? input.placeholder.GetGraphicText() : "";
+                    config.m_Text = input.text;
+                    config.m_InputType = (InputField.InputType)Enum.ToObject(typeof(InputField.InputType), (int)input.inputType);
+                    config.m_LineType = (InputField.LineType)Enum.ToObject(typeof(InputField.LineType), (int)input.lineType);
+                    config.m_ContentType = (InputField.ContentType)Enum.ToObject(typeof(InputField.ContentType), (int)input.contentType);
+                    config.m_CharacterValidation = (InputField.CharacterValidation)Enum.Parse(typeof(InputField.CharacterValidation), Enum.GetName(typeof(TMPro.TMP_InputField.CharacterValidation), input.characterValidation));
+                    config.m_KeyboardType = input.keyboardType;
+                    config.m_CharacterLimit = input.characterLimit;
+                    config.m_AsteriskChar = input.asteriskChar;
+                    config.m_HideMobileInput = input.shouldHideMobileInput;
+                    config.m_HintText = input.placeholder != null ? input.placeholder.GetGraphicText() : "";
                 }
 
-                return v_config;
+                return config;
             }
 
             #endregion

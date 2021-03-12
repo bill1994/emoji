@@ -10,89 +10,89 @@ namespace MaterialUI
     {
         #region Resources Get/Set/Replace
 
-        public static Color32 GetStyleColor(Color32 p_color)
+        public static Color32 GetStyleColor(Color32 color)
         {
-            var v_colorNoAlpha = new Color32(p_color.r, p_color.g, p_color.b, byte.MaxValue);
-            return v_colorNoAlpha;
+            var colorNoAlpha = new Color32(color.r, color.g, color.b, byte.MaxValue);
+            return colorNoAlpha;
         }
 
-        public static object GetStyleResource(Component p_target)
+        public static object GetStyleResource(Component target)
         {
-            if (p_target != null)
+            if (target != null)
             {
-                var v_targetGraphic = p_target is Graphic ? p_target as Graphic : p_target.GetComponent<Graphic>();
-                if (v_targetGraphic != null)
+                var targetGraphic = target is Graphic ? target as Graphic : target.GetComponent<Graphic>();
+                if (targetGraphic != null)
                 {
-                    if (v_targetGraphic is IVectorImage)
+                    if (targetGraphic is IVectorImage)
                     {
-                        return (v_targetGraphic as IVectorImage).vectorImageData;
+                        return (targetGraphic as IVectorImage).vectorImageData;
                     }
-                    else if (v_targetGraphic is Text)
+                    else if (targetGraphic is Text)
                     {
-                        return (v_targetGraphic as Text).font;
+                        return (targetGraphic as Text).font;
                     }
-                    else if (v_targetGraphic is TMPro.TMP_Text)
+                    else if (targetGraphic is TMPro.TMP_Text)
                     {
-                        return (v_targetGraphic as TMPro.TMP_Text).font;
+                        return (targetGraphic as TMPro.TMP_Text).font;
                     }
-                    else if (v_targetGraphic is Image)
+                    else if (targetGraphic is Image)
                     {
-                        return (v_targetGraphic as Image).sprite;
+                        return (targetGraphic as Image).sprite;
                     }
-                    else if (v_targetGraphic is RawImage)
+                    else if (targetGraphic is RawImage)
                     {
-                        return (v_targetGraphic as RawImage).texture;
+                        return (targetGraphic as RawImage).texture;
                     }
                 }
             }
             return null;
         }
 
-        public static bool ReplaceStyleColor(ref Color32 p_target, Color32 p_oldColor, Color32 p_newColor)
+        public static bool ReplaceStyleColor(ref Color32 target, Color32 oldColor, Color32 newColor)
         {
-            if (p_target.r == p_oldColor.r &&
-                p_target.g == p_oldColor.g &&
-                p_target.b == p_oldColor.b)
+            if (target.r == oldColor.r &&
+                target.g == oldColor.g &&
+                target.b == oldColor.b)
             {
-                p_target = new Color32(p_newColor.r, p_newColor.g, p_newColor.b, p_target.a);
+                target = new Color32(newColor.r, newColor.g, newColor.b, target.a);
                 return true;
             }
             return false;
         }
 
-        public static bool TryReplaceStyleResource(Component p_target, object p_oldResource, object p_newResource)
+        public static bool TryReplaceStyleResource(Component target, object oldResource, object newResource)
         {
-            if (p_target != null)
+            if (target != null)
             {
-                var v_targetGraphic = p_target is Graphic? p_target as Graphic : p_target.GetComponent<Graphic>();
-                if (v_targetGraphic != null)
+                var targetGraphic = target is Graphic? target as Graphic : target.GetComponent<Graphic>();
+                if (targetGraphic != null)
                 {
-                    var v_targetResource = GetStyleResource(p_target);
-                    if (v_targetResource != null && Object.Equals(v_targetResource, p_oldResource))
+                    var targetResource = GetStyleResource(target);
+                    if (targetResource != null && Object.Equals(targetResource, oldResource))
                     {
-                        if (v_targetGraphic is IVectorImage)
+                        if (targetGraphic is IVectorImage)
                         {
-                            (v_targetGraphic as IVectorImage).vectorImageData = p_newResource as VectorImageData;
+                            (targetGraphic as IVectorImage).vectorImageData = newResource as VectorImageData;
                             return true;
                         }
-                        else if (v_targetGraphic is Text)
+                        else if (targetGraphic is Text)
                         {
-                            (v_targetGraphic as Text).font = p_newResource as Font;
+                            (targetGraphic as Text).font = newResource as Font;
                             return true;
                         }
-                        else if (v_targetGraphic is TMPro.TMP_Text)
+                        else if (targetGraphic is TMPro.TMP_Text)
                         {
-                            (v_targetGraphic as TMPro.TMP_Text).font = p_newResource as TMPro.TMP_FontAsset;
+                            (targetGraphic as TMPro.TMP_Text).font = newResource as TMPro.TMP_FontAsset;
                             return true;
                         }
-                        else if (v_targetGraphic is Image)
+                        else if (targetGraphic is Image)
                         {
-                            (v_targetGraphic as Image).sprite = p_newResource as Sprite;
+                            (targetGraphic as Image).sprite = newResource as Sprite;
                             return true;
                         }
-                        else if (v_targetGraphic is RawImage)
+                        else if (targetGraphic is RawImage)
                         {
-                            (v_targetGraphic as RawImage).texture = p_newResource as Texture2D;
+                            (targetGraphic as RawImage).texture = newResource as Texture2D;
                             return true;
                         }
                     }
@@ -106,137 +106,258 @@ namespace MaterialUI
 
         #region Apply Target in Another
 
-        public static void ApplyObjectActive(Object p_target, Object p_template)
+        public static void ApplyObjectActive(Object target, Object template)
         {
-            ApplyObjectActive_Internal(p_target, p_template);
+            ApplyObjectActive_Internal(target, template);
         }
 
-        public static void ApplyStyleElement(Component p_target, Component p_template)
+        public static void ApplyStyleElement(Component target, Component template)
         {
-            ApplyStyleElement_Internal(p_target, p_template);
+            ApplyStyleElement_Internal(target, template);
         }
 
-        public static void ApplyGraphic(Component p_target, Component p_template, bool p_applyResources = true)
+        public static void ApplyGraphicData(Component target, object data)
         {
-            ApplyGraphic_Internal(p_target, p_template, p_applyResources, p_applyResources);
+            ApplyGraphicData_Internal(target, data, true, true);
         }
 
-        public static void ApplyImgGraphic(Component p_target, Component p_template)
+        public static void ApplyImgData(Component target, object data)
         {
-            ApplyGraphic_Internal(p_target, p_template, true, false);
+            ApplyGraphicData_Internal(target, data, true, false);
         }
 
-        public static void ApplyTextGraphic(Component p_target, Component p_template)
+        public static void ApplyTextData(Component target, object data)
         {
-            ApplyGraphic_Internal(p_target, p_template, false, true);
+            ApplyGraphicData_Internal(target, data, false, true);
         }
 
-        static void ApplyStyleElement_Internal(Component p_target, Component p_template)
+        public static object GetGraphicData(Component target)
         {
-            if (p_target != null && p_template != null)
+            return GetGraphicData_Internal(target, true, true);
+        }
+
+        public static object GetImgData(Component target)
+        {
+            return GetGraphicData_Internal(target, true, false);
+        }
+
+        public static object GetTextData(Component target)
+        {
+            return GetGraphicData_Internal(target, false, true);
+        }
+
+        public static void ApplyGraphic(Component target, Component template, bool applyResources = true)
+        {
+            ApplyGraphic_Internal(target, template, applyResources, applyResources);
+        }
+
+        public static void ApplyImgGraphic(Component target, Component template)
+        {
+            ApplyGraphic_Internal(target, template, true, false);
+        }
+
+        public static void ApplyTextGraphic(Component target, Component template)
+        {
+            ApplyGraphic_Internal(target, template, false, true);
+        }
+
+        static void ApplyStyleElement_Internal(Component target, Component template)
+        {
+            if (target != null && template != null)
             {
-                var v_targetStyle = p_target is BaseStyleElement? p_target as BaseStyleElement : p_target.GetComponent<BaseStyleElement>();
-                var v_templateStyle = p_template is BaseStyleElement ? p_template as BaseStyleElement : p_template.GetComponent<BaseStyleElement>();
+                var targetStyle = target is BaseStyleElement? target as BaseStyleElement : target.GetComponent<BaseStyleElement>();
+                var templateStyle = template is BaseStyleElement ? template as BaseStyleElement : template.GetComponent<BaseStyleElement>();
 
-                if (v_targetStyle != null && v_templateStyle != null)
+                if (targetStyle != null && templateStyle != null)
                 {
-                    if (v_targetStyle.IsSupportedStyleElement(v_templateStyle))
-                        v_targetStyle.StyleDataName = v_templateStyle.StyleDataName;
+                    if (targetStyle.IsSupportedStyleElement(templateStyle))
+                        targetStyle.StyleDataName = templateStyle.StyleDataName;
+                }
+            }
+        }
+        static void ApplyGraphicData_Internal(Component target, object data, bool supportImg, bool supportText)
+        {
+            if (target != null)
+            {
+                var targetGraphic = target is Graphic ? target as Graphic : target.GetComponent<Graphic>();
+
+                if (targetGraphic != null)
+                {
+                    if (supportText)
+                    {
+                        if (targetGraphic is Text && !(targetGraphic is IVectorImage))
+                        {
+                            var textTarget = targetGraphic as Text;
+                            if(data is string || data == null)
+                                textTarget.SetGraphicText(data as string);
+                        }
+                        else if (targetGraphic is TMPro.TMP_Text && !(targetGraphic is IVectorImage))
+                        {
+                            var textTarget = targetGraphic as TMPro.TMP_Text;
+                            if (data is string || data == null)
+                                textTarget.SetGraphicText(data as string);
+                        }
+                    }
+                    if (supportImg)
+                    {
+                        if (targetGraphic is IVectorImage)
+                        {
+                            var vectorTarget = targetGraphic as IVectorImage;
+                            if (data is VectorImageData || data == null)
+                                vectorTarget.vectorImageData = data as VectorImageData;
+                        }
+                        else if (targetGraphic is Image)
+                        {
+                            var imageTarget = targetGraphic as Image;
+                            if (data is Sprite || data == null)
+                                imageTarget.sprite = data as Sprite;
+                        }
+                        else if (targetGraphic is RawImage)
+                        {
+                            var rawTarget = targetGraphic as RawImage;
+                            if (data is Texture || data == null)
+                                rawTarget.texture = data as Texture;
+                        }
+                    }
                 }
             }
         }
 
-        static void ApplyGraphic_Internal(Component p_target, Component p_template, bool p_supportImg, bool p_supportText)
+        static object GetGraphicData_Internal(Component target, bool supportImg, bool supportText)
         {
-            if (p_target != null && p_template != null)
+            if (target != null)
             {
-                var v_targetGraphic = p_target is Graphic ? p_target as Graphic : p_target.GetComponent<Graphic>();
-                var v_templateGraphic = p_template is Graphic ? p_template as Graphic : p_template.GetComponent<Graphic>();
+                var targetGraphic = target is Graphic ? target as Graphic : target.GetComponent<Graphic>();
 
-                if (v_targetGraphic != null && v_templateGraphic != null)
+                if (targetGraphic != null)
+                {
+                    if (supportText)
+                    {
+                        if (targetGraphic is Text && !(targetGraphic is IVectorImage))
+                        {
+                            var textTarget = targetGraphic as Text;
+                            return textTarget.GetGraphicText();
+                        }
+                        else if (targetGraphic is TMPro.TMP_Text && !(targetGraphic is IVectorImage))
+                        {
+                            var textTarget = targetGraphic as TMPro.TMP_Text;
+                            return textTarget.GetGraphicText();
+                        }
+                    }
+                    if (supportImg)
+                    {
+                        if (targetGraphic is IVectorImage)
+                        {
+                            var vectorTarget = targetGraphic as IVectorImage;
+                            return vectorTarget.vectorImageData;
+                        }
+                        else if (targetGraphic is Image)
+                        {
+                            var imageTarget = targetGraphic as Image;
+                            return imageTarget.sprite;
+                        }
+                        else if (targetGraphic is RawImage)
+                        {
+                            var rawTarget = targetGraphic as RawImage;
+                            return rawTarget.texture;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        static void ApplyGraphic_Internal(Component target, Component template, bool supportImg, bool supportText)
+        {
+            if (target != null && template != null)
+            {
+                var targetGraphic = target is Graphic ? target as Graphic : target.GetComponent<Graphic>();
+                var templateGraphic = template is Graphic ? template as Graphic : template.GetComponent<Graphic>();
+
+                if (targetGraphic != null && templateGraphic != null)
                 {
                     //Disable/Enable Graphic based in Template
-                    //v_targetGraphic.enabled = v_templateGraphic.enabled;
+                    //targetGraphic.enabled = templateGraphic.enabled;
 
-                    var v_targetType = v_targetGraphic.GetType();
-                    var v_templateType = v_templateGraphic.GetType();
+                    var targetType = targetGraphic.GetType();
+                    var templateType = templateGraphic.GetType();
 
                     //Clone Asset based in Graphic Type (Support Text / TMP_Text / Image / Raw Image / Vector Image)
-                    if (v_targetType == v_templateType || v_targetType.IsSubclassOf(v_templateType) || v_templateType.IsSubclassOf(v_targetType))
+                    if (targetType == templateType || targetType.IsSubclassOf(templateType) || templateType.IsSubclassOf(targetType))
                     {
-                        v_targetGraphic.raycastTarget = v_templateGraphic.raycastTarget;
-                        v_targetGraphic.color = v_templateGraphic.color;
+                        targetGraphic.raycastTarget = templateGraphic.raycastTarget;
+                        targetGraphic.color = templateGraphic.color;
 
-                        if (p_supportText)
+                        if (supportText)
                         {
-                            if (v_targetGraphic is Text && !(v_targetGraphic is IVectorImage))
+                            if (targetGraphic is Text && !(targetGraphic is IVectorImage))
                             {
-                                var v_textTarget = v_targetGraphic as Text;
-                                var v_textTemplate = v_templateGraphic as Text;
+                                var textTarget = targetGraphic as Text;
+                                var textTemplate = templateGraphic as Text;
 
-                                if (v_textTemplate != null)
+                                if (textTemplate != null)
                                 {
-                                    v_textTarget.font = v_textTemplate.font;
-                                    v_textTarget.fontStyle = v_textTemplate.fontStyle;
-                                    v_textTarget.supportRichText = v_textTemplate.supportRichText;
+                                    textTarget.font = textTemplate.font;
+                                    textTarget.fontStyle = textTemplate.fontStyle;
+                                    textTarget.supportRichText = textTemplate.supportRichText;
                                 }
                             }
-                            else if (v_targetGraphic is TMPro.TMP_Text && !(v_targetGraphic is IVectorImage))
+                            else if (targetGraphic is TMPro.TMP_Text && !(targetGraphic is IVectorImage))
                             {
-                                var v_textTarget = v_targetGraphic as TMPro.TMP_Text;
-                                var v_textTemplate = v_templateGraphic as TMPro.TMP_Text;
+                                var textTarget = targetGraphic as TMPro.TMP_Text;
+                                var textTemplate = templateGraphic as TMPro.TMP_Text;
 
-                                if (v_textTemplate != null)
+                                if (textTemplate != null)
                                 {
-                                    v_textTarget.font = v_textTemplate.font;
-                                    v_textTarget.fontStyle = v_textTemplate.fontStyle;
-                                    v_textTarget.richText = v_textTemplate.richText;
+                                    textTarget.font = textTemplate.font;
+                                    textTarget.fontStyle = textTemplate.fontStyle;
+                                    textTarget.richText = textTemplate.richText;
                                 }
                             }
                         }
-                        if (p_supportImg)
+                        if (supportImg)
                         {
-                            if (v_targetGraphic is IVectorImage)
+                            if (targetGraphic is IVectorImage)
                             {
-                                var v_vectorTarget = v_targetGraphic as IVectorImage;
-                                var v_vectorTemplate = v_templateGraphic as IVectorImage;
+                                var vectorTarget = targetGraphic as IVectorImage;
+                                var vectorTemplate = templateGraphic as IVectorImage;
 
-                                if (v_vectorTarget != null && v_vectorTarget.gameObject != null)
+                                if (vectorTarget != null && vectorTarget.gameObject != null)
                                 {
-                                    v_vectorTarget.vectorImageData = v_vectorTemplate.vectorImageData;
-                                    v_vectorTarget.sizeMode = v_vectorTemplate.sizeMode;
-                                    v_vectorTarget.size = v_vectorTemplate.size;
-                                    v_targetGraphic.material = v_templateGraphic.material;
+                                    vectorTarget.vectorImageData = vectorTemplate.vectorImageData;
+                                    vectorTarget.sizeMode = vectorTemplate.sizeMode;
+                                    vectorTarget.size = vectorTemplate.size;
+                                    targetGraphic.material = templateGraphic.material;
                                 }
                             }
-                            else if (v_targetGraphic is Image)
+                            else if (targetGraphic is Image)
                             {
-                                var v_imageTarget = v_targetGraphic as Image;
-                                var v_imageTemplate = v_templateGraphic as Image;
+                                var imageTarget = targetGraphic as Image;
+                                var imageTemplate = templateGraphic as Image;
 
-                                if (v_imageTarget != null)
+                                if (imageTarget != null)
                                 {
-                                    v_imageTarget.sprite = v_imageTemplate.sprite;
-                                    v_imageTarget.pixelsPerUnitMultiplier = v_imageTemplate.pixelsPerUnitMultiplier;
-                                    v_imageTarget.preserveAspect = v_imageTemplate.preserveAspect;
-                                    v_imageTarget.type = v_imageTemplate.type;
-                                    v_imageTarget.fillAmount = v_imageTemplate.fillAmount;
-                                    v_imageTarget.fillCenter = v_imageTemplate.fillCenter;
-                                    v_imageTarget.fillClockwise = v_imageTemplate.fillClockwise;
-                                    v_imageTarget.fillMethod = v_imageTemplate.fillMethod;
-                                    v_imageTarget.material = v_imageTemplate.material;
+                                    imageTarget.sprite = imageTemplate.sprite;
+                                    imageTarget.pixelsPerUnitMultiplier = imageTemplate.pixelsPerUnitMultiplier;
+                                    imageTarget.preserveAspect = imageTemplate.preserveAspect;
+                                    imageTarget.type = imageTemplate.type;
+                                    imageTarget.fillAmount = imageTemplate.fillAmount;
+                                    imageTarget.fillCenter = imageTemplate.fillCenter;
+                                    imageTarget.fillClockwise = imageTemplate.fillClockwise;
+                                    imageTarget.fillMethod = imageTemplate.fillMethod;
+                                    imageTarget.material = imageTemplate.material;
                                 }
                             }
-                            else if (v_targetGraphic is RawImage)
+                            else if (targetGraphic is RawImage)
                             {
-                                var v_rawTarget = v_targetGraphic as RawImage;
-                                var v_rawTemplate = v_templateGraphic as RawImage;
+                                var rawTarget = targetGraphic as RawImage;
+                                var rawTemplate = templateGraphic as RawImage;
 
-                                if (v_rawTarget != null)
+                                if (rawTarget != null)
                                 {
-                                    v_rawTarget.texture = v_rawTemplate.texture;
-                                    v_rawTarget.uvRect = v_rawTemplate.uvRect;
-                                    v_rawTarget.material = v_rawTemplate.material;
+                                    rawTarget.texture = rawTemplate.texture;
+                                    rawTarget.uvRect = rawTemplate.uvRect;
+                                    rawTarget.material = rawTemplate.material;
                                 }
                             }
                         }
@@ -245,33 +366,33 @@ namespace MaterialUI
             }
         }
 
-        static void ApplyObjectActive_Internal(Object p_target, Object p_template)
+        static void ApplyObjectActive_Internal(Object target, Object template)
         {
-            if (p_target != null && p_template != null)
+            if (target != null && template != null)
             {
-                if (p_target is GameObject && p_template is GameObject)
+                if (target is GameObject && template is GameObject)
                 {
-                    var v_goTarget = p_target as GameObject;
-                    var v_goTemplate = p_template as GameObject;
+                    var goTarget = target as GameObject;
+                    var goTemplate = template as GameObject;
 
-                    v_goTarget.SetActive(v_goTemplate.activeSelf);
+                    goTarget.SetActive(goTemplate.activeSelf);
                 }
 
-                else if (p_target is Behaviour && p_template is Behaviour)
+                else if (target is Behaviour && template is Behaviour)
                 {
-                    var v_behaviourTarget = p_target as Behaviour;
-                    var v_behaviourTemplate = p_template as Behaviour;
+                    var behaviourTarget = target as Behaviour;
+                    var behaviourTemplate = template as Behaviour;
 
-                    //v_behaviourTarget.enabled = v_behaviourTemplate.enabled;
-                    v_behaviourTarget.gameObject.SetActive(v_behaviourTemplate.gameObject.activeSelf);
+                    //behaviourTarget.enabled = behaviourTemplate.enabled;
+                    behaviourTarget.gameObject.SetActive(behaviourTemplate.gameObject.activeSelf);
                 }
 
-                else if (p_target is Component && p_template is Component)
+                else if (target is Component && template is Component)
                 {
-                    var v_componentTarget = p_target as Component;
-                    var v_componentTemplate = p_template as Component;
+                    var componentTarget = target as Component;
+                    var componentTemplate = template as Component;
 
-                    v_componentTarget.gameObject.SetActive(v_componentTemplate.gameObject.activeSelf);
+                    componentTarget.gameObject.SetActive(componentTemplate.gameObject.activeSelf);
                 }
             }
         }
