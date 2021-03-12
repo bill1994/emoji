@@ -40,31 +40,31 @@ namespace MaterialUI
 
         public MaterialInputField firstInputField
         {
-			get { return m_FirstInputField; }
+            get { return m_FirstInputField; }
         }
 
-		public MaterialInputField secondInputField
-		{
-			get { return m_SecondInputField; }
-		}
+        public MaterialInputField secondInputField
+        {
+            get { return m_SecondInputField; }
+        }
 
         #endregion
 
         #region Callbacks
 
         private Action<string> m_OnAffirmativeOneButtonClicked;
-		public Action<string> onAffirmativeOneButtonClicked
-		{
-			get { return m_OnAffirmativeOneButtonClicked; }
-			set { m_OnAffirmativeOneButtonClicked = value; }
-		}
+        public Action<string> onAffirmativeOneButtonClicked
+        {
+            get { return m_OnAffirmativeOneButtonClicked; }
+            set { m_OnAffirmativeOneButtonClicked = value; }
+        }
 
-		private Action<string, string> m_OnAffirmativeTwoButtonClicked;
-		public Action<string, string> onAffirmativeTwoButtonClicked
-		{
-			get { return m_OnAffirmativeTwoButtonClicked; }
-			set { m_OnAffirmativeTwoButtonClicked = value; }
-		}
+        private Action<string, string> m_OnAffirmativeTwoButtonClicked;
+        public Action<string, string> onAffirmativeTwoButtonClicked
+        {
+            get { return m_OnAffirmativeTwoButtonClicked; }
+            set { m_OnAffirmativeTwoButtonClicked = value; }
+        }
 
         #endregion
 
@@ -91,7 +91,7 @@ namespace MaterialUI
         }
 
         public void Initialize(string firstFieldName, Action<string> onAffirmativeButtonClicked, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
-		{
+        {
             var firstFieldConfig = new InputFieldConfigData() { hintText = firstFieldName };
             Initialize(firstFieldConfig, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
         }
@@ -115,11 +115,16 @@ namespace MaterialUI
             Initialize(firstFieldConfig, secondFieldConfig, onAffirmativeButtonClicked, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
         }
 
-		private void CommonInitialize(InputFieldConfigData firstFieldConfig, InputFieldConfigData secondFieldConfig, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
-		{
-			m_TitleSection.SetTitle(titleText, icon);
-			m_ButtonSection.SetButtons(null, affirmativeButtonText, onDismissiveButtonClicked, dismissiveButtonText);
-			m_ButtonSection.SetupButtonLayout(rectTransform);
+        private void CommonInitialize(InputFieldConfigData firstFieldConfig, InputFieldConfigData secondFieldConfig, string affirmativeButtonText, string titleText, ImageData icon, Action onDismissiveButtonClicked, string dismissiveButtonText)
+        {
+            if (m_TitleSection != null)
+                m_TitleSection.SetTitle(titleText, icon);
+
+            if (m_ButtonSection != null)
+            {
+                m_ButtonSection.SetButtons(null, affirmativeButtonText, onDismissiveButtonClicked, dismissiveButtonText);
+                m_ButtonSection.SetupButtonLayout(rectTransform);
+            }
 
             if (m_FirstInputField)
             {
@@ -136,10 +141,10 @@ namespace MaterialUI
                 m_SecondInputField.gameObject.SetActive(secondFieldConfig != null);
             }
 
-			UpdateAffirmativeButtonState();
+            UpdateAffirmativeButtonState();
 
-			//Initialize();
-		}
+            //Initialize();
+        }
 
         protected virtual void AffirmativeButtonClickedConditional()
         {
@@ -150,44 +155,46 @@ namespace MaterialUI
 
         public virtual void AffirmativeButtonClicked()
         {
-			if (m_OnAffirmativeOneButtonClicked != null && m_FirstInputField)
-			{
-				m_OnAffirmativeOneButtonClicked(m_FirstInputField.text);
-			}
+            if (m_OnAffirmativeOneButtonClicked != null && m_FirstInputField)
+            {
+                m_OnAffirmativeOneButtonClicked(m_FirstInputField.text);
+            }
 
-			if (m_OnAffirmativeTwoButtonClicked != null && m_FirstInputField)
-			{
-				m_OnAffirmativeTwoButtonClicked(m_FirstInputField.text, m_SecondInputField.text);
-			}
+            if (m_OnAffirmativeTwoButtonClicked != null && m_FirstInputField)
+            {
+                m_OnAffirmativeTwoButtonClicked(m_FirstInputField.text, m_SecondInputField.text);
+            }
 
             Hide();
         }
 
         public void DismissiveButtonClicked()
         {
-            m_ButtonSection.OnDismissiveButtonClicked();
+            if (m_ButtonSection != null)
+                m_ButtonSection.OnDismissiveButtonClicked();
             Hide();
         }
 
-		public virtual void UpdateAffirmativeButtonState()
-		{
-			bool isButtonInteractable = true;
+        public virtual void UpdateAffirmativeButtonState()
+        {
+            bool isButtonInteractable = true;
 
-			if (m_FirstInputField && m_FirstInputField.customTextValidator != null)
-			{
-				isButtonInteractable = m_FirstInputField.customTextValidator.IsTextValid();
-			}
+            if (m_FirstInputField && m_FirstInputField.customTextValidator != null)
+            {
+                isButtonInteractable = m_FirstInputField.customTextValidator.IsTextValid();
+            }
 
-			if (m_SecondInputField && m_SecondInputField.gameObject.activeSelf)
-			{
-				if (m_SecondInputField.customTextValidator != null)
-				{
-					isButtonInteractable &= m_SecondInputField.customTextValidator.IsTextValid();
-				}
-			}
+            if (m_SecondInputField && m_SecondInputField.gameObject.activeSelf)
+            {
+                if (m_SecondInputField.customTextValidator != null)
+                {
+                    isButtonInteractable &= m_SecondInputField.customTextValidator.IsTextValid();
+                }
+            }
 
-			m_ButtonSection.affirmativeButton.interactable = isButtonInteractable;
-		}
+            if (m_ButtonSection != null && m_ButtonSection.affirmativeButton != null)
+                m_ButtonSection.affirmativeButton.interactable = isButtonInteractable;
+        }
 
         #endregion
 
@@ -381,7 +388,7 @@ namespace MaterialUI
                     input.inputType = (TMPro.TMP_InputField.InputType)Enum.ToObject(typeof(TMPro.TMP_InputField.InputType), (int)m_InputType);
                     input.lineType = (TMPro.TMP_InputField.LineType)Enum.ToObject(typeof(TMPro.TMP_InputField.LineType), (int)m_LineType);
                     input.contentType = (TMPro.TMP_InputField.ContentType)Enum.ToObject(typeof(TMPro.TMP_InputField.ContentType), (int)m_ContentType);
-                    input.characterValidation = (TMPro.TMP_InputField.CharacterValidation)Enum.Parse(typeof(TMPro.TMP_InputField.CharacterValidation), Enum.GetName(typeof(InputField.CharacterValidation), m_ContentType));
+                    input.characterValidation = (TMPro.TMP_InputField.CharacterValidation)Enum.Parse(typeof(TMPro.TMP_InputField.CharacterValidation), Enum.GetName(typeof(InputField.CharacterValidation), m_CharacterValidation));
                     input.keyboardType = m_KeyboardType;
                     input.characterLimit = m_CharacterLimit;
                     input.asteriskChar = m_AsteriskChar;
@@ -403,9 +410,9 @@ namespace MaterialUI
                     if (materialInput.inputField is InputField)
                         config = materialInput.inputField as InputField;
                     else if (materialInput.inputField is TMPro.TMP_InputField)
-                        config =  materialInput.inputField as TMPro.TMP_InputField;
+                        config = materialInput.inputField as TMPro.TMP_InputField;
                     else if (materialInput.inputField is InputPromptField)
-                        config =  materialInput.inputField as InputPromptField;
+                        config = materialInput.inputField as InputPromptField;
 
                     config.m_HintText = materialInput.hintText;
 
@@ -462,7 +469,7 @@ namespace MaterialUI
                     config.m_CharacterLimit = input.characterLimit;
                     config.m_AsteriskChar = input.asteriskChar;
                     config.m_HideMobileInput = input.shouldHideMobileInput;
-                    config.m_HintText = input.placeholder != null? input.placeholder.GetGraphicText() : "";
+                    config.m_HintText = input.placeholder != null ? input.placeholder.GetGraphicText() : "";
                 }
 
                 return config;
