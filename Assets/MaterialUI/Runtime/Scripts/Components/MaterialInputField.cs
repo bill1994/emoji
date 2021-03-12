@@ -337,7 +337,7 @@ namespace MaterialUI
                 if (m_InputPromptDisplayOption == value)
                     return;
                 m_InputPromptDisplayOption = value;
-                if(enabled && gameObject.activeInHierarchy)
+                if (enabled && gameObject.activeInHierarchy)
                     CheckInputPromptDisplayModeVisibility();
             }
         }
@@ -1647,13 +1647,14 @@ namespace MaterialUI
         {
             base.OnDisable();
             SetLayoutDirty();
-            ForceDestroyDisplayer();
+            ForceDisableDisplayer(false);
         }
 
         protected override void OnDestroy()
         {
             UnregisterEvents();
             base.OnDestroy();
+            ForceDisableDisplayer(true);
         }
 
         protected override void OnRectTransformDimensionsChange()
@@ -1710,7 +1711,7 @@ namespace MaterialUI
                     if (changed)
                         OnSelect(new PointerEventData(EventSystem.current));
                 }
-                else 
+                else
                 {
                     if (changed)
                         OnDeselect(new PointerEventData(EventSystem.current));
@@ -1839,7 +1840,7 @@ namespace MaterialUI
             if (!m_FloatingHint)
                 SetHintLayoutToFloatingValue();
 
-            if(m_ClearButtonDisplayMode == ClearButtonDisplayModeEnum.Auto)
+            if (m_ClearButtonDisplayMode == ClearButtonDisplayModeEnum.Auto)
                 SetClearButtonActive(!string.IsNullOrEmpty(value));
         }
 
@@ -1881,7 +1882,7 @@ namespace MaterialUI
                 {
                     if (!supportPrompt)
                     {
-                        ForceDestroyDisplayer();
+                        ForceDisableDisplayer(true);
                     }
                     else if (!displayer.enabled)
                     {
@@ -1891,7 +1892,7 @@ namespace MaterialUI
             }
         }
 
-        protected virtual void ForceDestroyDisplayer()
+        protected virtual void ForceDisableDisplayer(bool canDestroy)
         {
             var displayer = GetComponent<InputPromptDisplayer>();
             if (displayer != null)
@@ -2677,7 +2678,7 @@ namespace MaterialUI
 
                     if (m_ValidationTextTransform != null && validationText != null && !HasIgnoreLayout(m_ValidationTextTransform))
                     {
-                        
+
                         m_ValidationTextTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Bottom, positionY, m_ValidationText != null ? LayoutUtility.GetPreferredHeight(m_ValidationText.rectTransform) : 0);
                     }
 
@@ -2810,7 +2811,7 @@ namespace MaterialUI
                 }
 
                 var counterIsInsideBG = IsBottomContentInsideOutline();
-                m_BottomContentTransform.offsetMin = new Vector2(m_Padding.left, (counterIsInsideBG? m_Padding.bottom : 0));
+                m_BottomContentTransform.offsetMin = new Vector2(m_Padding.left, (counterIsInsideBG ? m_Padding.bottom : 0));
                 m_BottomContentTransform.offsetMax = new Vector2(-m_Padding.right, (counterIsInsideBG ? m_Padding.bottom : 0) + m_BottomContentHeight);
             }
 
@@ -2884,7 +2885,7 @@ namespace MaterialUI
             if (m_FloatingHint || m_TopContentTransform != null)
             {
                 m_TopSectionHeight = m_TopContentHeight = m_TopContentTransform != null && !HasIgnoreLayout(m_TopContentTransform) ? Mathf.Max(0, LayoutUtility.GetPreferredHeight(m_TopContentTransform)) : 0;
-                
+
                 if (m_TopSectionHeight > 0)
                     m_TopSectionHeight += 4;
 
@@ -2899,7 +2900,7 @@ namespace MaterialUI
             m_BottomSectionHeight = m_BottomContentHeight = 0;
             if (m_HasCharacterCounter || m_HasValidation || m_BottomContentTransform != null)
             {
-                m_BottomSectionHeight = m_BottomContentHeight = m_BottomContentTransform != null && !HasIgnoreLayout(m_BottomContentTransform)? Mathf.Max(0, LayoutUtility.GetPreferredHeight(m_BottomContentTransform)) : 0;
+                m_BottomSectionHeight = m_BottomContentHeight = m_BottomContentTransform != null && !HasIgnoreLayout(m_BottomContentTransform) ? Mathf.Max(0, LayoutUtility.GetPreferredHeight(m_BottomContentTransform)) : 0;
 
                 if (m_HasCharacterCounter && counterText != null && !HasIgnoreLayout(counterText))
                 {
