@@ -16,9 +16,11 @@ namespace MaterialUI
     [CanEditMultipleObjects]
     public class MaterialInputFieldEditor : BaseStyleElementEditor
     {
-        SerializedProperty m_InputPromptDisplayOption;
-        SerializedProperty m_CustomPromptDialogAddress;
-
+        private SerializedProperty m_InputPromptDisplayOption;
+        private SerializedProperty m_CustomPromptDialogAddress;
+        private SerializedProperty m_CallReturnOnSubmit;
+        private SerializedProperty onPromptSubmit;
+        
         //  Fields
         private SerializedProperty m_Interactable;
 
@@ -104,6 +106,8 @@ namespace MaterialUI
 
             m_InputPromptDisplayOption = serializedObject.FindProperty("m_InputPromptDisplayOption");
             m_CustomPromptDialogAddress = serializedObject.FindProperty("m_CustomPromptDialogAddress");
+            m_CallReturnOnSubmit = serializedObject.FindProperty("m_CallReturnOnSubmit");
+            onPromptSubmit = serializedObject.FindProperty("onPromptSubmit");
 
             //  Fields
             m_Interactable = serializedObject.FindProperty("m_Interactable");
@@ -382,7 +386,11 @@ namespace MaterialUI
             var oldEnableStatus = GUI.enabled;
             GUI.enabled = m_InputPromptDisplayOption.enumValueIndex != 0;
             LayoutStyle_PropertyField(m_CustomPromptDialogAddress);
+            LayoutStyle_PropertyField(m_CallReturnOnSubmit);
             GUI.enabled = oldEnableStatus;
+
+            EditorGUILayout.Space();
+            LayoutStyle_PropertyField(onPromptSubmit);
 
             EditorGUI.indentLevel--;
 

@@ -47,6 +47,8 @@ namespace MaterialUI
         /// </summary>
         /// <returns></returns>
         bool IsTextValid();
+
+        ITextValidator Clone();
     }
 
     public interface IAutoFormatTextValidator : ITextValidator

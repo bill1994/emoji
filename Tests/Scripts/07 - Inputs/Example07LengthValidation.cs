@@ -19,4 +19,9 @@ public class Example07LengthValidation : BaseAutoFormatTextValidator, ITextValid
             return false;
         }
     }
+
+    public virtual ITextValidator Clone()
+    {
+        return new Example07LengthValidation();
+    }
 }

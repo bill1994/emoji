@@ -77,6 +77,8 @@ namespace MaterialUI
         InputPromptDisplayMode m_InputPromptDisplayOption = (InputPromptDisplayMode)0;
         [SerializeField]
         DialogPromptAddress m_CustomPromptDialogAddress = null;
+        [SerializeField]
+        bool m_CallReturnOnSubmit = false;
 
         [SerializeField, SerializeStyleProperty, UnityEngine.Serialization.FormerlySerializedAs("m_BackgroundSizeMode")]
         BackgroundLayoutMode m_BackgroundLayoutMode = BackgroundLayoutMode.TextOnly;
@@ -267,6 +269,7 @@ namespace MaterialUI
         public InputField.OnChangeEvent onValueChanged = new InputField.OnChangeEvent();
         public InputField.OnChangeEvent onEndEdit = new InputField.OnChangeEvent();
         public UnityEvent onReturnPressed = new UnityEvent();
+        public UnityEvent onPromptSubmit = new UnityEvent();
 
         /*public UnityEvent<string> onValueChanged
         {
@@ -311,6 +314,20 @@ namespace MaterialUI
         #endregion
 
         #region Properties
+
+        public bool callReturnEventOnPromptSubmit
+        {
+            get
+            {
+                return m_CallReturnOnSubmit;
+            }
+            set
+            {
+                if (m_CallReturnOnSubmit == value)
+                    return;
+                m_CallReturnOnSubmit = validateOnStart;
+            }
+        }
 
         public DialogPromptAddress customPromptDialogAddress
         {
@@ -1800,6 +1817,13 @@ namespace MaterialUI
             OnEndEditInternal(value);
         }
 
+        private void HandleOnAfterPromptSubmit()
+        {
+            if (callReturnEventOnPromptSubmit)
+                HandleOnReturnPressed();
+        }
+
+
         protected virtual void HandleOnReturnPressed()
         {
             if (onReturnPressed != null)
@@ -2018,6 +2042,9 @@ namespace MaterialUI
             else if (m_InputText != null)
                 m_InputText.RegisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
 
+            if (onPromptSubmit != null)
+                onPromptSubmit.AddListener(HandleOnAfterPromptSubmit);
+
             if (m_InputField != null)
             {
                 var onReturnPressedField = m_InputField.GetType().GetField("OnReturnPressed", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
@@ -2053,6 +2080,10 @@ namespace MaterialUI
                 promptInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
             else if (m_InputText != null)
                 m_InputText.UnregisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
+
+            if (onPromptSubmit != null)
+                onPromptSubmit.RemoveListener(HandleOnAfterPromptSubmit);
+
 
             if (m_InputField != null)
             {

@@ -193,6 +193,11 @@ namespace MaterialUI
 
 			return true;
 		}
+
+        public virtual ITextValidator Clone()
+        {
+            return new EmptyTextValidator(m_ErrorMessage);
+        }
     }
 
     /// <summary>
@@ -232,7 +237,12 @@ namespace MaterialUI
 
 			return true;
 		}
-	}
+
+        public virtual ITextValidator Clone()
+        {
+            return new EmailTextValidator(m_ErrorMessage);
+        }
+    }
 
     /// <summary>
     /// Text validator that checks for names.
@@ -293,7 +303,12 @@ namespace MaterialUI
 
 			return true;
 		}
-	}
+
+        public virtual ITextValidator Clone()
+        {
+            return new NameTextValidator(m_MinimumLength, m_ErrorMessage);
+        }
+    }
 
     /// <summary>
     /// Text validator that checks for minimum length.
@@ -338,7 +353,12 @@ namespace MaterialUI
 
 			return true;
 		}
-	}
+
+        public virtual ITextValidator Clone()
+        {
+            return new MinLengthTextValidator(m_MinimumLength, m_ErrorMessage);
+        }
+    }
 
 	/// <summary>
 	/// Text validator that checks for maximum length.
@@ -390,7 +410,12 @@ namespace MaterialUI
 
 			return true;
 		}
-	}
+
+        public virtual ITextValidator Clone()
+        {
+            return new MaxLengthTextValidator(m_MaximumLength, m_ErrorMessage);
+        }
+    }
 
     /// <summary>
     /// Text validator that checks two passwords to see if they are the same.
@@ -435,7 +460,12 @@ namespace MaterialUI
 
 			return true;
 		}
-	}
+
+        public virtual ITextValidator Clone()
+        {
+            return new SamePasswordTextValidator(m_OriginalPasswordInputField, m_ErrorMessage);
+        }
+    }
 
     /// <summary>
     /// Text validator that checks for existing directories.
@@ -472,7 +502,12 @@ namespace MaterialUI
 
 			return directoryExists;
 		}
-	}
+
+        public virtual ITextValidator Clone()
+        {
+            return new DirectoryExistTextValidator(m_ErrorMessage);
+        }
+    }
 
     /// <summary>
     /// Text validator that checks for existing files.
@@ -509,7 +544,73 @@ namespace MaterialUI
 
 			return fileExists;
 		}
-	}
+        public virtual ITextValidator Clone()
+        {
+            return new FileExistTextValidator(m_ErrorMessage);
+        }
+    }
+
+    public class DecimalValidator : CustomFormatValidator
+    {
+        public const string DEFAULT_DECIMAL_EXCLUSIVE_VALIDATOR_ERROR_MSG = "Value must be a number greater than '<localeparam=0>{0}</localeparam>' and  smaller than '<localeparam=1>{1}</localeparam>'";
+        public const string DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG = "Value must be a number between '<localeparam=0>{0}</localeparam>' and '<localeparam=1>{1}</localeparam>' (Inclusive)";
+
+        double _minValue = double.MinValue;
+        double _maxValue = double.MaxValue;
+        bool _isInclusive = true;
+        const string DECIMAL_VALIDATOR = @"^[-+]?\d+(\.\d+)?$";
+
+        public DecimalValidator(string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : this(true, double.MinValue, double.MaxValue, error)
+        {
+        }
+
+        public DecimalValidator(bool isInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : base(DECIMAL_VALIDATOR, string.Format(error, minValue.ToString("0.0"), maxValue.ToString("0.0")))
+        {
+            _isInclusive = isInclusive;
+            _minValue = minValue;
+            _maxValue = maxValue;
+        }
+
+        public override bool IsTextValid()
+        {
+            var isValid = base.IsTextValid();
+
+            if (isValid)
+            {
+                double parsedValue;
+                isValid = m_MaterialInputField != null &&
+                    double.TryParse(m_MaterialInputField.text, out parsedValue) &&
+                    ((_isInclusive && parsedValue >= _minValue && parsedValue <= _maxValue) ||
+                    (!_isInclusive && parsedValue > _minValue && parsedValue < _maxValue));
+            }
+
+            if (!isValid)
+            {
+                if (m_MaterialInputField != null && m_MaterialInputField.validationText != null)
+                    m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+            }
+            return isValid;
+        }
+
+        public override ITextValidator Clone()
+        {
+            return new DecimalValidator(_isInclusive, _minValue, _maxValue, m_ErrorMessage);
+        }
+    }
+
+    public class StrongPasswordValidator : CustomFormatValidator
+    {
+        const string STRONG_PASS_VALIDATOR = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,15}$";
+
+        public StrongPasswordValidator(string error = "Passwords must be strong.") : base(STRONG_PASS_VALIDATOR, error)
+        {
+        }
+
+        public override ITextValidator Clone()
+        {
+            return new StrongPasswordValidator(m_ErrorMessage);
+        }
+    }
 
     public abstract class CustomFormatValidator : BaseAutoFormatTextValidator, IAutoFormatTextValidator
     {
@@ -563,6 +664,8 @@ namespace MaterialUI
             }
             return false;
         }
+
+        public abstract ITextValidator Clone();
 
         #endregion
 
