@@ -1654,7 +1654,7 @@ namespace MaterialUI
         {
             UnregisterEvents();
             base.OnDestroy();
-            ForceDisableDisplayer(true);
+            ForceDisableDisplayer(Application.isPlaying);
         }
 
         protected override void OnRectTransformDimensionsChange()
@@ -1897,8 +1897,13 @@ namespace MaterialUI
             var displayer = GetComponent<InputPromptDisplayer>();
             if (displayer != null)
             {
-                if (displayer.hideFlags != HideFlags.None)
-                    Component.DestroyImmediate(displayer);
+                if (canDestroy && displayer.hideFlags != HideFlags.None)
+                {
+                    if (Application.isPlaying)
+                        Component.Destroy(displayer);
+                    else
+                        Component.DestroyImmediate(displayer);
+                }
                 else
                     displayer.enabled = false;
             }
@@ -2704,12 +2709,12 @@ namespace MaterialUI
             }
         }
 
-        protected bool HasIgnoreLayout(Component p_component)
+        protected bool HasIgnoreLayout(Component component)
         {
-            if (p_component != null)
+            if (component != null)
             {
-                var v_layout = p_component.GetComponent<LayoutElement>();
-                return v_layout != null && v_layout.ignoreLayout;
+                var layout = component.GetComponent<LayoutElement>();
+                return layout != null && layout.ignoreLayout;
             }
             return false;
         }
@@ -3004,10 +3009,10 @@ namespace MaterialUI
             return interactable;
         }
 
-        public override void RefreshVisualStyles(bool p_canAnimate = true)
+        public override void RefreshVisualStyles(bool canAnimate = true)
         {
             UpdateSelectionState();
-            SetStylePropertyColorsActive_Internal(p_canAnimate, m_AnimationDuration);
+            SetStylePropertyColorsActive_Internal(canAnimate, m_AnimationDuration);
         }
 
         #endregion
@@ -3062,46 +3067,46 @@ namespace MaterialUI
             {
             }
 
-            public InputFieldStyleProperty(string p_name, Component p_target, Color p_colorActive, Color p_colorInactive, bool p_useStyleGraphic)
+            public InputFieldStyleProperty(string name, Component target, Color colorActive, Color colorInactive, bool useStyleGraphic)
             {
-                m_target = p_target != null ? p_target.transform : null;
-                m_name = p_name;
-                m_colorActive = p_colorActive;
-                m_colorInactive = p_colorInactive;
-                m_useStyleGraphic = p_useStyleGraphic;
+                m_target = target != null ? target.transform : null;
+                m_name = name;
+                m_colorActive = colorActive;
+                m_colorInactive = colorInactive;
+                m_useStyleGraphic = useStyleGraphic;
             }
 
             #endregion
 
             #region Helper Functions
 
-            public override void Tween(BaseStyleElement p_sender, bool p_canAnimate, float p_animationDuration)
+            public override void Tween(BaseStyleElement sender, bool canAnimate, float animationDuration)
             {
                 TweenManager.EndTween(_tweenId);
 
-                var v_graphic = GetTarget<Graphic>();
-                if (v_graphic != null)
+                var graphic = GetTarget<Graphic>();
+                if (graphic != null)
                 {
-                    var v_inputField = p_sender as MaterialInputField;
-                    var v_isActive = v_inputField != null ? v_inputField.IsSelected() : true;
+                    var inputField = sender as MaterialInputField;
+                    var isActive = inputField != null ? inputField.IsSelected() : true;
 
-                    var v_endColor = v_isActive ? m_colorActive : m_colorInactive;
-                    if (p_canAnimate && Application.isPlaying)
+                    var endColor = isActive ? m_colorActive : m_colorInactive;
+                    if (canAnimate && Application.isPlaying)
                     {
                         _tweenId = TweenManager.TweenColor(
                                 (color) =>
                                 {
-                                    if (v_graphic != null)
-                                        v_graphic.color = color;
+                                    if (graphic != null)
+                                        graphic.color = color;
                                 },
-                                v_graphic.color,
-                                v_endColor,
-                                p_animationDuration
+                                graphic.color,
+                                endColor,
+                                animationDuration
                             );
                     }
                     else
                     {
-                        v_graphic.color = v_endColor;
+                        graphic.color = endColor;
                     }
                 }
             }
