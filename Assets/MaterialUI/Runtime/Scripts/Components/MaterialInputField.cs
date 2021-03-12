@@ -1908,14 +1908,15 @@ namespace MaterialUI
                     }
                     else if (displayer != null)
                     {
-                        editNativeInputEnable = true;
                         if (!supportPrompt)
                         {
+                            editNativeInputEnable = true;
                             ForceDisableDisplayer(true);
                         }
-                        else if (!displayer.enabled)
+                        else if (displayer.enabled != supportPrompt)
                         {
-                            displayer.enabled = true;
+                            editNativeInputEnable = true;
+                            displayer.enabled = supportPrompt;
                         }
                     }
 
