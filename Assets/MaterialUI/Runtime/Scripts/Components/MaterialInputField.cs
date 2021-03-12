@@ -1817,12 +1817,12 @@ namespace MaterialUI
             OnEndEditInternal(value);
         }
 
-        private void HandleOnAfterPromptSubmit()
+        protected virtual void HandleOnAfterPromptSubmit()
         {
+            ValidateText();
             if (callReturnEventOnPromptSubmit)
                 HandleOnReturnPressed();
         }
-
 
         protected virtual void HandleOnReturnPressed()
         {
