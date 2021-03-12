@@ -1850,13 +1850,15 @@ namespace MaterialUI
         public virtual bool SupportCustomPrompt()
         {
             var supportPrompt = false;
-            if (m_InputPromptDisplayOption == InputPromptDisplayMode.Always)
-                supportPrompt = true;
-            else if (m_InputPromptDisplayOption == InputPromptDisplayMode.WhenCanShowMobileInput)
-                supportPrompt = !shouldHideMobileInput;
-            else if (m_InputPromptDisplayOption == InputPromptDisplayMode.WhenSupportTouchScreen)
-                supportPrompt = TouchScreenKeyboard.isSupported;
-
+            if (inputField != null)
+            {
+                if (m_InputPromptDisplayOption == InputPromptDisplayMode.Always)
+                    supportPrompt = true;
+                else if (m_InputPromptDisplayOption == InputPromptDisplayMode.WhenCanShowMobileInput)
+                    supportPrompt = !shouldHideMobileInput;
+                else if (m_InputPromptDisplayOption == InputPromptDisplayMode.WhenSupportTouchScreen)
+                    supportPrompt = TouchScreenKeyboard.isSupported;
+            }
             return supportPrompt;
         }
 
