@@ -20,4 +20,9 @@ public class Example07LetterValidation : BaseTextValidator, ITextValidator
             return true;
         }
     }
+
+    public virtual ITextValidator Clone()
+    {
+        return new Example07LetterValidation();
+    }
 }

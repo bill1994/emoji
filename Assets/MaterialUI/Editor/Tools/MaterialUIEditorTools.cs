@@ -267,30 +267,6 @@ namespace MaterialUI
             CreateInstance("Components/InputFields/InputField Filled PermaHint", "InputField - Filled PermaHint");
         }
 
-        [MenuItem("GameObject/MaterialUI/PromptFields/Basic", false, 070)]
-        private static void CreateSimpleInputPromptFieldBasic()
-        {
-            CreateInstance("Components/PromptFields/PromptField", "PromptField");
-        }
-
-        [MenuItem("GameObject/MaterialUI/PromptFields/Outline", false, 070)]
-        private static void CreateSimpleInputPromptFieldOutline()
-        {
-            CreateInstance("Components/PromptFields/PromptField Outline", "PromptField - Outline");
-        }
-
-        [MenuItem("GameObject/MaterialUI/PromptFields/Filled", false, 070)]
-        private static void CreateSimpleInputPromptFieldFilled()
-        {
-            CreateInstance("Components/PromptFields/PromptField Filled", "PromptField - Filled");
-        }
-
-        [MenuItem("GameObject/MaterialUI/PromptFields/Filled PermaHint", false, 070)]
-        private static void CreateSimpleInputPromptFieldFilledPermaHint()
-        {
-            CreateInstance("Components/PromptFields/PromptField Filled PermaHint", "PromptField - Filled PermaHint");
-        }
-
         [MenuItem("GameObject/MaterialUI/Progress Indicators/Circle", false, 082)]
         private static void CreateProgressCircle()
         {

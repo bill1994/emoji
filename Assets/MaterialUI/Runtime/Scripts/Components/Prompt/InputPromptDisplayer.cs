@@ -11,16 +11,47 @@ namespace MaterialUI.Internal
 {
     public class InputPromptDisplayer : UIBehaviour, ISelectHandler, IDeselectHandler, IPointerClickHandler, ISubmitHandler, ILayoutElement
     {
-        #region Callbacks
-
-        [Header("Callbacks")]
-        public InputField.OnChangeEvent onValueChanged = new InputField.OnChangeEvent();
-        public InputField.SubmitEvent onEndEdit = new InputField.SubmitEvent();
-        public UnityEvent OnReturnPressed = new UnityEvent();
-
-        #endregion
-
         #region Properties
+
+        public InputField.OnChangeEvent onValueChanged
+        {
+            get
+            {
+                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
+
+                return materialInputField != null ? materialInputField.onValueChanged : null;
+            }
+        }
+
+        public InputField.OnChangeEvent onEndEdit
+        {
+            get
+            {
+                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
+
+                return materialInputField != null ? materialInputField.onEndEdit : null;
+            }
+        }
+
+        public UnityEvent onReturnPressed
+        {
+            get
+            {
+                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
+
+                return materialInputField != null ? materialInputField.onReturnPressed : null;
+            }
+        }
+
+        public UnityEvent onPromptSubmit
+        {
+            get
+            {
+                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
+
+                return materialInputField != null ? materialInputField.onPromptSubmit : null;
+            }
+        }
 
         public DialogPromptAddress customDialogAddress
         {
@@ -447,8 +478,8 @@ namespace MaterialUI.Internal
                                     this.text = value;
                                     if (willChange && onEndEdit != null)
                                         onEndEdit.Invoke(text);
-                                    if (OnReturnPressed != null)
-                                        OnReturnPressed.Invoke();
+                                    if (onPromptSubmit != null)
+                                        onPromptSubmit.Invoke();
                                 }
                             },
                             "OK",
@@ -485,8 +516,8 @@ namespace MaterialUI.Internal
                     if (this != null)
                     {
                         this.text = value;
-                        if (OnReturnPressed != null)
-                            OnReturnPressed.Invoke();
+                        if (onReturnPressed != null)
+                            onReturnPressed.Invoke();
                     }
                 },
                 "OK",
