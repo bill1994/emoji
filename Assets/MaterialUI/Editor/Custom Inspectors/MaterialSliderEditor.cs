@@ -35,6 +35,7 @@ namespace MaterialUI
 
         private SerializedProperty m_SliderContentTransform;
 
+        private SerializedProperty m_DotContentTransform;
         private SerializedProperty m_DotTemplateIcon;
 
         protected override void OnEnable()
@@ -59,6 +60,7 @@ namespace MaterialUI
             m_InputField = serializedObject.FindProperty("m_InputField");
             m_BackgroundGraphic = serializedObject.FindProperty("m_BackgroundGraphic");
             m_SliderContentTransform = serializedObject.FindProperty("m_SliderContentTransform");
+            m_DotContentTransform = serializedObject.FindProperty("m_DotContentTransform");
             m_DotTemplateIcon = serializedObject.FindProperty("m_DotTemplateIcon");
         }
 
@@ -126,6 +128,7 @@ namespace MaterialUI
             EditorGUILayout.Space();
             LayoutStyle_PropertyField(m_BackgroundGraphic);
             LayoutStyle_PropertyField(m_SliderContentTransform);
+            LayoutStyle_PropertyField(m_DotContentTransform);
             LayoutStyle_PropertyField(m_DotTemplateIcon);
             EditorGUI.indentLevel--;
         }
