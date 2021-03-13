@@ -1838,26 +1838,24 @@ namespace MaterialUI
                 var supportPrompt = SupportCustomPrompt();
                 if (force || _CachedSupportPromptStatus == null || _CachedSupportPromptStatus.Value != supportPrompt)
                 {
-                    var displayer = GetComponent<InputPromptDisplayer>();
-
                     var editNativeInputEnable = false;
-                    if (supportPrompt && displayer == null)
+                    if (supportPrompt && promptDisplayer == null)
                     {
                         editNativeInputEnable = true;
-                        displayer = gameObject.AddComponent<InputPromptDisplayer>();
-                        displayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
+                        m_PromptDisplayer = gameObject.AddComponent<InputPromptDisplayer>();
+                        m_PromptDisplayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
                     }
-                    else if (displayer != null)
+                    else if (promptDisplayer != null)
                     {
                         if (!supportPrompt)
                         {
                             editNativeInputEnable = true;
                             ForceDisableDisplayer(true);
                         }
-                        else if (displayer.enabled != supportPrompt)
+                        else if (m_PromptDisplayer.enabled != supportPrompt)
                         {
                             editNativeInputEnable = true;
-                            displayer.enabled = supportPrompt;
+                            m_PromptDisplayer.enabled = supportPrompt;
                         }
                     }
 
@@ -1884,13 +1882,12 @@ namespace MaterialUI
 
         protected virtual void ForceDisableDisplayer(bool canDestroy)
         {
-            var displayer = GetComponent<InputPromptDisplayer>();
-            if (displayer != null)
+            if (promptDisplayer != null)
             {
                 _CachedSupportPromptStatus = null;
-                displayer.enabled = false;
-                if (canDestroy && displayer.hideFlags != HideFlags.None)
-                    displayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
+                m_PromptDisplayer.enabled = false;
+                if (canDestroy && m_PromptDisplayer.hideFlags != HideFlags.None)
+                    m_PromptDisplayer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor | HideFlags.HideInInspector;
             }
         }
 
