@@ -395,7 +395,6 @@ namespace MaterialUI.Internal
 
         #region UI Unity Functions
 
-        // Trigger all registered callbacks.
         public virtual void OnPointerClick(PointerEventData eventData)
         {
             if (!IsActive())
@@ -404,7 +403,17 @@ namespace MaterialUI.Internal
             if (eventData.button != PointerEventData.InputButton.Left)
                 return;
 
-            OpenPromptDialog();
+            //Check if this component is inside another "DraagHandler" (Probably an ScrollRect).
+            //In this case, cancel the click is eventData.dragging is true
+            if (eventData.dragging &&
+                this.transform.parent != null)
+            {
+                var dragHandler = this.transform.parent.GetComponentInParent<IBeginDragHandler>();
+                if ((dragHandler as Component) != null)
+                    return;
+            }
+
+            ActivateInputField();
         }
 
         public virtual void OnSubmit(BaseEventData eventData)
@@ -417,6 +426,13 @@ namespace MaterialUI.Internal
 
         public virtual void OnSelect(BaseEventData eventData)
         {
+            if (!IsActive())
+                return;
+
+            //We can only activate inputfield if not raised by pointerdown event as we want to only activate inputfield in OnPointerClick
+            var pointerEventData = eventData as PointerEventData;
+            if (pointerEventData == null || !pointerEventData.eligibleForClick)
+                ActivateInputField();
         }
 
         public virtual void OnDeselect(BaseEventData eventData)
@@ -547,12 +563,6 @@ namespace MaterialUI.Internal
 
         protected virtual void UpdateLabel()
         {
-            MaterialInputField materialInputField = GetComponent<MaterialInputField>();
-            if (materialInputField != null)
-            {
-                materialInputField.ForceLabelUpdate();
-            }
-
             string processed;
 
             var text = this.text;
