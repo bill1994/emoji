@@ -43,16 +43,6 @@ namespace MaterialUI.Internal
             }
         }
 
-        public UnityEvent onPromptSubmit
-        {
-            get
-            {
-                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
-
-                return materialInputField != null ? materialInputField.onPromptSubmit : null;
-            }
-        }
-
         public DialogPromptAddress customDialogAddress
         {
             get
@@ -67,6 +57,23 @@ namespace MaterialUI.Internal
 
                 if (materialInputField != null)
                     materialInputField.customPromptDialogAddress = value;
+            }
+        }
+
+        public bool openPromptOnSelect
+        {
+            get
+            {
+                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
+
+                return materialInputField != null ? materialInputField.openPromptOnSelect : false;
+            }
+            set
+            {
+                MaterialInputField materialInputField = GetComponent<MaterialInputField>();
+
+                if (materialInputField != null)
+                    materialInputField.openPromptOnSelect = value;
             }
         }
 
@@ -418,15 +425,15 @@ namespace MaterialUI.Internal
 
         public virtual void OnSubmit(BaseEventData eventData)
         {
-            if (!IsActive())
+            if (!IsActive() || !openPromptOnSelect)
                 return;
 
-            OpenPromptDialog();
+            ActivateInputField();
         }
 
         public virtual void OnSelect(BaseEventData eventData)
         {
-            if (!IsActive())
+            if (!IsActive() || !openPromptOnSelect)
                 return;
 
             //We can only activate inputfield if not raised by pointerdown event as we want to only activate inputfield in OnPointerClick
@@ -506,8 +513,8 @@ namespace MaterialUI.Internal
                                     this.text = value;
                                     if (willChange && onEndEdit != null)
                                         onEndEdit.Invoke(text);
-                                    if (onPromptSubmit != null)
-                                        onPromptSubmit.Invoke();
+                                    if (onReturnPressed != null)
+                                        onReturnPressed.Invoke();
                                 }
                             },
                             "OK",

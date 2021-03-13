@@ -78,7 +78,7 @@ namespace MaterialUI
         [SerializeField]
         DialogPromptAddress m_CustomPromptDialogAddress = null;
         [SerializeField]
-        bool m_CallReturnOnSubmit = false;
+        bool m_OpenPromptOnSelect = true;
 
         [SerializeField, SerializeStyleProperty, UnityEngine.Serialization.FormerlySerializedAs("m_BackgroundSizeMode")]
         BackgroundLayoutMode m_BackgroundLayoutMode = BackgroundLayoutMode.TextOnly;
@@ -274,7 +274,6 @@ namespace MaterialUI
         public InputField.OnChangeEvent onValueChanged = new InputField.OnChangeEvent();
         public InputField.OnChangeEvent onEndEdit = new InputField.OnChangeEvent();
         public UnityEvent onReturnPressed = new UnityEvent();
-        public UnityEvent onPromptSubmit = new UnityEvent();
 
         /*public UnityEvent<string> onValueChanged
         {
@@ -320,17 +319,17 @@ namespace MaterialUI
 
         #region Properties
 
-        public bool callReturnEventOnPromptSubmit
+        public bool openPromptOnSelect
         {
             get
             {
-                return m_CallReturnOnSubmit;
+                return m_OpenPromptOnSelect;
             }
             set
             {
-                if (m_CallReturnOnSubmit == value)
+                if (m_OpenPromptOnSelect == value)
                     return;
-                m_CallReturnOnSubmit = validateOnStart;
+                m_OpenPromptOnSelect = value;
             }
         }
 
@@ -1753,32 +1752,21 @@ namespace MaterialUI
             {
                 if (this == null)
                     return;
-                OnEndEditInternal(text);
+                HandleOnEndEdit(text);
             });
         }
 
         protected virtual void HandleOnEndEdit(string value)
         {
-            OnEndEditInternal(value);
-        }
-
-        protected virtual void HandleOnAfterPromptSubmit()
-        {
             ValidateText();
-            if (callReturnEventOnPromptSubmit)
-                HandleOnReturnPressed();
+            if (onEndEdit != null)
+                onEndEdit.Invoke(value);
         }
 
         protected virtual void HandleOnReturnPressed()
         {
             if (onReturnPressed != null)
                 onReturnPressed.Invoke();
-        }
-
-        protected virtual void OnEndEditInternal(string value)
-        {
-            if (onEndEdit != null)
-                onEndEdit.Invoke(value);
         }
 
         protected virtual void OnTextChangedInternal(string value)
@@ -2000,9 +1988,6 @@ namespace MaterialUI
             else if (m_InputText != null)
                 m_InputText.RegisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
 
-            if (onPromptSubmit != null)
-                onPromptSubmit.AddListener(HandleOnAfterPromptSubmit);
-
             if (m_InputField != null)
             {
                 var onReturnPressedField = m_InputField.GetType().GetField("OnReturnPressed", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
@@ -2033,10 +2018,6 @@ namespace MaterialUI
                 tmpInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
             else if (m_InputText != null)
                 m_InputText.UnregisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
-
-            if (onPromptSubmit != null)
-                onPromptSubmit.RemoveListener(HandleOnAfterPromptSubmit);
-
 
             if (m_InputField != null)
             {
