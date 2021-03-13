@@ -239,7 +239,7 @@ namespace MaterialUI
             ITextValidator m_CustomTextValidator = null;
 
             [SerializeField]
-            Dictionary<string, object> m_extraProperties = new Dictionary<string, object>();
+            Dictionary<string, object> m_ExtraProperties = new Dictionary<string, object>();
 
             #endregion
 
@@ -307,8 +307,8 @@ namespace MaterialUI
 
             public Dictionary<string, object> extraProperties
             {
-                get { return m_extraProperties; }
-                set { m_extraProperties = value; }
+                get { return m_ExtraProperties; }
+                set { m_ExtraProperties = value; }
             }
 
             public ITextValidator customTextValidator
@@ -335,7 +335,7 @@ namespace MaterialUI
                     materialInput.customTextValidator = m_CustomTextValidator;
 
                     //Try Apply Extra Properties
-                    if (m_extraProperties != null)
+                    if (m_ExtraProperties != null)
                     {
                         var stylesToApplyDict = materialInput.ExtraStylePropertiesMap;
 
@@ -345,7 +345,7 @@ namespace MaterialUI
                             var style = pair.Value;
 
                             object data;
-                            if (!string.IsNullOrEmpty(key) && m_extraProperties.TryGetValue(key, out data))
+                            if (!string.IsNullOrEmpty(key) && m_ExtraProperties.TryGetValue(key, out data))
                             {
                                 StyleUtils.ApplyGraphicData(style.Target, data);
                             }
@@ -428,7 +428,7 @@ namespace MaterialUI
 
                     var stylesDict = materialInput.ExtraStylePropertiesMap;
 
-                    config.m_extraProperties = new Dictionary<string, object>();
+                    config.m_ExtraProperties = new Dictionary<string, object>();
                     foreach (var pair in stylesDict)
                     {
                         var key = pair.Key;
@@ -437,7 +437,7 @@ namespace MaterialUI
                         if (!string.IsNullOrEmpty(key) && style != null && style.Target != null)
                         {
                             var data = StyleUtils.GetGraphicData(style.Target);
-                            config.m_extraProperties[key] = data;
+                            config.m_ExtraProperties[key] = data;
                         }
                     }
                 }

@@ -214,6 +214,9 @@ namespace MaterialUI
 
         [System.NonSerialized]
         private Selectable m_InputField = null;
+        [System.NonSerialized]
+        private InputPromptDisplayer m_PromptDisplayer = null;
+
 
         private RectTransform m_CaretTransform;
         private CanvasGroup m_CanvasGroup;
@@ -1071,6 +1074,20 @@ namespace MaterialUI
                         RegisterEvents();
                 }
                 return m_InputField;
+            }
+        }
+
+        public InputPromptDisplayer promptDisplayer
+        {
+            get
+            {
+                if (m_PromptDisplayer == null)
+                {
+                    m_PromptDisplayer = GetComponent<InputPromptDisplayer>();
+                    if (m_PromptDisplayer != null)
+                        RegisterEvents();
+                }
+                return m_PromptDisplayer;
             }
         }
 
@@ -2038,6 +2055,11 @@ namespace MaterialUI
                     else if (inputField is TMP_InputField)
                         (inputField as TMP_InputField).DeactivateInputField();
                 }
+            }
+
+            if (promptDisplayer != null && promptDisplayer.enabled)
+            {
+                promptDisplayer.DeactivateInputField();
             }
         }
 
