@@ -62,6 +62,8 @@ namespace MaterialUI
         [SerializeField]
         private RectTransform m_SliderContentTransform = null;
         [SerializeField]
+        private RectTransform m_DotContentTransform = null;
+        [SerializeField]
         private VectorImageData m_DotTemplateIcon = null;
         [SerializeField]
         private Graphic[] m_DotGraphics = new Graphic[0];
@@ -393,6 +395,12 @@ namespace MaterialUI
             set { m_SliderContentTransform = value; }
         }
 
+        public RectTransform dotContentTransform
+        {
+            get { return m_DotContentTransform; }
+            set { m_DotContentTransform = value; }
+        }
+
         public RectTransform rectTransform
         {
             get { return transform as RectTransform; }
@@ -658,21 +666,28 @@ namespace MaterialUI
 
         protected virtual void RebuildDots()
         {
-            m_NumberOfDots = GetSliderValueRange();
-            float dotDistance = 1 / (float)m_NumberOfDots;
-
-            var previousDots = m_DotGraphics;
-            m_DotGraphics = new Graphic[m_NumberOfDots + 1];
-
-            for (int i = 0; i < m_DotGraphics.Length; i++)
+            if (m_DotContentTransform != null)
             {
-                m_DotGraphics[i] = previousDots != null && previousDots.Length > i ? previousDots[i] : null;
-                if (m_DotGraphics[i] == null)
-                    m_DotGraphics[i] = CreateDot();
-                m_DotGraphics[i].rectTransform.SetAnchorX(dotDistance * i, dotDistance * i);
-            }
+                m_NumberOfDots = GetSliderValueRange();
+                float dotDistance = 1 / (float)m_NumberOfDots;
 
-            UpdateColors();
+                var previousDots = m_DotGraphics;
+                m_DotGraphics = new Graphic[m_NumberOfDots + 1];
+
+                for (int i = 0; i < m_DotGraphics.Length; i++)
+                {
+                    m_DotGraphics[i] = previousDots != null && previousDots.Length > i ? previousDots[i] : null;
+                    if (m_DotGraphics[i] == null)
+                        m_DotGraphics[i] = CreateDot();
+                    m_DotGraphics[i].rectTransform.SetAnchorX(dotDistance * i, dotDistance * i);
+                }
+
+                UpdateColors();
+            }
+            else
+            {
+                DestroyDots();
+            }
         }
 
         protected virtual int GetSliderValueRange()
@@ -682,8 +697,7 @@ namespace MaterialUI
 
         private Graphic CreateDot()
         {
-            RectTransform dot = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.sliderDot, m_SliderContentTransform).GetComponent<RectTransform>();
-            dot.SetSiblingIndex(1);
+            RectTransform dot = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.sliderDot, m_DotContentTransform).GetComponent<RectTransform>();
             dot.anchoredPosition = Vector2.zero;
             dot.anchoredPosition = new Vector2(0f, 0.5f);
             return dot.GetComponent<Graphic>();

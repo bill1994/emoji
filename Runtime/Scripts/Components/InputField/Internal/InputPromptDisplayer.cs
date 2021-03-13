@@ -363,6 +363,19 @@ namespace MaterialUI.Internal
             base.OnDisable();
         }
 
+        protected override void Start()
+        {
+            base.Start();
+
+            //Remove Prompt when materialInputField not found
+            MaterialInputField materialInputField = GetComponent<MaterialInputField>();
+            if (materialInputField == null)
+            {
+                Debug.LogWarning("[INPUT PROMPT DISPLAYER] Not supported without materialInputField (sender " + name + ")");
+                Component.DestroyImmediate(this);
+            }
+        }
+
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
