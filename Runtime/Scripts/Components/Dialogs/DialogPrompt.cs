@@ -329,8 +329,7 @@ namespace MaterialUI
                         Apply_Internal(materialInput.inputField as InputField);
                     else if (materialInput.inputField is TMPro.TMP_InputField)
                         Apply_Internal(materialInput.inputField as TMPro.TMP_InputField);
-                    else if (materialInput.inputField is InputPromptField)
-                        Apply_Internal(materialInput.inputField as InputPromptField);
+
                     materialInput.hintText = m_HintText;
                     materialInput.customTextValidator = m_CustomTextValidator;
 
@@ -351,23 +350,6 @@ namespace MaterialUI
                             }
                         }
                     }
-                }
-            }
-
-            protected void Apply_Internal(InputPromptField input)
-            {
-                if (input != null)
-                {
-                    input.text = m_Text;
-                    input.inputType = m_InputType;
-                    input.lineType = m_LineType;
-                    input.contentType = m_ContentType;
-                    input.characterValidation = m_CharacterValidation;
-                    input.keyboardType = m_KeyboardType;
-                    input.characterLimit = m_CharacterLimit;
-                    input.asteriskChar = m_AsteriskChar;
-                    input.shouldHideMobileInput = m_HideMobileInput;
-                    input.hintText = m_HintText;
                 }
             }
 
@@ -420,8 +402,6 @@ namespace MaterialUI
                         config = materialInput.inputField as InputField;
                     else if (materialInput.inputField is TMPro.TMP_InputField)
                         config = materialInput.inputField as TMPro.TMP_InputField;
-                    else if (materialInput.inputField is InputPromptField)
-                        config = materialInput.inputField as InputPromptField;
 
                     config.m_HintText = materialInput.hintText;
                     config.m_CustomTextValidator = materialInput.customTextValidator != null ? materialInput.customTextValidator.Clone() : null;
@@ -440,26 +420,6 @@ namespace MaterialUI
                             config.m_ExtraProperties[key] = data;
                         }
                     }
-                }
-
-                return config;
-            }
-
-            public static implicit operator InputFieldConfigData(InputPromptField input)
-            {
-                var config = new InputFieldConfigData();
-                if (input != null)
-                {
-                    config.m_Text = input.text;
-                    config.m_InputType = input.inputType;
-                    config.m_LineType = input.lineType;
-                    config.m_ContentType = input.contentType;
-                    config.m_CharacterValidation = input.characterValidation;
-                    config.m_KeyboardType = input.keyboardType;
-                    config.m_CharacterLimit = input.characterLimit;
-                    config.m_AsteriskChar = input.asteriskChar;
-                    config.m_HideMobileInput = input.shouldHideMobileInput;
-                    config.m_HintText = input.hintText;
                 }
 
                 return config;

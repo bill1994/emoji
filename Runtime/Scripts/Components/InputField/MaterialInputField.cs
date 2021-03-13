@@ -410,15 +410,13 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.inputType == InputField.InputType.Password : (tmpInputField != null ? tmpInputField.inputType == TMP_InputField.InputType.Password : (promptInputField != null ? promptInputField.inputType == InputField.InputType.Password : false));
+                return unityInputField != null ? unityInputField.inputType == InputField.InputType.Password : (tmpInputField != null ? tmpInputField.inputType == TMP_InputField.InputType.Password : false);
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                 {
@@ -430,11 +428,6 @@ namespace MaterialUI
                     tmpInputField.inputType = value ? TMP_InputField.InputType.Password : (tmpInputField.inputType != TMP_InputField.InputType.Password ? tmpInputField.inputType : TMP_InputField.InputType.Standard);
                     ForceUpdateAll();
                 }
-                else if (promptInputField != null)
-                {
-                    promptInputField.inputType = value ? InputField.InputType.Password : (promptInputField.inputType != InputField.InputType.Password ? promptInputField.inputType : InputField.InputType.Standard);
-                    ForceUpdateAll();
-                }
             }
         }
 
@@ -444,15 +437,13 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.contentType : (tmpInputField != null ? (InputField.ContentType)((int)tmpInputField.contentType) : (promptInputField != null ? promptInputField.contentType : InputField.ContentType.Standard));
+                return unityInputField != null ? unityInputField.contentType : (tmpInputField != null ? (InputField.ContentType)((int)tmpInputField.contentType) : InputField.ContentType.Standard);
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                 {
@@ -464,11 +455,6 @@ namespace MaterialUI
                     tmpInputField.contentType = (TMP_InputField.ContentType)((int)value);
                     ForceUpdateAll();
                 }
-                else if (promptInputField != null)
-                {
-                    promptInputField.contentType = value;
-                    ForceUpdateAll();
-                }
             }
         }
 
@@ -478,14 +464,13 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 InputField.CharacterValidation enumValue;
                 if (tmpInputField == null || !Enum.TryParse(tmpInputField.characterValidation.ToString(), true, out enumValue))
                 {
                     enumValue = unityInputField != null ? unityInputField.characterValidation :
                         (tmpInputField != null ? (InputField.CharacterValidation)((int)tmpInputField.characterValidation) :
-                        (promptInputField != null ? promptInputField.characterValidation : InputField.CharacterValidation.None));
+                        InputField.CharacterValidation.None);
                 }
                 return enumValue;
             }
@@ -493,7 +478,6 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                 {
@@ -510,11 +494,6 @@ namespace MaterialUI
                     tmpInputField.characterValidation = enumValue;
                     ForceUpdateAll();
                 }
-                else if (promptInputField != null)
-                {
-                    promptInputField.characterValidation = value;
-                    ForceUpdateAll();
-                }
             }
         }
 
@@ -524,15 +503,13 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.inputType : (tmpInputField != null ? (InputField.InputType)((int)tmpInputField.inputType) : (promptInputField != null ? promptInputField.inputType : InputField.InputType.Standard));
+                return unityInputField != null ? unityInputField.inputType : (tmpInputField != null ? (InputField.InputType)((int)tmpInputField.inputType) : InputField.InputType.Standard);
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                 {
@@ -544,11 +521,6 @@ namespace MaterialUI
                     tmpInputField.inputType = (TMP_InputField.InputType)((int)value);
                     ForceUpdateAll();
                 }
-                else if (promptInputField != null)
-                {
-                    promptInputField.inputType = value;
-                    ForceUpdateAll();
-                }
             }
         }
 
@@ -558,15 +530,13 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.lineType : (tmpInputField != null ? (InputField.LineType)((int)tmpInputField.lineType) : (promptInputField != null ? promptInputField.lineType : InputField.LineType.SingleLine));
+                return unityInputField != null ? unityInputField.lineType : (tmpInputField != null ? (InputField.LineType)((int)tmpInputField.lineType) : InputField.LineType.SingleLine);
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                 {
@@ -578,11 +548,6 @@ namespace MaterialUI
                     tmpInputField.lineType = (TMP_InputField.LineType)((int)value);
                     ForceUpdateAll();
                 }
-                else if (promptInputField != null)
-                {
-                    promptInputField.lineType = value;
-                    ForceUpdateAll();
-                }
             }
         }
 
@@ -592,15 +557,13 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.keyboardType : (tmpInputField != null ? tmpInputField.keyboardType : (promptInputField != null ? promptInputField.keyboardType : TouchScreenKeyboardType.Default));
+                return unityInputField != null ? unityInputField.keyboardType : (tmpInputField != null ? tmpInputField.keyboardType : TouchScreenKeyboardType.Default);
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                 {
@@ -610,11 +573,6 @@ namespace MaterialUI
                 else if (tmpInputField != null)
                 {
                     tmpInputField.keyboardType = value;
-                    ForceUpdateAll();
-                }
-                else if (promptInputField != null)
-                {
-                    promptInputField.keyboardType = value;
                     ForceUpdateAll();
                 }
             }
@@ -654,22 +612,18 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null && unityInputField.textComponent != null ? unityInputField.textComponent.fontSize : (tmpInputField != null ? (int)tmpInputField.pointSize : (promptInputField != null ? (int)promptInputField.fontSize : (m_InputText != null ? (int)m_InputText.GetGraphicFontSize() : 0)));
+                return unityInputField != null && unityInputField.textComponent != null ? unityInputField.textComponent.fontSize : (tmpInputField != null ? (int)tmpInputField.pointSize : (m_InputText != null ? (int)m_InputText.GetGraphicFontSize() : 0));
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null && unityInputField.textComponent != null)
                     unityInputField.textComponent.fontSize = value;
                 else if (tmpInputField != null)
                     tmpInputField.pointSize = value;
-                else if (promptInputField != null)
-                    promptInputField.fontSize = value;
                 else if (m_InputText != null)
                     m_InputText.SetGraphicFontSize(value);
             }
@@ -682,23 +636,19 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null && unityInputField.textComponent != null ? (UnityEngine.Object)unityInputField.textComponent.font : (tmpInputField != null ? tmpInputField.fontAsset : (promptInputField != null ? promptInputField.fontAsset :
-                    (m_InputText is TMP_Text ? (m_InputText as TMP_Text).font : (m_InputText is Text ? (UnityEngine.Object)(m_InputText as Text).font : null))));
+                return unityInputField != null && unityInputField.textComponent != null ? (UnityEngine.Object)unityInputField.textComponent.font : (tmpInputField != null ? tmpInputField.fontAsset :
+                    (m_InputText is TMP_Text ? (m_InputText as TMP_Text).font : (m_InputText is Text ? (UnityEngine.Object)(m_InputText as Text).font : null)));
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null && unityInputField.textComponent != null && (value is Font || value == (UnityEngine.Object)null))
                     unityInputField.textComponent.font = value as Font;
                 else if (tmpInputField != null && (value is TMP_FontAsset || value == (UnityEngine.Object)null))
                     tmpInputField.fontAsset = value as TMP_FontAsset;
-                else if (promptInputField != null)
-                    promptInputField.fontAsset = value;
                 else if (m_InputText is TMP_Text)
                     (m_InputText as TMP_Text).font = value as TMP_FontAsset;
                 else if (m_InputText is Text)
@@ -713,22 +663,18 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.asteriskChar : (tmpInputField != null ? tmpInputField.asteriskChar : (promptInputField != null ? promptInputField.asteriskChar : '•'));
+                return unityInputField != null ? unityInputField.asteriskChar : (tmpInputField != null ? tmpInputField.asteriskChar : '•');
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                     unityInputField.asteriskChar = value;
                 else if (tmpInputField != null)
                     tmpInputField.asteriskChar = value;
-                else if (promptInputField != null)
-                    promptInputField.asteriskChar = value;
             }
         }
 
@@ -738,22 +684,18 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.shouldHideMobileInput : (tmpInputField != null ? tmpInputField.shouldHideMobileInput : (promptInputField != null ? promptInputField.shouldHideMobileInput : true));
+                return unityInputField != null ? unityInputField.shouldHideMobileInput : (tmpInputField != null ? tmpInputField.shouldHideMobileInput : true);
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                     unityInputField.shouldHideMobileInput = value;
                 else if (tmpInputField != null)
                     tmpInputField.shouldHideMobileInput = value;
-                else if (promptInputField != null)
-                    promptInputField.shouldHideMobileInput = value;
             }
         }
 
@@ -763,9 +705,8 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.multiLine : (tmpInputField != null ? tmpInputField.multiLine : (promptInputField != null ? promptInputField.multiLine : false));
+                return unityInputField != null ? unityInputField.multiLine : (tmpInputField != null ? tmpInputField.multiLine : false);
             }
         }
 
@@ -775,7 +716,6 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 System.Func<string> getGraphicText = () =>
                 {
@@ -787,20 +727,17 @@ namespace MaterialUI
 
                     return graphicText;
                 };
-                return unityInputField != null ? unityInputField.text : (tmpInputField != null ? tmpInputField.text : (promptInputField != null ? promptInputField.text : getGraphicText()));
+                return unityInputField != null ? unityInputField.text : (tmpInputField != null ? tmpInputField.text : getGraphicText());
             }
             set
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 if (unityInputField != null)
                     unityInputField.text = value;
                 else if (tmpInputField != null)
                     tmpInputField.text = value;
-                else if (promptInputField != null)
-                    promptInputField.text = value;
                 else if (m_InputText != null)
                     m_InputText.SetGraphicText(value);
             }
@@ -812,9 +749,8 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
-                return unityInputField != null ? unityInputField.isFocused : (tmpInputField != null ? tmpInputField.isFocused : (promptInputField != null ? promptInputField.isFocused : false));
+                return unityInputField != null ? unityInputField.isFocused : (tmpInputField != null ? tmpInputField.isFocused : (promptDisplayer != null ? promptDisplayer.isFocused : false));
             }
         }
 
@@ -911,12 +847,10 @@ namespace MaterialUI
             {
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 var limit = m_MatchInputFieldCharacterLimit ?
                     (unityInputField != null ? unityInputField.characterLimit :
-                    (tmpInputField != null ? tmpInputField.characterLimit :
-                    (promptInputField != null ? promptInputField.characterLimit : m_CharacterLimit))) :
+                    (tmpInputField != null ? tmpInputField.characterLimit : m_CharacterLimit)) :
                     m_CharacterLimit;
 
                 if (limit != m_CharacterLimit)
@@ -936,7 +870,6 @@ namespace MaterialUI
 
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
-                var promptInputField = m_InputField as InputPromptField;
 
                 m_CharacterLimit = value;
                 if (m_MatchInputFieldCharacterLimit)
@@ -945,8 +878,6 @@ namespace MaterialUI
                         unityInputField.characterLimit = m_CharacterLimit;
                     else if (tmpInputField != null)
                         tmpInputField.characterLimit = m_CharacterLimit;
-                    else if (promptInputField != null)
-                        promptInputField.characterLimit = m_CharacterLimit;
                 }
 
                 SetLayoutDirty();
@@ -1101,7 +1032,6 @@ namespace MaterialUI
                     {
                         var unityInputField = m_InputField as InputField;
                         var tmpInputField = m_InputField as TMP_InputField;
-                        var promptInputField = m_InputField as InputPromptField;
 
                         if (unityInputField != null && unityInputField.textComponent != null)
                         {
@@ -1110,10 +1040,6 @@ namespace MaterialUI
                         else if (tmpInputField != null && tmpInputField.textComponent != null)
                         {
                             m_InputTextTransform = tmpInputField.textComponent.GetComponent<RectTransform>();
-                        }
-                        else if (promptInputField != null && promptInputField.textComponent != null)
-                        {
-                            m_InputTextTransform = promptInputField.textComponent.GetComponent<RectTransform>();
                         }
                     }
                     else if (m_InputText != null)
@@ -1859,9 +1785,8 @@ namespace MaterialUI
         {
             var unityInputField = m_InputField as InputField;
             var tmpInputField = m_InputField as TMP_InputField;
-            var promptInputField = m_InputField as InputPromptField;
 
-            OnTextChangedInternal(value, unityInputField == null && tmpInputField == null && promptInputField == null && m_InputText != null);
+            OnTextChangedInternal(value, unityInputField == null && tmpInputField == null && m_InputText != null);
         }
 
         protected virtual void OnTextChangedInternal(string value, bool canFixText)
@@ -1974,14 +1899,11 @@ namespace MaterialUI
             text = string.IsNullOrEmpty(text) ? string.Empty : text;
             var unityInputField = m_InputField as InputField;
             var tmpInputField = m_InputField as TMP_InputField;
-            var promptInputField = m_InputField as InputPromptField;
 
             if (unityInputField != null)
                 unityInputField.SetTextWithoutNotify(text);
             else if (tmpInputField != null)
                 tmpInputField.SetTextWithoutNotify(text);
-            else if (promptInputField != null)
-                promptInputField.SetTextWithoutNotify(text);
         }
 
         public virtual void ForceUpdateAll()
@@ -2007,14 +1929,11 @@ namespace MaterialUI
         {
             var unityInputField = inputField as InputField;
             var tmpInputField = m_InputField as TMP_InputField;
-            var promptInputField = m_InputField as InputPromptField;
 
             if (unityInputField != null)
                 unityInputField.ForceLabelUpdate();
             else if (tmpInputField != null)
                 tmpInputField.ForceLabelUpdate();
-            else if (promptInputField != null)
-                promptInputField.ForceLabelUpdate();
         }
 
         public override void SnapTo()
@@ -2069,14 +1988,11 @@ namespace MaterialUI
 
             var unityInputField = m_InputField as InputField;
             var tmpInputField = m_InputField as TMP_InputField;
-            var promptInputField = m_InputField as InputPromptField;
 
             if (unityInputField != null)
                 unityInputField.onValueChanged.AddListener(HandleOnTextChanged);
             else if (tmpInputField != null)
                 tmpInputField.onValueChanged.AddListener(HandleOnTextChanged);
-            else if (promptInputField != null)
-                promptInputField.onValueChanged.AddListener(HandleOnTextChanged);
             else if (m_InputText != null)
                 m_InputText.RegisterDirtyVerticesCallback(HandleOnGraphicTextChanged);
 
@@ -2084,8 +2000,6 @@ namespace MaterialUI
                 unityInputField.onEndEdit.AddListener(HandleOnEndEdit);
             else if (tmpInputField != null)
                 tmpInputField.onEndEdit.AddListener(HandleOnEndEdit);
-            else if (promptInputField != null)
-                promptInputField.onEndEdit.AddListener(HandleOnEndEdit);
             else if (m_InputText != null)
                 m_InputText.RegisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
 
@@ -2108,14 +2022,11 @@ namespace MaterialUI
         {
             var unityInputField = m_InputField as InputField;
             var tmpInputField = m_InputField as TMP_InputField;
-            var promptInputField = m_InputField as InputPromptField;
 
             if (unityInputField != null)
                 unityInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
             else if (tmpInputField != null)
                 tmpInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
-            else if (promptInputField != null)
-                promptInputField.onValueChanged.RemoveListener(HandleOnTextChanged);
             else if (m_InputText != null)
                 m_InputText.UnregisterDirtyVerticesCallback(HandleOnGraphicTextChanged);
 
@@ -2123,8 +2034,6 @@ namespace MaterialUI
                 unityInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
             else if (tmpInputField != null)
                 tmpInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
-            else if (promptInputField != null)
-                promptInputField.onEndEdit.RemoveListener(HandleOnEndEdit);
             else if (m_InputText != null)
                 m_InputText.UnregisterDirtyVerticesCallback(HandleOnGraphicEndEdit);
 
@@ -2148,15 +2057,12 @@ namespace MaterialUI
         {
             var unityInputField = m_InputField as InputField;
             var tmpInputField = m_InputField as TMP_InputField;
-            var promptInputField = m_InputField as InputPromptField;
 
             bool requireCallback = true;
             if (unityInputField != null)
                 unityInputField.text = "";
             else if (tmpInputField != null)
                 tmpInputField.text = "";
-            else if (promptInputField != null)
-                promptInputField.text = "";
             else if (m_InputText != null)
             {
                 requireCallback = false;
