@@ -2106,7 +2106,7 @@ namespace MaterialUI
                             m_ValidationTweener = TweenManager.TweenFloat(
                                 f =>
                                 {
-                                    if (validationCanvasGroup != null)
+                                    if (this != null && validationCanvasGroup != null)
                                         validationCanvasGroup.alpha = f;
                                 },
                                 validationCanvasGroup.alpha, 1f,
@@ -2121,14 +2121,14 @@ namespace MaterialUI
                             m_ValidationTweener = TweenManager.TweenFloat(
                                 f =>
                                 {
-                                    if (validationCanvasGroup != null)
+                                    if (this != null && validationCanvasGroup != null)
                                         validationCanvasGroup.alpha = f;
                                 },
                                 validationCanvasGroup.alpha, 0f, m_AnimationDuration / 2, 
                                 0, 
                                 () =>
                                 {
-                                    if (validationCanvasGroup != null)
+                                    if (this != null && validationCanvasGroup != null)
                                     {
                                         validationCanvasGroup.interactable = false;
                                         validationCanvasGroup.blocksRaycasts = false;
