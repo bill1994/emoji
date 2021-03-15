@@ -2124,10 +2124,15 @@ namespace MaterialUI
                                     if (validationCanvasGroup != null)
                                         validationCanvasGroup.alpha = f;
                                 },
-                                validationCanvasGroup.alpha, 0f, m_AnimationDuration / 2, 0, () =>
+                                validationCanvasGroup.alpha, 0f, m_AnimationDuration / 2, 
+                                0, 
+                                () =>
                                 {
-                                    validationCanvasGroup.interactable = false;
-                                    validationCanvasGroup.blocksRaycasts = false;
+                                    if (validationCanvasGroup != null)
+                                    {
+                                        validationCanvasGroup.interactable = false;
+                                        validationCanvasGroup.blocksRaycasts = false;
+                                    }
                                 },
                                 false,
                                 Tween.TweenType.Linear);
