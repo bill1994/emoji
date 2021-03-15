@@ -3735,7 +3735,7 @@ MonoBehaviour:
     m_asset: {fileID: 0}
     m_assetPath: 
     m_keepLoaded: 0
-  m_CallReturnOnSubmit: 0
+  m_OpenPromptOnSelect: 1
   m_BackgroundLayoutMode: 0
   m_LineLayoutMode: 0
   m_FloatingHint: 0
@@ -3815,9 +3815,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onReturnPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  onPromptSubmit:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &506810688
@@ -4444,7 +4441,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4708,7 +4705,7 @@ MonoBehaviour:
     m_asset: {fileID: 0}
     m_assetPath: 
     m_keepLoaded: 0
-  m_CallReturnOnSubmit: 0
+  m_OpenPromptOnSelect: 1
   m_BackgroundLayoutMode: 0
   m_LineLayoutMode: 0
   m_FloatingHint: 0
@@ -4788,9 +4785,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onReturnPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  onPromptSubmit:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &548526157
@@ -5101,7 +5095,7 @@ MonoBehaviour:
     m_asset: {fileID: 0}
     m_assetPath: 
     m_keepLoaded: 0
-  m_CallReturnOnSubmit: 0
+  m_OpenPromptOnSelect: 1
   m_BackgroundLayoutMode: 0
   m_LineLayoutMode: 0
   m_FloatingHint: 0
@@ -5181,9 +5175,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onReturnPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  onPromptSubmit:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &555846528
@@ -6820,7 +6811,7 @@ MonoBehaviour:
     m_asset: {fileID: 0}
     m_assetPath: 
     m_keepLoaded: 0
-  m_CallReturnOnSubmit: 0
+  m_OpenPromptOnSelect: 1
   m_BackgroundLayoutMode: 0
   m_LineLayoutMode: 0
   m_FloatingHint: 0
@@ -6900,9 +6891,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onReturnPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  onPromptSubmit:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &818377802
@@ -10508,7 +10496,7 @@ MonoBehaviour:
     m_asset: {fileID: 0}
     m_assetPath: 
     m_keepLoaded: 0
-  m_CallReturnOnSubmit: 0
+  m_OpenPromptOnSelect: 1
   m_BackgroundLayoutMode: 0
   m_LineLayoutMode: 0
   m_FloatingHint: 0
@@ -10588,9 +10576,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onReturnPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  onPromptSubmit:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &1355983793
@@ -15347,7 +15332,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bdb3c2fa2edce14428c2588d923d9431, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f8e0ae8fe4abe4e44bb4a9a89648eea4, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -15520,7 +15505,7 @@ MonoBehaviour:
     m_asset: {fileID: 0}
     m_assetPath: 
     m_keepLoaded: 0
-  m_CallReturnOnSubmit: 0
+  m_OpenPromptOnSelect: 1
   m_BackgroundLayoutMode: 0
   m_LineLayoutMode: 0
   m_FloatingHint: 0
@@ -15600,9 +15585,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onReturnPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  onPromptSubmit:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &1988946564

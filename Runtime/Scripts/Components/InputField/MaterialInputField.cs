@@ -1942,6 +1942,11 @@ namespace MaterialUI
         public virtual void ActivateInputField()
         {
             Select();
+
+            if (promptDisplayer != null && promptDisplayer.enabled && !m_OpenPromptOnSelect)
+            {
+                promptDisplayer.ActivateInputField();
+            }
         }
 
         public virtual void DeactivateInputField()
