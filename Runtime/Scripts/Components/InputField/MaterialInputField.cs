@@ -140,12 +140,6 @@ namespace MaterialUI
         private RectTransform m_BottomContentTransform = null;
         [SerializeField]
         private RectTransform m_ClearButton = null;
-        [SerializeField]
-        private CanvasGroup m_ActiveLineCanvasGroup = null;
-        [SerializeField]
-        private CanvasGroup m_HintTextCanvasGroup = null;
-        [SerializeField]
-        private CanvasGroup m_ValidationCanvasGroup = null;
 
         [SerializeField, SerializeStyleProperty]
         private Graphic m_InputText = null;
@@ -216,7 +210,12 @@ namespace MaterialUI
         private Selectable m_InputField = null;
         [System.NonSerialized]
         private InputPromptDisplayer m_PromptDisplayer = null;
-
+        [System.NonSerialized]
+        private CanvasGroup m_ActiveLineCanvasGroup = null;
+        [System.NonSerialized]
+        private CanvasGroup m_HintTextCanvasGroup = null;
+        [System.NonSerialized]
+        private CanvasGroup m_ValidationCanvasGroup = null;
 
         private RectTransform m_CaretTransform;
         private CanvasGroup m_CanvasGroup;
