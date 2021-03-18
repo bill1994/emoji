@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
+using System.Globalization;
 
 namespace MaterialUI
 {
@@ -558,17 +559,24 @@ namespace MaterialUI
         double _minValue = double.MinValue;
         double _maxValue = double.MaxValue;
         bool _isInclusive = true;
+        System.IFormatProvider _formatProvider = null;
         const string DECIMAL_VALIDATOR = @"^[-+]?\d+(\.\d+)?$";
 
         public DecimalValidator(string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : this(true, double.MinValue, double.MaxValue, error)
         {
         }
 
-        public DecimalValidator(bool isInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : base(DECIMAL_VALIDATOR, string.Format(error, minValue.ToString("0.0"), maxValue.ToString("0.0")))
+        public DecimalValidator(bool isInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) :
+            this(null, isInclusive, minValue, maxValue, error)
+        {
+        }
+
+        public DecimalValidator(System.IFormatProvider format, bool isInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : base(DECIMAL_VALIDATOR, string.Format(error, minValue.ToString("0.0"), maxValue.ToString("0.0")))
         {
             _isInclusive = isInclusive;
             _minValue = minValue;
             _maxValue = maxValue;
+            _formatProvider = format == null ? CultureInfo.InvariantCulture : format;
         }
 
         public override bool IsTextValid()
@@ -579,7 +587,7 @@ namespace MaterialUI
             {
                 double parsedValue;
                 isValid = m_MaterialInputField != null &&
-                    double.TryParse(m_MaterialInputField.text, out parsedValue) &&
+                    double.TryParse(m_MaterialInputField.text, NumberStyles.Float, _formatProvider, out parsedValue) &&
                     ((_isInclusive && parsedValue >= _minValue && parsedValue <= _maxValue) ||
                     (!_isInclusive && parsedValue > _minValue && parsedValue < _maxValue));
             }

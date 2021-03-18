@@ -3765,16 +3765,12 @@ MonoBehaviour:
   m_TopContentTransform: {fileID: 0}
   m_BottomContentTransform: {fileID: 0}
   m_ClearButton: {fileID: 0}
-  m_ActiveLineCanvasGroup: {fileID: 0}
-  m_HintTextCanvasGroup: {fileID: 1541580986}
-  m_ValidationCanvasGroup: {fileID: 1072579925}
   m_InputText: {fileID: 519510723}
   m_HintTextObject: {fileID: 1541580987}
   m_CounterText: {fileID: 191352729}
   m_ValidationText: {fileID: 1072579926}
   m_BackgroundGraphic: {fileID: 0}
   m_OutlineGraphic: {fileID: 0}
-  m_LineImage: {fileID: 455598470}
   m_LeftContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
   m_LeftContentInactiveColor: {r: 0, g: 0, b: 0, a: 0.25882354}
   m_RightContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
@@ -4735,16 +4731,12 @@ MonoBehaviour:
   m_TopContentTransform: {fileID: 0}
   m_BottomContentTransform: {fileID: 0}
   m_ClearButton: {fileID: 0}
-  m_ActiveLineCanvasGroup: {fileID: 0}
-  m_HintTextCanvasGroup: {fileID: 1886581609}
-  m_ValidationCanvasGroup: {fileID: 906799420}
   m_InputText: {fileID: 907006989}
   m_HintTextObject: {fileID: 1886581610}
   m_CounterText: {fileID: 431888628}
   m_ValidationText: {fileID: 906799421}
   m_BackgroundGraphic: {fileID: 0}
   m_OutlineGraphic: {fileID: 0}
-  m_LineImage: {fileID: 1416687603}
   m_LeftContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
   m_LeftContentInactiveColor: {r: 0, g: 0, b: 0, a: 0.25882354}
   m_RightContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
@@ -5125,16 +5117,12 @@ MonoBehaviour:
   m_TopContentTransform: {fileID: 0}
   m_BottomContentTransform: {fileID: 0}
   m_ClearButton: {fileID: 0}
-  m_ActiveLineCanvasGroup: {fileID: 0}
-  m_HintTextCanvasGroup: {fileID: 1902295380}
-  m_ValidationCanvasGroup: {fileID: 827400996}
   m_InputText: {fileID: 555247782}
   m_HintTextObject: {fileID: 1902295381}
   m_CounterText: {fileID: 1480294465}
   m_ValidationText: {fileID: 827400997}
   m_BackgroundGraphic: {fileID: 0}
   m_OutlineGraphic: {fileID: 0}
-  m_LineImage: {fileID: 442492729}
   m_LeftContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
   m_LeftContentInactiveColor: {r: 0, g: 0, b: 0, a: 0.25882354}
   m_RightContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
@@ -6841,16 +6829,12 @@ MonoBehaviour:
   m_TopContentTransform: {fileID: 0}
   m_BottomContentTransform: {fileID: 0}
   m_ClearButton: {fileID: 0}
-  m_ActiveLineCanvasGroup: {fileID: 0}
-  m_HintTextCanvasGroup: {fileID: 2115499683}
-  m_ValidationCanvasGroup: {fileID: 150306285}
   m_InputText: {fileID: 1801285864}
   m_HintTextObject: {fileID: 2115499684}
   m_CounterText: {fileID: 1912971564}
   m_ValidationText: {fileID: 150306286}
   m_BackgroundGraphic: {fileID: 0}
   m_OutlineGraphic: {fileID: 0}
-  m_LineImage: {fileID: 26377637}
   m_LeftContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
   m_LeftContentInactiveColor: {r: 0, g: 0, b: 0, a: 0.25882354}
   m_RightContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
@@ -10526,16 +10510,12 @@ MonoBehaviour:
   m_TopContentTransform: {fileID: 0}
   m_BottomContentTransform: {fileID: 0}
   m_ClearButton: {fileID: 0}
-  m_ActiveLineCanvasGroup: {fileID: 0}
-  m_HintTextCanvasGroup: {fileID: 25584452}
-  m_ValidationCanvasGroup: {fileID: 509304691}
   m_InputText: {fileID: 360717294}
   m_HintTextObject: {fileID: 25584453}
   m_CounterText: {fileID: 2046016187}
   m_ValidationText: {fileID: 509304692}
   m_BackgroundGraphic: {fileID: 0}
   m_OutlineGraphic: {fileID: 0}
-  m_LineImage: {fileID: 1920868592}
   m_LeftContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
   m_LeftContentInactiveColor: {r: 0, g: 0, b: 0, a: 0.25882354}
   m_RightContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
@@ -15535,16 +15515,12 @@ MonoBehaviour:
   m_TopContentTransform: {fileID: 0}
   m_BottomContentTransform: {fileID: 0}
   m_ClearButton: {fileID: 0}
-  m_ActiveLineCanvasGroup: {fileID: 0}
-  m_HintTextCanvasGroup: {fileID: 1231220205}
-  m_ValidationCanvasGroup: {fileID: 1138193157}
   m_InputText: {fileID: 905223897}
   m_HintTextObject: {fileID: 1231220206}
   m_CounterText: {fileID: 127123126}
   m_ValidationText: {fileID: 1138193158}
   m_BackgroundGraphic: {fileID: 0}
   m_OutlineGraphic: {fileID: 0}
-  m_LineImage: {fileID: 1960115008}
   m_LeftContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
   m_LeftContentInactiveColor: {r: 0, g: 0, b: 0, a: 0.25882354}
   m_RightContentActiveColor: {r: 0, g: 0, b: 0, a: 0.5411765}
