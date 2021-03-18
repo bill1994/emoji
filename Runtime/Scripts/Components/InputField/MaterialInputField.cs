@@ -153,8 +153,6 @@ namespace MaterialUI
         private Graphic m_BackgroundGraphic = null;
         [SerializeField, SerializeStyleProperty]
         private Graphic m_OutlineGraphic = null;
-        [SerializeField, SerializeStyleProperty]
-        private Image m_LineImage = null;
 
         [SerializeField, SerializeStyleProperty]
         private Color m_LeftContentActiveColor = MaterialColor.iconDark;
