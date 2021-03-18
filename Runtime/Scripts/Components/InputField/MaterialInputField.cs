@@ -219,7 +219,7 @@ namespace MaterialUI
 
         private RectTransform m_CaretTransform;
         private CanvasGroup m_CanvasGroup;
-        private static Sprite m_LineDisabledSprite;
+        //private static Sprite m_LineDisabledSprite;
         private ITextValidator m_CustomTextValidator;
 
         private bool m_AnimateHintText;
@@ -1269,7 +1269,7 @@ namespace MaterialUI
             }
         }
 
-        public Image lineImage
+        /*public Image lineImage
         {
             get
             {
@@ -1282,7 +1282,7 @@ namespace MaterialUI
                 }
                 return m_LineImage;
             }
-        }
+        }*/
 
         public CanvasGroup activeLineCanvasGroup
         {
@@ -1488,7 +1488,7 @@ namespace MaterialUI
             }
         }
 
-        private static Sprite lineDisabledSprite
+        /*private static Sprite lineDisabledSprite
         {
             get
             {
@@ -1519,7 +1519,7 @@ namespace MaterialUI
 
                 return m_LineDisabledSprite;
             }
-        }
+        }*/
 
         public ITextValidator customTextValidator
         {
@@ -2176,20 +2176,20 @@ namespace MaterialUI
             {
                 m_CurrentSelectionState = isFocused ? ColorSelectionState.EnabledSelected : ColorSelectionState.EnabledDeselected;
 
-                if (lineImage != null)
+                /*if (lineImage != null)
                 {
                     lineImage.sprite = null;
-                }
+                }*/
             }
             else
             {
                 m_CurrentSelectionState = isFocused ? ColorSelectionState.DisabledSelected : ColorSelectionState.DisabledDeselected;
 
-                if (lineImage != null)
+                /*if (lineImage != null)
                 {
                     lineImage.sprite = lineDisabledSprite;
                     lineImage.type = Image.Type.Tiled;
-                }
+                }*/
             }
 
             if (m_CurrentSelectionState != m_LastSelectionState)
