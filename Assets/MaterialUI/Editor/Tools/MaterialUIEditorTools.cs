@@ -381,6 +381,7 @@ namespace MaterialUI
             var count = 0;
             if (s_FillSquareSprite != null)
             {
+                var sceneChanged = false;
                 var selectedGameObjects = Selection.gameObjects;
                 foreach (var gameObject in selectedGameObjects)
                 {
@@ -390,14 +391,26 @@ namespace MaterialUI
                     {
                         if (image.sprite == null)
                         {
-                            image.sprite = s_FillSquareSprite;
+                            var serializedObject = new SerializedObject(image);
+                            var spriteProp = serializedObject.FindProperty("m_Sprite");
+                            spriteProp.objectReferenceValue = s_FillSquareSprite;
+                            serializedObject.ApplyModifiedProperties();
                             EditorUtility.SetDirty(image);
                             changed = true;
                             count++;
                         }
                     }
-                    if(changed)
+                    if (changed)
                         EditorUtility.SetDirty(gameObject);
+
+                    sceneChanged = changed || sceneChanged;
+                }
+
+                if (sceneChanged)
+                {
+                    var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+                    if (prefabStage != null)
+                        EditorSceneManager.MarkSceneDirty(prefabStage.scene);
                 }
             }
 
