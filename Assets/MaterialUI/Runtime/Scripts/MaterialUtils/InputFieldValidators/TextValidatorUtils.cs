@@ -553,12 +553,12 @@ namespace MaterialUI
 
     public class DecimalValidator : CustomFormatValidator
     {
-        public const string DEFAULT_DECIMAL_EXCLUSIVE_VALIDATOR_ERROR_MSG = "Value must be a number greater than '<localeparam=0>{0}</localeparam>' and  smaller than '<localeparam=1>{1}</localeparam>'";
         public const string DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG = "Value must be a number between '<localeparam=0>{0}</localeparam>' and '<localeparam=1>{1}</localeparam>' (Inclusive)";
 
         double _minValue = double.MinValue;
         double _maxValue = double.MaxValue;
-        bool _isInclusive = true;
+        bool _isMinInclusive = true;
+        bool _isMaxInclusive = true;
         System.IFormatProvider _formatProvider = null;
         const string DECIMAL_VALIDATOR = @"^[-+]?\d+(\.\d+)?$";
 
@@ -571,11 +571,30 @@ namespace MaterialUI
         {
         }
 
-        public DecimalValidator(System.IFormatProvider format, bool isInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : base(DECIMAL_VALIDATOR, string.Format(error, minValue.ToString("0.0"), maxValue.ToString("0.0")))
+        public DecimalValidator(bool isMinInclusive, bool isMaxInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) :
+            this(null, isMinInclusive, isMaxInclusive, minValue, maxValue, error)
         {
-            _isInclusive = isInclusive;
+        }
+
+        public DecimalValidator(System.IFormatProvider format, bool isInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : 
+            this(format, isInclusive, isInclusive, minValue, maxValue, error)
+        {
+        }
+
+        public DecimalValidator(System.IFormatProvider format, bool isMinInclusive, bool isMaxInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : base(DECIMAL_VALIDATOR, string.Format(error, minValue.ToString("0.0"), maxValue.ToString("0.0")))
+        {
+            _isMinInclusive = isMinInclusive;
+            _isMaxInclusive = isMaxInclusive;
             _minValue = minValue;
             _maxValue = maxValue;
+
+            //Swap values if Min > Max
+            if (_minValue > _maxValue)
+            {
+                var tempMin = _minValue;
+                _minValue = _maxValue;
+                _maxValue = tempMin;
+            }
             _formatProvider = format == null ? CultureInfo.InvariantCulture : format;
         }
 
@@ -588,10 +607,9 @@ namespace MaterialUI
                 double parsedValue;
                 isValid = m_MaterialInputField != null &&
                     double.TryParse(m_MaterialInputField.text, NumberStyles.Float, _formatProvider, out parsedValue) &&
-                    ((_isInclusive && parsedValue >= _minValue && parsedValue <= _maxValue) ||
-                    (!_isInclusive && parsedValue > _minValue && parsedValue < _maxValue));
+                    ((_isMinInclusive && parsedValue == _minValue) || parsedValue > _minValue) &&
+                    ((_isMaxInclusive && parsedValue == _maxValue) || parsedValue < _maxValue);
             }
-
             if (!isValid)
             {
                 if (m_MaterialInputField != null && m_MaterialInputField.validationText != null)
@@ -602,7 +620,7 @@ namespace MaterialUI
 
         public override ITextValidator Clone()
         {
-            return new DecimalValidator(_isInclusive, _minValue, _maxValue, m_ErrorMessage);
+            return new DecimalValidator(_formatProvider, _isMinInclusive, _isMaxInclusive, _minValue, _maxValue, m_ErrorMessage);
         }
     }
 
