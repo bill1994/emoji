@@ -10,7 +10,7 @@ namespace Kyub.Localization
     {
         #region Consts
 
-        
+
         public const string LOCALE_SKIP_TAG = @"<skiplocale>";
         public static Dictionary<string, string> s_localeClearTagsDict = new Dictionary<string, string>() {
                     { @"<locale>", "" },
@@ -219,7 +219,7 @@ namespace Kyub.Localization
             {
                 foreach (var langData in m_localizationDatas)
                 {
-                    if (langData != null && 
+                    if (langData != null &&
                         (string.Equals(langData.Name, language) || string.Equals(langData.FullName, language)))
                     {
                         return langData;
@@ -267,7 +267,7 @@ namespace Kyub.Localization
         protected virtual Dictionary<string, string> GetCurrentDictionaryData()
         {
             var loc = GetOrLoadCurrentData();
-            return loc != null? loc.Dictionary : null;
+            return loc != null ? loc.Dictionary : null;
         }
 
         protected virtual LocalizationData GetOrLoadCurrentData()
@@ -311,7 +311,7 @@ namespace Kyub.Localization
                 PlayerPrefs.SetString(LANGUANGE_KEY, CurrentLanguage);
                 PlayerPrefs.Save();
             }
-            //Unload all other loaclization datas
+            //Unload all other localization datas
             for (int i = 0; i < LocalizationDatas.Count; i++)
             {
                 var data = LocalizationDatas[i];
@@ -329,7 +329,7 @@ namespace Kyub.Localization
             TryUpdateCurrentCulture();
             if (OnLocalizeChanged != null)
                 OnLocalizeChanged(forceReapply);
-            
+
         }
 
         protected internal virtual bool TryGetLocalizedText_Internal(string key, out string val)
@@ -337,18 +337,7 @@ namespace Kyub.Localization
             key = key != null ? Kyub.RegexUtils.BulkReplace(key, s_uselessCharsDict).Trim() : "";
             var dictionary = GetCurrentDictionaryData();
 
-            bool sucess = false;
-            if (!Application.isPlaying)
-            {
-                sucess = false;
-                val = key;
-            }
-            else
-            {
-                val = key;
-                if (dictionary != null && dictionary.TryGetValue(key, out val))
-                    sucess = true;
-            }
+            var sucess = TryGetLocalizedText_Internal(key, dictionary, out val);
 
 #if UNITY_EDITOR
             if (m_addInvalidRequestedKeysInEditor && !sucess && !string.IsNullOrEmpty(key) && !key.Equals("\u200B"))
@@ -365,6 +354,28 @@ namespace Kyub.Localization
                 dictionary[key] = key;
             }
 #endif
+            if (val == null)
+                val = key;
+            return sucess;
+        }
+
+        protected internal virtual bool TryGetLocalizedText_Internal(string key, Dictionary<string, string> dict, out string val)
+        {
+            key = key != null ? Kyub.RegexUtils.BulkReplace(key, s_uselessCharsDict).Trim() : "";
+
+            bool sucess = false;
+            if (!Application.isPlaying)
+            {
+                sucess = false;
+                val = key;
+            }
+            else
+            {
+                val = key;
+                if (dict != null && dict.TryGetValue(key, out val))
+                    sucess = true;
+            }
+
             if (val == null)
                 val = key;
             return sucess;
@@ -425,11 +436,9 @@ namespace Kyub.Localization
 
 
             //Localize text and than replace the parameters found
+            TryGetLocalizedText_Internal(localizedValue, out localizedValue);
             if (paramsDict != null)
-            {
-                TryGetLocalizedText_Internal(localizedValue, out localizedValue);
                 localizedValue = Kyub.RegexUtils.BulkReplace(localizedValue, paramsDict);
-            }
 
             return sucess;
         }
@@ -496,7 +505,7 @@ namespace Kyub.Localization
             var loc = GetOrLoadCurrentData();
 
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
-            builder.AppendLine(string.Format("\"//Keys\";\"Text({0})\"" , CurrentLanguage));
+            builder.AppendLine(string.Format("\"//Keys\";\"Text({0})\"", CurrentLanguage));
             if (loc != null && loc._keyValueArray != null)
             {
                 foreach (var pair in loc._keyValueArray)
@@ -751,7 +760,7 @@ namespace Kyub.Localization
         {
             if (!Application.isEditor || !Application.isPlaying)
                 _keyValueArray = null;
-            else if(Application.isPlaying)
+            else if (Application.isPlaying)
             {
                 var valueArray = new List<LocalizationPair>();
                 if (_cachedDict != null)
