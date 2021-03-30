@@ -11,6 +11,19 @@ namespace Kyub.UI
     public static class LayoutUtilityEx
     {
         /// <summary>
+        /// Returns the maximum size of the layout element.
+        /// </summary>
+        /// <param name="rect">The RectTransform of the layout element to query.</param>
+        /// <param name="axis">The axis to query. This can be 0 or 1.</param>
+        /// <remarks>All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.</remarks>
+        public static float GetMaxSize(RectTransform rect, int axis, int defaultValue = 0)
+        {
+            if (axis == 0)
+                return GetMaxWidth(rect, defaultValue);
+            return GetMaxHeight(rect, defaultValue);
+        }
+
+        /// <summary>
         /// Returns the minimum size of the layout element.
         /// </summary>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
@@ -123,6 +136,30 @@ namespace Kyub.UI
         public static float GetFlexibleHeight(RectTransform rect, int defaultValue = 0)
         {
             return GetLayoutProperty(rect, e => e.flexibleHeight, defaultValue);
+        }
+
+        /// <summary>
+        /// Returns the max height of the layout element.
+        /// </summary>
+        /// <remarks>
+        /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
+        /// </remarks>
+        /// <param name="rect">The RectTransform of the layout element to query.</param>
+        public static float GetMaxHeight(RectTransform rect, int defaultValue = 0)
+        {
+            return GetLayoutProperty(rect, e => (e is IMaxLayoutElement) ? ((IMaxLayoutElement)e).GetMaxHeightInDefaultMode() : -1, defaultValue);
+        }
+
+        /// <summary>
+        /// Returns the max width of the layout element.
+        /// </summary>
+        /// <remarks>
+        /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
+        /// </remarks>
+        /// <param name="rect">The RectTransform of the layout element to query.</param>
+        public static float GetMaxWidth(RectTransform rect, int defaultValue = 0)
+        {
+            return GetLayoutProperty(rect, e => (e is IMaxLayoutElement)? ((IMaxLayoutElement)e).GetMaxWidthInDefaultMode() : -1, defaultValue);
         }
 
         /// <summary>

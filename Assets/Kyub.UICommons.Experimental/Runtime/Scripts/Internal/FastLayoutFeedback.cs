@@ -23,6 +23,9 @@ namespace Kyub.UI.Experimental
         internal float _cachedRectHeight = -1;
         internal float _cachedRectWidth = -1;
 
+        internal float _cachedMaxWidth = -1;
+        internal float _cachedMaxHeight = -1;
+
         internal bool _cachedLayoutIgnore = false;
 
         [System.NonSerialized] internal RectTransform _rect;
@@ -147,6 +150,36 @@ namespace Kyub.UI.Experimental
                     return;
                 _cachedLayoutIgnore = value;
                 SetAxisDirty(DrivenAxis.Ignore);
+            }
+        }
+
+        public float cachedMaxWidth
+        {
+            get
+            {
+                return _cachedMaxWidth;
+            }
+            internal set
+            {
+                if (_cachedMaxWidth == value)
+                    return;
+                _cachedMaxWidth = value;
+                SetAxisDirty(DrivenAxis.Horizontal);
+            }
+        }
+
+        public float cachedMaxHeight
+        {
+            get
+            {
+                return _cachedMaxHeight;
+            }
+            internal set
+            {
+                if (_cachedMaxHeight == value)
+                    return;
+                _cachedMaxHeight = value;
+                SetAxisDirty(DrivenAxis.Vertical);
             }
         }
 
@@ -363,6 +396,7 @@ namespace Kyub.UI.Experimental
             cachedMinWidth = LayoutUtility.GetMinWidth(this.rectTransform);
             cachedPreferredWidth = LayoutUtility.GetPreferredWidth(this.rectTransform);
             cachedFlexibleWidth = LayoutUtility.GetFlexibleWidth(this.rectTransform);
+            cachedMaxWidth = LayoutUtilityEx.GetMaxWidth(this.rectTransform, -1);
             CalculateLayoutIgnore();
         }
 
@@ -371,6 +405,7 @@ namespace Kyub.UI.Experimental
             cachedMinHeight = LayoutUtility.GetMinHeight(this.rectTransform);
             cachedPreferredHeight = LayoutUtility.GetPreferredHeight(this.rectTransform);
             cachedFlexibleHeight = LayoutUtility.GetFlexibleHeight(this.rectTransform);
+            cachedMaxHeight = LayoutUtilityEx.GetMaxHeight(this.rectTransform, -1);
             SendFeedback();
         }
 

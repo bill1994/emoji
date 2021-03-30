@@ -5,12 +5,26 @@ using UnityEngine.UI;
 
 namespace Kyub.UI
 {
-    [AddComponentMenu("Kyub UI/Max Layout Element")]
-    public class MaxLayoutElement : LayoutElement
-    {
-        public enum MaxLayoutMode { Default, ParentPercent, ParentOffset }
+    public enum MaxLayoutMode { Default, ParentPercent, ParentOffset }
 
+    public interface IMaxLayoutElement : ILayoutElement
+    { 
+        float maxWidth { get; set; }
+        float maxHeight { get; set; }
+
+        MaxLayoutMode maxWidthMode { get; set; }
+        MaxLayoutMode maxHeightMode { get; set; }
+
+        float GetMaxWidthInDefaultMode();
+        float GetMaxHeightInDefaultMode();
+    }
+
+    [AddComponentMenu("Kyub UI/Max Layout Element")]
+    public class MaxLayoutElement : LayoutElement, IMaxLayoutElement
+    {
+        
         #region Private Variables
+
         [SerializeField, Tooltip("* DefaultMode : RectTransform Width/Height\n* ParentPercent : Percent value of parent rect size (0 to 1)\n* ParentOffset : Parent rect size - offset")]
         MaxLayoutMode m_MaxWidthMode = MaxLayoutMode.Default;
         [SerializeField, Tooltip("* DefaultMode : RectTransform Width/Height\n* ParentPercent : Percent value of parent rect size (0 to 1)\n* ParentOffset : Parent rect size - offset")]
@@ -135,6 +149,8 @@ namespace Kyub.UI
         {
             get
             {
+                if (_CurrentFlexibleWidth < 0 && baseFlexibleWidth >= 0)
+                    _CurrentFlexibleWidth = baseFlexibleWidth;
                 return _CurrentFlexibleWidth;
             }
 
@@ -151,6 +167,8 @@ namespace Kyub.UI
         {
             get
             {
+                if (_CurrentFlexibleHeight < 0 && baseFlexibleHeight >= 0)
+                    _CurrentFlexibleHeight = baseFlexibleHeight;
                 return _CurrentFlexibleHeight;
             }
 
@@ -286,11 +304,17 @@ namespace Kyub.UI
             base.CalculateLayoutInputHorizontal();
 
             var rectTransform = transform as RectTransform;
-
-            var convertedMaxWidth = CalculateConvertedMaxWidth();
-            _CurrentPreferredWidth = basePreferredWidth > 0 && convertedMaxWidth > 0 ? Mathf.Min(basePreferredWidth, convertedMaxWidth) : basePreferredWidth;
             _CurrentFlexibleWidth = baseFlexibleWidth;
 
+            if (rectTransform.parent != null && rectTransform.parent.GetComponent<IMaxLayoutGroup>() as Behaviour != null)
+            {
+                _CurrentPreferredWidth = basePreferredWidth;
+                return;
+            }
+            
+            var convertedMaxWidth = GetMaxWidthInDefaultMode();
+            _CurrentPreferredWidth = basePreferredWidth > 0 && convertedMaxWidth > 0 ? Mathf.Min(basePreferredWidth, convertedMaxWidth) : basePreferredWidth;
+            
             if (rectTransform != null && convertedMaxWidth > 0)
             {
                 //Prevent element to have size greater than parent
@@ -318,10 +342,16 @@ namespace Kyub.UI
         {
             base.CalculateLayoutInputVertical();
             var rectTransform = transform as RectTransform;
-
-            var convertedMaxHeight = CalculateConvertedMaxHeight();
-            _CurrentPreferredHeight = basePreferredHeight > 0 && convertedMaxHeight > 0 ? Mathf.Min(basePreferredHeight, convertedMaxHeight) : basePreferredHeight;
             _CurrentFlexibleHeight = baseFlexibleHeight;
+
+            if (rectTransform.parent != null && rectTransform.parent.GetComponent<IMaxLayoutGroup>() as Behaviour != null)
+            {
+                _CurrentPreferredHeight = basePreferredHeight;
+                return;
+            }
+
+            var convertedMaxHeight = GetMaxHeightInDefaultMode();
+            _CurrentPreferredHeight = basePreferredHeight > 0 && convertedMaxHeight > 0 ? Mathf.Min(basePreferredHeight, convertedMaxHeight) : basePreferredHeight;
 
             if (rectTransform != null && convertedMaxHeight > 0)
             {
@@ -346,11 +376,7 @@ namespace Kyub.UI
             }
         }
 
-        #endregion
-
-        #region Internal Helper Functions
-
-        protected float CalculateConvertedMaxWidth()
+        public float GetMaxWidthInDefaultMode()
         {
             if (m_MaxWidth > 0 && m_MaxWidthMode != MaxLayoutMode.Default)
             {
@@ -371,7 +397,7 @@ namespace Kyub.UI
             return m_MaxWidth;
         }
 
-        protected float CalculateConvertedMaxHeight()
+        public float GetMaxHeightInDefaultMode()
         {
             if (m_MaxHeight > 0 && m_MaxHeightMode != MaxLayoutMode.Default)
             {
@@ -392,59 +418,24 @@ namespace Kyub.UI
             return m_MaxHeight;
         }
 
-        protected virtual bool CheckMaxSize()
-        {
-            return CheckMaxSize(true);
-        }
+        #endregion
 
-        protected virtual bool CheckMaxSize(bool p_forceCalculate)
-        {
-            //CancelInvoke("CheckMaxSize");
-            var changed = false;
-            var rectTransform = transform as RectTransform;
-            var rectSize = rectTransform != null ? rectTransform.rect.size : Vector2.zero;
-
-            var maxWidth = Mathf.Max(CalculateConvertedMaxWidth(), minWidth);
-            var maxHeight = Mathf.Max(CalculateConvertedMaxHeight(), minHeight);
-
-            if (rectTransform != null && (maxWidth > 0 || maxHeight > 0))
-            {
-                var widthIsDirty = p_forceCalculate || rectSize.x > maxWidth;
-                var heightIsDirty = p_forceCalculate || rectSize.y > maxHeight;
-
-                if (widthIsDirty)
-                {
-                    var oldPreferredWidth = _CurrentPreferredWidth;
-                    var oldFlexibleWidth = _CurrentFlexibleWidth;
-                    CalculateLayoutInputHorizontal();
-                    changed = changed || oldPreferredWidth != _CurrentPreferredWidth || oldFlexibleWidth != _CurrentFlexibleWidth;
-                }
-                if (heightIsDirty)
-                {
-                    var oldPreferredHeight = _CurrentPreferredHeight;
-                    var oldFlexibleHeight = _CurrentFlexibleHeight;
-
-                    CalculateLayoutInputVertical();
-                    changed = changed || oldPreferredHeight != _CurrentPreferredHeight || oldFlexibleHeight != _CurrentFlexibleHeight;
-                }
-            }
-            return changed;
-        }
+        #region Internal Helper Functions
 
         protected virtual bool IsLayoutDirty()
         {
             var rectTransform = transform as RectTransform;
-            if (rectTransform != null)
+            if (rectTransform != null && rectTransform.parent != null && rectTransform.parent.GetComponent<IMaxLayoutGroup>() as Behaviour != null)
             {
                 var rectSize = rectTransform.rect.size;
-                var maxWidth = Mathf.Max(CalculateConvertedMaxWidth(), minWidth);
+                var maxWidth = Mathf.Max(GetMaxWidthInDefaultMode(), minWidth);
                 if (maxWidth > 0 && rectSize.x > maxWidth)
                 {
                     return true;
                 }
                 else
                 {
-                    var maxHeight = Mathf.Max(CalculateConvertedMaxHeight(), minHeight);
+                    var maxHeight = Mathf.Max(GetMaxHeightInDefaultMode(), minHeight);
                     if (maxHeight > 0 && rectSize.y > maxHeight)
                     {
                         return true;
