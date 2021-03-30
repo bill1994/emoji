@@ -11,6 +11,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 namespace Kyub.Internal.NativeInputPlugin
 {
@@ -54,6 +55,8 @@ namespace Kyub.Internal.NativeInputPlugin
     public class MobileInputBehaviour : MobileInputReceiver
     {
         #region Static Helper Functions
+
+        protected static List<MobileInputBehaviour> s_mobilesWithFocus = new List<MobileInputBehaviour>();
 
         public static bool IsSupported()
         {
@@ -133,6 +136,7 @@ namespace Kyub.Internal.NativeInputPlugin
         private bool _isVisibleOnCreate = false;
         private bool _isVisible = false;
 
+        bool _applicationHasFocus = true;
         //private Rect _lastRect;
 
         /*#if (UNITY_IPHONE) && !UNITY_EDITOR
@@ -179,6 +183,11 @@ namespace Kyub.Internal.NativeInputPlugin
                                     iOSStatusBar.iOSStatusBarManager.Show(!_isVisible);
                                 }
                 #endif*/
+
+                if (_isVisible)
+                    AddToFocusController();
+                else
+                    RemoveFromFocusController();
 #if (UNITY_IPHONE || UNITY_ANDROID) && !UNITY_EDITOR
                 if (_isVisible)
                     RegisterInputFieldEvents();
@@ -317,6 +326,7 @@ namespace Kyub.Internal.NativeInputPlugin
         /// </summary>
         protected virtual void OnDisable()
         {
+            RemoveFromFocusController();
             if (_isMobileInputCreated)
             {
                 StopCoroutine("SetFocusRoutine");
@@ -341,6 +351,7 @@ namespace Kyub.Internal.NativeInputPlugin
         /// </summary>
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
+            _applicationHasFocus = hasFocus;
             if (!_isMobileInputCreated || !this.Visible)
             {
                 return;
@@ -385,6 +396,19 @@ namespace Kyub.Internal.NativeInputPlugin
         #endregion
 
         #region Helper Functions
+
+        protected virtual void AddToFocusController()
+        {
+            if (!s_mobilesWithFocus.Contains(this))
+                s_mobilesWithFocus.Add(this);
+        }
+
+        protected virtual void RemoveFromFocusController()
+        {
+            var index = s_mobilesWithFocus.IndexOf(this);
+            if (index >= 0)
+                s_mobilesWithFocus.RemoveAt(index);
+        }
 
         protected virtual void RegisterInputFieldEvents()
         {
@@ -821,10 +845,14 @@ namespace Kyub.Internal.NativeInputPlugin
                 _isFocusOnCreate = isFocus;
                 return;
             }
-            JsonObject data = new JsonObject ();
-            data["msg"] = SET_FOCUS;
-            data["is_focus"] = isFocus;
-            this.Execute (data);
+            //Only Apply Focus if another mobile was not selected (attempt to prevent recrete keyboard everytime)
+            if (isFocus || (!isFocus && !_applicationFocus) || s_mobilesWithFocus.Count == 0)
+            {
+                JsonObject data = new JsonObject ();
+                data["msg"] = SET_FOCUS;
+                data["is_focus"] = isFocus;
+                this.Execute (data);
+            }
 #else
             if (gameObject.activeInHierarchy)
             {
