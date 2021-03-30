@@ -846,7 +846,7 @@ namespace Kyub.Internal.NativeInputPlugin
                 return;
             }
             //Only Apply Focus if another mobile was not selected (attempt to prevent recrete keyboard everytime)
-            if (isFocus || (!isFocus && !_applicationFocus) || s_mobilesWithFocus.Count == 0)
+            if (isFocus || (!isFocus && !_applicationHasFocus) || s_mobilesWithFocus.Count == 0)
             {
                 JsonObject data = new JsonObject ();
                 data["msg"] = SET_FOCUS;
