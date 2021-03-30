@@ -20,6 +20,8 @@ namespace Kyub.UI
             [SerializeField] private Vector2 m_TotalPreferredSize = Vector2.zero;
             [SerializeField] private Vector2 m_TotalFlexibleSize = Vector2.zero;
 
+            private Dictionary<int, List<int>> m_AxisPreFilterIndexes = new Dictionary<int, List<int>>() { { 0, new List<int>() }, { 1, new List<int>() } };
+
             public Vector2 position
             {
                 get
@@ -61,6 +63,20 @@ namespace Kyub.UI
                     if (m_RectChildren == value)
                         return;
                     m_RectChildren = value;
+                }
+            }
+
+            public Dictionary<int, List<int>> AxisPreFilterIndexes
+            {
+                get
+                {
+                    return m_AxisPreFilterIndexes;
+                }
+                set
+                {
+                    if (m_AxisPreFilterIndexes == value)
+                        return;
+                    m_AxisPreFilterIndexes = value;
                 }
             }
 
@@ -203,8 +219,8 @@ namespace Kyub.UI
             for (int i = 0; i < rectChildren.Count; i++)
             {
                 RectTransform child = rectChildren[i];
-                float min, preferred, flexible;
-                GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible);
+                float min, preferred, flexible, max;
+                GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
                 float scaleFactor = useScale ? child.localScale[axis] : 1f;
 
                 float childSize = Mathf.Max(min, preferred);
@@ -304,12 +320,26 @@ namespace Kyub.UI
             float totalPreferred = 0;
             float totalFlexible = 0;
 
+            //Pick PreFilter of MaxLayout
+            List<int> preFilter = group.AxisPreFilterIndexes[axis];
+            if (preFilter == null)
+            {
+                preFilter = new List<int>();
+                group.AxisPreFilterIndexes[axis] = preFilter;
+            }
+            else
+                preFilter.Clear();
+
             bool alongOtherAxis = (isVertical ^ (axis == 1));
             for (int i = 0; i < group.RectChildren.Count; i++)
             {
                 RectTransform child = group.RectChildren[i];
-                float min, preferred, flexible;
-                GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible);
+                float min, preferred, flexible, max;
+                GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
+
+                //Add this child to be pre-processed before SetLayout (We must pre-process elements with Max Value)
+                if (max >= 0 && flexible > 0)
+                    preFilter.Add(i);
 
                 if (useScale)
                 {
@@ -347,6 +377,11 @@ namespace Kyub.UI
         protected new void SetChildrenAlongAxis(int axis, bool isVertical)
         {
             float size = rectTransform.rect.size[axis];
+
+            //Apply Inner Offset
+            var innerOffset = GetInnerOffsetOnAxis(axis, size);
+            size -= (innerOffset.x + innerOffset.y);
+
             float innerSize = size - (axis == 0 ? padding.horizontal : padding.vertical);
             bool alongOtherAxis = (isVertical ^ (axis == 1));
 
@@ -357,14 +392,21 @@ namespace Kyub.UI
             float pos = (axis == 0 ? padding.left : padding.top);
             float surplusSpace = size - GetTotalPreferredSize(axis);
 
+            float itemFlexibleMultiplier = 0;
+            var totalFlexibleSize = GetTotalFlexibleSize(axis);
             if (surplusSpace > 0 && alongOtherAxis)
             {
-                if (GetTotalFlexibleSize(axis) == 0)
+                if (totalFlexibleSize == 0)
                 {
                     if (!controlSize || !childForceExpandSize)
                         pos = GetStartOffset(axis, GetTotalPreferredSize(axis) - (axis == 0 ? padding.horizontal : padding.vertical));
                 }
+                else if (totalFlexibleSize > 0)
+                    itemFlexibleMultiplier = surplusSpace / totalFlexibleSize;
             }
+
+            //Apply InnerOffset to Pos
+            pos += innerOffset.x;
 
             for (int i = 0; i < _Groups.Count; i++)
             {
@@ -372,6 +414,8 @@ namespace Kyub.UI
 
                 var groupSize = group.size;
                 groupSize[axis] = alongOtherAxis ? Mathf.Max(group.GetTotalMinSize(axis), group.GetTotalPreferredSize(axis)) : innerSize;
+                if (alongOtherAxis && itemFlexibleMultiplier > 0)
+                    groupSize[axis] += (group.GetTotalFlexibleSize(axis) * itemFlexibleMultiplier);
                 group.size = groupSize;
 
                 var groupPosition = group.position;
@@ -399,11 +443,15 @@ namespace Kyub.UI
                 for (int i = 0; i < group.RectChildren.Count; i++)
                 {
                     RectTransform child = group.RectChildren[i];
-                    float min, preferred, flexible;
-                    GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible);
+                    float min, preferred, flexible, max;
+                    GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
                     float scaleFactor = useScale ? child.localScale[axis] : 1f;
 
                     float requiredSpace = Mathf.Clamp(size, min, flexible > 0 ? size : preferred);
+                    //Apply max value
+                    if (max >= 0 && requiredSpace > max)
+                        requiredSpace = max;
+
                     float startOffset = pos + group.GetStartOffset(axis, requiredSpace * scaleFactor, alignmentOnAxis);
                     if (controlSize)
                     {
@@ -422,10 +470,11 @@ namespace Kyub.UI
                 float itemFlexibleMultiplier = 0;
                 float surplusSpace = size - group.GetTotalPreferredSize(axis);
 
+                var totalFlexibleSize = group.GetTotalFlexibleSize(axis);
                 var useFlexibleSpacing = false;
                 if (surplusSpace > 0)
                 {
-                    if (group.GetTotalFlexibleSize(axis) == 0)
+                    if (totalFlexibleSize == 0)
                     {
                         if (!controlSize || !childForceExpandSize)
                         {
@@ -434,8 +483,8 @@ namespace Kyub.UI
                         else
                             useFlexibleSpacing = true;
                     }
-                    else if (group.GetTotalFlexibleSize(axis) > 0)
-                        itemFlexibleMultiplier = surplusSpace / group.GetTotalFlexibleSize(axis);
+                    else if (totalFlexibleSize > 0)
+                        itemFlexibleMultiplier = surplusSpace / totalFlexibleSize;
                 }
 
                 float minMaxLerp = 0;
@@ -443,15 +492,28 @@ namespace Kyub.UI
                     minMaxLerp = Mathf.Clamp01((size - group.GetTotalMinSize(axis)) / (group.GetTotalPreferredSize(axis) - group.GetTotalMinSize(axis)));
 
                 var currentSpacing = useFlexibleSpacing && group.RectChildren.Count - 1 > 0 ? Mathf.Max(spacing, surplusSpace / (group.RectChildren.Count - 1)) : spacing;
+
+                var remainingSurplusPerChilden = GetRemainingSurplusPerChildren(group.AxisPreFilterIndexes, group.RectChildren, axis, controlSize, childForceExpandSize, minMaxLerp, itemFlexibleMultiplier, totalFlexibleSize);
+
                 for (int i = 0; i < group.RectChildren.Count; i++)
                 {
                     RectTransform child = group.RectChildren[i];
-                    float min, preferred, flexible;
-                    GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible);
+                    float min, preferred, flexible, max;
+                    GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
                     float scaleFactor = useScale ? child.localScale[axis] : 1f;
 
                     float childSize = Mathf.Lerp(min, preferred, minMaxLerp);
-                    childSize += flexible * itemFlexibleMultiplier;
+                    //We will only expand if childcontrol size is false
+                    float desiredChildSize = childSize + (flexible * itemFlexibleMultiplier);
+                    if (max >= 0 && desiredChildSize > max)
+                    {
+                        childSize = max;
+                    }
+                    else
+                    {
+                        //Non MaxElements contains RemainingSurplusPerChildren calculated in GetRemainingSurplusPerChildren() Before Loop begins (Aka Pre-Filter)
+                        childSize = desiredChildSize + (flexible * remainingSurplusPerChilden);
+                    }
                     if (controlSize)
                     {
                         SetChildAlongAxisWithScale(child, axis, pos, childSize, scaleFactor);
