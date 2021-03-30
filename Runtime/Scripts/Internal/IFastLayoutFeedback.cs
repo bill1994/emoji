@@ -20,6 +20,8 @@ namespace Kyub.UI.Experimental
         float cachedPreferredHeight { get; }
         float cachedFlexibleWidth { get; }
         float cachedFlexibleHeight { get; }
+        float cachedMaxWidth { get; }
+        float cachedMaxHeight { get; }
 
         float cachedRectWidth { get; }
         float cachedRectHeight { get; }
