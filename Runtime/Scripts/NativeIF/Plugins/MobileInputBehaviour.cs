@@ -56,8 +56,6 @@ namespace Kyub.Internal.NativeInputPlugin
     {
         #region Static Helper Functions
 
-        protected static List<MobileInputBehaviour> s_mobilesWithFocus = new List<MobileInputBehaviour>();
-
         public static bool IsSupported()
         {
             return TouchScreenKeyboard.isSupported && !Application.isEditor && Application.isPlaying;
@@ -136,7 +134,8 @@ namespace Kyub.Internal.NativeInputPlugin
         private bool _isVisibleOnCreate = false;
         private bool _isVisible = false;
 
-        bool _applicationHasFocus = true;
+        int _defaultDelayCount = 5;
+
         //private Rect _lastRect;
 
         /*#if (UNITY_IPHONE) && !UNITY_EDITOR
@@ -184,10 +183,6 @@ namespace Kyub.Internal.NativeInputPlugin
                                 }
                 #endif*/
 
-                if (_isVisible)
-                    AddToFocusController();
-                else
-                    RemoveFromFocusController();
 #if (UNITY_IPHONE || UNITY_ANDROID) && !UNITY_EDITOR
                 if (_isVisible)
                     RegisterInputFieldEvents();
@@ -326,11 +321,10 @@ namespace Kyub.Internal.NativeInputPlugin
         /// </summary>
         protected virtual void OnDisable()
         {
-            RemoveFromFocusController();
             if (_isMobileInputCreated)
             {
                 StopCoroutine("SetFocusRoutine");
-                this.SetVisible(false);
+                this.SetVisible(false, false);
             }
         }
 
@@ -351,12 +345,11 @@ namespace Kyub.Internal.NativeInputPlugin
         /// </summary>
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
-            _applicationHasFocus = hasFocus;
             if (!_isMobileInputCreated || !this.Visible)
             {
                 return;
             }
-            this.SetVisibleAndFocus_Internal(hasFocus && _inputObject != null && _inputObject.isFocused);
+            this.SetVisibleAndFocus_Internal(hasFocus && _inputObject != null && _inputObject.isFocused, true);
         }
 
         protected virtual void Update()
@@ -398,19 +391,6 @@ namespace Kyub.Internal.NativeInputPlugin
         #endregion
 
         #region Helper Functions
-
-        protected virtual void AddToFocusController()
-        {
-            if (!s_mobilesWithFocus.Contains(this))
-                s_mobilesWithFocus.Add(this);
-        }
-
-        protected virtual void RemoveFromFocusController()
-        {
-            var index = s_mobilesWithFocus.IndexOf(this);
-            if (index >= 0)
-                s_mobilesWithFocus.RemoveAt(index);
-        }
 
         protected virtual void RegisterInputFieldEvents()
         {
@@ -471,7 +451,7 @@ namespace Kyub.Internal.NativeInputPlugin
             this.CreateNativeEdit ();
             this.SetTextNative (this._inputObject.text);
 #else
-            SetVisibleAndFocus_Internal(isVisible);
+            SetVisibleAndFocus_Internal(isVisible, true);
 #endif
         }
 
@@ -636,7 +616,7 @@ namespace Kyub.Internal.NativeInputPlugin
         /// </summary>
         public override void Hide()
         {
-            this.SetVisibleAndFocus_Internal(false);
+            this.SetVisibleAndFocus_Internal(false, true);
         }
 
         /// <summary>
@@ -671,7 +651,7 @@ namespace Kyub.Internal.NativeInputPlugin
                     if (OnReturnPressed != null)
                         OnReturnPressed();
 
-                    SetVisibleAndFocus_Internal(false);
+                    SetVisibleAndFocus_Internal(false, true);
 
                     if (OnReturnPressedEvent != null)
                         OnReturnPressedEvent.Invoke();
@@ -776,7 +756,7 @@ namespace Kyub.Internal.NativeInputPlugin
         void Ready()
         {
             _isMobileInputCreated = true;
-            SetVisibleAndFocus_Internal(_isVisibleOnCreate, _isFocusOnCreate);
+            SetVisibleAndFocus_Internal(_isVisibleOnCreate, _isFocusOnCreate, true);
 
             //SetVisible(_isVisibleOnCreate);
             /*if (_isFocusOnCreate)
@@ -847,14 +827,11 @@ namespace Kyub.Internal.NativeInputPlugin
                 _isFocusOnCreate = isFocus;
                 return;
             }
-            //Only Apply Focus if another mobile was not selected (attempt to prevent recrete keyboard everytime)
-            if (isFocus || (!isFocus && !_applicationHasFocus) || s_mobilesWithFocus.Count == 0)
-            {
-                JsonObject data = new JsonObject ();
-                data["msg"] = SET_FOCUS;
-                data["is_focus"] = isFocus;
-                this.Execute (data);
-            }
+            
+            JsonObject data = new JsonObject ();
+            data["msg"] = SET_FOCUS;
+            data["is_focus"] = isFocus;
+            this.Execute (data);
 #else
             if (gameObject.activeInHierarchy)
             {
@@ -893,20 +870,25 @@ namespace Kyub.Internal.NativeInputPlugin
                 RecreateNativeEdit(isVisible);
             }
             else
-                SetVisibleAndFocus_Internal(isVisible);
+                SetVisibleAndFocus_Internal(isVisible, false);
         }
 
         protected void SetVisibleAndFocus_Internal(bool isVisibleAndFocus)
         {
-            SetVisibleAndFocus_Internal(isVisibleAndFocus, isVisibleAndFocus);
+            SetVisibleAndFocus_Internal(isVisibleAndFocus, isVisibleAndFocus, false);
         }
 
-        protected void SetVisibleAndFocus_Internal(bool isVisible, bool isFocus)
+        protected void SetVisibleAndFocus_Internal(bool isVisibleAndFocus, bool delayed)
+        {
+            SetVisibleAndFocus_Internal(isVisibleAndFocus, isVisibleAndFocus, delayed);
+        }
+
+        protected void SetVisibleAndFocus_Internal(bool isVisible, bool isFocus, bool delayed)
         {
             SetVisible(isVisible);
-            if (enabled && gameObject.activeInHierarchy)
+            StopCoroutine("SetFocusRoutine");
+            if (enabled && gameObject.activeInHierarchy && _isMobileInputCreated && delayed)
             {
-                StopCoroutine("SetFocusRoutine");
                 StartCoroutine("SetFocusRoutine", isFocus);
             }
             else
@@ -917,29 +899,61 @@ namespace Kyub.Internal.NativeInputPlugin
 
         private IEnumerator SetFocusRoutine(bool isVisible)
         {
-            yield return null;
+            var waitCounter = (isVisible ? 1 : _defaultDelayCount);
+            for (int i = 0; i < (isVisible ? 1 : _defaultDelayCount); i++)
+            {
+                yield return null;
+            }
             SetFocus(isVisible);
         }
 
         public void SetVisible(bool isVisible)
+        {
+            SetVisible(isVisible, !isVisible);
+        }
+
+        public void SetVisible(bool isVisible, bool delayed)
         {
             if (!_isMobileInputCreated)
             {
                 _isVisibleOnCreate = isVisible;
                 return;
             }
-            JsonObject data = new JsonObject();
-            data["msg"] = SET_VISIBLE;
-            data["is_visible"] = isVisible;
-            this.Execute(data);
+            StopCoroutine("EmitVisibleMsgRoutine");
             if (this.Visible != isVisible)
             {
                 this.Visible = isVisible;
                 //if (isVisible)
                 //    _lastRect = Rect.zero;
             }
+            //Try Delay betweem EmitVisible to prevent recrete keyboard while selecting another input field
+            if (enabled && gameObject.activeInHierarchy && delayed)
+            {
+                StartCoroutine("EmitVisibleMsgRoutine", isVisible);
+            }
+            else
+            {
+                JsonObject data = new JsonObject();
+                data["msg"] = SET_VISIBLE;
+                data["is_visible"] = isVisible;
+                this.Execute(data);
+            }
+
 
             CheckUnityFieldsVisibility();
+        }
+
+        protected virtual IEnumerator EmitVisibleMsgRoutine(bool isVisible)
+        {
+            var delay = isVisible ? 0 : _defaultDelayCount;
+            for (int i = 0; i < delay; i++)
+            {
+                yield return null;
+            }
+            JsonObject data = new JsonObject();
+            data["msg"] = SET_VISIBLE;
+            data["is_visible"] = isVisible;
+            this.Execute(data);
         }
 
         protected virtual void CheckUnityFieldsVisibility()
