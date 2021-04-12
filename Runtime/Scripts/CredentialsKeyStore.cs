@@ -43,6 +43,7 @@ namespace Kyub.Credentials
 
         static CredentialsKeyStore()
         {
+            s_instance = null;
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
