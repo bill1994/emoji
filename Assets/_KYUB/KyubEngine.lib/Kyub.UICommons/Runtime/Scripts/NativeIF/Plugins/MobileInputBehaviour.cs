@@ -937,10 +937,8 @@ namespace Kyub.Internal.NativeInputPlugin
                 data["msg"] = SET_VISIBLE;
                 data["is_visible"] = isVisible;
                 this.Execute(data);
+                CheckUnityFieldsVisibility();
             }
-
-
-            CheckUnityFieldsVisibility();
         }
 
         protected virtual IEnumerator EmitVisibleMsgRoutine(bool isVisible)
@@ -954,6 +952,7 @@ namespace Kyub.Internal.NativeInputPlugin
             data["msg"] = SET_VISIBLE;
             data["is_visible"] = isVisible;
             this.Execute(data);
+            CheckUnityFieldsVisibility();
         }
 
         protected virtual void CheckUnityFieldsVisibility()
