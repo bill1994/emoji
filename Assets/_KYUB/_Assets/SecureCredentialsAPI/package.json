@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.credentials",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Kyub Secure Credentials API",
   "description": "Cross Biometrics/Security API",
   "unity": "2019.1",

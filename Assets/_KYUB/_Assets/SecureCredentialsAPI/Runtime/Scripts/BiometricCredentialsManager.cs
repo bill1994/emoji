@@ -143,34 +143,34 @@ namespace Kyub.Credentials
 
         #region Internal Helper Functions (Instance)
 
-        protected void RetrieveStoredKey_Instance(string p_storedKey, System.Action<AuthResponse> callback, string p_dialogTitle = null, string p_dialogSubtitle = null, string p_cancelText = null)
+        protected void RetrieveStoredKey_Instance(string storedKey, System.Action<AuthResponse> callback, string dialogTitle = null, string dialogSubtitle = null, string cancelText = null)
         {
-            if (CredentialsKeyStore.HasKey(p_storedKey))
+            if (CredentialsKeyStore.HasKey(storedKey))
             {
                 //Create and register delegates
                 if (callback != null)
                 {
-                    System.Action v_delegateUnregister = null;
-                    System.Action<AuthResponse> v_delegateCallback = (result) =>
+                    System.Action delegateUnregister = null;
+                    System.Action<AuthResponse> delegateCallback = (result) =>
                     {
-                        v_delegateUnregister();
+                        delegateUnregister();
                         if (callback != null)
                             callback(result);
                     };
-                    v_delegateUnregister = () =>
+                    delegateUnregister = () =>
                     {
-                        OnAuthFailed -= v_delegateCallback;
-                        OnAuthSucess -= v_delegateCallback;
+                        OnAuthFailed -= delegateCallback;
+                        OnAuthSucess -= delegateCallback;
                     };
 
-                    OnAuthFailed += v_delegateCallback;
-                    OnAuthSucess += v_delegateCallback;
+                    OnAuthFailed += delegateCallback;
+                    OnAuthSucess += delegateCallback;
                 }
 
                 if (IsBiometricHardwareAvailable_Native())
                 {
-                    _processingStoredKey = p_storedKey;
-                    StartFingerprint_Native(p_dialogTitle, p_dialogSubtitle, p_cancelText);
+                    _processingStoredKey = storedKey;
+                    StartFingerprint_Native(dialogTitle, dialogSubtitle, cancelText);
                     if (OnAuthStarted != null)
                         OnAuthStarted();
                 }
@@ -198,33 +198,33 @@ namespace Kyub.Credentials
 
 #elif UNITY_IOS && !UNITY_EDITOR
 	    [DllImport ("__Internal")]
-	    private static extern void _StartBiometricsAuth (string p_objectName, string p_authenticationPopupDescription);
+	    private static extern void _StartBiometricsAuth (string objectName, string authenticationPopupDescription);
 
 #endif
 
         int _remainingFailChances = 0;
-        protected internal void StartFingerprint_Native(string p_dialogTitle, string p_dialogSubtitle, string p_cancelText)
+        protected internal void StartFingerprint_Native(string dialogTitle, string dialogSubtitle, string cancelText)
         {
-            if (p_dialogTitle == null)
-                p_dialogTitle = m_dialogDefaultTitle;
+            if (dialogTitle == null)
+                dialogTitle = m_dialogDefaultTitle;
 
-            if (p_dialogSubtitle == null)
-                p_dialogSubtitle = m_dialogDefaultSubtitle;
+            if (dialogSubtitle == null)
+                dialogSubtitle = m_dialogDefaultSubtitle;
 
-            if (p_cancelText == null)
-                p_cancelText = m_dialogDefaultCancelText;
+            if (cancelText == null)
+                cancelText = m_dialogDefaultCancelText;
 
-            p_dialogTitle = Kyub.Localization.LocaleManager.GetLocalizedText(p_dialogTitle);
-            p_dialogSubtitle = Kyub.Localization.LocaleManager.GetLocalizedText(p_dialogSubtitle);
-            p_cancelText = Kyub.Localization.LocaleManager.GetLocalizedText(p_cancelText);
+            dialogTitle = Kyub.Localization.LocaleManager.GetLocalizedText(dialogTitle);
+            dialogSubtitle = Kyub.Localization.LocaleManager.GetLocalizedText(dialogSubtitle);
+            cancelText = Kyub.Localization.LocaleManager.GetLocalizedText(cancelText);
 
 
-            var v_isNativePromptAvailable = IsBiometricPromptAvailable_Native();
+            var isNativePromptAvailable = IsBiometricPromptAvailable_Native();
 
             //Native Prompts has infinity chances to fail
             _remainingFailChances = m_maxBiometricsFailure;
 
-            if (!v_isNativePromptAvailable && !Application.isEditor && Application.isMobilePlatform)
+            if (!isNativePromptAvailable && !Application.isEditor && Application.isMobilePlatform)
             {
                 //Show custom dialogs
                 if (_activeFingerprintDialog == null)
@@ -235,7 +235,7 @@ namespace Kyub.Credentials
                         if (fingerprintDialog != null)
                         {
                             _activeFingerprintDialog = fingerprintDialog;
-                            fingerprintDialog.Initialize(p_dialogTitle, p_dialogSubtitle, null, p_cancelText);
+                            fingerprintDialog.Initialize(dialogTitle, dialogSubtitle, null, cancelText);
                         }
                     };
 
@@ -244,7 +244,7 @@ namespace Kyub.Credentials
                 }
                 else
                 {
-                    _activeFingerprintDialog.Initialize(p_dialogTitle, p_dialogSubtitle);
+                    _activeFingerprintDialog.Initialize(dialogTitle, dialogSubtitle);
                     _activeFingerprintDialog.ShowModal();
                 }
             }
@@ -260,13 +260,13 @@ namespace Kyub.Credentials
                         _biometricsBridge = pluginClass.CallStatic<AndroidJavaObject>("instance");
                         _biometricsBridge.Call("setContext", _activityContext);
                         _biometricsBridge.Call("setLegacyMode", m_useLegacyMode);
-                        _biometricsBridge.Call("startBiometricsAuth", this.gameObject.name, p_dialogTitle, "", p_dialogSubtitle, p_cancelText);
+                        _biometricsBridge.Call("startBiometricsAuth", this.gameObject.name, dialogTitle, "", dialogSubtitle, cancelText);
                     }
                 }
             }
 #elif UNITY_IOS && !UNITY_EDITOR
             _remainingFailChances = 1;
-            _StartBiometricsAuth(this.gameObject.name, p_dialogSubtitle);
+            _StartBiometricsAuth(this.gameObject.name, dialogSubtitle);
 #endif
         }
 
@@ -350,17 +350,17 @@ namespace Kyub.Credentials
         #region Receivers
 
         //this functions is used to reduce amount of remaining chances in callback
-        protected internal void OnAuthenticationReturn(string p_error)
+        protected internal void OnAuthenticationReturn(string error)
         {
-            bool v_success = string.IsNullOrEmpty(p_error);
+            bool success = string.IsNullOrEmpty(error);
             _remainingFailChances--;
-            if (v_success || _remainingFailChances <= 0)
+            if (success || _remainingFailChances <= 0)
             {
                 _remainingFailChances = 0;
-                if (!v_success)
+                if (!success)
                     CancelFingerprint_Native();
                 else
-                    OnAuthenticationBridgeDidFinish(p_error);
+                    OnAuthenticationBridgeDidFinish(error);
             }
             else
             {
@@ -371,38 +371,38 @@ namespace Kyub.Credentials
         }
 
         //this is the true return function (after all chances over, or sucess == true)
-        protected internal void OnAuthenticationBridgeDidFinish(string p_error)
+        protected internal void OnAuthenticationBridgeDidFinish(string error)
         {
             _remainingFailChances = 0;
-            bool v_success = string.IsNullOrEmpty(p_error);
-            if (v_success && !CredentialsKeyStore.HasKey(_processingStoredKey))
+            bool success = string.IsNullOrEmpty(error);
+            if (success && !CredentialsKeyStore.HasKey(_processingStoredKey))
             {
-                p_error = INVALID_CREDENTIALS;
-                v_success = false;
+                error = INVALID_CREDENTIALS;
+                success = false;
             }
 
-            if (v_success)
+            if (success)
             {
-                var v_credentialValueStr = CredentialsKeyStore.GetString(_processingStoredKey);
+                var credentialValueStr = CredentialsKeyStore.GetString(_processingStoredKey);
                 //Sucess
-                if (!string.IsNullOrEmpty(v_credentialValueStr))
+                if (!string.IsNullOrEmpty(credentialValueStr))
                 {
                     if (OnAuthSucess != null)
-                        OnAuthSucess(new AuthResponse(_processingStoredKey, v_credentialValueStr, null));
+                        OnAuthSucess(new AuthResponse(_processingStoredKey, credentialValueStr, null));
                 }
                 //Failed to retrieve credentials
                 else
                 {
-                    p_error = INVALID_CREDENTIALS;
-                    v_success = false;
+                    error = INVALID_CREDENTIALS;
+                    success = false;
                 }
             }
 
-            if (!v_success)
+            if (!success)
             {
-                Debug.Log("Auth Error: " + p_error);
+                Debug.Log("Auth Error: " + error);
                 if (OnAuthFailed != null)
-                    OnAuthFailed(new AuthResponse(_processingStoredKey, null, p_error));
+                    OnAuthFailed(new AuthResponse(_processingStoredKey, null, error));
             }
 
             _processingStoredKey = null;
@@ -427,68 +427,68 @@ namespace Kyub.Credentials
             return false;
         }
 
-        public static void Load(string p_key, System.Action<AuthResponse> callback, string p_dialogTitle = null, string p_dialogSubtitle = null, string p_cancelText = null)
+        public static void Load(string key, System.Action<AuthResponse> callback, string dialogTitle = null, string dialogSubtitle = null, string cancelText = null)
         {
             if (IsBiometricHardwareAvailable())
             {
-                Instance.RetrieveStoredKey_Instance(p_key, callback, p_dialogTitle, p_dialogSubtitle, p_cancelText);
+                Instance.RetrieveStoredKey_Instance(key, callback, dialogTitle, dialogSubtitle, cancelText);
             }
             else
             {
-                Instance._processingStoredKey = p_key;
+                Instance._processingStoredKey = key;
                 if (callback != null)
                 {
-                    System.Action v_delegateUnregister = null;
-                    System.Action<AuthResponse> v_delegateCallback = (result) =>
+                    System.Action delegateUnregister = null;
+                    System.Action<AuthResponse> delegateCallback = (result) =>
                     {
-                        v_delegateUnregister();
+                        delegateUnregister();
                         if (callback != null)
                             callback(result);
                     };
-                    v_delegateUnregister = () =>
+                    delegateUnregister = () =>
                     {
-                        OnAuthFailed -= v_delegateCallback;
-                        OnAuthSucess -= v_delegateCallback;
+                        OnAuthFailed -= delegateCallback;
+                        OnAuthSucess -= delegateCallback;
                     };
 
-                    OnAuthFailed += v_delegateCallback;
-                    OnAuthSucess += v_delegateCallback;
+                    OnAuthFailed += delegateCallback;
+                    OnAuthSucess += delegateCallback;
                 }
                 Instance.OnAuthenticationBridgeDidFinish(null);
             }
         }
 
-        public static void Load<T>(string p_key, System.Action<AuthResponse, T> callbackWithCastedData, string p_dialogTitle = null, string p_dialogSubtitle = null, string p_cancelText = null)
+        public static void Load<T>(string key, System.Action<AuthResponse, T> callbackWithCastedData, string dialogTitle = null, string dialogSubtitle = null, string cancelText = null)
         {
-            System.Action<AuthResponse> v_delegateCallbackWithCastedData = null;
+            System.Action<AuthResponse> delegateCallbackWithCastedData = null;
             if (callbackWithCastedData != null)
             {
-                v_delegateCallbackWithCastedData = (response) =>
+                delegateCallbackWithCastedData = (response) =>
                 {
                     if (callbackWithCastedData != null)
                         callbackWithCastedData(response, response.GetCastedData<T>());
                 };
             }
-            Load(p_key, v_delegateCallbackWithCastedData, p_dialogTitle, p_dialogSubtitle, p_cancelText);
+            Load(key, delegateCallbackWithCastedData, dialogTitle, dialogSubtitle, cancelText);
         }
 
-        public static bool Save<T>(string p_key, T p_credentialData)
+        public static bool Save<T>(string key, T credentialData)
         {
-            var v_sucess = CredentialsKeyStore.SetCredential<T>(p_key, p_credentialData);
-            if (v_sucess)
+            var sucess = CredentialsKeyStore.SetCredential<T>(key, credentialData);
+            if (sucess)
                 CredentialsKeyStore.Save();
 
-            return v_sucess;
+            return sucess;
         }
 
-        public static bool HasKey(string p_key)
+        public static bool HasKey(string key)
         {
-            return CredentialsKeyStore.HasKey(p_key);
+            return CredentialsKeyStore.HasKey(key);
         }
 
-        public static void Delete(string p_key)
+        public static void Delete(string key)
         {
-            CredentialsKeyStore.DeleteKey(p_key);
+            CredentialsKeyStore.DeleteKey(key);
             CredentialsKeyStore.Save();
         }
 
@@ -560,11 +560,11 @@ namespace Kyub.Credentials
 
             #region Constructors
 
-            public AuthResponse(string p_key, string p_data, string p_error)
+            public AuthResponse(string key, string data, string error)
             {
-                m_requestedKey = p_key;
-                m_data = p_data;
-                m_error = p_error;
+                m_requestedKey = key;
+                m_data = data;
+                m_error = error;
             }
 
             #endregion
