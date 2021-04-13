@@ -163,7 +163,6 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
                     if(s_delayedHandler == handler && s_autoPipModeOnPause) {
                         EnterInPipMode();
                         ResumeUnityPlayer();
-                        s_delayedHandler = null;
                     }
                 }
             }, 20);
@@ -171,8 +170,12 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
     }
 
     @Override
-    public void onActivityStopped(Activity activity) {
-        s_delayedHandler = null;
+    public void onActivityStopped(Activity activity)
+    {
+        if(IsInPipMode() || s_delayedHandler != null) {
+            s_delayedHandler = null;
+            PauseUnityPlayer();
+        }
     }
 
     @Override
