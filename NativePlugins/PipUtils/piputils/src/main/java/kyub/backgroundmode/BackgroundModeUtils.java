@@ -107,7 +107,7 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
         UnityPlayer unityPlayerInstance = GetUnityPlayerInstance();
 
         if (unityPlayerInstance != null)
-            unityPlayerInstance.resume();
+            unityPlayerInstance.pause();
     }
 
     protected static UnityPlayer GetUnityPlayerInstance() {
