@@ -21,15 +21,16 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
     static BackgroundModeUtils s_instance = null;
     static boolean s_autoPipModeOnPause = false;
 
-    public static void SetAutoPipModeOnPause(boolean supportPipModeOnPause)
-    {
-        TryCreateAndRegisterInstance();
+    public static void SetAutoPipModeOnPause(boolean supportPipModeOnPause) {
         s_autoPipModeOnPause = supportPipModeOnPause;
+
+        TryCreateAndRegisterInstance();
     }
 
-    public static boolean GetAutoPipModeOnPause()
-    {
+    public static boolean GetAutoPipModeOnPause() {
+
         TryCreateAndRegisterInstance();
+
         return s_autoPipModeOnPause;
     }
 
@@ -62,7 +63,7 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
     @TargetApi(26)
     protected static boolean EnterInPipMode_API26() {
         UnityPlayer unityPlayerInstance = GetUnityPlayerInstance();
-        if(unityPlayerInstance != null) {
+        if (unityPlayerInstance != null) {
             Rational rational = new Rational(unityPlayerInstance.getWidth(), unityPlayerInstance.getHeight());
             PictureInPictureParams params = new PictureInPictureParams.Builder()
                     .setAspectRatio(rational)
@@ -78,18 +79,31 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
         return UnityPlayer.currentActivity.isInPictureInPictureMode();
     }
 
-    protected static void TryCreateAndRegisterInstance()
-    {
+    protected static void TryCreateAndRegisterInstance() {
         try {
-            if (s_instance == null && UnityPlayer.currentActivity != null) {
+            if (s_instance == null) {
                 s_instance = new BackgroundModeUtils();
-                Application app = UnityPlayer.currentActivity.getApplication();
+            }
 
+            if(UnityPlayer.currentActivity != null) {
+                Application app = UnityPlayer.currentActivity.getApplication();
                 app.unregisterActivityLifecycleCallbacks(s_instance);
                 app.registerActivityLifecycleCallbacks(s_instance);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch (Exception e) {
+    }
+
+    protected static void UnregisterInstance() {
+        try {
+            s_delayedHandler = null;
+            if (s_instance != null && UnityPlayer.currentActivity != null) {
+                Application app = UnityPlayer.currentActivity.getApplication();
+
+                app.unregisterActivityLifecycleCallbacks(s_instance);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
