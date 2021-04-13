@@ -21,6 +21,9 @@ namespace Kyub
         #region Events
 
         public static event Action OnUpdate;
+        public static event Action OnLateUpdate;
+        public static event Action<bool> OnApplicationPause;
+        public static event Action<bool> OnApplicationFocus;
 
         #endregion
 
@@ -198,6 +201,21 @@ namespace Kyub
                 CallUpdate();
             }
 
+            private void LateUpdate()
+            {
+                CallLateUpdate();
+            }
+
+            private void OnApplicationPause(bool isPause)
+            {
+                CallApplicationPause(isPause);
+            }
+
+            private void OnApplicationFocus(bool isFocus)
+            {
+                CallApplicationFocus(isFocus);
+            }
+
             #endregion
 
             #region Static Functions
@@ -263,6 +281,24 @@ namespace Kyub
                         }
                     }
                 }
+            }
+
+            private static void CallLateUpdate()
+            {
+                if (ApplicationContext.OnLateUpdate != null)
+                    ApplicationContext.OnLateUpdate.Invoke();
+            }
+
+            private static void CallApplicationPause(bool isPause)
+            {
+                if (ApplicationContext.OnApplicationPause != null)
+                    ApplicationContext.OnApplicationPause.Invoke(isPause);
+            }
+
+            private static void CallApplicationFocus(bool isFocus)
+            {
+                if (ApplicationContext.OnApplicationFocus != null)
+                    ApplicationContext.OnApplicationFocus.Invoke(isFocus);
             }
 
             #endregion
