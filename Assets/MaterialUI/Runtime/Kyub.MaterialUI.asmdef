@@ -21,11 +21,6 @@
             "name": "com.kyub.uicommons",
             "expression": "",
             "define": "UI_COMMONS_DEFINED"
-        },
-        {
-            "name": "com.kyub.backgroundmode",
-            "expression": "1.0.8",
-            "define": "UI_COMMONS_DEFINED"
         }
     ],
     "noEngineReferences": false

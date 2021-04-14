@@ -87,7 +87,7 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
     protected static boolean EnterInPipMode_API26() {
         UnityPlayer unityPlayerInstance = GetUnityPlayerInstance();
         if (unityPlayerInstance != null) {
-            Rational rational = new Rational(unityPlayerInstance.getWidth(), unityPlayerInstance.getHeight());
+            Rational rational = new Rational(1,1); //new Rational(unityPlayerInstance.getWidth(), unityPlayerInstance.getHeight());
             PictureInPictureParams params = new PictureInPictureParams.Builder()
                     .setAspectRatio(rational)
                     .build();
