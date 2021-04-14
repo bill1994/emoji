@@ -10,6 +10,9 @@ namespace MaterialUI
     [CustomEditor(typeof(EasyFrameAnimator))]
     public class EasyFrameAnimatorEditor : Editor
     {
+        
+        private SerializedProperty m_CanControlCanvasInteractable;
+
         private SerializedProperty m_FadeIn;
         private SerializedProperty m_FadeInTweenType;
         private SerializedProperty m_FadeInAlpha;
@@ -58,6 +61,8 @@ namespace MaterialUI
 
         void OnEnable()
         {
+            m_CanControlCanvasInteractable = serializedObject.FindProperty("m_CanControlCanvasInteractable");
+
             m_FadeIn = serializedObject.FindProperty("m_FadeIn");
             m_FadeInTweenType = serializedObject.FindProperty("m_FadeInTweenType");
             m_FadeInAlpha = serializedObject.FindProperty("m_FadeInAlpha");
@@ -108,6 +113,9 @@ namespace MaterialUI
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+
+            EditorGUILayout.PropertyField(m_CanControlCanvasInteractable);
+            EditorGUILayout.Space();
 
             bool fadeIn = m_FadeIn.boolValue;
             bool scaleIn = m_ScaleIn.boolValue;
