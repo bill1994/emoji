@@ -152,7 +152,6 @@ namespace MaterialUI
 
             if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
             {
-                RecalculatePipModeActive();
                 ClearCachedInteropInfos();
                 if (HasNotch() &&
                     ((m_UnsafeContent == null && m_AutoCreateUnsafeContent) ||
@@ -184,11 +183,6 @@ namespace MaterialUI
             }
         }
 
-        protected virtual void OnWillEnterInPipMode()
-        {
-            s_isPipMode = null;
-        }
-
         #endregion
 
         #region Helper Functions
@@ -199,10 +193,6 @@ namespace MaterialUI
             var canvasScaler = GetComponentInParent<MaterialCanvasScaler>();
             if (canvasScaler != null)
                 canvasScaler.onCanvasAreaChanged.AddListener(OnCanvasAreaChanged);
-
-#if PIPCONTROLLER_DEFINED
-            Kyub.BackgroudMode.NativePipModeController.OnWillEnterInPipMode += OnWillEnterInPipMode;
-#endif
         }
 
         protected virtual void UnregisterEvents()
@@ -210,10 +200,6 @@ namespace MaterialUI
             var canvasScaler = GetComponentInParent<MaterialCanvasScaler>();
             if (canvasScaler != null)
                 canvasScaler.onCanvasAreaChanged.RemoveListener(OnCanvasAreaChanged);
-
-#if PIPCONTROLLER_DEFINED
-            Kyub.BackgroudMode.NativePipModeController.OnWillEnterInPipMode -= OnWillEnterInPipMode;
-#endif
         }
 
         protected virtual void RefreshContentChildrenDelayed()
@@ -625,19 +611,9 @@ namespace MaterialUI
         static extern float _GetStatusBarHeight();
 #endif
 
-        static bool? s_isPipMode = false;
-        protected static void RecalculatePipModeActive()
-        {
-#if PIPCONTROLLER_DEFINED
-            s_isPipMode = Kyub.BackgroudMode.NativePipModeController.IsPipModeActive();
-#endif
-        }
-
         public static bool IsPipModeActive()
         {
-            if (s_isPipMode == null)
-                RecalculatePipModeActive();
-            return s_isPipMode != null && s_isPipMode.Value;
+            return Kyub.NativePipModeController.IsPipModeActive;
         }
 
         static bool? s_cachedIsStatusBarActive = null;
@@ -678,7 +654,6 @@ namespace MaterialUI
 
         protected static void ClearCachedInteropInfos()
         {
-            s_isPipMode = null;
             s_cachedStatusBarHeight = -1;
             s_cachedIsStatusBarActive = null;
         }
