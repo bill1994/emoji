@@ -18,13 +18,27 @@ import java.lang.reflect.Field;
 
 public class BackgroundModeUtils implements Application.ActivityLifecycleCallbacks {
 
+    static boolean s_isPipMode = false;
     static BackgroundModeUtils s_instance = null;
     static boolean s_autoPipModeOnPause = false;
+    static OnPipModeChangedListener s_pipModeChangedUnityCallback = null;
+
+    public interface OnPipModeChangedListener {
+        void Execute(boolean value);
+    }
+
+    public static void SetPipModeChangedUnityCallback(OnPipModeChangedListener pipModeChangedUnityCallback) {
+        s_pipModeChangedUnityCallback = pipModeChangedUnityCallback;
+    }
 
     public static void SetAutoPipModeOnPause(boolean supportPipModeOnPause) {
         s_autoPipModeOnPause = supportPipModeOnPause;
 
         TryCreateAndRegisterInstance();
+
+        //Close Activity when state changed to false and is in pipmode
+        if(!s_autoPipModeOnPause && s_isPipMode)
+            UnityPlayer.currentActivity.moveTaskToBack(true);
     }
 
     public static boolean GetAutoPipModeOnPause() {
@@ -60,6 +74,15 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
 
     //INTERNAL ONLY
 
+    protected static void SetPipModeStateCallingEvents_Internal(boolean isPipMode) {
+        if(s_isPipMode != isPipMode)
+        {
+            s_isPipMode = isPipMode;
+            if(s_pipModeChangedUnityCallback != null)
+                s_pipModeChangedUnityCallback.Execute(s_isPipMode);
+        }
+    }
+
     @TargetApi(26)
     protected static boolean EnterInPipMode_API26() {
         UnityPlayer unityPlayerInstance = GetUnityPlayerInstance();
@@ -68,8 +91,12 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
             PictureInPictureParams params = new PictureInPictureParams.Builder()
                     .setAspectRatio(rational)
                     .build();
-            UnityPlayer.currentActivity.enterPictureInPictureMode(params);
-            return true;
+
+            if(!s_isPipMode) {
+                boolean isPipMode = UnityPlayer.currentActivity.enterPictureInPictureMode(params);
+                SetPipModeStateCallingEvents_Internal(isPipMode);
+            }
+            return s_isPipMode;
         }
         return false;
     }
@@ -156,6 +183,7 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
     @Override
     public void onActivityResumed(Activity activity) {
         s_delayedHandler = null;
+        SetPipModeStateCallingEvents_Internal(false);
     }
 
     //Used to control if activity is axecuting delayed
@@ -175,8 +203,8 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
                 @Override
                 public void run() {
                     if(s_delayedHandler == handler && s_autoPipModeOnPause) {
-                        EnterInPipMode();
                         ResumeUnityPlayer();
+                        EnterInPipMode();
                     }
                 }
             }, 20);
@@ -186,8 +214,10 @@ public class BackgroundModeUtils implements Application.ActivityLifecycleCallbac
     @Override
     public void onActivityStopped(Activity activity)
     {
-        if(IsInPipMode() || s_delayedHandler != null) {
+        if(s_isPipMode || s_delayedHandler != null) {
             s_delayedHandler = null;
+
+            SetPipModeStateCallingEvents_Internal(false);
             PauseUnityPlayer();
         }
     }

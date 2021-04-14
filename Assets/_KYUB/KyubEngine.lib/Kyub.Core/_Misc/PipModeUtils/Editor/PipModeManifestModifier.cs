@@ -4,9 +4,9 @@ using System.Text;
 using System.Xml;
 using UnityEditor.Android;
 
-namespace KyubEditor.BackgroundMode
+namespace KyubEditor
 {
-    public class BackgroudModeManifestModifier : IPostGenerateGradleAndroidProject
+    public class PipModeManifestModifier : IPostGenerateGradleAndroidProject
     {
         public void OnPostGenerateGradleAndroidProject(string basePath)
         {

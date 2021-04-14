@@ -545,6 +545,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &67758406
 GameObject:
@@ -2597,6 +2600,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &331510361
 GameObject:
@@ -5464,6 +5470,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &614433011
 GameObject:
@@ -5567,6 +5576,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &646060691
 GameObject:
@@ -6219,6 +6231,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!225 &741528081
 CanvasGroup:
@@ -7316,6 +7331,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &861891373
 GameObject:
@@ -7905,6 +7923,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!225 &937958189
 CanvasGroup:
@@ -8721,6 +8742,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &1072579923
 GameObject:
@@ -9481,6 +9505,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &1138193155
 GameObject:
@@ -11614,6 +11641,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &1600113498
 GameObject:
@@ -11717,6 +11747,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &1611968393
 GameObject:
@@ -11847,6 +11880,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!225 &1616766842
 CanvasGroup:
@@ -12061,6 +12097,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!225 &1617551294
 CanvasGroup:
@@ -14241,6 +14280,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!225 &1852204553
 CanvasGroup:
@@ -15208,6 +15250,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &1958841185
 GameObject:
@@ -16188,6 +16233,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!225 &2036343543
 CanvasGroup:
@@ -16646,6 +16694,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &2066050851
 GameObject:
@@ -17163,6 +17214,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &2111530868
 GameObject:

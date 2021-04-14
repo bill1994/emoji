@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Kyub;
 using System;
 
-namespace Kyub.BackgroudMode
+namespace Kyub
 {
     public class NativePipModeController
     {
@@ -16,8 +15,31 @@ namespace Kyub.BackgroudMode
 
         #endregion
 
+        #region Helper Classes
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+        public class OnPipModeChangedAndroidProxy : AndroidJavaProxy
+        {
+            Action<bool> _callback = null;
+
+            public OnPipModeChangedAndroidProxy(Action<bool> callback) : base("kyub.backgroundmode.BackgroundModeUtils$OnPipModeChangedListener")
+            {
+                _callback = callback;
+            }
+
+            public void Execute(bool isPipModeOn)
+            {
+                if (_callback != null)
+                    _callback.Invoke(isPipModeOn);
+            }
+        }
+#endif
+
+        #endregion
+
         #region Properties
 
+        static bool? s_isPipModeActive = null;
         static bool? s_isSupported = null;
         static bool s_autoPipMode = false;
 
@@ -37,24 +59,21 @@ namespace Kyub.BackgroudMode
             }
         }
 
+        public static bool IsPipModeActive
+        {
+            get
+            {
+                if (s_isPipModeActive == null)
+                    s_isPipModeActive = IsPipModeActive_Internal();
+                return s_isPipModeActive != null ? s_isPipModeActive.Value : false;
+            }
+        }
+
         #endregion
 
         #region Callback
 
-        public static event Action OnWillEnterInPipMode;
-
-        #endregion
-
-        #region Unity Functions
-
-        protected static void HandleOnApplicationPause(bool isPause)
-        {
-            if (isPause && s_autoPipMode && IsSupported())
-            {
-                if (OnWillEnterInPipMode != null)
-                    OnWillEnterInPipMode.Invoke();
-            }
-        }
+        public static Action<bool> OnPipModeStateChanged;
 
         #endregion
 
@@ -70,19 +89,24 @@ namespace Kyub.BackgroudMode
                     s_isSupported = pluginClass.CallStatic<bool>("IsPipModeSupported");
                 }
 #else
-                s_isSupported =  false;
+                s_isSupported = false;
 #endif
             }
             return s_isSupported != null && s_isSupported.Value;
         }
 
+        protected static void SetPipModeChangedUnityCallback(Action<bool> callback)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            using (var pluginClass = new AndroidJavaClass(PLUGIN_CLASS_NAME))
+            {
+                pluginClass.CallStatic("SetPipModeChangedUnityCallback", new OnPipModeChangedAndroidProxy(callback));
+            }
+#endif
+        }
+
         public static bool ActivatePipMode()
         {
-            if (IsSupported() && !IsPipModeActive())
-            {
-                if(OnWillEnterInPipMode != null)
-                    OnWillEnterInPipMode.Invoke();
-            }
 #if UNITY_ANDROID && !UNITY_EDITOR
             using (var pluginClass = new AndroidJavaClass(PLUGIN_CLASS_NAME))
             {
@@ -93,7 +117,11 @@ namespace Kyub.BackgroudMode
 #endif
         }
 
-        public static bool IsPipModeActive()
+        #endregion
+
+        #region Internal Methods
+
+        protected static bool IsPipModeActive_Internal()
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
             using (var pluginClass = new AndroidJavaClass(PLUGIN_CLASS_NAME))
@@ -105,10 +133,6 @@ namespace Kyub.BackgroudMode
 #endif
         }
 
-        #endregion
-
-        #region Internal Methods
-
         protected static void SetAutoPipModeOnPause_Internal(bool supportPipModeOnPause)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -119,12 +143,26 @@ namespace Kyub.BackgroudMode
 #endif
         }
 
+        #endregion
+
+        #region Receivers
+
+        protected static void HandleOnPipModeChanged_Internal(bool isPipModeActive)
+        {
+            s_isPipModeActive = isPipModeActive;
+            if (OnPipModeStateChanged != null)
+                OnPipModeStateChanged.Invoke(isPipModeActive);
+        }
+
+        #endregion
+
+        #region Auto-Initialize Methods
+
         [RuntimeInitializeOnLoadMethod]
         static void InitializeOnLoad()
         {
+            SetPipModeChangedUnityCallback(HandleOnPipModeChanged_Internal);
             SetAutoPipModeOnPause_Internal(s_autoPipMode);
-            ApplicationContext.OnApplicationPause -= HandleOnApplicationPause;
-            ApplicationContext.OnApplicationPause += HandleOnApplicationPause;
         }
 
         #endregion
