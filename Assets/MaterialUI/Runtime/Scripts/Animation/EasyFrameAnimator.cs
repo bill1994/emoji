@@ -63,6 +63,9 @@ namespace MaterialUI
 
         #region Private Variables
 
+        [SerializeField]
+        bool m_CanControlCanvasInteractable = true;
+
         //  Transition In
         [SerializeField]
         private bool m_FadeIn = false;
@@ -178,6 +181,20 @@ namespace MaterialUI
         #endregion
 
         #region Properties
+
+        public bool canControlCanvasInteractable
+        {
+            get
+            {
+                return m_CanControlCanvasInteractable;
+            }
+            set
+            {
+                if (m_CanControlCanvasInteractable == value)
+                    return;
+                m_CanControlCanvasInteractable = value;
+            }
+        }
 
         protected BaseInput input
         {
@@ -477,7 +494,8 @@ namespace MaterialUI
                 {
                     _CanvasGroup = gameObject.GetAddComponent<CanvasGroup>();
                     //_CanvasGroup.blocksRaycasts = true;
-                    _CanvasGroup.interactable = true;
+                    if(m_CanControlCanvasInteractable)
+                        _CanvasGroup.interactable = true;
                     //m_CanvasGroup.ignoreParentGroups = true;
                 }
                 return _CanvasGroup;
@@ -632,7 +650,8 @@ namespace MaterialUI
 
             if (canvasGroup != null)
             {
-                canvasGroup.interactable = true;
+                if(m_CanControlCanvasInteractable)
+                    canvasGroup.interactable = true;
                 //canvasGroup.blocksRaycasts = true;
             }
 
@@ -655,7 +674,8 @@ namespace MaterialUI
 
             InterruptAnimation(false);
 
-            canvasGroup.interactable = false;
+            if(m_CanControlCanvasInteractable)
+                canvasGroup.interactable = false;
             //canvasGroup.blocksRaycasts = false;
 
             if (_TempScreenPos == null && this.transform is RectTransform)
@@ -772,7 +792,7 @@ namespace MaterialUI
                 }
                 if (scaleIn)
                 {
-                    rectTransform.localScale = new Vector3(scaleInScale, scaleInScale, scaleInScale);
+                    rectTransform.localScale = new Vector3(1f, 1f, 1f);
                 }
                 if (slideIn)
                 {
@@ -839,11 +859,11 @@ namespace MaterialUI
                 }
                 if (fadeOut)
                 {
-                    canvasGroup.alpha = 1f;
+                    canvasGroup.alpha = fadeOutAlpha;
                 }
                 if (scaleOut)
                 {
-                    rectTransform.localScale = new Vector3(1f, 1f, 1f);
+                    rectTransform.localScale = new Vector3(scaleOutScale, scaleOutScale, scaleOutScale);
                 }
                 if (slideOut)
                 {
@@ -967,7 +987,7 @@ namespace MaterialUI
                 }
                 if (scaleIn)
                 {
-                    rectTransform.localScale = new Vector3(1f, 1f, 1f);
+                    rectTransform.localScale = new Vector3(1, 1, 1);
                 }
                 if (slideIn)
                 {
@@ -993,11 +1013,11 @@ namespace MaterialUI
                 }
                 if (fadeOut)
                 {
-                    canvasGroup.alpha = 1f;
+                    canvasGroup.alpha = fadeOutAlpha;
                 }
                 if (scaleOut)
                 {
-                    rectTransform.localScale = new Vector3(1f, 1f, 1f);
+                    rectTransform.localScale = new Vector3(scaleOutScale, scaleOutScale, scaleOutScale);
                 }
                 if (slideOut)
                 {
