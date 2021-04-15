@@ -99,22 +99,10 @@ namespace Kyub.Localization
             }
             set
             {
-                var index = 0;
-                if (value != null)
-                {
-                    value = value.ToUpper();
-                    for (int i = 0; i < LocalizationDatas.Count; i++)
-                    {
-                        var data = LocalizationDatas[i];
-                        if (data != null && (string.Equals(data.Name, value, System.StringComparison.InvariantCultureIgnoreCase) || string.Equals(data.FullName, value, System.StringComparison.InvariantCultureIgnoreCase)))
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
-                }
+                var index = Mathf.Max(0, GetLocationDataIndexFromLanguage(value));
                 if (index == _index)
                     return;
+
                 _index = index;
                 SetDirty();
             }
@@ -210,23 +198,47 @@ namespace Kyub.Localization
 
         public virtual bool HasLanguage(string language)
         {
-            return GetLocationDataFromLanguage(language) != null;
+            return GetLocationDataIndexFromLanguage(language) >= 0;
         }
 
         public virtual LocalizationData GetLocationDataFromLanguage(string language)
         {
             if (m_localizationDatas != null)
             {
-                foreach (var langData in m_localizationDatas)
+                var index = GetLocationDataIndexFromLanguage(language);
+                if (index >= 0)
+                    return m_localizationDatas[index];
+            }
+            return null;
+        }
+
+        public virtual int GetLocationDataIndexFromLanguage(string language)
+        {
+            int selectedIndex = -1;
+            if (m_localizationDatas != null && !string.IsNullOrEmpty(language))
+            {
+                for (int i=0; i< m_localizationDatas.Count; i++)
                 {
-                    if (langData != null &&
-                        (string.Equals(langData.Name, language) || string.Equals(langData.FullName, language)))
+                    var langData = m_localizationDatas[i];
+                    if (langData != null)
                     {
-                        return langData;
+                        //Perfect Match
+                        if (string.Equals(langData.Name, language, System.StringComparison.InvariantCultureIgnoreCase) || 
+                            string.Equals(langData.FullName, language, System.StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            selectedIndex = i;
+                            break;
+                        }
+                        //Find possible name (Non-Perfect Match)
+                        else if (langData.Name.IndexOf(language, System.StringComparison.InvariantCultureIgnoreCase) != -1 || 
+                            langData.FullName.IndexOf(language, System.StringComparison.InvariantCultureIgnoreCase) != -1)
+                        {
+                            selectedIndex = i;
+                        }
                     }
                 }
             }
-            return null;
+            return selectedIndex;
         }
 
         protected virtual void Init()
