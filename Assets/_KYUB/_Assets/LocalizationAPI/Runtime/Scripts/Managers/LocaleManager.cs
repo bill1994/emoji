@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Kyub.Collections;
 using System.Globalization;
+using System.Collections.Specialized;
 
 namespace Kyub.Localization
 {
@@ -505,13 +506,14 @@ namespace Kyub.Localization
 
 #if UNITY_EDITOR
 
-        [ContextMenu("ExportCurrentLocalizationData", true)]
+        [ContextMenu("Export Locale/As JSON", true)]
+        [ContextMenu("Export Locale/As CSV", true)]
         protected virtual bool ExportCurrentLocalizationData_Validator()
         {
             return Application.isPlaying;
         }
 
-        [ContextMenu("ExportCurrentLocalizationData")]
+        [ContextMenu("Export Locale/As CSV")]
         protected virtual void ExportCurrentLocalizationData()
         {
             var loc = GetOrLoadCurrentData();
@@ -534,6 +536,29 @@ namespace Kyub.Localization
             UnityEditor.AssetDatabase.Refresh();
         }
 
+        [ContextMenu("Export Locale/As JSON")]
+        protected virtual void ExportCurrentLocalizationDataJson()
+        {
+            var loc = GetOrLoadCurrentData();
+
+            OrderedDictionary dict = new OrderedDictionary();
+            if (loc != null && loc._keyValueArray != null)
+            {
+                
+                foreach (var pair in loc._keyValueArray)
+                {
+                    //Escape to double quotemark format (used in csv)
+                    var key = pair.Key == null ? "" : pair.Key.Trim().Replace("\n", "\\n").Replace("\r", "");
+                    var value = pair.Value == null ? "" : pair.Value.Trim().Replace("\n", "\\n").Replace("\r", "");
+                    if (!string.IsNullOrEmpty(key) && !key.Equals("\u200B"))
+                        dict[key] = value;
+                }
+            }
+            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.json", SerializationUtils.ToJson(dict));
+
+            UnityEditor.AssetDatabase.Refresh();
+        }
+
 #endif
 
         #endregion
@@ -543,7 +568,13 @@ namespace Kyub.Localization
 
     public enum LocalizationDataMemoryConfigEnum { Unloadable, Permanent }
 
-    public enum LocalizationDataFileTypeEnum { Csv, Json }
+    public enum LocalizationDataFileTypeEnum 
+    { 
+        Csv, 
+        Json, 
+        [System.Obsolete("Use Json as Dictionary instead this mode")]
+        JsonClass 
+    }
 
     [System.Serializable]
     public class LocalizationData
@@ -690,9 +721,15 @@ namespace Kyub.Localization
                     LocalizationCsvFileReader reader = new LocalizationCsvFileReader(asset);
                     _cachedDict = reader.ReadDictionary();
                 }
+                else if (fileType == LocalizationDataFileTypeEnum.Json)
+                {
+                    this.LoadFromJsonDictionary(asset.text);
+                    
+                    return;
+                }
                 else
                 {
-                    this.LoadFromJson(asset.text);
+                    this.LoadFromJsonClass(asset.text);
                     return;
                 }
                 _isLoaded = true;
@@ -723,7 +760,39 @@ namespace Kyub.Localization
             FinishLoad();
         }
 
-        public virtual void LoadFromJson(string json)
+        public virtual void LoadFromJsonDictionary(string json)
+        {
+            var rootData = SerializationUtils.FromJson<Kyub.Serialization.Data>(json);
+
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+
+            List<Kyub.Serialization.Data> datasToProcess = new List<Serialization.Data>();
+            if (rootData != null)
+                datasToProcess.Add(rootData);
+
+            for (int i = 0; i < datasToProcess.Count; i++)
+            {
+                var child = datasToProcess[i];
+                if (child == null || !child.IsDictionary)
+                    continue;
+
+                var childDict = child.AsDictionary;
+                foreach (var pair in childDict)
+                {
+                    if (string.IsNullOrEmpty(pair.Key) || pair.Value == null)
+                        continue;
+
+                    if (pair.Value.IsString)
+                        dict[pair.Key] = pair.Value.AsString;
+                    else if (pair.Value.IsDictionary)
+                        datasToProcess.Add(pair.Value);
+                }
+            }
+
+            LoadFromDictionary(dict);
+        }
+
+        public virtual void LoadFromJsonClass(string json)
         {
             if (!string.IsNullOrEmpty(json))
                 SerializationUtils.FromJsonOverwrite(json, this);
@@ -790,10 +859,17 @@ namespace Kyub.Localization
 
         #region Static Functions
 
-        public static LocalizationData CreateFromJson(string json)
+        public static LocalizationData CreateFromJsonClass(string json)
         {
             LocalizationData data = new LocalizationData();
-            data.LoadFromJson(json);
+            data.LoadFromJsonClass(json);
+            return data;
+        }
+
+        public static LocalizationData CreateFromJsonDictionary(string json)
+        {
+            LocalizationData data = new LocalizationData();
+            data.LoadFromJsonDictionary(json);
             return data;
         }
 
