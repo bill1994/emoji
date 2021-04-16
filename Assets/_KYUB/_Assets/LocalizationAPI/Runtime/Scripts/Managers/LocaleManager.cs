@@ -547,13 +547,14 @@ namespace Kyub.Localization
                 foreach (var pair in loc._keyValueArray)
                 {
                     //Escape to double quotemark format (used in csv)
-                    var key = pair.Key == null ? "" : pair.Key;
-                    var value = pair.Value == null ? "" : pair.Value;
+                    var key = pair.Key == null ? "" : pair.Key.Trim().Replace("\n", "\\n").Replace("\r", "");
+                    var value = pair.Value == null ? "" : pair.Value.Trim().Replace("\n", "\\n").Replace("\r", "");
                     if (!string.IsNullOrEmpty(key) && !key.Equals("\u200B"))
                         dict[key] = value;
                 }
             }
-            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.json", SerializationUtils.ToJson(dict));
+            var json = SerializationUtils.ToJson(dict, true);
+            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.json", json);
 
             UnityEditor.AssetDatabase.Refresh();
         }
@@ -845,7 +846,17 @@ namespace Kyub.Localization
                 var valueArray = new List<LocalizationPair>();
                 if (_cachedDict != null)
                 {
-                    foreach (string key in _cachedDict.Keys)
+                    //We must fix dictionary to prevent \n and \r in keys
+                    Dictionary<string, string> fixedKeysDictionary = new Dictionary<string, string>();
+                    foreach (var pair in _cachedDict)
+                    {
+                        var key = pair.Key.Replace("\n", "\\n").Replace("\r", "").Trim();
+                        fixedKeysDictionary[key] = pair.Value;
+                    }
+                    _cachedDict = fixedKeysDictionary;
+
+                    var keys = _cachedDict.Keys;
+                    foreach (string key in keys)
                     {
                         valueArray.Add(new LocalizationPair() { Key = key, Value = _cachedDict[key] });
                     }
