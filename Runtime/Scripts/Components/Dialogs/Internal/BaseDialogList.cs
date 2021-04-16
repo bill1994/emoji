@@ -403,7 +403,7 @@ namespace MaterialUI
                     if (option != null)
                     {
                         string localizedText;
-                        if (!string.IsNullOrEmpty(option.text) && Kyub.Localization.LocaleManager.TryGetLocalizedText(option.text, out localizedText))
+                        if (!string.IsNullOrEmpty(option.text) && Kyub.Localization.LocaleManager.TryGetLocalizedText(option.text, out localizedText, true))
                         {
                             indexedLocaleKeys[option.text] = localizedText;
                         }
