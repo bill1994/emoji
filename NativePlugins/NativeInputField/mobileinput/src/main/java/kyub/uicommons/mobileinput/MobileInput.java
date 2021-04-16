@@ -499,8 +499,18 @@ public class MobileInput {
             double y = data.getDouble("y") * (double) layout.getHeight();
             double width = data.getDouble("width") * (double) layout.getWidth();
             double height = data.getDouble("height") * (double) layout.getHeight();
+
+            //Used as reference to Pan LeafView
+            double pan_x = data.getDouble("pan_content_x") * (double) layout.getWidth();
+            double pan_y = data.getDouble("pan_content_y") * (double) layout.getHeight();
+            double pan_width = data.getDouble("pan_content_width") * (double) layout.getWidth();
+            double pan_height = data.getDouble("pan_content_height") * (double) layout.getHeight();
+
             Rect rect = new Rect((int) x, (int) y, (int) (x + width), (int) (y + height));
-            final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(rect.width(), rect.height() + edit.getPaddingBottom());
+            Rect panRect = new Rect((int) pan_x, (int) pan_y, (int) (pan_x + pan_width), (int) (pan_y + pan_height));
+            int offset = panRect.bottom - rect.bottom > 0? panRect.bottom - rect.bottom : 0;
+
+            final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(rect.width(), rect.height() + offset);
             params.setMargins(rect.left, rect.top, 0, 0);
 
             //Fix crash when SetRect is applied outside main thread

@@ -360,7 +360,7 @@ namespace Kyub.Internal.NativeInputPlugin
 
             if (Visible && this._inputObject != null && _isMobileInputCreated)
             {
-                SetRectNative(this._inputObject.textViewport, this._inputObject.rectMaskContent);
+                SetRectNative(this._inputObject.textViewport, this._inputObject.panContent, this._inputObject.rectMaskContent);
             }
             //Set Visible false when click out of rect
             if (Application.isMobilePlatform && input.touchCount > 0)
@@ -796,22 +796,30 @@ namespace Kyub.Internal.NativeInputPlugin
         /// Set new size and position
         /// </summary>
         /// <param name="inputRect">RectTransform</param>
-        public void SetRectNative(RectTransform inputRect, RectTransform clipperRect)
+        public void SetRectNative(RectTransform inputRect, RectTransform panContent, RectTransform clipperRect)
         {
             if (_isMobileInputCreated)
             {
                 Rect rect = GetScreenRectFromRectTransform(inputRect, clipperRect);
+                Rect panContentRect = GetScreenRectFromRectTransform(panContent);
                 //if (_lastRect == rect)
                 //{
                 //    return;
                 //}
                 //_lastRect = rect;
+
                 JsonObject data = new JsonObject();
                 data["msg"] = SET_RECT;
                 data["x"] = rect.x / Screen.width;
                 data["y"] = rect.y / Screen.height;
                 data["width"] = rect.width / Screen.width;
                 data["height"] = rect.height / Screen.height;
+
+                data["pan_content_x"] = panContentRect.x / Screen.width;
+                data["pan_content_y"] = panContentRect.y / Screen.height;
+                data["pan_content_width"] = panContentRect.width / Screen.width;
+                data["pan_content_height"] = panContentRect.height / Screen.height;
+
                 this.Execute(data);
             }
         }

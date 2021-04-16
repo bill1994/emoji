@@ -168,6 +168,16 @@ NSString *plugin;
     float height = [[data valueForKey:@"height"] floatValue] * viewController.view.bounds.size.height;
     //x -= editView.superview.frame.origin.x;
     //y -= editView.superview.frame.origin.y;
+	
+	//Pan Content Offset
+    float pan_y = [[data valueForKey:@"pan_content_y"] floatValue] * viewController.view.bounds.size.height;
+	
+	//Setup AutoToolbar in IQKeyboardManager
+	float pan_offset =  y - pan_y; //Zero is on top of the screen, so we must subtract y - pan_y to pickup the offset
+	pan_offset = pan_offset > 0? pan_offset : 0;
+	[[IQKeyboardManager sharedManager] setEnableAutoToolbar:NO];
+	[[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:pan_offset];
+	
     editView.frame = CGRectMake(x, y, width, height);
 }
 
