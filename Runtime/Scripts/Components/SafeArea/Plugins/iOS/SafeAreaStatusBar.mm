@@ -10,7 +10,13 @@ extern "C"
 	
 	float _GetStatusBarHeight()
 	{
+#ifdef __IPHONE_13_0
+		UIStatusBarManager *manager = [UIApplication sharedApplication].keyWindow.windowScene.statusBarManager;
+		CGFloat height = manager.statusBarFrame.size.height;
+		return height;
+#else
 		CGSize statusBarSize = [[UIApplication sharedApplication] statusBarFrame].size;
 		return MIN(statusBarSize.width, statusBarSize.height);
+#endif
 	}
 }
