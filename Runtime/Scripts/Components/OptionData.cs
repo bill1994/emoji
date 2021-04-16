@@ -85,6 +85,12 @@ namespace MaterialUI
             set { m_ImageData = value; }
         }
 
+        public Action OnOptionSelectedAction
+        {
+            get { return _OnOptionSelectedAction; }
+            set { _OnOptionSelectedAction = value; }
+        }
+
         /// <summary>
         /// Called when the option is selected.
         /// </summary>
@@ -102,20 +108,21 @@ namespace MaterialUI
         /// <param name="imageData">The image data.</param>
         /// <param name="onOptionSelected">Called when the option is selected.</param>
 
-        //Action _OnOptionSelected = null;
+        Action _OnOptionSelectedAction = null;
         public OptionData(string text, ImageData imageData, Action onOptionSelectedAction = null)
         {
             m_Text = text;
             m_ImageData = imageData;
             if (onOptionSelectedAction != null)
             {
+                _OnOptionSelectedAction = onOptionSelectedAction;
                 if (this.onOptionSelected == null)
                     this.onOptionSelected = new UnityEvent();
-                this.onOptionSelected.AddListener(() =>
+                this.onOptionSelected.AddListener((UnityAction)(() =>
                 {
-                    if (onOptionSelectedAction != null)
-                        onOptionSelectedAction();
-                });
+                    if (this._OnOptionSelectedAction != null)
+                        this._OnOptionSelectedAction();
+                }));
             }
         }
     }

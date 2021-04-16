@@ -29,14 +29,42 @@ namespace MaterialUI
         protected SearchInputFieldVisibilityMode m_SearchVisibilityMode = SearchInputFieldVisibilityMode.Manual;
         [SerializeField]
         protected int m_MinAmountOfElementsToShowSearch = 20;
+        [SerializeField]
+        protected bool m_SupportLocalizedSearch = true;
 
         protected IList<OptionData> _Options;
+        protected Dictionary<string, string> _OptionsLocaleMap = new Dictionary<string, string>();
 
         protected Action _onDismissiveButtonClicked = null;
 
         #endregion
 
         #region Properties
+
+        public bool SupportLocalizedSearch
+        {
+            get
+            {
+                return m_SupportLocalizedSearch;
+            }
+            set
+            {
+                if (m_SupportLocalizedSearch == value)
+                    return;
+                m_SupportLocalizedSearch = value;
+
+                RecreateIndexedLocaleKeys(_Options, ref _OptionsLocaleMap);
+
+                if (m_ScrollDataView != null)
+                {
+                    m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
+                    var filteredOption = _Options == null ? null : new List<OptionData>(_Options);
+                    ApplyFilterInList(filteredOption, m_SearchInputField != null ? m_SearchInputField.text : string.Empty, optionsLocaleMap);
+                    m_ScrollDataView.Setup(filteredOption);
+                }
+            }
+        }
+
 
         public SearchInputFieldVisibilityMode searchInputFieldVisiblityMode
         {
@@ -130,13 +158,22 @@ namespace MaterialUI
                     return;
                 _Options = value;
 
+                RecreateIndexedLocaleKeys(_Options, ref _OptionsLocaleMap);
                 if (m_ScrollDataView != null)
                 {
                     m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
-                    var filteredOption = options == null ? null : new List<OptionData>(options);
-                    ApplyFilterInList(filteredOption, m_SearchInputField != null ? m_SearchInputField.text : string.Empty);
+                    var filteredOption = _Options == null ? null : new List<OptionData>(_Options);
+                    ApplyFilterInList(filteredOption, m_SearchInputField != null ? m_SearchInputField.text : string.Empty, optionsLocaleMap);
                     m_ScrollDataView.Setup(filteredOption);
                 }
+            }
+        }
+
+        protected Dictionary<string, string> optionsLocaleMap
+        {
+            get
+            {
+                return m_SupportLocalizedSearch ? _OptionsLocaleMap : null;
             }
         }
 
@@ -171,6 +208,8 @@ namespace MaterialUI
             ClearList();
 
             _Options = options is IList<OptionData> || options == null ? (IList<OptionData>)options : options.ToArray<OptionData>();
+
+            RecreateIndexedLocaleKeys(_Options, ref _OptionsLocaleMap);
 
             var optionsCount = _Options != null ? _Options.Count : 0;
             if (m_SearchInputField != null && m_SearchVisibilityMode == SearchInputFieldVisibilityMode.Auto)
@@ -231,6 +270,10 @@ namespace MaterialUI
 
             if (m_SearchInputField != null)
                 m_SearchInputField.onValueChanged.AddListener(HandleOnSeachValueChanged);
+
+#if UI_LOCALE_DEFINED
+            Kyub.Localization.LocaleManager.OnLocalizeChanged += HandleOnLocalizeChanged;
+#endif
         }
 
         protected virtual void UnregisterEvents()
@@ -240,6 +283,10 @@ namespace MaterialUI
 
             if (m_SearchInputField != null)
                 m_SearchInputField.onValueChanged.RemoveListener(HandleOnSeachValueChanged);
+
+#if UI_LOCALE_DEFINED
+            Kyub.Localization.LocaleManager.OnLocalizeChanged -= HandleOnLocalizeChanged;
+#endif
         }
 
         public void AffirmativeButtonClicked()
@@ -281,13 +328,18 @@ namespace MaterialUI
 
         #region Receivers
 
+        protected virtual void HandleOnLocalizeChanged(bool forceReapply)
+        {
+            RecreateIndexedLocaleKeys(_Options, ref _OptionsLocaleMap);
+        }
+
         protected virtual void HandleOnSeachValueChanged(string value)
         {
             if (m_ScrollDataView != null)
             {
                 m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
                 var filteredOption = options == null ? null : new List<OptionData>(options);
-                ApplyFilterInList(filteredOption, value);
+                ApplyFilterInList(filteredOption, value, optionsLocaleMap);
                 m_ScrollDataView.Setup(filteredOption);
             }
         }
@@ -336,7 +388,32 @@ namespace MaterialUI
 
         #region Static Helper Functions
 
-        protected static void ApplyFilterInList(IList<OptionData> list, string filterKeys)
+        protected static void RecreateIndexedLocaleKeys(IList<OptionData> options, ref Dictionary<string, string> indexedLocaleKeys)
+        {
+            if (indexedLocaleKeys == null)
+                indexedLocaleKeys = new Dictionary<string, string>();
+            else
+                indexedLocaleKeys.Clear();
+
+#if UI_LOCALE_DEFINED
+            if (options != null)
+            {
+                foreach (var option in options)
+                {
+                    if (option != null)
+                    {
+                        string localizedText;
+                        if (!string.IsNullOrEmpty(option.text) && Kyub.Localization.LocaleManager.TryGetLocalizedText(option.text, out localizedText))
+                        {
+                            indexedLocaleKeys[option.text] = localizedText;
+                        }
+                    }
+                }
+            }
+#endif
+        }
+
+        protected static void ApplyFilterInList(IList<OptionData> list, string filterKeys, Dictionary<string, string> indexedLocale)
         {
             if (string.IsNullOrEmpty(filterKeys) || list == null || list.Count == 0)
                 return;
@@ -344,7 +421,7 @@ namespace MaterialUI
             var filters = !string.IsNullOrEmpty(filterKeys) ? filterKeys.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries) : null;
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i] == null || !IsValidFilter(list[i].text, filters))
+                if (list[i] == null || !IsValidFilter(list[i].text, filters, indexedLocale))
                 {
                     list.RemoveAt(i);
                     i--;
@@ -352,7 +429,7 @@ namespace MaterialUI
             }
         }
 
-        protected static bool IsValidFilter(string key, string[] filters)
+        protected static bool IsValidFilter(string key, string[] filters, Dictionary<string, string> indexedLocale)
         {
             if (string.IsNullOrEmpty(key))
                 return false;
@@ -360,9 +437,14 @@ namespace MaterialUI
             if (filters == null || filters.Length == 0)
                 return true;
 
+            string localizedKey = null;
+            if(indexedLocale != null)
+                indexedLocale.TryGetValue(key, out localizedKey);
             foreach (var filter in filters)
             {
-                if (filter != null && key.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) < 0)
+                if (filter != null && 
+                    (key.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) < 0 && 
+                    (string.IsNullOrEmpty(localizedKey) || localizedKey.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) < 0)))
                     return false;
             }
             return true;
