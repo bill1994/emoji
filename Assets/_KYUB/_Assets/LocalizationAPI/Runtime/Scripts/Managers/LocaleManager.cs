@@ -554,7 +554,7 @@ namespace Kyub.Localization
                         dict[key] = value;
                 }
             }
-            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.json", SerializationUtils.ToJson(dict));
+            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.json", SerializationUtils.ToJson(dict, true));
 
             UnityEditor.AssetDatabase.Refresh();
         }
