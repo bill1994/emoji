@@ -16,12 +16,12 @@ namespace Kyub.Localization
 
         #region Constructors
 
-        public LocalizationCsvFileReader(string p_text)
+        public LocalizationCsvFileReader(string text)
         {
-            _text = p_text != null ? p_text : "";
+            _text = text != null ? text : "";
         }
 
-        public LocalizationCsvFileReader(TextAsset p_asset) : this(p_asset.text)
+        public LocalizationCsvFileReader(TextAsset asset) : this(asset.text)
         {
         }
 
@@ -31,38 +31,38 @@ namespace Kyub.Localization
 
         public virtual Dictionary<string, string> ReadDictionary()
         {
-            var v_rows = CsvUtils.Parse(_text, new CsvConfig(new char[] { ';', '=' }, "\r\n", '\"'));
-            Dictionary<string, string> v_dict = new Dictionary<string, string>();
+            var rows = CsvUtils.Parse(_text, new CsvConfig(new char[] { ';', '=' }, "\r\n", '\"'));
+            Dictionary<string, string> dict = new Dictionary<string, string>();
 
-            foreach (var v_row in v_rows)
+            foreach (var row in rows)
             {
-                if (v_row == null)
+                if (row == null)
                     continue;
 
-                for (int i = 0; i < v_row.Length; i++)
+                for (int i = 0; i < row.Length; i++)
                 {
-                    var v_cell = v_row[i] == null? "" : v_row[i].Trim();
+                    var cell = row[i] == null? "" : row[i].Trim();
                     //Ignore empty rows of rows that start with // (coment tag)
-                    if (string.IsNullOrEmpty(v_cell))
+                    if (string.IsNullOrEmpty(cell))
                         continue;
 
                     //Comments tag will force ignore next cells in this row
-                    if (v_cell.StartsWith("//"))
+                    if (cell.StartsWith("//"))
                         break;
 
                     else
                     {
-                        var v_key = Kyub.RegexUtils.BulkReplace(v_cell, Localization.LocaleManager.s_uselessCharsDict).Trim();
-                        var v_value = v_row.Length > i + 1 && v_row[i + 1] != null ? v_row[i + 1] : "";
+                        var key = Kyub.RegexUtils.BulkReplace(cell, Localization.LocaleManager.s_uselessCharsDict).Trim();
+                        var value = row.Length > i + 1 && row[i + 1] != null ? row[i + 1] : "";
                         //Comment value-cell will force empty cell
-                        if (v_value.StartsWith("//"))
-                            v_value = "";
-                        v_dict[v_key] = Kyub.RegexUtils.BulkReplace(v_value, Localization.LocaleManager.s_uselessCharsDict).Trim();
+                        if (value.StartsWith("//"))
+                            value = "";
+                        dict[key] = Kyub.RegexUtils.BulkReplace(value, Localization.LocaleManager.s_uselessCharsDict).Trim();
                         break;
                     }
                 }
             }
-            return v_dict;
+            return dict;
         }
 
         #endregion
@@ -72,24 +72,24 @@ namespace Kyub.Localization
 
     internal static class CsvUtils
     {
-        public static List<string[]> Parse(string csvFileContents, CsvConfig p_config = null)
+        public static List<string[]> Parse(string csvFileContents, CsvConfig config = null)
         {
-            List<string[]> v_rows = new List<string[]>();
-            var reader = new CsvReader(p_config);
+            List<string[]> rows = new List<string[]>();
+            var reader = new CsvReader(config);
             try
             {
-                var v_counter = 0;
+                var counter = 0;
                 foreach (var row in reader.Read(csvFileContents))
                 {
-                    v_rows.Add(row);
-                    v_counter++;
+                    rows.Add(row);
+                    counter++;
                 }
             }
-            catch (Exception p_exception)
+            catch (Exception exception)
             {
-                Debug.Log(p_exception.Message);
+                Debug.Log(exception.Message);
             }
-            return v_rows;
+            return rows;
         }
     }
 
@@ -183,10 +183,10 @@ namespace Kyub.Localization
                 return null;
 
             //Find Line Breaks
-            var v_matchCount = IsLineBreak(data, i);
-            if (v_matchCount > 0)
+            var matchCount = IsLineBreak(data, i);
+            if (matchCount > 0)
             {
-                i += v_matchCount;
+                i += matchCount;
                 return null;
             }
 
@@ -199,18 +199,18 @@ namespace Kyub.Localization
         protected int IsLineBreak(string data, int i)
         {
             //Find Line Breaks
-            var v_matchCount = 0;
+            var matchCount = 0;
             for (int j = 0; j < m_config.NewLineMark.Length; j++)
             {
                 if (data[i + j] == m_config.NewLineMark[j])
-                    v_matchCount++;
+                    matchCount++;
                 else
                     break;
             }
-            if (v_matchCount == m_config.NewLineMark.Length)
+            if (matchCount == m_config.NewLineMark.Length)
             {
-                //i += v_matchCount;
-                return v_matchCount;
+                //i += matchCount;
+                return matchCount;
             }
             return 0;
         }

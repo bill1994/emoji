@@ -544,17 +544,16 @@ namespace Kyub.Localization
             OrderedDictionary dict = new OrderedDictionary();
             if (loc != null && loc._keyValueArray != null)
             {
-                
                 foreach (var pair in loc._keyValueArray)
                 {
                     //Escape to double quotemark format (used in csv)
-                    var key = pair.Key == null ? "" : pair.Key.Trim().Replace("\n", "\\n").Replace("\r", "");
-                    var value = pair.Value == null ? "" : pair.Value.Trim().Replace("\n", "\\n").Replace("\r", "");
+                    var key = pair.Key == null ? "" : pair.Key;
+                    var value = pair.Value == null ? "" : pair.Value;
                     if (!string.IsNullOrEmpty(key) && !key.Equals("\u200B"))
                         dict[key] = value;
                 }
             }
-            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.json", SerializationUtils.ToJson(dict, true));
+            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.json", SerializationUtils.ToJson(dict));
 
             UnityEditor.AssetDatabase.Refresh();
         }
