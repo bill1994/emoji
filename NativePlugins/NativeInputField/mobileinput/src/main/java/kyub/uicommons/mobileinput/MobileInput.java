@@ -508,10 +508,12 @@ public class MobileInput {
 
             Rect rect = new Rect((int) x, (int) y, (int) (x + width), (int) (y + height));
             Rect panRect = new Rect((int) pan_x, (int) pan_y, (int) (pan_x + pan_width), (int) (pan_y + pan_height));
-            int offset = panRect.bottom - rect.bottom > 0? panRect.bottom - rect.bottom : 0;
+            final int offset = panRect.bottom - rect.bottom > 0? panRect.bottom - rect.bottom : 0;
 
-            final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(rect.width(), rect.height() + offset);
+            final LayoutParams params = new LayoutParams(rect.width(), rect.height() + offset);
             params.setMargins(rect.left, rect.top, 0, 0);
+            edit.setLayoutParams(params);
+            edit.setPadding(0, 0, 0, offset);
 
             //Fix crash when SetRect is applied outside main thread
             final Activity a = UnityPlayer.currentActivity;
@@ -520,6 +522,7 @@ public class MobileInput {
                     return;
                 }
                 edit.setLayoutParams(params);
+                edit.setPadding(0, 0, 0, offset);
             }});
         } catch (JSONException e) {}
     }
