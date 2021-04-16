@@ -531,9 +531,12 @@ namespace Kyub.Localization
                         builder.AppendLine(string.Format("\"{0}\";\"{1}\"", key, value));
                 }
             }
-            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.csv", builder.ToString());
+            var path = Application.dataPath + "/" + CurrentLanguage + "_Exported.csv";
+            System.IO.File.WriteAllText(path, builder.ToString());
 
             UnityEditor.AssetDatabase.Refresh();
+
+            Debug.Log($"Exported CSV to path '{path}'");
         }
 
         [ContextMenu("Export Locale/As JSON")]
@@ -541,22 +544,28 @@ namespace Kyub.Localization
         {
             var loc = GetOrLoadCurrentData();
 
-            OrderedDictionary dict = new OrderedDictionary();
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            builder.AppendLine("{");
             if (loc != null && loc._keyValueArray != null)
             {
-                foreach (var pair in loc._keyValueArray)
+                for (int i = 0; i < loc._keyValueArray.Count; i++)
                 {
-                    //Escape to double quotemark format (used in csv)
-                    var key = pair.Key == null ? "" : pair.Key.Trim().Replace("\n", "\\n").Replace("\r", "");
-                    var value = pair.Value == null ? "" : pair.Value.Trim().Replace("\n", "\\n").Replace("\r", "");
+                    var pair = loc._keyValueArray[i];
+
+                    var key = pair.Key == null ? "" : pair.Key.Trim().Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "");
+                    var value = pair.Value == null ? "" : pair.Value.Trim().Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "");
                     if (!string.IsNullOrEmpty(key) && !key.Equals("\u200B"))
-                        dict[key] = value;
+                        builder.AppendLine(string.Format("\t\"{0}\":\"{1}\"{2}", key, value, (i < loc._keyValueArray.Count-1? "," : "")));
                 }
             }
-            var json = SerializationUtils.ToJson(dict, true);
-            System.IO.File.WriteAllText(Application.dataPath + "/" + CurrentLanguage + "_Exported.json", json);
+            builder.AppendLine("}");
+
+            var path = Application.dataPath + "/" + CurrentLanguage + "_Exported.json";
+            System.IO.File.WriteAllText(path, builder.ToString());
 
             UnityEditor.AssetDatabase.Refresh();
+
+            Debug.Log($"Exported JSON to path '{path}'");
         }
 
 #endif
