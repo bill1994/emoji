@@ -7,7 +7,8 @@
         "GUID:43f813160d15da94094b77983b7241a1",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:ba47530a8893ff54fba148927ac9e2ed",
-        "GUID:41175c1412c601548a1d1cc8d9a7e266"
+        "GUID:41175c1412c601548a1d1cc8d9a7e266",
+        "GUID:47d802c15a355314f943053577719f24"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -21,6 +22,11 @@
             "name": "com.kyub.uicommons",
             "expression": "",
             "define": "UI_COMMONS_DEFINED"
+        },
+		{
+            "name": "com.kyub.localization",
+            "expression": "",
+            "define": "UI_LOCALE_DEFINED"
         }
     ],
     "noEngineReferences": false
