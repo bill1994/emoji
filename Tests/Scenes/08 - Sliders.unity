@@ -9860,6 +9860,7 @@ MonoBehaviour:
   m_EditorForceDPIValue: 160
   m_UseLegacyPhysicalSizeCalc: 0
   m_SupportSafeArea: 1
+  m_DefaultScalingOrientation: 0
   onCanvasAreaChanged:
     m_PersistentCalls:
       m_Calls: []

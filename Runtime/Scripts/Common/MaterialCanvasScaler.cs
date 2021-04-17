@@ -9,6 +9,8 @@ namespace MaterialUI
 {
     public class MaterialCanvasScaler : CanvasScaler
     {
+        public enum ReferenceOrientations { None = 0, Portrait = 1, Landscape = 2 }
+
         [System.Serializable]
         public class CanvasAreaChangedEvent : UnityEvent<bool, bool> { }
 
@@ -38,6 +40,9 @@ namespace MaterialUI
         [Tooltip("Activate safe area scaling")]
         [SerializeField] protected bool m_SupportSafeArea = true;
 
+        [Tooltip("This property will be used to know if we must keep pixel size.\nWhen the device orientation was not inside this reference property, we will calculate scaling based in a default orientation (Keeping elements in screen with same pixel size)")]
+        [SerializeField] protected ReferenceOrientations m_DefaultScalingOrientation = ReferenceOrientations.None;
+
         [System.NonSerialized]
         private Canvas _Canvas;
         [System.NonSerialized]
@@ -56,6 +61,20 @@ namespace MaterialUI
         #endregion
 
         #region Properties
+
+        public ReferenceOrientations defaultScalingOrientation
+        {
+            get
+            {
+                return m_DefaultScalingOrientation;
+            }
+            set
+            {
+                if (m_DefaultScalingOrientation == value)
+                    return;
+                m_DefaultScalingOrientation = value;
+            }
+        }
 
         public Vector2 safeScreenSize
         {
@@ -257,6 +276,18 @@ namespace MaterialUI
             {
                 Display disp = Display.displays[displayIndex];
                 screenSize = new Vector2(disp.renderingWidth, disp.renderingHeight);
+            }
+
+            if (m_DefaultScalingOrientation != ReferenceOrientations.None)
+            {
+                bool currentIsWideScreen = Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.orientation == ScreenOrientation.LandscapeRight;
+
+                //Current orientation was not predicted in ReferenceOrientation, so we must change this value to reflect
+                if((currentIsWideScreen && m_DefaultScalingOrientation != ReferenceOrientations.Landscape) ||
+                   (!currentIsWideScreen && m_DefaultScalingOrientation != ReferenceOrientations.Portrait))
+                {
+                    screenSize = new Vector2(screenSize.y, screenSize.x);
+                }
             }
 
             float scaleFactor = 0;
