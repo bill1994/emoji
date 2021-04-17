@@ -191,7 +191,7 @@ namespace Kyub.Localization.UI
                     TryClearLocaleTags(m_text, out m_text) :
                     TryGetLocalizedText(m_text, out m_text);
 
-                if(m_monospaceDistEm != 0)
+                if (m_monospaceDistEm != 0)
                     ApplyMonoSpacingValues(m_text, out m_text);
 
                 _localeParsingRequired = false;
@@ -338,6 +338,7 @@ namespace Kyub.Localization.UI
 
         #region Layout Overriden Functions
 
+#if TMP_2_1_3_OR_NEWER
         public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
         public override float preferredHeight { get { m_preferredHeight = GetPreferredHeight(); return m_preferredHeight; } }
 
@@ -428,6 +429,7 @@ namespace Kyub.Localization.UI
 
             return preferredHeight;
         }
+#endif
 
         #endregion
 
