@@ -363,8 +363,11 @@ namespace MaterialUI
 
         protected virtual void OnEnable()
         {
-            //Force Instantiate RippleManager
-            if (RippleManager.Instance != null) { }
+            if (Application.isPlaying)
+            {
+                //Force Instantiate RippleManager
+                if (RippleManager.Instance != null) { }
+            }
         }
 
         /// <summary>
@@ -372,8 +375,11 @@ namespace MaterialUI
         /// </summary>
         protected virtual void Start()
         {
-            //Force Instantiate RippleManager
-            if (RippleManager.Instance != null) { }
+            if (Application.isPlaying)
+            {
+                //Force Instantiate RippleManager
+                if (RippleManager.Instance != null) { }
+            }
 
             if (!m_RippleData.RippleParent)
             {
