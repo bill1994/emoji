@@ -190,7 +190,7 @@ namespace MaterialUI
         /// <summary>
         /// See MonoBehaviour.OnApplicationQuit.
         /// </summary>
-        void OnApplicationQuit()
+        protected virtual void OnApplicationQuit()
         {
             ResetMaterial();
         }
@@ -365,7 +365,8 @@ namespace MaterialUI
             {
                 m_RippleCreator.OnDestroyRipple();
             }
-            RippleManager.Instance.ReleaseRipple(this);
+            if(RippleManager.InstanceExists())
+                RippleManager.Instance.ReleaseRipple(this);
         }
 
         /// <summary>
@@ -430,7 +431,8 @@ namespace MaterialUI
                     {
                         m_RippleCreator.OnDestroyRipple();
                     }
-                    RippleManager.Instance.ReleaseRipple(this);
+                    if (RippleManager.InstanceExists())
+                        RippleManager.Instance.ReleaseRipple(this);
                 }
             }
             else if (m_State == 3)
