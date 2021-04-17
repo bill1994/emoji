@@ -12,6 +12,7 @@ namespace MaterialUI
         SerializedProperty m_EditorForceDPIValue;
         SerializedProperty m_UseLegacyPhysicalSizeCalc;
         SerializedProperty m_SupportSafeArea;
+        SerializedProperty m_DefaultScalingOrientation;
         SerializedProperty m_UiScaleMode;
         SerializedProperty m_ScaleFactor;
         SerializedProperty m_ReferenceResolution;
@@ -66,6 +67,7 @@ namespace MaterialUI
             m_DefaultSpriteDPI = serializedObject.FindProperty("m_DefaultSpriteDPI");
             m_DynamicPixelsPerUnit = serializedObject.FindProperty("m_DynamicPixelsPerUnit");
             m_ReferencePixelsPerUnit = serializedObject.FindProperty("m_ReferencePixelsPerUnit");
+            m_DefaultScalingOrientation = serializedObject.FindProperty("m_DefaultScalingOrientation");
 
             onCanvasAreaChanged = serializedObject.FindProperty("onCanvasAreaChanged");
         }
@@ -142,6 +144,10 @@ namespace MaterialUI
                     }
                     EditorGUILayout.PropertyField(m_SupportSafeArea);
                     EditorGUILayout.PropertyField(m_ScaleFactor);
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(m_DefaultScalingOrientation);
+                    EditorGUILayout.Space();
                 }
                 // Constant physical size
                 else if (m_UiScaleMode.enumValueIndex == (int)CanvasScaler.ScaleMode.ConstantPhysicalSize)
