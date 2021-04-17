@@ -336,6 +336,101 @@ namespace Kyub.Localization.UI
 
         #endregion
 
+        #region Layout Overriden Functions
+
+        public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
+        public override float preferredHeight { get { m_preferredHeight = GetPreferredHeight(); return m_preferredHeight; } }
+
+        //NOTE: In Version 2.1.3 or newer we detected an incorrect behaviour in GetPreferredWidth() and GetPreferredHeight() Logic.
+        //Fixed this logic creating a "new" version of this funcion that override old behaviour to the correct one
+        protected new float GetPreferredWidth()
+        {
+            if (TMP_Settings.instance == null) return 0;
+
+            // Return cached preferred height if already computed
+            if (!m_isPreferredWidthDirty)
+                return m_preferredWidth;
+
+            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
+
+            // Reset auto sizing point size bounds
+            m_minFontSize = m_fontSizeMin;
+            m_maxFontSize = m_fontSizeMax;
+            m_charWidthAdjDelta = 0;
+
+            // Set Margins to Infinity
+            Vector2 margin = k_LargePositiveVector2;
+
+            if (IsInputParsingRequired_Internal || m_isTextTruncated)
+            {
+                m_isCalculatingPreferredValues = true;
+                ParseInputText();
+
+                _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
+                if (_localeParsingRequired)
+                    ParseInputTextAndLocalizeTags();
+            }
+
+            m_AutoSizeIterationCount = 0;
+            float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, false).x;
+
+            m_isPreferredWidthDirty = false;
+
+            //Debug.Log("GetPreferredWidth() called on Object ID: " + GetInstanceID() + " on frame: " + Time.frameCount + ". Returning width of " + preferredWidth);
+
+            return preferredWidth;
+        }
+
+        protected new float GetPreferredHeight()
+        {
+            if (TMP_Settings.instance == null) return 0;
+
+            // Return cached preferred height if already computed
+            if (!m_isPreferredHeightDirty)
+                return m_preferredHeight;
+
+            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
+
+            // Reset auto sizing point size bounds
+            m_minFontSize = m_fontSizeMin;
+            m_maxFontSize = m_fontSizeMax;
+            m_charWidthAdjDelta = 0;
+
+            Vector2 margin = new Vector2(m_marginWidth != 0 ? m_marginWidth : k_LargePositiveFloat, k_LargePositiveFloat);
+
+            if (IsInputParsingRequired_Internal || m_isTextTruncated)
+            {
+                m_isCalculatingPreferredValues = true;
+                ParseInputText();
+
+                _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
+                if (_localeParsingRequired)
+                    ParseInputTextAndLocalizeTags();
+            }
+
+            // Reset Text Auto Size iteration tracking.
+            m_IsAutoSizePointSizeSet = false;
+            m_AutoSizeIterationCount = 0;
+
+            // The CalculatePreferredValues function is potentially called repeatedly when text auto size is enabled.
+            // This is a revised implementation to remove the use of recursion which could potentially result in stack overflow issues.
+            float preferredHeight = 0;
+
+            while (m_IsAutoSizePointSizeSet == false)
+            {
+                preferredHeight = CalculatePreferredValues(ref fontSize, margin, m_enableAutoSizing, m_enableWordWrapping).y;
+                m_AutoSizeIterationCount += 1;
+            }
+
+            m_isPreferredHeightDirty = false;
+
+            //Debug.Log("GetPreferredHeight() called on Object ID: " + GetInstanceID() + " on frame: " + Time.frameCount +". Returning height of " + preferredHeight);
+
+            return preferredHeight;
+        }
+
+        #endregion
+
         #region Register Functions
 
         protected virtual void RegisterEvents()

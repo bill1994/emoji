@@ -55,14 +55,34 @@ namespace Kyub.EmojiSearch.Utilities
                            fastLookupPath.Contains(auxSequence.ToString()))
                           )
                     {
-                        //We must skip variant selectors (if found it)
-                        auxSequence.Append(text[endCounter]);
+                        //Try Split \U and \u string and convert to UTF16 or UTF32 character
+                        string unicode;
+                        var unicodeEndIndex = GetUnicodeChar(ref text, endCounter, out unicode);
+                        if (unicodeEndIndex >= 0 && !string.IsNullOrEmpty(unicode))
+                        {
+                            endCounter = unicodeEndIndex;
+                            for (int j = 0; j < unicode.Length; j++)
+                            {
+                                auxSequence.Append(unicode[j]);
+                                //Cancel Append (When we found an UTF32 Character, we can add multiple inputs in same loop, so we cancel it to keep internal logic)
+                                if (!fastLookupPath.Contains(auxSequence.ToString()))
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            //We must skip variant selectors (if found it)
+                            auxSequence.Append(text[endCounter]);
+                        }
                         endCounter++;
                     }
 
                     //Remove last added guy (the previous one is the correct)
                     if (auxSequence.Length > 0 && !fastLookupPath.Contains(auxSequence.ToString()))
+                    {
                         auxSequence.Remove(auxSequence.Length - 1, 1);
+                        endCounter--;
+                    }
 
                     var sequence = auxSequence.Length > 0 ? auxSequence.ToString() : "";
                     //Found a sequence, add it instead add the character
@@ -72,7 +92,9 @@ namespace Kyub.EmojiSearch.Utilities
                         //Changed Index to Sprite Name to prevent erros when looking at fallbacks
                         sb.Append(string.Format("<sprite name=\"{0}\">", lookupTableSequences[sequence]));
 
-                        i += (sequence.Length - 1); //jump checked characters
+                        int deltaChecked = (endCounter - i); //jump checked characters
+                        if (deltaChecked > 0)
+                            i += deltaChecked;
                     }
                     //add the char (normal character)
                     else
@@ -86,6 +108,71 @@ namespace Kyub.EmojiSearch.Utilities
             }
 
             return changed;
+        }
+
+        /// <summary>
+        /// Return final index of Unicode in String and output the Unicode String
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="index"></param>
+        /// <param name="unicode"></param>
+        /// <returns></returns>
+        public static int GetUnicodeChar(ref string text, int index, out string unicode)
+        {
+            if (text == null || index >= text.Length || index < 0)
+            {
+                unicode = null;
+                return -1;
+            }
+
+            var length = text.Length;
+            var c = text[index];
+            if (c == '\\' && index + 1 < length)
+            {
+                switch (text[index + 1])
+                {
+                    case '\\':
+                        index += 1;
+                        break;
+                    case 'u':
+                        // UTF16 format is "\uFF00" or u + 2 hex pairs.
+                        if (index + 5 < length)
+                        {
+                            var utf16Value = GetUTF16(text, index + 2);
+                            unicode = ((char)utf16Value).ToString();
+
+                            index += 5;
+                            return index;
+                        }
+                        break;
+                    case 'U':
+                        // UTF32 format is "\UFF00FF00" or U + 4 hex pairs.
+                        if (index + 9 < length)
+                        {
+                            var utf32Value = GetUTF32(text, index + 2);
+                            unicode = UTF32ToString(utf32Value);
+
+                            index += 9;
+                            return index;
+                        }
+                        break;
+                }
+            }
+
+            unicode = null;
+            return -1;
+        }
+
+        static string UTF32ToString(int intValue)
+        {
+            //Not a surrogate and is valid UTF32 (conditions to use char.ConvertFromUtf32 function)
+            if (intValue > 0x000000 && intValue < 0x10ffff &&
+                (intValue < 0x00d800 || intValue > 0x00dfff))
+            {
+                var UTF16Surrogate = char.ConvertFromUtf32(intValue);
+                return UTF16Surrogate;
+            }
+            return null;
         }
 
         /// <summary>
@@ -302,6 +389,74 @@ namespace Kyub.EmojiSearch.Utilities
                 }
             }
             return fileName;
+        }
+
+        #endregion
+
+        #region Internal UTF16/UTF32 Parser Functions
+
+        /// <summary>
+        /// Convert UTF-16 Hex to Char
+        /// </summary>
+        /// <returns>The Unicode hex.</returns>
+        /// <param name="i">The index.</param>
+        static int GetUTF16(string text, int i)
+        {
+            int unicode = 0;
+            unicode += CharHexToInt(text[i]) << 12;
+            unicode += CharHexToInt(text[i + 1]) << 8;
+            unicode += CharHexToInt(text[i + 2]) << 4;
+            unicode += CharHexToInt(text[i + 3]);
+            return unicode;
+        }
+
+        /// <summary>
+        /// Convert UTF-32 Hex to Char
+        /// </summary>
+        /// <returns>The Unicode hex.</returns>
+        /// <param name="i">The index.</param>
+        static int GetUTF32(string text, int i)
+        {
+            int unicode = 0;
+            unicode += CharHexToInt(text[i]) << 28;
+            unicode += CharHexToInt(text[i + 1]) << 24;
+            unicode += CharHexToInt(text[i + 2]) << 20;
+            unicode += CharHexToInt(text[i + 3]) << 16;
+            unicode += CharHexToInt(text[i + 4]) << 12;
+            unicode += CharHexToInt(text[i + 5]) << 8;
+            unicode += CharHexToInt(text[i + 6]) << 4;
+            unicode += CharHexToInt(text[i + 7]);
+            return unicode;
+        }
+
+        static int CharHexToInt(char hex)
+        {
+            switch (hex)
+            {
+                case '0': return 0;
+                case '1': return 1;
+                case '2': return 2;
+                case '3': return 3;
+                case '4': return 4;
+                case '5': return 5;
+                case '6': return 6;
+                case '7': return 7;
+                case '8': return 8;
+                case '9': return 9;
+                case 'A': return 10;
+                case 'B': return 11;
+                case 'C': return 12;
+                case 'D': return 13;
+                case 'E': return 14;
+                case 'F': return 15;
+                case 'a': return 10;
+                case 'b': return 11;
+                case 'c': return 12;
+                case 'd': return 13;
+                case 'e': return 14;
+                case 'f': return 15;
+            }
+            return 15;
         }
 
         #endregion

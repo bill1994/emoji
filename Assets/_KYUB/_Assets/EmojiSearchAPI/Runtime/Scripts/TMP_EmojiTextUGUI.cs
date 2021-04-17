@@ -145,6 +145,7 @@ namespace Kyub.EmojiSearch.UI
                     SetArraySizes(m_char_buffer);
                 }*/
 
+                //Debug.Log("ParseInputTextAndEmojiCharSequence Begin");
                 parsedEmoji = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref m_text);
 
                 if (m_monospaceDistEm != 0)
@@ -159,7 +160,7 @@ namespace Kyub.EmojiSearch.UI
                 m_emojiParsingRequired = false;
                 IsInputParsingRequired_Internal = false;
 
-                //Debug.Log("ParseInputTextAndEmojiCharSequence");
+                //Debug.Log("ParseInputTextAndEmojiCharSequence End");
                 //We must revert the original text because we dont want to permanently change the text
                 m_text = oldText;
 
@@ -226,7 +227,6 @@ namespace Kyub.EmojiSearch.UI
             return base.GetTextInfo(text);
         }
 
-
 #if TMP_2_1_0_PREVIEW_8_OR_NEWER
         protected override Vector2 CalculatePreferredValues(ref float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing, bool isWordWrappingEnabled)
         {
@@ -253,40 +253,101 @@ namespace Kyub.EmojiSearch.UI
         }
 #endif
 
-        /*public string CharBufferToString()
-        {
-            System.Text.StringBuilder builder = new System.Text.StringBuilder();
-            if (m_char_buffer != null)
-            {
-                for (int i = 0; i < m_char_buffer.Length; i++)
-                {
-                    var intValue = m_char_buffer[i];
+        #endregion
 
-                    //Not a surrogate and is valid UTF32 (conditions to use char.ConvertFromUtf32 function)
-                    if (intValue > 0x000000 && intValue < 0x10ffff &&
-                                        (intValue < 0x00d800 || intValue > 0x00dfff))
-                    {
-                        var UTF16Surrogate = char.ConvertFromUtf32(intValue);
-                        if (!string.IsNullOrEmpty(UTF16Surrogate))
-                        {
-                            //Add chars into cache (we must include the both char paths in fastLookupPath)
-                            foreach (var surrogateChar in UTF16Surrogate)
-                            {
-                                builder.Append(surrogateChar);
-                            }
-                        }
-                    }
-                    //Simple Append
-                    else
-                    {
-                        builder.Append((char)intValue);
-                    }
-                }
+        #region Layout Overriden Functions
+
+        public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
+        public override float preferredHeight { get { m_preferredHeight = GetPreferredHeight(); return m_preferredHeight; } }
+
+        //NOTE: In Version 2.1.3 or newer we detected an incorrect behaviour in GetPreferredWidth() and GetPreferredHeight() Logic.
+        //Fixed this logic creating a "new" version of this funcion that override old behaviour to the correct one
+        protected new float GetPreferredWidth()
+        {
+            if (TMP_Settings.instance == null) return 0;
+
+            // Return cached preferred height if already computed
+            if (!m_isPreferredWidthDirty)
+                return m_preferredWidth;
+
+            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
+
+            // Reset auto sizing point size bounds
+            m_minFontSize = m_fontSizeMin;
+            m_maxFontSize = m_fontSizeMax;
+            m_charWidthAdjDelta = 0;
+
+            // Set Margins to Infinity
+            Vector2 margin = k_LargePositiveVector2;
+
+            if (IsInputParsingRequired_Internal || m_isTextTruncated)
+            {
+                m_isCalculatingPreferredValues = true;
+                ParseInputText();
+
+                m_emojiParsingRequired = m_isRichText;
+                if (m_emojiParsingRequired)
+                    ParseInputTextAndEmojiCharSequence();
             }
 
-            return builder.ToString();
-        }*/
+            m_AutoSizeIterationCount = 0;
+            float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, false).x;
 
-#endregion
+            m_isPreferredWidthDirty = false;
+
+            //Debug.Log("GetPreferredWidth() called on Object ID: " + GetInstanceID() + " on frame: " + Time.frameCount + ". Returning width of " + preferredWidth);
+
+            return preferredWidth;
+        }
+
+        protected new float GetPreferredHeight()
+        {
+            if (TMP_Settings.instance == null) return 0;
+
+            // Return cached preferred height if already computed
+            if (!m_isPreferredHeightDirty)
+                return m_preferredHeight;
+
+            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
+
+            // Reset auto sizing point size bounds
+            m_minFontSize = m_fontSizeMin;
+            m_maxFontSize = m_fontSizeMax;
+            m_charWidthAdjDelta = 0;
+
+            Vector2 margin = new Vector2(m_marginWidth != 0 ? m_marginWidth : k_LargePositiveFloat, k_LargePositiveFloat);
+
+            if (IsInputParsingRequired_Internal || m_isTextTruncated)
+            {
+                m_isCalculatingPreferredValues = true;
+                ParseInputText();
+
+                m_emojiParsingRequired = m_isRichText;
+                if (m_emojiParsingRequired)
+                    ParseInputTextAndEmojiCharSequence();
+            }
+
+            // Reset Text Auto Size iteration tracking.
+            m_IsAutoSizePointSizeSet = false;
+            m_AutoSizeIterationCount = 0;
+
+            // The CalculatePreferredValues function is potentially called repeatedly when text auto size is enabled.
+            // This is a revised implementation to remove the use of recursion which could potentially result in stack overflow issues.
+            float preferredHeight = 0;
+
+            while (m_IsAutoSizePointSizeSet == false)
+            {
+                preferredHeight = CalculatePreferredValues(ref fontSize, margin, m_enableAutoSizing, m_enableWordWrapping).y;
+                m_AutoSizeIterationCount += 1;
+            }
+
+            m_isPreferredHeightDirty = false;
+
+            //Debug.Log("GetPreferredHeight() called on Object ID: " + GetInstanceID() + " on frame: " + Time.frameCount +". Returning height of " + preferredHeight);
+
+            return preferredHeight;
+        }
+
+        #endregion
     }
 }
