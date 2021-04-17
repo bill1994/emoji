@@ -308,12 +308,12 @@ namespace KyubEditor.EmojiSearch
             for (int i = 0; i < spriteAtlas.spriteGlyphTable.Count; i++)
             {
                 var glyph = spriteAtlas.spriteGlyphTable[i];
-                //glyph.index = (uint)i;
-
+                
                 //Change metrics if required
                 if (glyph != null && m_CreatedWithEmojiJson)
                 {
                     changed = true;
+                    glyph.index = (uint)i;
                     glyph.scale = globalGlyphScale;
                     //Change metrics based in Scale
                     var newOffset = glyph.metrics.height * 0.75f;
@@ -325,6 +325,20 @@ namespace KyubEditor.EmojiSearch
             }
             if (changed)
                 spriteAtlas.UpdateLookupTables();
+
+            //Update Character Table GlyphID (fix bug in new versions of textmesh pro versions)
+            for (int i = 0; i < spriteAtlas.spriteCharacterTable.Count; i++)
+            {
+                var characterTable = spriteAtlas.spriteCharacterTable[i];
+                
+                //Change Glyph ID
+                if (characterTable != null && m_CreatedWithEmojiJson)
+                {
+                    var glyphIndex = characterTable.glyph != null ? characterTable.glyph.index : (uint)i;
+                    characterTable.glyphIndex = glyphIndex;
+                }
+            }
+
             EditorUtility.SetDirty(spriteAtlas);
 #endif
         }
