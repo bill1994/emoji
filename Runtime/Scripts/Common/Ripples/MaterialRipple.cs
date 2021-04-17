@@ -361,11 +361,20 @@ namespace MaterialUI
         /// </summary>
         private bool m_Clicked;
 
+        protected virtual void OnEnable()
+        {
+            //Force Instantiate RippleManager
+            if (RippleManager.Instance != null) { }
+        }
+
         /// <summary>
         /// See Monobehaviour.Start.
         /// </summary>
-        private void Start()
+        protected virtual void Start()
         {
+            //Force Instantiate RippleManager
+            if (RippleManager.Instance != null) { }
+
             if (!m_RippleData.RippleParent)
             {
                 Image[] possibleTargets = GetComponentsInChildren<Image>();
@@ -397,7 +406,7 @@ namespace MaterialUI
         /// <summary>
         /// See Monobehaviour.Update.
         /// </summary>
-        private void Update()
+        protected virtual void Update()
         {
             if (!highlightGraphic)
             {
@@ -446,7 +455,7 @@ namespace MaterialUI
         /// If there are any active ripples and the graphic is 'supposed to be transparent', the graphic alpha is set to 0.015 so that the masking won't completely hide the ripples and the mask's showMaskGraphic value is set to false.
         /// Otherwise, sets the alpha to the true value, and shows the mask graphic.
         /// </summary>
-        private void CheckTransparency()
+        protected virtual void CheckTransparency()
         {
             if (m_ImageIsTransparent)
             {
@@ -720,9 +729,12 @@ namespace MaterialUI
         {
             if (!m_RipplesEnabled) return;
 
-            m_CurrentRipple = RippleManager.Instance.GetRipple();
-            m_CurrentRipple.Setup(rippleData, worldPosition, this, oscillate);
-            m_CurrentRipple.Expand();
+            m_CurrentRipple = RippleManager.InstanceExists()? RippleManager.Instance.GetRipple() : null;
+            if (m_CurrentRipple != null)
+            {
+                m_CurrentRipple.Setup(rippleData, worldPosition, this, oscillate);
+                m_CurrentRipple.Expand();
+            }
         }
 
         /// <summary>
