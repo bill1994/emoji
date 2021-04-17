@@ -257,6 +257,7 @@ namespace Kyub.EmojiSearch.UI
 
         #region Layout Overriden Functions
 
+#if TMP_2_1_3_OR_NEWER
         public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
         public override float preferredHeight { get { m_preferredHeight = GetPreferredHeight(); return m_preferredHeight; } }
 
@@ -347,6 +348,7 @@ namespace Kyub.EmojiSearch.UI
 
             return preferredHeight;
         }
+#endif
 
         #endregion
     }
