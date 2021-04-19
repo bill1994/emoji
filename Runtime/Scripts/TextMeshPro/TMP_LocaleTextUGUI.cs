@@ -1,4 +1,12 @@
-﻿using System.Collections;
+﻿#if (TMP_2_1_4_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_0_4_OR_NEWER
+#define TMP_NEW_PREPROCESSOR
+#endif
+
+#if UNITY_2018_3_OR_NEWER && !UNITY_2019_1_OR_NEWER
+#define TMP_1_4_0_OR_NEWER
+#endif
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +15,11 @@ using TMPro;
 
 namespace Kyub.Localization.UI
 {
+#if TMP_NEW_PREPROCESSOR
+    public class TMP_LocaleTextUGUI : TextMeshProUGUI, ITextPreprocessor
+#else
     public class TMP_LocaleTextUGUI : TextMeshProUGUI
+#endif
     {
         #region Private Fields
 
@@ -158,8 +170,15 @@ namespace Kyub.Localization.UI
 
         #region Unity Functions
 
+        protected override void Awake()
+        {
+            InitTextPreProcessor();
+            base.Awake();
+        }
+
         protected override void OnEnable()
         {
+            InitTextPreProcessor();
             RegisterEvents();
             base.OnEnable();
         }
@@ -170,6 +189,14 @@ namespace Kyub.Localization.UI
             base.OnDisable();
         }
 
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            InitTextPreProcessor();
+            base.OnValidate();
+        }
+#endif
+
         #endregion
 
         #region Locale Parser Functions
@@ -178,21 +205,17 @@ namespace Kyub.Localization.UI
         {
             _localeParsingRequired = false;
 
+#if TMP_NEW_PREPROCESSOR
+            //Only Apply this function when new preprocessor is not active
+            if (m_TextPreprocessor as Object == this)
+                return false;
+#endif
             //Only parse when richtext active (we need the <sprite=index> tag)
             if (LocaleManager.InstanceExists() || !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized) || (m_monospaceDistEm != 0 && m_isRichText))
             {
-                var parsedLocale = false;
                 var oldText = m_text;
 
-                if (IsInputParsingRequired_Internal)
-                    m_text = m_text != null ? m_text.Replace("\n", "\\n").Replace("\r", "") : null;
-
-                parsedLocale = !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized) ?
-                    TryClearLocaleTags(m_text, out m_text) :
-                    TryGetLocalizedText(m_text, out m_text);
-
-                if (m_monospaceDistEm != 0)
-                    ApplyMonoSpacingValues(m_text, out m_text);
+                bool parsedLocale = PreprocessText(m_text, out m_text, true);
 
                 _localeParsingRequired = false;
                 IsInputParsingRequired_Internal = false;
@@ -269,6 +292,53 @@ namespace Kyub.Localization.UI
 
         #endregion
 
+        #region New TMP PreProcessor Functions
+
+        protected virtual void InitTextPreProcessor()
+        {
+#if TMP_NEW_PREPROCESSOR
+            if (m_TextPreprocessor == null)
+                m_TextPreprocessor = this;
+#endif
+        }
+
+        //New PreProcessor Implementation
+        public virtual string PreprocessText(string text)
+        {
+            PreprocessText(text, out text, false);
+            return text;
+        }
+
+        public virtual bool PreprocessText(string text, out string parsedString, bool forceApply)
+        {
+            bool success = false;
+            if (forceApply || LocaleManager.InstanceExists() || !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized) || (m_monospaceDistEm != 0 && m_isRichText))
+            {
+                if (IsInputParsingRequired_Internal)
+                    text = text != null ? text.Replace("\n", "\\n").Replace("\r", "") : null;
+
+                if (!Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized))
+                {
+                    success = TryClearLocaleTags(text, out parsedString);
+                }
+                else
+                {
+                    success = TryGetLocalizedText(text, out parsedString);
+                }
+
+                if (m_monospaceDistEm != 0)
+                    ApplyMonoSpacingValues(text, out text);
+            }
+            else
+            {
+                parsedString = text;
+            }
+
+            return success;
+        }
+
+        #endregion
+
         #region Text Overriden Functions
 
         public override void SetVerticesDirty()
@@ -338,7 +408,7 @@ namespace Kyub.Localization.UI
 
         #region Layout Overriden Functions
 
-#if TMP_2_1_3_OR_NEWER
+#if TMP_2_1_3_OR_NEWER && !TMP_NEW_PREPROCESSOR
         public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
         public override float preferredHeight { get { m_preferredHeight = GetPreferredHeight(); return m_preferredHeight; } }
 
