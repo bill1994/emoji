@@ -65,6 +65,31 @@
             "name": "com.unity.textmeshpro",
             "expression": "2.1.3",
             "define": "TMP_2_1_3_OR_NEWER"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "2.1.4",
+            "define": "TMP_2_1_4_OR_NEWER"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "2.1.5",
+            "define": "TMP_2_1_5_OR_NEWER"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "3.0.0",
+            "define": "TMP_3_0_0_OR_NEWER"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "3.0.4",
+            "define": "TMP_3_0_4_OR_NEWER"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "3.0.5",
+            "define": "TMP_3_0_5_OR_NEWER"
         }
     ],
     "noEngineReferences": false

@@ -1,6 +1,11 @@
-﻿#if UNITY_2018_3_OR_NEWER && !UNITY_2019_1_OR_NEWER
+﻿#if (TMP_2_1_4_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_0_4_OR_NEWER
+#define TMP_NEW_PREPROCESSOR
+#endif
+
+#if UNITY_2018_3_OR_NEWER && !UNITY_2019_1_OR_NEWER
 #define TMP_1_4_0_OR_NEWER
 #endif
+
 
 using System.Collections;
 using System.Collections.Generic;
@@ -11,14 +16,18 @@ using Kyub.EmojiSearch.Utilities;
 
 namespace Kyub.EmojiSearch.UI
 {
+#if TMP_NEW_PREPROCESSOR
+    public class TMP_EmojiTextUGUI : TextMeshProUGUI, ITextPreprocessor
+#else
     public class TMP_EmojiTextUGUI : TextMeshProUGUI
+#endif
     {
         #region Private Fields
 
         [SerializeField, Tooltip("Force monospace character with (value)em.\nRequire RichText active")]
         protected float m_monospaceDistEm = 0;
 
-        protected bool m_emojiParsingRequired = true;
+        protected bool _emojiParsingRequired = true;
 
         #endregion
 
@@ -119,45 +128,55 @@ namespace Kyub.EmojiSearch.UI
 
         #endregion
 
+        #region Unity Functions
+
+        protected override void Awake()
+        {
+            InitTextPreProcessor();
+            base.Awake();
+        }
+
+        protected override void OnEnable()
+        {
+            InitTextPreProcessor();
+            base.OnEnable();
+        }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            InitTextPreProcessor();
+            base.OnValidate();
+        }
+#endif
+
+        #endregion
+
         #region Emoji Parser Functions
 
         protected virtual bool ParseInputTextAndEmojiCharSequence()
         {
-            m_emojiParsingRequired = false;
+            _emojiParsingRequired = false;
+
+#if TMP_NEW_PREPROCESSOR
+            //Only Apply this function when new preprocessor is not active
+            if (m_TextPreprocessor as Object == this)
+                return false;
+#endif
 
             //Only parse when richtext active (we need the <sprite=index> tag)
             if (m_isRichText)
             {
-                var parsedEmoji = false;
                 var oldText = m_text;
 
-                /*//Parse Sprite Chars
-                ParseInputText();
-
-                //Parse Emojis
-                m_text = CharBufferToString(); //Pick the char unicodes to parse the emojis
-                parsedEmoji = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref m_text);
-
-                //Apply parsed Emoji to char buffer
-                if (parsedEmoji)
-                {
-                    StringToCharArray(m_text, ref m_char_buffer);
-                    SetArraySizes(m_char_buffer);
-                }*/
-
-                //Debug.Log("ParseInputTextAndEmojiCharSequence Begin");
-                parsedEmoji = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref m_text);
-
-                if (m_monospaceDistEm != 0)
-                    ApplyMonoSpacingValues(m_text, out m_text);
-
-                m_emojiParsingRequired = false;
+                var parsedEmoji = PreprocessText(m_text, out m_text, true);
+                _emojiParsingRequired = false;
                 IsInputParsingRequired_Internal = false;
                 InputSource_Internal = TextInputSources.Text;
 
                 ParseInputText();
 
-                m_emojiParsingRequired = false;
+                _emojiParsingRequired = false;
                 IsInputParsingRequired_Internal = false;
 
                 //Debug.Log("ParseInputTextAndEmojiCharSequence End");
@@ -191,6 +210,45 @@ namespace Kyub.EmojiSearch.UI
 
         #endregion
 
+        #region New TMP PreProcessor Functions
+
+        protected virtual void InitTextPreProcessor()
+        {
+#if TMP_NEW_PREPROCESSOR
+            if (m_TextPreprocessor == null)
+                m_TextPreprocessor = this;
+#endif
+        }
+
+        //New PreProcessor Implementation
+        public virtual string PreprocessText(string text)
+        {
+            PreprocessText(text, out text, false);
+            return text;
+        }
+
+        public virtual bool PreprocessText(string text, out string parsedString, bool forceApply)
+        {
+            bool success = false;
+            if (forceApply || m_isRichText)
+            {
+                success = TMP_EmojiSearchEngine.ParseEmojiCharSequence(spriteAsset, ref text);
+
+                if (m_monospaceDistEm != 0)
+                    ApplyMonoSpacingValues(text, out text);
+
+                parsedString = text;
+            }
+            else
+            {
+                parsedString = text;
+            }
+
+            return success;
+        }
+
+        #endregion
+
         #region Text Overriden Functions
 
         public override void SetVerticesDirty()
@@ -198,7 +256,7 @@ namespace Kyub.EmojiSearch.UI
             //In textmeshpro 1.4 the parameter "m_isInputParsingRequired" changed to internal, so, to dont use reflection i changed to "m_havePropertiesChanged" parameter
             if (IsInputParsingRequired_Internal)
             {
-                m_emojiParsingRequired = m_isRichText;
+                _emojiParsingRequired = m_isRichText;
             }
             base.SetVerticesDirty();
         }
@@ -207,7 +265,7 @@ namespace Kyub.EmojiSearch.UI
         {
             if (this == null && enabled && gameObject.activeInHierarchy) return;
 
-            if (m_emojiParsingRequired)
+            if (_emojiParsingRequired)
                 ParseInputTextAndEmojiCharSequence();
 
             base.Rebuild(update);
@@ -215,7 +273,7 @@ namespace Kyub.EmojiSearch.UI
 
         public override string GetParsedText()
         {
-            if (m_emojiParsingRequired)
+            if (_emojiParsingRequired)
                 ParseInputTextAndEmojiCharSequence();
 
             return base.GetParsedText();
@@ -230,7 +288,7 @@ namespace Kyub.EmojiSearch.UI
 #if TMP_2_1_0_PREVIEW_8_OR_NEWER
         protected override Vector2 CalculatePreferredValues(ref float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing, bool isWordWrappingEnabled)
         {
-            if (m_emojiParsingRequired)
+            if (_emojiParsingRequired)
                 ParseInputTextAndEmojiCharSequence();
 
             return base.CalculatePreferredValues(ref defaultFontSize, marginSize, ignoreTextAutoSizing, isWordWrappingEnabled);
@@ -238,7 +296,7 @@ namespace Kyub.EmojiSearch.UI
 #elif TMP_2_1_0_PREVIEW_3_OR_NEWER
         protected override Vector2 CalculatePreferredValues(float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing, bool isWordWrappingEnabled)
         {
-            if (m_emojiParsingRequired)
+            if (_emojiParsingRequired)
                 ParseInputTextAndEmojiCharSequence();
 
             return base.CalculatePreferredValues(defaultFontSize, marginSize, ignoreTextAutoSizing, isWordWrappingEnabled);
@@ -246,7 +304,7 @@ namespace Kyub.EmojiSearch.UI
 #else
         protected override Vector2 CalculatePreferredValues(float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing)
         {
-            if (m_emojiParsingRequired)
+            if (_emojiParsingRequired)
                 ParseInputTextAndEmojiCharSequence();
 
             return base.CalculatePreferredValues(defaultFontSize, marginSize, ignoreTextAutoSizing);
@@ -286,8 +344,8 @@ namespace Kyub.EmojiSearch.UI
                 m_isCalculatingPreferredValues = true;
                 ParseInputText();
 
-                m_emojiParsingRequired = m_isRichText;
-                if (m_emojiParsingRequired)
+                _emojiParsingRequired = m_isRichText;
+                if (_emojiParsingRequired)
                     ParseInputTextAndEmojiCharSequence();
             }
 
@@ -323,8 +381,8 @@ namespace Kyub.EmojiSearch.UI
                 m_isCalculatingPreferredValues = true;
                 ParseInputText();
 
-                m_emojiParsingRequired = m_isRichText;
-                if (m_emojiParsingRequired)
+                _emojiParsingRequired = m_isRichText;
+                if (_emojiParsingRequired)
                     ParseInputTextAndEmojiCharSequence();
             }
 
