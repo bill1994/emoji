@@ -38,9 +38,26 @@ namespace Kyub.Localization.UI
 
         protected string _lastLocalizedLanguage = "";
 
+#if TMP_NEW_PREPROCESSOR
+        [SerializeField]
+        protected ITextPreprocessor m_SecondaryPreprocessor;
+#endif
+
         #endregion
 
         #region Properties
+
+#if TMP_NEW_PREPROCESSOR
+        public new ITextPreprocessor textPreprocessor
+        {
+            get { return m_SecondaryPreprocessor; }
+            set
+            {
+                m_SecondaryPreprocessor = value;
+                InitTextPreProcessor();
+            }
+        }
+#endif
 
         public float MonospaceDistEm
         {
@@ -205,11 +222,9 @@ namespace Kyub.Localization.UI
         {
             _localeParsingRequired = false;
 
-#if TMP_NEW_PREPROCESSOR
-            //Only Apply this function when new preprocessor is not active
-            if (m_TextPreprocessor as Object == this)
+            if (IsUsingNewPreprocessor())
                 return false;
-#endif
+
             //Only parse when richtext active (we need the <sprite=index> tag)
             if (LocaleManager.InstanceExists() || !Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized) || (m_monospaceDistEm != 0 && m_isRichText))
             {
@@ -294,11 +309,28 @@ namespace Kyub.Localization.UI
 
         #region New TMP PreProcessor Functions
 
+        protected bool IsUsingNewPreprocessor()
+        {
+#if TMP_NEW_PREPROCESSOR
+            InitTextPreProcessor();
+            //Only Apply this function when new preprocessor is not active
+            if (m_TextPreprocessor as Object == this)
+                return true;
+#endif
+            return false;
+        }
+
         protected virtual void InitTextPreProcessor()
         {
 #if TMP_NEW_PREPROCESSOR
-            if (m_TextPreprocessor == null)
+            if (m_SecondaryPreprocessor as Object == this)
+                m_SecondaryPreprocessor = null;
+
+            if (m_TextPreprocessor as Object != this)
+            {
+                m_SecondaryPreprocessor = m_TextPreprocessor;
                 m_TextPreprocessor = this;
+            } 
 #endif
         }
 
@@ -319,20 +351,21 @@ namespace Kyub.Localization.UI
 
                 if (!Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized))
                 {
-                    success = TryClearLocaleTags(text, out parsedString);
+                    success = TryClearLocaleTags(text, out text);
                 }
                 else
                 {
-                    success = TryGetLocalizedText(text, out parsedString);
+                    success = TryGetLocalizedText(text, out text);
                 }
 
                 if (m_monospaceDistEm != 0)
                     ApplyMonoSpacingValues(text, out text);
             }
-            else
-            {
-                parsedString = text;
-            }
+#if TMP_NEW_PREPROCESSOR
+            if (m_SecondaryPreprocessor != null)
+                text = m_SecondaryPreprocessor.PreprocessText(text);
+#endif
+            parsedString = text;
 
             return success;
         }
@@ -408,7 +441,7 @@ namespace Kyub.Localization.UI
 
         #region Layout Overriden Functions
 
-#if TMP_2_1_3_OR_NEWER && !TMP_NEW_PREPROCESSOR
+#if (TMP_2_1_3_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_0_3_OR_NEWER
         public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
         public override float preferredHeight { get { m_preferredHeight = GetPreferredHeight(); return m_preferredHeight; } }
 
@@ -416,6 +449,9 @@ namespace Kyub.Localization.UI
         //Fixed this logic creating a "new" version of this funcion that override old behaviour to the correct one
         protected new float GetPreferredWidth()
         {
+            if (IsUsingNewPreprocessor())
+                return base.GetPreferredWidth();
+
             if (TMP_Settings.instance == null) return 0;
 
             // Return cached preferred height if already computed
@@ -432,15 +468,15 @@ namespace Kyub.Localization.UI
             // Set Margins to Infinity
             Vector2 margin = k_LargePositiveVector2;
 
-            if (IsInputParsingRequired_Internal || m_isTextTruncated)
-            {
+            //if (IsInputParsingRequired_Internal || m_isTextTruncated)
+            //{
                 m_isCalculatingPreferredValues = true;
                 ParseInputText();
 
                 _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
                 if (_localeParsingRequired)
                     ParseInputTextAndLocalizeTags();
-            }
+            //}
 
             m_AutoSizeIterationCount = 0;
             float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, false).x;
@@ -454,6 +490,9 @@ namespace Kyub.Localization.UI
 
         protected new float GetPreferredHeight()
         {
+            if (IsUsingNewPreprocessor())
+                return base.GetPreferredHeight();
+
             if (TMP_Settings.instance == null) return 0;
 
             // Return cached preferred height if already computed
@@ -469,15 +508,15 @@ namespace Kyub.Localization.UI
 
             Vector2 margin = new Vector2(m_marginWidth != 0 ? m_marginWidth : k_LargePositiveFloat, k_LargePositiveFloat);
 
-            if (IsInputParsingRequired_Internal || m_isTextTruncated)
-            {
+            //if (IsInputParsingRequired_Internal || m_isTextTruncated)
+            //{
                 m_isCalculatingPreferredValues = true;
                 ParseInputText();
 
                 _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
                 if (_localeParsingRequired)
                     ParseInputTextAndLocalizeTags();
-            }
+            //}
 
             // Reset Text Auto Size iteration tracking.
             m_IsAutoSizePointSizeSet = false;
