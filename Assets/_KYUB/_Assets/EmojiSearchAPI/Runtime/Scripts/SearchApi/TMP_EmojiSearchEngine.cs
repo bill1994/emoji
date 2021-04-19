@@ -60,14 +60,19 @@ namespace Kyub.EmojiSearch.Utilities
                         var unicodeEndIndex = GetUnicodeChar(ref text, endCounter, out unicode);
                         if (unicodeEndIndex >= 0 && !string.IsNullOrEmpty(unicode))
                         {
-                            endCounter = unicodeEndIndex;
+                            var failed = false;
                             for (int j = 0; j < unicode.Length; j++)
                             {
                                 auxSequence.Append(unicode[j]);
                                 //Cancel Append (When we found an UTF32 Character, we can add multiple inputs in same loop, so we cancel it to keep internal logic)
                                 if (!fastLookupPath.Contains(auxSequence.ToString()))
+                                {
+                                    failed = true;
                                     break;
+                                }
                             }
+                            if(!failed)
+                                endCounter = unicodeEndIndex;
                         }
                         else
                         {
@@ -92,7 +97,7 @@ namespace Kyub.EmojiSearch.Utilities
                         //Changed Index to Sprite Name to prevent erros when looking at fallbacks
                         sb.Append(string.Format("<sprite name=\"{0}\">", lookupTableSequences[sequence]));
 
-                        int deltaChecked = (endCounter - i); //jump checked characters
+                        int deltaChecked = (endCounter - i - 1); //jump checked characters
                         if (deltaChecked > 0)
                             i += deltaChecked;
                     }
