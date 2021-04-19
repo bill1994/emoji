@@ -245,7 +245,8 @@ namespace Kyub.EmojiSearch.UI
 
             if (m_TextPreprocessor as Object != this)
             {
-                m_SecondaryPreprocessor = m_TextPreprocessor;
+                if(m_TextPreprocessor != null)
+                    m_SecondaryPreprocessor = m_TextPreprocessor;
                 m_TextPreprocessor = this;
             }
 #endif
