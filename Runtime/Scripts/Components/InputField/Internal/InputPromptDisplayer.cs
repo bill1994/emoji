@@ -240,7 +240,7 @@ namespace MaterialUI.Internal
                     return;
 
                 materialInputField.text = value;
-                SendOnValueChangedAndUpdateLabel();
+                //SendOnValueChangedAndUpdateLabel();
             }
         }
 
@@ -450,6 +450,14 @@ namespace MaterialUI.Internal
 
         #region Helper Functions
 
+        public void SetTextToPromptDialog(string value)
+        {
+            if (_dialogPrompt != null && _dialogPrompt.firstInputField != null)
+            {
+                _dialogPrompt.firstInputField.text = value;
+            }
+        }
+
         public void ForceLabelUpdate()
         {
             UpdateLabel();
@@ -463,7 +471,7 @@ namespace MaterialUI.Internal
 
         public void DeactivateInputField()
         {
-            if (isFocused)
+            if (isFocused && _dialogPrompt != null)
                 _dialogPrompt.Hide();
         }
 
@@ -494,6 +502,7 @@ namespace MaterialUI.Internal
                 var configData = materialInputField != null ? (DialogPrompt.InputFieldConfigData)materialInputField : null;
                 DialogManager.ShowCustomDialog<DialogPrompt>(prefabAddress, (dialog) =>
                 {
+                    dialog.destroyOnHide = true;
                     _dialogPrompt = dialog;
                     if (_dialogPrompt != null)
                     {
@@ -556,7 +565,7 @@ namespace MaterialUI.Internal
             contentType = InputField.ContentType.Custom;
         }
 
-        protected virtual void SendOnValueChangedAndUpdateLabel()
+        protected internal virtual void SendOnValueChangedAndUpdateLabel()
         {
             SendOnValueChanged();
             UpdateLabel();
