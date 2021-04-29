@@ -730,12 +730,31 @@ namespace MaterialUI
                 var unityInputField = inputField as InputField;
                 var tmpInputField = m_InputField as TMP_InputField;
 
+                var changed = false;
                 if (unityInputField != null)
+                {
+                    changed = unityInputField.text != value;
                     unityInputField.text = value;
+                }
                 else if (tmpInputField != null)
+                {
+                    changed = tmpInputField.text != value;
                     tmpInputField.text = value;
+                }
                 else if (m_InputText != null)
+                {
+                    changed = m_InputText.GetGraphicText() != value;
                     m_InputText.SetGraphicText(value);
+                }
+
+                if (m_PromptDisplayer != null)
+                {
+                    if (m_PromptDisplayer.enabled && m_PromptDisplayer.gameObject.activeInHierarchy)
+                        m_PromptDisplayer.SetTextToPromptDialog(value);
+
+                    if (changed)
+                        m_PromptDisplayer.SendOnValueChangedAndUpdateLabel();
+                }
             }
         }
 
