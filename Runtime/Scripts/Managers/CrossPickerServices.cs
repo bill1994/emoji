@@ -287,6 +287,34 @@ namespace Kyub.PickerServices
 #endif
         }
 
+        public static void OpenImageBrowser(bool multiselect, System.Action<string[]> callback = null)
+        {
+            //AutoRegister/Unregister callback
+            if (callback != null)
+            {
+                System.Action<string[]> internalCallback = null;
+                internalCallback = (result) =>
+                {
+                    if (callback != null)
+                        callback.Invoke(result);
+                    OnFilesPickerFinish -= internalCallback;
+                };
+                OnFilesPickerFinish -= internalCallback;
+                OnFilesPickerFinish += internalCallback;
+            }
+
+            SetInitParemeters();
+#if UNITY_ANDROID && !UNITY_EDITOR
+		    AndroidPickerServices.OpenImageBrowser(multiselect);
+#elif UNITY_IOS && !UNITY_EDITOR
+		    IOSPickerServices.OpenImageBrowser(multiselect);
+#elif UNITY_STANDALONE || UNITY_EDITOR || UNITY_WEBGL
+            StandalonePickerServices.OpenImageBrowser(multiselect);
+#else
+            CallFilesPickerFinishEvent(null);
+#endif
+        }
+
         public static void OpenFileBrowser(bool multiselect, System.Action<string[]> callback = null)
         {
             OpenFileBrowser(null, multiselect, callback);
