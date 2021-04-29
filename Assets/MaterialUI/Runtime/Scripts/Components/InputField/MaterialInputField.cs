@@ -1688,6 +1688,8 @@ namespace MaterialUI
 
         public override void OnSelect(BaseEventData eventData)
         {
+            var callEvent = !m_HasBeenSelected;
+
             m_HasBeenSelected = true;
             var canSelect = (m_InputField == null || isFocused);
 
@@ -1703,6 +1705,11 @@ namespace MaterialUI
 
                 SnapTo();
 
+                if (onActivate != null)
+                    onActivate.Invoke();
+            }
+            else if(callEvent)
+            {
                 if (onActivate != null)
                     onActivate.Invoke();
             }
