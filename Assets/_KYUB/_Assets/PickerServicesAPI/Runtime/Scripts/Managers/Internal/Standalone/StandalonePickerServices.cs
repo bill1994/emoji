@@ -126,6 +126,11 @@ namespace Kyub.PickerServices
 #endif
         }
 
+        public static void OpenImageBrowser(bool multiselect)
+        {
+            OpenFileBrowser(new string[] { "png", "jpg", "jpeg" }, multiselect);
+        }
+
         #endregion
 
         #region Native Callbacks

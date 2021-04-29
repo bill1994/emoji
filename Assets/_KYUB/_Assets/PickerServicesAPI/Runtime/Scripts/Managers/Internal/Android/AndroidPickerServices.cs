@@ -114,6 +114,38 @@ namespace Kyub.PickerServices
             }
         }
 
+        public static void OpenImageBrowser(bool multiselect)
+        {
+            if (NativeGallery.IsMediaPickerBusy())
+            {
+                if (Instance != null)
+                    Instance.NativeFilesPickedEnd(null);
+            }
+
+            var permission = NativeGallery.CheckPermission(NativeGallery.PermissionType.Read);
+            if (permission == NativeGallery.Permission.Denied)
+                NativeGallery.OpenSettings();
+            else if (permission == NativeGallery.Permission.ShouldAsk)
+                NativeGallery.RequestPermission(NativeGallery.PermissionType.Read);
+
+            if (multiselect && NativeGallery.CanSelectMultipleFilesFromGallery())
+            {
+                NativeGallery.GetImagesFromGallery((files) =>
+                {
+                    if (Instance != null)
+                        Instance.NativeFilesPickedEnd(files);
+                });
+            }
+            else
+            {
+                NativeGallery.GetImageFromGallery((file) =>
+                {
+                    if (Instance != null)
+                        Instance.NativeFilesPickedEnd(string.IsNullOrEmpty(file) ? null : new string[] { file });
+                });
+            }
+        }
+
         #endregion
 
         #region Native Callbacks
