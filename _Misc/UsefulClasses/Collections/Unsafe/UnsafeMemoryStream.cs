@@ -19,36 +19,36 @@ namespace Kyub.Collections.Unsafe
     /// </summary>
     public class UnsafeMemoryStream : UnmanagedMemoryStream
     {
-        //Right now defaults to automatically dispose UnmanagedArray<byte> array passed into
+        //Right now defaults to automatically dispose UnsafeArray<byte> array passed into
         //constructor when this class is disposed, to make sure don't leak memory if
         //forget to dispose array.
-        private UnmanagedArray<byte> _array = null;
+        private UnsafeArray<byte> _array = null;
         private bool _automaticallyDisposeArray = true;
 
         private UnsafeMemoryStream()
         {
         }
 
-        unsafe public UnsafeMemoryStream(UnmanagedArray<byte> array)
+        unsafe public UnsafeMemoryStream(UnsafeArray<byte> array)
             : this(array, 0, array.Length)
         {
         }
 
-        unsafe public UnsafeMemoryStream(UnmanagedArray<byte> array, int offset, int length)
+        unsafe public UnsafeMemoryStream(UnsafeArray<byte> array, int offset, int length)
             : this(array, 0, array.Length, false)
         {
             _array = array;
         }
 
 
-        unsafe public UnsafeMemoryStream(UnmanagedArray<byte> array, bool automaticallyDisposeArray)
+        unsafe public UnsafeMemoryStream(UnsafeArray<byte> array, bool automaticallyDisposeArray)
             : this(array, 0, array.Length, automaticallyDisposeArray)
         {
             _array = array;
             _automaticallyDisposeArray = automaticallyDisposeArray;
         }
 
-        unsafe public UnsafeMemoryStream(UnmanagedArray<byte> array, int offset, int length, bool automaticallyDisposeArray)
+        unsafe public UnsafeMemoryStream(UnsafeArray<byte> array, int offset, int length, bool automaticallyDisposeArray)
            : base((byte*)IntPtr.Add(array.NativePtr, offset), length, length, FileAccess.ReadWrite)
         {
             _array = array;
@@ -67,7 +67,7 @@ namespace Kyub.Collections.Unsafe
             }
         }
 
-        public virtual UnmanagedArray<byte> GetNativeBuffer()
+        public virtual UnsafeArray<byte> GetNativeBuffer()
         {
             return _array;
         }

@@ -26,7 +26,7 @@ namespace Kyub.Collections.Unsafe
     public unsafe struct MemorySegment<T> : IList<T>, IReadOnlyList<T> where T : unmanaged
     {
         T* _offsetArrayPtr;
-        UnmanagedArray<T> _nativeArray;
+        UnsafeArray<T> _nativeArray;
         T[] _array;
         int _offset;
         int _count;
@@ -99,7 +99,7 @@ namespace Kyub.Collections.Unsafe
             }
         }
 
-        public UnmanagedArray<T> NativeArray
+        public UnsafeArray<T> NativeArray
         {
             get
             {
@@ -157,7 +157,7 @@ namespace Kyub.Collections.Unsafe
         }
 
         /// <summary>
-        /// Cast Memory Segment with UnmanagedArray to another type without allocate
+        /// Cast Memory Segment with UnsafeArray to another type without allocate
         /// </summary>
         /// <typeparam name="Y"></typeparam>
         /// <returns></returns>
@@ -168,7 +168,7 @@ namespace Kyub.Collections.Unsafe
 
             UnsafeArray castNativeArray = _nativeArray;
             if (castNativeArray == null)
-                castNativeArray = new UnmanagedArray<T>(this._array);
+                castNativeArray = new UnsafeArray<T>(this._array);
 
             castNativeArray = castNativeArray.UnsafeCast<Y>();
 
@@ -265,7 +265,7 @@ namespace Kyub.Collections.Unsafe
 
             int index = _array != null ?
                 System.Array.IndexOf<T>(_array, item, _offset, _count) :
-                UnmanagedArray<T>.IndexOf(_nativeArray, item, _offset, _count);
+                UnsafeArray<T>.IndexOf(_nativeArray, item, _offset, _count);
 
             return index >= 0 ? index - _offset : -1;
         }
@@ -403,7 +403,7 @@ namespace Kyub.Collections.Unsafe
             }
         }
 
-        public static unsafe void Copy(MemorySegment<T> sourceArray, int sourceIndex, UnmanagedArray<T> destinationArray, int destinationIndex, int length)
+        public static unsafe void Copy(MemorySegment<T> sourceArray, int sourceIndex, UnsafeArray<T> destinationArray, int destinationIndex, int length)
         {
             if (sourceArray.Array != null)
             {
@@ -427,7 +427,7 @@ namespace Kyub.Collections.Unsafe
             }
         }
 
-        public static unsafe void Copy(UnmanagedArray<T> sourceArray, int sourceIndex, MemorySegment<T> destinationArray, int destinationIndex, int length)
+        public static unsafe void Copy(UnsafeArray<T> sourceArray, int sourceIndex, MemorySegment<T> destinationArray, int destinationIndex, int length)
         {
             if (destinationArray.Array != null)
             {
