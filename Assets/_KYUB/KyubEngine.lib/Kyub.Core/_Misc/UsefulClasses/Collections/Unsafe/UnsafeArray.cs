@@ -190,6 +190,11 @@ namespace Kyub.Collections.Unsafe
             return refCount;
         }
 
+        protected internal int CurrentRefCount()
+        {
+            return _refCount;
+        }
+
         protected internal abstract UnsafeArray GetRootArray();
 
         #endregion
@@ -607,7 +612,7 @@ namespace Kyub.Collections.Unsafe
                     GC.RemoveMemoryPressure(_allocatedBytes);
 
                 //if(canDeleteUnmanagedMemory)
-                //UnityEngine.Debug.Log($"[UnsafeArray] Free Len: {(_allocatedBytes)}");
+                //    UnityEngine.Debug.Log($"[UnsafeArray] Free Len: {(_allocatedBytes)}");
                 _allocatedBytes = 0;
 
                 sucess = true;
@@ -621,7 +626,7 @@ namespace Kyub.Collections.Unsafe
                 var buffer = _sharedArrayRef;
                 _sharedArrayRef = null;
 
-                //UnityEngine.Debug.Log($"[UnsafeArray] Decremented Shared RefCount From: {(buffer._refCount)}");
+                //UnityEngine.Debug.Log($"[UnsafeArray] Decremented Shared RefCount From: {(buffer.CurrentRefCount())}");
                 buffer.DecrementRefCount();
             }
 
