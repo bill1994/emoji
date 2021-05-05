@@ -173,15 +173,18 @@ namespace Kyub.Collections.Unsafe
             this._disposed = true;
         }
 
-        protected internal void IncrementRefCount()
+        protected internal int IncrementRefCount()
         {
-            Interlocked.Increment(ref _refCount);
+            return Interlocked.Increment(ref _refCount);
         }
 
-        protected internal void DecrementRefCount()
+        protected internal int DecrementRefCount()
         {
-            if (Interlocked.Decrement(ref _refCount) <= 0)
+            var refCount = Interlocked.Decrement(ref _refCount);
+            if (refCount <= 0)
                 Free();
+
+            return refCount;
         }
 
         protected internal abstract UnsafeArray GetRootArray();
@@ -600,8 +603,9 @@ namespace Kyub.Collections.Unsafe
                 if (_gcPressure && canDeleteUnmanagedMemory)
                     GC.RemoveMemoryPressure(_allocatedBytes);
 
-                _allocatedBytes = 0;
+                //if(canDeleteUnmanagedMemory)
                 //UnityEngine.Debug.Log($"[UnsafeArray] Free Len: {(_allocatedBytes)}");
+                _allocatedBytes = 0;
 
                 sucess = true;
             }
@@ -614,6 +618,9 @@ namespace Kyub.Collections.Unsafe
                 var buffer = _sharedArrayRef;
                 _sharedArrayRef = null;
                 buffer.DecrementRefCount();
+
+                //var decrementCount = buffer.DecrementRefCount();
+                //UnityEngine.Debug.Log($"[UnsafeArray] Decremented Shared RefCount To: {(decrementCount)}");
             }
 
             return sucess;
