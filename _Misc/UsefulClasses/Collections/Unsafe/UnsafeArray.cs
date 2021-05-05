@@ -139,7 +139,10 @@ namespace Kyub.Collections.Unsafe
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
+
+            //We can only supress finalize if we disposed object that refcount is lower equals 0
+            if(_refCount <= 0)
+                GC.SuppressFinalize(this);
         }
 
         protected UnsafeArray()
