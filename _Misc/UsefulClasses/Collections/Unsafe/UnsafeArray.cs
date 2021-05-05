@@ -6,17 +6,18 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Kyub.Collections.Unsafe
 {
     public abstract unsafe class UnsafeArray : IEnumerable, IList, IDisposable
     {
-        protected static object s_refCountLock = new object();
-        protected static Dictionary<IntPtr, int> s_refCount = new Dictionary<IntPtr, int>();
-
         protected IntPtr _nativePtr = IntPtr.Zero;
         protected int _length = 0;
         protected int _elementSize = 1;
+        protected int _allocatedBytes = 0;
+
+        protected int _refCount = 0;
 
         /// <summary>
         /// Change to true if want to add pressure to GC also...this doesn't cause array to 
@@ -31,44 +32,7 @@ namespace Kyub.Collections.Unsafe
         /// <summary>
         /// Releases all unmanaged memory backing this array.
         /// </summary>
-        protected virtual bool Free()
-        {
-            var sucess = false;
-            if (_nativePtr != IntPtr.Zero)
-            {
-                lock (s_refCountLock)
-                {
-                    int refCount;
-
-                    //Decrement RefCount
-                    if (!s_refCount.TryGetValue(_nativePtr, out refCount) || refCount <= 1)
-                    {
-                        s_refCount.Remove(_nativePtr);
-
-                        Marshal.FreeHGlobal(_nativePtr);
-                        _nativePtr = IntPtr.Zero;
-
-                        if (_gcPressure)
-                            GC.RemoveMemoryPressure(_length * _elementSize);
-
-                        //UnityEngine.Debug.Log($"[UnsafeArray] Free Len: {(_length * _elementSize)}");
-                    }
-                    else
-                    {
-                        s_refCount[_nativePtr] -= 1;
-
-                        //UnityEngine.Debug.Log($"[UnsafeArray] Decrement To: {(s_refCount[_nativePtr])}");
-                    }
-                }
-
-                sucess = true;
-            }
-
-            _length = 0;
-
-            return sucess;
-        }
-
+        protected abstract bool Free();
 
         /// <summary>
         /// Gets pointer for unmanaged memory backing this array.
@@ -77,7 +41,7 @@ namespace Kyub.Collections.Unsafe
 
         public int Length { get { return _length; } }
 
-        public int LengthInBytes { get { return _length * _elementSize; } }
+        public int AllocatedBytes { get { return _allocatedBytes; } }
 
         public int ElementSize { get { return _elementSize; } }
 
@@ -178,14 +142,22 @@ namespace Kyub.Collections.Unsafe
             GC.SuppressFinalize(this);
         }
 
+        protected UnsafeArray()
+        {
+            IncrementRefCount();
+        }
+
         ~UnsafeArray()
         {
             Dispose(false);
+
+            //Force Destroy Memory
+            Free();
         }
 
         protected bool _disposed = false;
 
-        protected virtual void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             if (!this._disposed)
             {
@@ -196,10 +168,23 @@ namespace Kyub.Collections.Unsafe
 
                 //unmanaged here...
 
-                Free();
+                DecrementRefCount();
             }
             this._disposed = true;
         }
+
+        protected internal void IncrementRefCount()
+        {
+            Interlocked.Increment(ref _refCount);
+        }
+
+        protected internal void DecrementRefCount()
+        {
+            if (Interlocked.Decrement(ref _refCount) <= 0)
+                Free();
+        }
+
+        protected internal abstract UnsafeArray GetRootArray();
 
         #endregion
 
@@ -507,97 +492,94 @@ namespace Kyub.Collections.Unsafe
                     Buffer.MemoryCopy(sourceAddress, destPIndex, lengthInBytes, lengthInBytes);
                 }
             }
+        }
 
-           
+        public static unsafe void BlockCopy(UnsafeArray source, int sourceOffsetInBytes, UnsafeArray destination, int destinationOffsetInBytes, int lengthInBytes)
+        {
+            var destinationAddress = IntPtr.Add(destination.NativePtr, destinationOffsetInBytes).ToPointer();
+            var sourceAddress = IntPtr.Add(source.NativePtr, sourceOffsetInBytes).ToPointer();
+            Buffer.MemoryCopy(sourceAddress, destinationAddress, lengthInBytes, lengthInBytes);
         }
 
         #endregion
     }
 
-    public unsafe class UnsafeArray<T> : UnsafeArray, IList<T>, ICollection, IList
+    public sealed unsafe class UnsafeArray<T> : UnsafeArray, IList<T>, ICollection, IList
             where T : unmanaged //this constrains T to only allow user to use value-type (i.e. byte, int, long, etc...)
     {
-        protected T* _unsafeNativePtr = null;
+        T* _unsafeNativePtr = null;
 
-        public unsafe UnsafeArray(UnsafeArray nativeArray, bool shareBuffer)
+        UnsafeArray _sharedArrayRef = null;
+
+        public unsafe UnsafeArray(UnsafeArray nativeArray, bool shareBuffer) : base()
         {
-            _elementSize = Math.Max(1, Marshal.SizeOf(typeof(T)));
-            _length = nativeArray == null? 0 : nativeArray.LengthInBytes / _elementSize;
+            //Keep reference to root array instead one passed as parameter
+            if (nativeArray != null)
+                nativeArray = nativeArray.GetRootArray();
 
-            _nativePtr = nativeArray == null || !shareBuffer? IntPtr.Zero : nativeArray.NativePtr;
+            var isValidArray = nativeArray != null && !nativeArray.IsDisposed();
+            _elementSize = Math.Max(1, Marshal.SizeOf(typeof(T)));
+            _length = !isValidArray ? 0 : nativeArray.AllocatedBytes / _elementSize;
+
+            _nativePtr = !isValidArray || !shareBuffer ? IntPtr.Zero : nativeArray.NativePtr;
 
             if (_nativePtr == IntPtr.Zero)
             {
-                _nativePtr = Marshal.AllocHGlobal(_length * _elementSize);
+                var mallocSizeInBytes = _length * _elementSize;
+                _nativePtr = Marshal.AllocHGlobal(mallocSizeInBytes);
                 if (_nativePtr == IntPtr.Zero)
                     throw new OutOfMemoryException("Allocation request failed.");
 
-                if (_gcPressure) GC.AddMemoryPressure(_length * _elementSize);
+                _allocatedBytes = mallocSizeInBytes;
+                if (_gcPressure) GC.AddMemoryPressure(_allocatedBytes);
             }
 
             _unsafeNativePtr = (T*)_nativePtr;
 
-            //Increment RefCount
-            lock (s_refCountLock)
+            if (!isValidArray || !shareBuffer)
+                UnsafeArray.BlockCopy(nativeArray, 0, this, 0, _allocatedBytes);
+            else
             {
-                if (s_refCount.ContainsKey(_nativePtr))
-                    s_refCount[_nativePtr] += 1;
-                else
-                    s_refCount[_nativePtr] = 1;
+                _sharedArrayRef = nativeArray;
+                _sharedArrayRef.IncrementRefCount();
+                _allocatedBytes = _sharedArrayRef.AllocatedBytes;
             }
-
-            if(!shareBuffer)
-                UnsafeArray.Copy(nativeArray, 0, this, 0, _length);
         }
 
-        public unsafe UnsafeArray(T[] array)
+        public unsafe UnsafeArray(T[] array) : base()
         {
             _elementSize = Math.Max(1, Marshal.SizeOf(typeof(T)));
             _length = array == null ? 0 : array.Length;
 
-            _nativePtr = Marshal.AllocHGlobal(_length * _elementSize);
+            var mallocSizeInBytes = _length * _elementSize;
+            _nativePtr = Marshal.AllocHGlobal(mallocSizeInBytes);
             if (_nativePtr == IntPtr.Zero)
                 throw new OutOfMemoryException("Allocation request failed.");
 
-            if (_gcPressure) GC.AddMemoryPressure(_length * _elementSize);
+            _allocatedBytes = mallocSizeInBytes;
+            if (_gcPressure) GC.AddMemoryPressure(_allocatedBytes);
 
             _unsafeNativePtr = (T*)_nativePtr;
-
-            //Increment RefCount
-            lock (s_refCountLock)
-            {
-                if (s_refCount.ContainsKey(_nativePtr))
-                    s_refCount[_nativePtr] += 1;
-                else
-                    s_refCount[_nativePtr] = 1;
-            }
 
             //Copy Array
             if(array != null && _length > 0)
                 UnsafeArray.Copy(array, 0, this, 0, _length);
         }
 
-        public unsafe UnsafeArray(int length)
+        public unsafe UnsafeArray(int length) : base()
         {
             _elementSize = Math.Max(1, Marshal.SizeOf(typeof(T)));
             _length = length;
 
-            _nativePtr = Marshal.AllocHGlobal(_length * _elementSize);
+            var mallocSizeInBytes = _length * _elementSize;
+            _nativePtr = Marshal.AllocHGlobal(mallocSizeInBytes);
             if (_nativePtr == IntPtr.Zero)
                 throw new OutOfMemoryException("Allocation request failed.");
 
             _unsafeNativePtr = (T*)_nativePtr;
 
-            //Increment RefCount
-            lock (s_refCountLock)
-            {
-                if (s_refCount.ContainsKey(_nativePtr))
-                    s_refCount[_nativePtr] += 1;
-                else
-                    s_refCount[_nativePtr] = 1;
-            }
-
-            if (_gcPressure) GC.AddMemoryPressure(_length * _elementSize);
+            _allocatedBytes = mallocSizeInBytes;
+            if (_gcPressure) GC.AddMemoryPressure(_allocatedBytes);
         }
 
         /// <summary>
@@ -605,9 +587,36 @@ namespace Kyub.Collections.Unsafe
         /// </summary>
         protected override bool Free()
         {
-            _unsafeNativePtr = null;
-            return base.Free();
-            
+            var sucess = false;
+            var canDeleteUnmanagedMemory = _sharedArrayRef == null;
+            if (_nativePtr != IntPtr.Zero)
+            {
+                if(canDeleteUnmanagedMemory)
+                    Marshal.FreeHGlobal(_nativePtr);
+
+                _nativePtr = IntPtr.Zero;
+                _unsafeNativePtr = null;
+
+                if (_gcPressure && canDeleteUnmanagedMemory)
+                    GC.RemoveMemoryPressure(_allocatedBytes);
+
+                _allocatedBytes = 0;
+                //UnityEngine.Debug.Log($"[UnsafeArray] Free Len: {(_allocatedBytes)}");
+
+                sucess = true;
+            }
+
+            _length = 0;
+
+            //try dispose root buffer
+            if (_sharedArrayRef != null)
+            {
+                var buffer = _sharedArrayRef;
+                _sharedArrayRef = null;
+                buffer.DecrementRefCount();
+            }
+
+            return sucess;
         }
 
         public unsafe T* UnsafeNativePtr
@@ -634,7 +643,7 @@ namespace Kyub.Collections.Unsafe
         // IntUnmanagedArray, LongUnmanagedArray, etc.) When you benchmark to compare, make
         // sure you compile in Release mode for an accurate comparison.
         /////////////////////////
-        public unsafe virtual T this[int index]
+        public unsafe T this[int index]
         {
             get
             {
@@ -790,7 +799,7 @@ namespace Kyub.Collections.Unsafe
 
         void ICollection.CopyTo(Array array, int index)
         {
-            UnsafeArray.BlockCopy(this, 0, array, index * Buffer.ByteLength(array), Math.Min(LengthInBytes, array.Length - index));
+            UnsafeArray.BlockCopy(this, 0, array, index * Buffer.ByteLength(array), Math.Min(AllocatedBytes, (array.Length - index) * Buffer.ByteLength(array)));
         }
 
         bool IList.Contains(object value)
@@ -955,6 +964,13 @@ namespace Kyub.Collections.Unsafe
             get { return null; }
         }
 
+        protected internal override UnsafeArray GetRootArray()
+        {
+            if (_sharedArrayRef != null)
+                return _sharedArrayRef.GetRootArray();
+
+            return this;
+        }
 
         #endregion
     }
