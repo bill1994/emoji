@@ -443,6 +443,7 @@ BOOL multiline;
 - (void)setFocus:(BOOL)isFocus {
     if (isFocus) {
         [editView becomeFirstResponder];
+		[editView selectAll:nil];
     } else {
         [editView resignFirstResponder];
     }
