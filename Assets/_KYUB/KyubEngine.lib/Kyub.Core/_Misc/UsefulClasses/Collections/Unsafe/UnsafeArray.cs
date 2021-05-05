@@ -17,7 +17,7 @@ namespace Kyub.Collections.Unsafe
         protected int _elementSize = 1;
         protected int _allocatedBytes = 0;
 
-        protected int _refCount = 0;
+        protected internal int _refCount = 0;
 
         /// <summary>
         /// Change to true if want to add pressure to GC also...this doesn't cause array to 
@@ -617,10 +617,9 @@ namespace Kyub.Collections.Unsafe
             {
                 var buffer = _sharedArrayRef;
                 _sharedArrayRef = null;
-                buffer.DecrementRefCount();
 
-                //var decrementCount = buffer.DecrementRefCount();
-                //UnityEngine.Debug.Log($"[UnsafeArray] Decremented Shared RefCount To: {(decrementCount)}");
+                //UnityEngine.Debug.Log($"[UnsafeArray] Decremented Shared RefCount From: {(buffer._refCount)}");
+                buffer.DecrementRefCount();
             }
 
             return sucess;
