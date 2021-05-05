@@ -51,13 +51,13 @@ namespace Kyub.Collections.Unsafe
                         if (_gcPressure)
                             GC.RemoveMemoryPressure(_length * _elementSize);
 
-                        //UnityEngine.Debug.Log($"[UnmanagedArray] Free Len: {(_length * _elementSize)}");
+                        //UnityEngine.Debug.Log($"[UnsafeArray] Free Len: {(_length * _elementSize)}");
                     }
                     else
                     {
                         s_refCount[_nativePtr] -= 1;
 
-                        //UnityEngine.Debug.Log($"[UnmanagedArray] Decrement To: {(s_refCount[_nativePtr])}");
+                        //UnityEngine.Debug.Log($"[UnsafeArray] Decrement To: {(s_refCount[_nativePtr])}");
                     }
                 }
 
@@ -81,12 +81,12 @@ namespace Kyub.Collections.Unsafe
 
         public int ElementSize { get { return _elementSize; } }
 
-        public UnmanagedArray<Y> UnsafeCast<Y>() where Y : unmanaged
+        public UnsafeArray<Y> UnsafeCast<Y>() where Y : unmanaged
         {
-            if (this is UnmanagedArray<Y>)
-                return this as UnmanagedArray<Y>;
+            if (this is UnsafeArray<Y>)
+                return this as UnsafeArray<Y>;
 
-            return new UnmanagedArray<Y>(this, true);
+            return new UnsafeArray<Y>(this, true);
         }
 
         #region IList
@@ -514,12 +514,12 @@ namespace Kyub.Collections.Unsafe
         #endregion
     }
 
-    public unsafe class UnmanagedArray<T> : UnsafeArray, IList<T>, ICollection, IList
+    public unsafe class UnsafeArray<T> : UnsafeArray, IList<T>, ICollection, IList
             where T : unmanaged //this constrains T to only allow user to use value-type (i.e. byte, int, long, etc...)
     {
         protected T* _unsafeNativePtr = null;
 
-        public unsafe UnmanagedArray(UnsafeArray nativeArray, bool shareBuffer)
+        public unsafe UnsafeArray(UnsafeArray nativeArray, bool shareBuffer)
         {
             _elementSize = Math.Max(1, Marshal.SizeOf(typeof(T)));
             _length = nativeArray == null? 0 : nativeArray.LengthInBytes / _elementSize;
@@ -550,7 +550,7 @@ namespace Kyub.Collections.Unsafe
                 UnsafeArray.Copy(nativeArray, 0, this, 0, _length);
         }
 
-        public unsafe UnmanagedArray(T[] array)
+        public unsafe UnsafeArray(T[] array)
         {
             _elementSize = Math.Max(1, Marshal.SizeOf(typeof(T)));
             _length = array == null ? 0 : array.Length;
@@ -577,7 +577,7 @@ namespace Kyub.Collections.Unsafe
                 UnsafeArray.Copy(array, 0, this, 0, _length);
         }
 
-        public unsafe UnmanagedArray(int length)
+        public unsafe UnsafeArray(int length)
         {
             _elementSize = Math.Max(1, Marshal.SizeOf(typeof(T)));
             _length = length;
@@ -623,14 +623,14 @@ namespace Kyub.Collections.Unsafe
         /////////////////////////
         // IIndexer<T> is basically to get around the problem of not being able
         // to cast to type T. For each new value-type you want to support, you
-        // simply add another IIndexer<type> interface to this UnmanagedArray<T> class
+        // simply add another IIndexer<type> interface to this UnsafeArray<T> class
         // declaration, and specify how that specific type is going to be parsed
         // in the actual implemention of that IIndexer<type> interface.
         // We lose some overall throughput speed and efficiency going through these
         // extra interfaces. So, if speed is the highest concern and much more
-        // important than style of the code, you could re-write UnmanagedArray<T> to be
+        // important than style of the code, you could re-write UnsafeArray<T> to be
         // a separate class for each value-type, putting the type parsing logic
-        // directly in the main indexer. (e.g. re-write UnmanagedArray<T> to ByteUnmanagedArray,
+        // directly in the main indexer. (e.g. re-write UnsafeArray<T> to ByteUnmanagedArray,
         // IntUnmanagedArray, LongUnmanagedArray, etc.) When you benchmark to compare, make
         // sure you compile in Release mode for an accurate comparison.
         /////////////////////////
@@ -682,15 +682,15 @@ namespace Kyub.Collections.Unsafe
         }
 
         /// <summary>
-        /// Copies this source UnmanagedArray(T) to a destination UnmanagedArray(T) without using
+        /// Copies this source UnsafeArray(T) to a destination UnsafeArray(T) without using
         /// Large Object Heap.
         /// 
         /// Caution: This can be dangerous. Be extremely careful not to copy outside the bounds
         /// of the destination array.
         /// </summary>
-        /// <param name="array">Destination UnmanagedArray(T).</param>
-        /// <param name="arrayIndex">Starting index inside destination UnmanagedArray(T) to begin copying this entire source UnmanagedArray(T).</param>
-        public unsafe void CopyTo(UnmanagedArray<T> array, int arrayIndex)
+        /// <param name="array">Destination UnsafeArray(T).</param>
+        /// <param name="arrayIndex">Starting index inside destination UnsafeArray(T) to begin copying this entire source UnsafeArray(T).</param>
+        public unsafe void CopyTo(UnsafeArray<T> array, int arrayIndex)
         {
             if (this.Count <= 0)
                 throw new Exception("Nothing in source array to copy to destination array.");
@@ -708,7 +708,7 @@ namespace Kyub.Collections.Unsafe
 
         /// <summary>
         /// CopyTo(T[] array, int arrayIndex).
-        /// Must use CopyTo(UnmanagedArray(T) array, int arrayIndex) method to stay off Large Object Heap.
+        /// Must use CopyTo(UnsafeArray(T) array, int arrayIndex) method to stay off Large Object Heap.
         /// </summary>
         public unsafe void CopyTo(T[] array, int arrayIndex)
         {
@@ -831,15 +831,15 @@ namespace Kyub.Collections.Unsafe
         //////////////////////////
         // Instructions:
         //
-        //   For each new IIndexer<type> you add to UnmanagedArray<T> class declaration on top,
+        //   For each new IIndexer<type> you add to UnsafeArray<T> class declaration on top,
         //   add the new pair of explicit casting operators here if you want to support
-        //   casting to and from the .NET array type (i.e. UnmanagedArray<byte> to byte[],
-        //   and byte[] to UnmanagedArray<byte>, etc...)
+        //   casting to and from the .NET array type (i.e. UnsafeArray<byte> to byte[],
+        //   and byte[] to UnsafeArray<byte>, etc...)
         //
         //////////////////////////
         ///////////////////////////////////////////////////////////////////////
         // Important: These are here purely for convience. They are simply to
-        // make it easy to cast back and forth between this UnmanagedArray(T)
+        // make it easy to cast back and forth between this UnsafeArray(T)
         // class and the built-in .NET Framework array types (i.e. byte[],
         // int[], long[], etc.) for integrating with existing methods with
         // method parameters that only accept built-in .NET Framework array
@@ -870,11 +870,11 @@ namespace Kyub.Collections.Unsafe
         // 'Type-Facing' is essentially creating a null .Net value-type array
         // (i.e. byte[] b = null), adding the object header, method table
         // and length section of bytes from the .Net value-type byte[] to the
-        // beginning of the unmanaged memory backing our UnmanagedArray(T) array,
+        // beginning of the unmanaged memory backing our UnsafeArray(T) array,
         // and changing the pointer of that .Net value-type byte[] to the address
-        // of our unmanaged memory backing our UnmanagedArray(T) array. This worked
-        // in our tests, our UnmanagedArray(T) array now looked and functioned like
-        // the .Net value-type byte[] (e.g. our UnmanagedArray(T) array now
+        // of our unmanaged memory backing our UnsafeArray(T) array. This worked
+        // in our tests, our UnsafeArray(T) array now looked and functioned like
+        // the .Net value-type byte[] (e.g. our UnsafeArray(T) array now
         // essentially had a 'Face' of a .NET byte[]), however the GC would still
         // collect the .NET byte[] when the GC decided to do a GC collection at
         // various times because the .NET byte[] was pointing at unmanaged memory
@@ -884,54 +884,54 @@ namespace Kyub.Collections.Unsafe
         // unmanaged memory was still in place, the .NET byte[] object was now
         // unusuable.
         ///////////////////////////////////////////////////////////////////////
-        public static explicit operator byte[](UnmanagedArray<T> array)
+        public static explicit operator byte[](UnsafeArray<T> array)
         {
             byte[] a = new byte[array.Count];
             Marshal.Copy(array.NativePtr, a, 0, array.Count);
             return a;
         }
-        public static explicit operator UnmanagedArray<T>(byte[] array)
+        public static explicit operator UnsafeArray<T>(byte[] array)
         {
-            UnmanagedArray<T> a = new UnmanagedArray<T>(array.GetLength(0));
+            UnsafeArray<T> a = new UnsafeArray<T>(array.GetLength(0));
             Marshal.Copy(array, 0, a.NativePtr, array.GetLength(0));
             return a;
         }
 
-        public static explicit operator int[](UnmanagedArray<T> array)
+        public static explicit operator int[](UnsafeArray<T> array)
         {
             int[] a = new int[array.Count];
             Marshal.Copy(array.NativePtr, a, 0, array.Count);
             return a;
         }
-        public static explicit operator UnmanagedArray<T>(int[] array)
+        public static explicit operator UnsafeArray<T>(int[] array)
         {
-            UnmanagedArray<T> a = new UnmanagedArray<T>(array.GetLength(0));
+            UnsafeArray<T> a = new UnsafeArray<T>(array.GetLength(0));
             Marshal.Copy(array, 0, a.NativePtr, array.GetLength(0));
             return a;
         }
 
-        public static explicit operator long[](UnmanagedArray<T> array)
+        public static explicit operator long[](UnsafeArray<T> array)
         {
             long[] a = new long[array.Count];
             Marshal.Copy(array.NativePtr, a, 0, array.Count);
             return a;
         }
-        public static explicit operator UnmanagedArray<T>(long[] array)
+        public static explicit operator UnsafeArray<T>(long[] array)
         {
-            UnmanagedArray<T> a = new UnmanagedArray<T>(array.GetLength(0));
+            UnsafeArray<T> a = new UnsafeArray<T>(array.GetLength(0));
             Marshal.Copy(array, 0, a.NativePtr, array.GetLength(0));
             return a;
         }
 
-        public static explicit operator double[](UnmanagedArray<T> array)
+        public static explicit operator double[](UnsafeArray<T> array)
         {
             double[] a = new double[array.Count];
             Marshal.Copy(array.NativePtr, a, 0, array.Count);
             return a;
         }
-        public static explicit operator UnmanagedArray<T>(double[] array)
+        public static explicit operator UnsafeArray<T>(double[] array)
         {
-            UnmanagedArray<T> a = new UnmanagedArray<T>(array.GetLength(0));
+            UnsafeArray<T> a = new UnsafeArray<T>(array.GetLength(0));
             Marshal.Copy(array, 0, a.NativePtr, array.GetLength(0));
             return a;
         }
