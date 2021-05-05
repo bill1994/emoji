@@ -81,7 +81,7 @@ namespace Kyub.Collections.Unsafe
 
             var offsetInBytes = offset * nativeArray.ElementSize;
             var countInBytes = count * nativeArray.ElementSize;
-            if (nativeArray.LengthInBytes - offsetInBytes < countInBytes)
+            if (nativeArray.AllocatedBytes - offsetInBytes < countInBytes)
                 throw new ArgumentException("Argument_InvalidOffLen");
 
             _nativeArray = nativeArray.UnsafeCast<T>();
@@ -144,7 +144,7 @@ namespace Kyub.Collections.Unsafe
             if (_nativeArray != null)
             {
                 int elementSize = _nativeArray.ElementSize;
-                if (_nativeArray.LengthInBytes - _offset * elementSize < _count * elementSize)
+                if (_nativeArray.AllocatedBytes - (_offset * elementSize) < _count * elementSize)
                     return false;
             }
             else if (_array != null)
@@ -178,8 +178,8 @@ namespace Kyub.Collections.Unsafe
             var offsetInBytes = _offset * selfElementSize;
             var countInBytes = _count * selfElementSize;
 
-            var newOffset = castElementSize > 0? offsetInBytes / castElementSize : 0;
-            var newCount = castElementSize > 0 ? countInBytes / castElementSize : 0;
+            var newOffset = offsetInBytes / castElementSize;
+            var newCount = countInBytes / castElementSize;
 
             return new MemorySegment<Y>(castNativeArray, newOffset, newCount);
         }
