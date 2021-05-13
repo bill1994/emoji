@@ -71,6 +71,35 @@ namespace MaterialUI
 
         #region Properties
 
+        public MaterialInputField inputField
+        {
+            get
+            {
+                var inputField = GetComponentInChildren<MaterialInputField>(true);
+                return inputField;
+            }
+        }
+
+        public ITextValidator customTextValidator
+        {
+            get
+            {
+                return inputField != null ? inputField.customTextValidator : null;
+            }
+            set
+            {
+                if (inputField != null)
+                    inputField.customTextValidator = value;
+#if UNITY_EDITOR
+                else
+                {
+                    Debug.LogWarning("[MaterialDropdown] CustomTextValidator can only be used when dropdown contains an inputfield");
+                }
+#endif
+            }
+        }
+
+
         protected PrefabAddress cachedPrefabAddress
         {
             get

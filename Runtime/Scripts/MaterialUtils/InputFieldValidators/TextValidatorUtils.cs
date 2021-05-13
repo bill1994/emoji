@@ -624,6 +624,96 @@ namespace MaterialUI
         }
     }
 
+    public class DateFormatValidator : CustomFormatValidator
+    {
+        protected System.IFormatProvider _formatProvider = null;
+
+        public DateFormatValidator(System.IFormatProvider format, string error = "Date format is invalid") : base("", error)
+        {
+            _formatProvider = format == null ? CultureInfo.InvariantCulture : format;
+        }
+
+        public DateFormatValidator(string cultureInfoName, string error = "Date format is invalid") : base("", error)
+        {
+            _formatProvider = CultureInfo.GetCultureInfo(cultureInfoName);
+        }
+
+        public override bool IsTextValid()
+        {
+            var isValid = base.IsTextValid();
+            if (isValid)
+            {
+                var text = m_MaterialInputField != null ? m_MaterialInputField.text : "";
+                System.DateTime result;
+                return System.DateTime.TryParse(text, _formatProvider, System.Globalization.DateTimeStyles.None, out result);
+            }
+            return isValid;
+        }
+
+        public override ITextValidator Clone()
+        {
+            return new DateFormatValidator(_formatProvider, m_ErrorMessage);
+        }
+    }
+
+    public class DateMinMaxFormatValidator : DateFormatValidator
+    {
+        public const string DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG = "Value must be a date between '<localeparam=0>{0}</localeparam>' and '<localeparam=1>{1}</localeparam>' (Inclusive)";
+
+        protected bool _isMinInclusive = true;
+        protected bool _isMaxInclusive = true;
+        protected System.DateTime _minValue = System.DateTime.MinValue;
+        protected System.DateTime _maxValue = System.DateTime.MaxValue;
+
+        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, string cultureInfoName, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : 
+            this(isMinInclusive, isMaxInclusive, minValue, maxValue, CultureInfo.GetCultureInfo(cultureInfoName), error)
+        {
+        }
+
+        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, System.IFormatProvider format, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : base(format, error)
+        {
+            _isMinInclusive = isMinInclusive;
+            _isMaxInclusive = isMaxInclusive;
+            _minValue = minValue;
+            _maxValue = maxValue;
+
+            //Swap values if Min > Max
+            if (_minValue > _maxValue)
+            {
+                var tempMin = _minValue;
+                _minValue = _maxValue;
+                _maxValue = tempMin;
+            }
+            _formatProvider = format == null ? CultureInfo.InvariantCulture : format;
+        }
+
+        public override bool IsTextValid()
+        {
+            bool isValid = false;
+            var text = m_MaterialInputField != null ? m_MaterialInputField.text : "";
+            System.DateTime result;
+            isValid = System.DateTime.TryParse(text, _formatProvider, System.Globalization.DateTimeStyles.None, out result);
+
+            if (isValid)
+            {
+                isValid = m_MaterialInputField != null &&
+                    ((_isMinInclusive && result == _minValue) || result > _minValue) &&
+                    ((_isMaxInclusive && result == _maxValue) || result < _maxValue);
+            }
+            if (!isValid)
+            {
+                if (m_MaterialInputField != null && m_MaterialInputField.validationText != null)
+                    m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+            }
+            return isValid;
+        }
+
+        public override ITextValidator Clone()
+        {
+            return new DateMinMaxFormatValidator(_isMinInclusive, _isMaxInclusive, _minValue, _maxValue, _formatProvider, m_ErrorMessage);
+        }
+    }
+
     public class StrongPasswordValidator : CustomFormatValidator
     {
         const string STRONG_PASS_VALIDATOR = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,15}$";

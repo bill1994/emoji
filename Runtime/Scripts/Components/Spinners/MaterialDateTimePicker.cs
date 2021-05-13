@@ -77,6 +77,34 @@ namespace MaterialUI
 
         #region Public Properties
 
+        public MaterialInputField inputField
+        {
+            get
+            {
+                var inputField = GetComponentInChildren<MaterialInputField>(true);
+                return inputField;
+            }
+        }
+
+        public ITextValidator customTextValidator
+        {
+            get
+            {
+                return inputField != null ? inputField.customTextValidator : null;
+            }
+            set
+            {
+                if (inputField != null)
+                    inputField.customTextValidator = value;
+#if UNITY_EDITOR
+                else
+                {
+                    Debug.LogWarning("[MaterialDateTimePicker] CustomTextValidator can only be used when datepicker contains an inputfield");
+                }
+#endif
+            }
+        }
+
         public string hintText
         {
             get
