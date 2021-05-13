@@ -5,7 +5,7 @@
     <!--<androidPackage spec="com.android.support:appcompat-v7:28.0.0"/>-->
     
     <!-- New AndroidX API (comment next lines if want to support android.compat-v7) -->
-    <androidPackage spec="androidx.biometric:biometric:1.0.0"/>
+    <androidPackage spec="androidx.biometric:biometric:1.1.0"/>
     <androidPackage spec="com.google.android.material:material:1.0.0"/>
     
   </androidPackages>
