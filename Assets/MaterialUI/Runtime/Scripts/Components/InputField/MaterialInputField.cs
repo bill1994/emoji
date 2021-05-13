@@ -2059,7 +2059,7 @@ namespace MaterialUI
             }
         }
 
-        public void ClearText()
+        public virtual void ClearText()
         {
             var unityInputField = m_InputField as InputField;
             var tmpInputField = m_InputField as TMP_InputField;
@@ -2080,7 +2080,7 @@ namespace MaterialUI
             SetLayoutDirty();
         }
 
-        private void ValidateText()
+        public virtual void ValidateText()
         {
             ITextValidator validator = m_TextValidator != null ? m_TextValidator.GetComponent<ITextValidator>() : null;
 
