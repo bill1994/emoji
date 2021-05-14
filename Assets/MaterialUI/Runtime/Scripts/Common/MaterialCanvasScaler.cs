@@ -80,7 +80,7 @@ namespace MaterialUI
         {
             get
             {
-                var safeAreaComponent = GetComponent<CanvasSafeArea>();
+                var safeAreaComponent = this != null? GetComponent<CanvasSafeArea>() : null;
                 Vector2 screenSize = safeAreaComponent != null && m_SupportSafeArea ? safeAreaComponent.GetConformSafeArea().size : new Vector2(Screen.width, Screen.height);
 
                 return screenSize;
@@ -102,7 +102,7 @@ namespace MaterialUI
         {
             get
             {
-                if (_Canvas == null)
+                if (_Canvas == null && this != null)
                     _Canvas = GetComponent<Canvas>();
                 return _Canvas;
             }

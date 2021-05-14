@@ -23,7 +23,7 @@ android {
 dependencies {
     compileOnly fileTree(include: ['*.jar'], dir: 'libs')
     //implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'androidx.biometric:biometric:1.0.0'
+    implementation 'androidx.biometric:biometric:1.1.0'
 
     //Prompt Dependences
     implementation 'com.google.android.material:material:1.0.0'
