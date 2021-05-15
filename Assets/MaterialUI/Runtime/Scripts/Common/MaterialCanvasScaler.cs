@@ -203,6 +203,7 @@ namespace MaterialUI
 
         protected override void OnDisable()
         {
+            base.OnDisable();
             SetScaleFactor(1);
             SetReferencePixelsPerUnit(100);
         }
