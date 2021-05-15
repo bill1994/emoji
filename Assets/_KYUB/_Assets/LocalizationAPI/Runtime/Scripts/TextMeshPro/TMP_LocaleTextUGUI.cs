@@ -367,7 +367,7 @@ namespace Kyub.Localization.UI
                 text = m_SecondaryPreprocessor.PreprocessText(text);
 
             //TMP drop support to automatic convert \\n into \n
-            text = text.Replace("\\n", "\n");
+            text = text.Replace("\\n", "\n").Replace("\\t", "\t");
 #endif
             parsedString = text;
 
