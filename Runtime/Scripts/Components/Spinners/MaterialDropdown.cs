@@ -356,6 +356,18 @@ namespace MaterialUI
             selectedIndex = Mathf.Clamp(m_SelectedIndex, 0, options.Count - 1);
         }
 
+        public virtual void ValidateText()
+        {
+            ValidateText(false);
+        }
+
+        public virtual void ValidateText(bool force)
+        {
+            var input = inputField;
+            if (input != null)
+                input.ValidateText(force);
+        }
+
         public virtual void Select(int selectedItemIndex)
         {
             if (options.Count == 0)
@@ -373,6 +385,8 @@ namespace MaterialUI
 
             if (IsExpanded())
                 Hide();
+
+            ValidateText();
 
             if (OnItemSelected != null)
                 OnItemSelected.Invoke(selectedItemIndex);

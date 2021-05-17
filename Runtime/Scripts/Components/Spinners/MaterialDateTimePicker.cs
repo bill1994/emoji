@@ -202,12 +202,12 @@ namespace MaterialUI
 
             set
             {
-                var v_value = string.IsNullOrEmpty(value) ? "" : value;
-                if (m_DateFormat == v_value)
+                value = string.IsNullOrEmpty(value) ? "" : value;
+                if (m_DateFormat == value)
                     return;
 
-                m_CurrentFormattedDate = HasValidDate()? GetCurrentDate().ToString(v_value, GetCultureInfo()) : "";
-                m_DateFormat = v_value;
+                m_CurrentFormattedDate = HasValidDate()? GetCurrentDate().ToString(value, GetCultureInfo()) : "";
+                m_DateFormat = value;
                 HandleOnChangeDateTime(m_CurrentFormattedDate);
             }
         }
@@ -221,11 +221,11 @@ namespace MaterialUI
 
             set
             {
-                var v_value = string.IsNullOrEmpty(value) ? "" : value;
-                if (m_CultureInfo == v_value)
+                value = string.IsNullOrEmpty(value) ? "" : value;
+                if (m_CultureInfo == value)
                     return;
-                m_CurrentFormattedDate = HasValidDate() ? GetCurrentDate().ToString(v_value, GetCultureInfo()) : "";
-                m_CultureInfo = v_value;
+                m_CurrentFormattedDate = HasValidDate() ? GetCurrentDate().ToString(value, GetCultureInfo()) : "";
+                m_CultureInfo = value;
                 HandleOnChangeDateTime(m_CurrentFormattedDate);
             }
         }
@@ -361,6 +361,18 @@ namespace MaterialUI
 
         #region Public Helper Functions
 
+        public virtual void ValidateText()
+        {
+            ValidateText(false);
+        }
+
+        public virtual void ValidateText(bool force)
+        {
+            var input = inputField;
+            if (input != null)
+                input.ValidateText(force);
+        }
+
         public void SetPickerMode(int pickerMode)
         {
             var mode = (DateTimeMode)pickerMode;
@@ -380,9 +392,9 @@ namespace MaterialUI
             return IsValidDate(m_CurrentFormattedDate, m_DateFormat, GetCultureInfo());
         }
 
-        public void SetCurrentDate(System.DateTime p_value)
+        public void SetCurrentDate(System.DateTime value)
         {
-            HandleOnChangeDateTime(p_value);
+            HandleOnChangeDateTime(value);
         }
 
         public System.DateTime GetCurrentDate()
@@ -390,9 +402,9 @@ namespace MaterialUI
             return ParseDate(m_CurrentFormattedDate, m_DateFormat, GetCultureInfo());
         }
 
-        public override void RefreshVisualStyles(bool p_canAnimate = true)
+        public override void RefreshVisualStyles(bool canAnimate = true)
         {
-            SetStylePropertyColorsActive_Internal(p_canAnimate, 0);
+            SetStylePropertyColorsActive_Internal(canAnimate, 0);
         }
 
         #endregion
@@ -500,8 +512,11 @@ namespace MaterialUI
         {
             System.DateTime date = System.DateTime.Now;
             TryParseDate(dateFormatted, m_DateFormat, GetCultureInfo(), out date);
-            m_CurrentFormattedDate = dateFormatted;
-
+            if (m_CurrentFormattedDate != dateFormatted)
+            {
+                m_CurrentFormattedDate = dateFormatted;
+                ValidateText(true);
+            }
             UpdateLabelState();
             if (OnDateTimeChangedCallback != null)
                 OnDateTimeChangedCallback.Invoke(date);
