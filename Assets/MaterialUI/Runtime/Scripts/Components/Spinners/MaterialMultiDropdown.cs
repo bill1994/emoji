@@ -343,6 +343,18 @@ namespace MaterialUI
 
         #region Helper Functions
 
+        public virtual void ValidateText()
+        {
+            ValidateText(false);
+        }
+
+        public virtual void ValidateText(bool force)
+        {
+            var input = inputField;
+            if (input != null)
+                input.ValidateText(force);
+        }
+
         public IList<OptionData> GetCurrentSelectedDatas()
         {
             List<OptionData> selectedData = new List<OptionData>();
@@ -418,6 +430,8 @@ namespace MaterialUI
 
             if (IsExpanded())
                 Hide();
+
+            ValidateText(true);
 
             if (OnItemsSelected != null)
                 OnItemsSelected.Invoke(m_SelectedIndexes);

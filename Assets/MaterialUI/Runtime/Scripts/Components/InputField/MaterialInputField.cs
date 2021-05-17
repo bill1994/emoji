@@ -2082,6 +2082,11 @@ namespace MaterialUI
 
         public virtual void ValidateText()
         {
+            ValidateText(false);
+        }
+
+        public virtual void ValidateText(bool force)
+        {
             ITextValidator validator = m_TextValidator != null ? m_TextValidator.GetComponent<ITextValidator>() : null;
 
             if (m_CustomTextValidator != null)
@@ -2096,7 +2101,8 @@ namespace MaterialUI
 
             if (validationText == null) return;
 
-            if (!m_ValidateOnStart && !m_HasBeenSelected) return;
+            if (!force && !m_ValidateOnStart && !m_HasBeenSelected) 
+                return;
 
             m_ValidationText.color = IsSelected() ? m_ValidationActiveColor : m_ValidationInactiveColor;
 
