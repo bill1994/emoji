@@ -297,7 +297,7 @@ namespace MaterialUI
                             (dialog, isDialog) => 
                             {
                                 s_TimePicker = dialog;
-                                dialog.Initialize(pickedDate, HandleOnChangeTimeKeepingLastDate, m_DialogColor);
+                                dialog.Initialize(pickedDate, HandleOnChangeTimeKeepingLastDate, HandleOnHide, m_DialogColor);
                                 if (this != null && OnShowTimeDialogCallback != null)
                                     OnShowTimeDialogCallback.Invoke(dialog);
                             });
@@ -338,7 +338,7 @@ namespace MaterialUI
                             (dialog, isDialog) =>
                             {
                                 s_TimePicker = dialog;
-                                dialog.Initialize(date, HandleOnChangeDateTime, m_DialogColor);
+                                dialog.Initialize(date, HandleOnChangeDateTime, HandleOnHide, m_DialogColor);
                                 if (this != null && OnShowTimeDialogCallback != null)
                                     OnShowTimeDialogCallback.Invoke(dialog);
                             });
@@ -355,6 +355,12 @@ namespace MaterialUI
                 s_TimePicker.Hide();
 
             HandleOnHide();
+        }
+
+        protected override void HandleOnHide()
+        {
+            ValidateText(true);
+            base.HandleOnHide();
         }
 
         #endregion
@@ -512,12 +518,12 @@ namespace MaterialUI
         {
             System.DateTime date = System.DateTime.Now;
             TryParseDate(dateFormatted, m_DateFormat, GetCultureInfo(), out date);
-            if (m_CurrentFormattedDate != dateFormatted)
-            {
-                m_CurrentFormattedDate = dateFormatted;
-                ValidateText(true);
-            }
+            m_CurrentFormattedDate = dateFormatted;
             UpdateLabelState();
+
+            if (IsExpanded())
+                ValidateText(true);
+
             if (OnDateTimeChangedCallback != null)
                 OnDateTimeChangedCallback.Invoke(date);
             if (OnFormattedDateTimeChangedCallback != null)
