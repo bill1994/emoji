@@ -339,6 +339,12 @@ namespace MaterialUI
             HandleOnHide();
         }
 
+        protected override void HandleOnHide()
+        {
+            ValidateText(true);
+            base.HandleOnHide();
+        }
+
         #endregion
 
         #region Helper Functions
@@ -430,8 +436,6 @@ namespace MaterialUI
 
             if (IsExpanded())
                 Hide();
-
-            ValidateText(true);
 
             if (OnItemsSelected != null)
                 OnItemsSelected.Invoke(m_SelectedIndexes);

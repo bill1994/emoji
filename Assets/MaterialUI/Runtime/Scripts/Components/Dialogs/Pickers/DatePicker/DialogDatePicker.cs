@@ -43,20 +43,36 @@ namespace MaterialUI
         [SerializeField]
         private string m_DateFormatPattern = "ddd, MMM dd";
 
-        private DateTime m_CurrentDate;
+        private DateTime _CurrentDate;
 
-        private DayOfWeek m_DayOfWeek = DayOfWeek.Sunday;
+        private DayOfWeek _DayOfWeek = DayOfWeek.Sunday;
 
-        private CultureInfo m_CultureInfo;
+        private CultureInfo _CultureInfo;
 
-        private Action<DateTime> m_OnAffirmativeClicked;
-		private Action m_OnDismissiveClicked;
+		private Vector2 _InitialSize;
 
-		private Vector2 m_InitialSize;
+        #endregion
+
+        #region Callbacks
+
+        private Action<DateTime> _OnAffirmativeClicked;
+        private Action _OnDismissiveClicked;
 
         #endregion
 
         #region Public Properties
+
+        public Action<DateTime> onAffirmativeClicked
+        {
+            get { return _OnAffirmativeClicked; }
+            set { _OnAffirmativeClicked = value; }
+        }
+
+        public Action onDismissiveClicked
+        {
+            get { return _OnDismissiveClicked; }
+            set { _OnDismissiveClicked = value; }
+        }
 
         public Graphic textDate
         {
@@ -81,7 +97,7 @@ namespace MaterialUI
 
         public DateTime currentDate
         {
-            get { return m_CurrentDate; }
+            get { return _CurrentDate; }
             set
             {
                 SetDate(value);
@@ -90,12 +106,12 @@ namespace MaterialUI
 
         public DayOfWeek dayOfWeek
         {
-            get { return m_DayOfWeek; }
+            get { return _DayOfWeek; }
         }
 
         public CultureInfo cultureInfo
         {
-            get { return m_CultureInfo; }
+            get { return _CultureInfo; }
         }
 
         public string dateFormatPattern
@@ -110,7 +126,7 @@ namespace MaterialUI
         protected override void Awake()
 		{
             base.Awake();
-			m_InitialSize = rectTransform.sizeDelta;
+			_InitialSize = rectTransform.sizeDelta;
 		}
 
         #endregion
@@ -143,13 +159,13 @@ namespace MaterialUI
             OnDateClicked();
 
             // Callbacks
-            m_OnAffirmativeClicked = onAffirmativeClicked;
-			m_OnDismissiveClicked = onDismissiveClicked;
+            _OnAffirmativeClicked = onAffirmativeClicked;
+			_OnDismissiveClicked = onDismissiveClicked;
 
             SetColor(accentColor);
 
 			//Initialize();
-			rectTransform.sizeDelta = m_InitialSize;
+			rectTransform.sizeDelta = _InitialSize;
         }
 
         public void SetColor(Color accentColor)
@@ -183,9 +199,9 @@ namespace MaterialUI
 
         public virtual void SetDate(DateTime date)
         {
-            m_CurrentDate = date;
+            _CurrentDate = date;
 			UpdateDaysText();
-            UpdateDateList(GetMonthDateList(m_CurrentDate.Year, m_CurrentDate.Month));
+            UpdateDateList(GetMonthDateList(_CurrentDate.Year, _CurrentDate.Month));
             UpdateYearMonthsDateList();
 
             UpdateDatesText();
@@ -194,13 +210,13 @@ namespace MaterialUI
         public void SetYear(int year)
         {
             DateTime newDate = default(DateTime);
-            if (!DateTime.IsLeapYear(year) && m_CurrentDate.Month == 2 && m_CurrentDate.Day == 29)
+            if (!DateTime.IsLeapYear(year) && _CurrentDate.Month == 2 && _CurrentDate.Day == 29)
             {
-                newDate = new DateTime(year, m_CurrentDate.Month, 28);
+                newDate = new DateTime(year, _CurrentDate.Month, 28);
             }
             else
             {
-                newDate = new DateTime(year, m_CurrentDate.Month, m_CurrentDate.Day);
+                newDate = new DateTime(year, _CurrentDate.Month, _CurrentDate.Day);
             }
 
             SetDate(newDate);
@@ -210,19 +226,19 @@ namespace MaterialUI
 
         public void SetCultureInfo(CultureInfo cultureInfo)
         {
-            m_CultureInfo = cultureInfo;
+            _CultureInfo = cultureInfo;
 
-            if (m_CultureInfo == null)
+            if (_CultureInfo == null)
             {
-                m_CultureInfo = new CultureInfo("en-US");
+                _CultureInfo = new CultureInfo("en-US");
             }
 
-            SetDate(m_CurrentDate);
+            SetDate(_CurrentDate);
         }
 
         public void SetDayOfWeek(DayOfWeek dayOfWeek, CultureInfo cultureInfo)
 		{
-			m_DayOfWeek = dayOfWeek;
+			_DayOfWeek = dayOfWeek;
             SetCultureInfo(cultureInfo);
         }
 
@@ -239,72 +255,72 @@ namespace MaterialUI
                 DateTime date = (i < dateTime.Count) ? dateTime[i] : default(DateTime);
                 m_DatePickerDayItems[i].Init(date, OnDayItemValueChanged);
 
-                m_DatePickerDayItems[i].UpdateState(m_CurrentDate);
+                m_DatePickerDayItems[i].UpdateState(_CurrentDate);
             }
         }
 
         private void UpdateYearMonthsDateList()
         {
-            m_CultureInfo = cultureInfo;
+            _CultureInfo = cultureInfo;
 
-            if (m_CultureInfo == null)
+            if (_CultureInfo == null)
             {
-                m_CultureInfo = new CultureInfo("en-US");
+                _CultureInfo = new CultureInfo("en-US");
             }
 
-            var v_monthsDate = GetYearMonthsDateList(m_CurrentDate.Year);
+            var v_monthsDate = GetYearMonthsDateList(_CurrentDate.Year);
             for (int i = 0; i < m_DatePickerMonthItems.Length; i++)
             {
                 DateTime date = (i < v_monthsDate.Count) ? v_monthsDate[i] : default(DateTime);
-                m_DatePickerMonthItems[i].Init(date, m_CultureInfo, OnMonthItemValueChanged);
+                m_DatePickerMonthItems[i].Init(date, _CultureInfo, OnMonthItemValueChanged);
 
-                m_DatePickerMonthItems[i].UpdateState(m_CurrentDate);
+                m_DatePickerMonthItems[i].UpdateState(_CurrentDate);
             }
         }
 
         private void UpdateDatesText()
         {
-            if (m_CultureInfo == null)
+            if (_CultureInfo == null)
             {
-                m_CultureInfo = System.Globalization.CultureInfo.CurrentCulture;
+                _CultureInfo = System.Globalization.CultureInfo.CurrentCulture;
             }
 
             if (m_TextMonth != null)
             {
-                m_TextMonth.SetGraphicText(m_CurrentDate.ToString("MMMMM yyyy", m_CultureInfo));
+                m_TextMonth.SetGraphicText(_CurrentDate.ToString("MMMMM yyyy", _CultureInfo));
             }
 
             if(m_TextYear != null)
             {
-                m_TextYear.SetGraphicText(m_CurrentDate.ToString("yyyy"));
+                m_TextYear.SetGraphicText(_CurrentDate.ToString("yyyy"));
             }
 
             if(m_TextDate != null)
             {
-                m_TextDate.SetGraphicText(GetFormattedDate(m_CurrentDate));
+                m_TextDate.SetGraphicText(GetFormattedDate(_CurrentDate));
             }
         }
 
 		private void UpdateDaysText()
 		{
-            if (m_CultureInfo == null)
+            if (_CultureInfo == null)
             {
-                m_CultureInfo = new CultureInfo("en-US");
+                _CultureInfo = new CultureInfo("en-US");
             }
 
             for (int i = 0; i < 7; i++)
 			{
                 if (m_DatePickerDayTexts.Length > i)
                 {
-                    int day = ((int)m_DayOfWeek + i) % 7;
-                    m_DatePickerDayTexts[i].SetGraphicText(m_CultureInfo.DateTimeFormat.GetDayName((DayOfWeek)day).Substring(0, 1).ToUpper());
+                    int day = ((int)_DayOfWeek + i) % 7;
+                    m_DatePickerDayTexts[i].SetGraphicText(_CultureInfo.DateTimeFormat.GetDayName((DayOfWeek)day).Substring(0, 1).ToUpper());
                 }
 			}
 		}
 
         private string GetFormattedDate(DateTime date)
         {
-            return date.ToString(m_DateFormatPattern, m_CultureInfo);
+            return date.ToString(m_DateFormatPattern, _CultureInfo);
         }
 
         private List<DateTime> GetMonthDateList(int year, int month)
@@ -312,7 +328,7 @@ namespace MaterialUI
             List<DateTime> dateList = new List<DateTime>();
 
             DateTime firstDate = new DateTime(year, month, 1);
-            while (firstDate.DayOfWeek != m_DayOfWeek)
+            while (firstDate.DayOfWeek != _DayOfWeek)
             {
                 firstDate = firstDate.AddDays(-1);
             }
@@ -345,6 +361,14 @@ namespace MaterialUI
 
         #region Receivers
 
+        public override void OnActivityBeginHide()
+        {
+            if (_OnDismissiveClicked != null)
+                _OnDismissiveClicked.InvokeIfNotNull();
+
+            base.OnActivityBeginHide();
+        }
+
         protected virtual void OnDayItemValueChanged(DialogDatePickerDayItem dayItem, bool isOn)
         {
             if (!isOn)
@@ -352,7 +376,7 @@ namespace MaterialUI
                 return;
             }
 
-            m_CurrentDate = dayItem.dateTime;
+            _CurrentDate = dayItem.dateTime;
             UpdateDatesText();
         }
 
@@ -363,20 +387,20 @@ namespace MaterialUI
                 return;
             }
 
-            m_CurrentDate = monthItem.dateTime;
+            _CurrentDate = monthItem.dateTime;
             UpdateDatesText();
         }
 
         public void OnPreviousMonthClicked()
         {
-            DateTime date = m_CurrentDate;
+            DateTime date = _CurrentDate;
             date = date.AddMonths(-1);
             SetDate(new DateTime(date.Year, date.Month, 1));
         }
 
         public void OnNextMonthClicked()
         {
-            DateTime date = m_CurrentDate;
+            DateTime date = _CurrentDate;
             date = date.AddMonths(1);
             SetDate(new DateTime(date.Year, date.Month, 1));
         }
@@ -387,7 +411,7 @@ namespace MaterialUI
             TweenManager.TweenFloat(f => m_CalendarCanvasGroup.alpha = f, m_CalendarCanvasGroup.alpha, 0f, 0.5f);
             TweenManager.TweenFloat(f => m_YearCanvasGroup.alpha = f, m_YearCanvasGroup.alpha, 1f, 0.5f, 0.01f);  // HACK: 0.01f of delay, because if not, the animation is not played
 
-            m_DatePickerYearList.CenterToSelectedYear(m_CurrentDate.Year);
+            m_DatePickerYearList.CenterToSelectedYear(_CurrentDate.Year);
 
             m_CalendarCanvasGroup.blocksRaycasts = false;
             m_YearCanvasGroup.blocksRaycasts = true;
@@ -427,21 +451,21 @@ namespace MaterialUI
 
         public void OnButtonOkClicked()
         {
-            if (m_OnAffirmativeClicked != null)
+            var oldDismissAction = _OnDismissiveClicked;
+            _OnDismissiveClicked = null;
+
+            if (_OnAffirmativeClicked != null)
             {
-                m_OnAffirmativeClicked(m_CurrentDate);
+                _OnAffirmativeClicked(_CurrentDate);
             }
 
             Hide();
+
+            _OnDismissiveClicked = oldDismissAction;
         }
 
 		public void OnButtonCancelClicked()
 		{
-			if (m_OnDismissiveClicked != null)
-			{
-				m_OnDismissiveClicked();
-			}
-
 			Hide();
 		}
 

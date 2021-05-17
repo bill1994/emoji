@@ -525,7 +525,7 @@ namespace MaterialUI
         {
             DialogTimePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogTimePicker, GetContentTransform()).GetComponent<DialogTimePicker>();
             DialogManager.CreateActivity(dialog, dialog.transform.parent);
-            dialog.Initialize(time, onAffirmativeClicked, accentColor);
+            dialog.Initialize(time, onAffirmativeClicked, null, accentColor);
             dialog.Show();
 			return dialog;
         }

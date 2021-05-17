@@ -5203,7 +5203,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbf069c62d4f73a43a0f3ee17986d425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_delayedReload: 0
   OnReload:
     m_PersistentCalls:
       m_Calls: []
@@ -9044,6 +9043,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1676842b7da1b45b3b19ec7f00cf0b94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_activity: {fileID: 0}
   onShow:
     m_PersistentCalls:
       m_Calls: []
@@ -19590,6 +19590,9 @@ MonoBehaviour:
   m_autoPickElements: 1
   m_minVisibleElements: 0
   m_elementsToAwakePerStep: 1
+  m_extraVisibleElementsCount:
+    m_before: 0
+    m_after: 0
   m_optimizeDeepHierarchy: 1
   m_elements:
   - {fileID: 125732}

@@ -53,23 +53,30 @@ namespace MaterialUI
 
         private Graphic m_ClosestText;
 
-        #endregion
+		#endregion
 
-        #region Callbacks
+		#region Callbacks
 
-        private Action<DateTime> m_OnAffirmativeClicked;
+		private Action<DateTime> _OnAffirmativeClicked;
+		private Action _OnDismissiveClicked;
 
-        #endregion
+		#endregion
 
-        #region Properties
+		#region Properties
 
-        public Action<DateTime> onAffirmativeClicked
+		public Action<DateTime> onAffirmativeClicked
         {
-            get { return m_OnAffirmativeClicked; }
-            set { m_OnAffirmativeClicked = value; }
+            get { return _OnAffirmativeClicked; }
+            set { _OnAffirmativeClicked = value; }
         }
 
-        public MaterialButton affirmativeButton
+		public Action onDismissiveClicked
+		{
+			get { return _OnDismissiveClicked; }
+			set { _OnDismissiveClicked = value; }
+		}
+
+		public MaterialButton affirmativeButton
         {
             get { return m_AffirmativeButton; }
             set { m_AffirmativeButton = value; }
@@ -179,11 +186,31 @@ namespace MaterialUI
 			set { m_NeedleEnd = value; }
 		}
 
-        #endregion
+		#endregion
 
-        #region Helper Functions
+		#region Unity Functions
 
-        protected override void ValidateKeyTriggers(MaterialFocusGroup p_materialKeyFocus)
+		protected virtual void Update()
+		{
+			m_ClockNeedle.transform.localRotation = Quaternion.Slerp(m_ClockNeedle.transform.localRotation, Quaternion.Euler(new Vector3(0, 0, m_NeedleAngle)), Time.deltaTime * 20f);
+
+			int hour = GetHourFromAngle(m_ClockNeedle.transform.eulerAngles.z) - 1;
+			if (hour == -1)
+			{
+				hour = 11;
+			}
+			m_ClosestText = m_ClockTextArray[hour];
+			m_MaskedText.transform.position = m_ClosestText.transform.position;
+			m_MaskedText.transform.rotation = m_ClosestText.transform.rotation;
+			m_MaskedText.SetGraphicText(m_ClosestText.GetGraphicText());
+		}
+
+
+		#endregion
+
+		#region Helper Functions
+
+		protected override void ValidateKeyTriggers(MaterialFocusGroup p_materialKeyFocus)
         {
             if (p_materialKeyFocus != null)
             {
@@ -203,7 +230,7 @@ namespace MaterialUI
             }
         }
 
-        public void Initialize(DateTime time, Action<DateTime> onAffirmativeClicked, Color accentColor)
+        public void Initialize(DateTime time, Action<DateTime> onAffirmativeClicked, Action onDismissiveClicked, Color accentColor)
 		{
 			this.currentHour = time.Hour % 12;
 			this.currentMinute = time.Minute;
@@ -247,21 +274,7 @@ namespace MaterialUI
 			m_DismissiveButton.materialRipple.rippleData.Color = accentColor;
 		}
 
-		void Update()
-		{
-			m_ClockNeedle.transform.localRotation = Quaternion.Slerp(m_ClockNeedle.transform.localRotation, Quaternion.Euler(new Vector3(0, 0, m_NeedleAngle)), Time.deltaTime * 20f);
-
-			int hour = GetHourFromAngle(m_ClockNeedle.transform.eulerAngles.z) - 1;
-			if (hour == -1)
-			{
-				hour = 11;
-			}
-			m_ClosestText = m_ClockTextArray[hour];
-			m_MaskedText.transform.position = m_ClosestText.transform.position;
-			m_MaskedText.transform.rotation = m_ClosestText.transform.rotation;
-            m_MaskedText.SetGraphicText(m_ClosestText.GetGraphicText());
-		}
-
+		
 		private float GetAngleFromHour(int hour)
 		{
 			return -m_CurrentHour * 30 + 90;
@@ -369,24 +382,7 @@ namespace MaterialUI
 			UpdateNeedle();
 		}
 
-		public void OnAMClicked()
-		{
-			m_IsAM = true;
-			m_TextAM.color = new Color(m_TextAM.color.r, m_TextAM.color.g, m_TextAM.color.b, 1.0f);
-			textPM.color = new Color(textPM.color.r, textPM.color.g, textPM.color.b, 0.5f);
-		}
-
-		public void OnPMClicked()
-		{
-			m_IsAM = false;
-			textPM.color = new Color(textPM.color.r, textPM.color.g, textPM.color.b, 1.0f);
-			m_TextAM.color = new Color(m_TextAM.color.r, m_TextAM.color.g, m_TextAM.color.b, 0.5f);
-		}
-
-		public void OnHoursClicked()
-		{
-			SelectHours();
-		}
+		
 
 		private void SelectHours()
 		{
@@ -411,9 +407,21 @@ namespace MaterialUI
 			UpdateClockTextArray();
 		}
 
+		#endregion
+
+		#region Receivers
+
+		public void OnButtonCancelClicked()
+		{
+			Hide();
+		}
+
 		public void OnButtonOkClicked()
 		{
-			if (m_OnAffirmativeClicked != null)
+			var oldDismissAction = _OnDismissiveClicked;
+			_OnDismissiveClicked = null;
+
+			if (_OnAffirmativeClicked != null)
 			{
 				DateTime date = DateTime.MinValue.AddHours(m_CurrentHour).AddMinutes(m_CurrentMinute);
 				if (!m_IsAM && m_CurrentHour == 12) { } // If it's both PM and 12, we do nothing
@@ -426,12 +434,41 @@ namespace MaterialUI
 					date = date.AddHours(-12);
 				}
 
-				m_OnAffirmativeClicked(date);
+				_OnAffirmativeClicked(date);
 			}
 
 			Hide();
+
+			_OnDismissiveClicked = oldDismissAction;
 		}
 
-        #endregion
-    }
+		public override void OnActivityBeginHide()
+		{
+			if (_OnDismissiveClicked != null)
+				_OnDismissiveClicked.InvokeIfNotNull();
+
+			base.OnActivityBeginHide();
+		}
+
+		public void OnAMClicked()
+		{
+			m_IsAM = true;
+			m_TextAM.color = new Color(m_TextAM.color.r, m_TextAM.color.g, m_TextAM.color.b, 1.0f);
+			textPM.color = new Color(textPM.color.r, textPM.color.g, textPM.color.b, 0.5f);
+		}
+
+		public void OnPMClicked()
+		{
+			m_IsAM = false;
+			textPM.color = new Color(textPM.color.r, textPM.color.g, textPM.color.b, 1.0f);
+			m_TextAM.color = new Color(m_TextAM.color.r, m_TextAM.color.g, m_TextAM.color.b, 0.5f);
+		}
+
+		public void OnHoursClicked()
+		{
+			SelectHours();
+		}
+
+		#endregion
+	}
 }

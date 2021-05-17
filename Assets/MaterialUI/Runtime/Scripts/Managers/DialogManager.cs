@@ -826,9 +826,14 @@ namespace MaterialUI
 
         public static void ShowTimePickerAsync(DateTime time, Action<DateTime> onAffirmativeClicked, Color accentColor, System.Action<DialogTimePicker> onCreateCallback = null, ProgressIndicator progressIndicator = null)
         {
+            ShowTimePickerAsync(time, onAffirmativeClicked, null, accentColor, onCreateCallback, progressIndicator);
+        }
+
+        public static void ShowTimePickerAsync(DateTime time, Action<DateTime> onAffirmativeClicked, Action onDismissiveClicked, Color accentColor, System.Action<DialogTimePicker> onCreateCallback = null, ProgressIndicator progressIndicator = null)
+        {
             System.Action<DialogTimePicker> initialize = (DialogTimePicker dialog) =>
             {
-                dialog.Initialize(time, onAffirmativeClicked, accentColor);
+                dialog.Initialize(time, onAffirmativeClicked, onDismissiveClicked, accentColor);
                 if (onCreateCallback != null)
                     onCreateCallback(dialog);
             };
@@ -846,19 +851,24 @@ namespace MaterialUI
             return ShowTimePicker(time, onAffirmativeClicked, MaterialColor.teal500);
         }
 
+        public static DialogTimePicker ShowTimePicker(DateTime time, Action<DateTime> onAffirmativeClicked, Color accentColor)
+        {
+            return ShowTimePicker(time, onAffirmativeClicked, null, accentColor);
+        }
+
         /// <summary>
         /// Shows a time picker dialog with a required time picker, and a required button.
         /// </summary>
         /// <param name="time">The time selected when the dialog is shown.</param>
         /// <param name="onAffirmativeClicked">Called when the affirmative button is clicked.</param>
         /// <param name="accentColor">Color of the accent of the picker.</param>
-		public static DialogTimePicker ShowTimePicker(DateTime time, Action<DateTime> onAffirmativeClicked, Color accentColor)
+		public static DialogTimePicker ShowTimePicker(DateTime time, Action<DateTime> onAffirmativeClicked, Action onDismissiveClicked, Color accentColor)
         {
             var canvas = DialogManager.parentCanvas;
             DialogTimePicker dialog = PrefabManager.InstantiateGameObject(PrefabManager.ResourcePrefabs.dialogTimePicker, Instance.transform, false).GetComponent<DialogTimePicker>();
             CreateActivity(dialog, canvas);
 
-            dialog.Initialize(time, onAffirmativeClicked, accentColor);
+            dialog.Initialize(time, onAffirmativeClicked, onDismissiveClicked, accentColor);
             dialog.Show();
             return dialog;
         }
