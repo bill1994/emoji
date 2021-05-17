@@ -50,7 +50,7 @@ namespace Kyub.PickerServices
         protected System.Action _onPickerFailedCallback = null;
         protected System.Action<ExternImgFile> _onPickerSucessCallback = null;
 
-        protected virtual void Initialize(System.Action<ExternImgFile> onPickerSucess, System.Action onPickerFailed)
+        protected virtual void InitializeInternal(System.Action<ExternImgFile> onPickerSucess, System.Action onPickerFailed)
         {
             _onPickerFailedCallback = onPickerFailed;
             _onPickerSucessCallback = onPickerSucess;

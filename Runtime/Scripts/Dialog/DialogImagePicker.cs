@@ -41,10 +41,15 @@ namespace Kyub.PickerServices
 
         #region Helper Functions
 
+        public void Initialize(System.Action<ExternImgFile> onPickerSucess = null, System.Action onPickerFailed = null)
+        {
+            Initialize(this.cameraMode, onPickerSucess, onPickerFailed);
+        }
+
         public void Initialize(PickerSelectorForm.CameraModeEnum cameraMode, System.Action<ExternImgFile> onPickerSucess = null, System.Action onPickerFailed = null)
         {
-            base.Initialize(onPickerSucess, onPickerFailed);
-            m_CameraMode = this.cameraMode;
+            base.InitializeInternal(onPickerSucess, onPickerFailed);
+            m_CameraMode = cameraMode;
         }
 
         protected void CallPickerCamera()
