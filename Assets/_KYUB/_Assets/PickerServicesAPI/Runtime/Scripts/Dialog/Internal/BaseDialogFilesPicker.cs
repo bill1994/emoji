@@ -9,7 +9,7 @@ using MaterialUI;
 
 namespace Kyub.PickerServices
 {
-    public abstract class BaseDialogMultiImagePicker : MaterialDialogCompat
+    public abstract class BaseDialogFilesPicker : MaterialDialogCompat
     {
         [System.Serializable]
         public class StrArrayUnityEvent : UnityEvent<string[]> { }
@@ -42,7 +42,7 @@ namespace Kyub.PickerServices
         protected System.Action _onPickerFailedCallback = null;
         protected System.Action<string[]> _onPickerSucessCallback = null;
 
-        protected virtual void Initialize(System.Action<string[]> onPickerSucess, System.Action onPickerFailed)
+        protected virtual void InitializeInternal(System.Action<string[]> onPickerSucess, System.Action onPickerFailed)
         {
             _onPickerFailedCallback = onPickerFailed;
             _onPickerSucessCallback = onPickerSucess;
