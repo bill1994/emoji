@@ -96,7 +96,7 @@ namespace Kyub.PickerServices
             //Save Camera Image into TempFolder
             System.Action<ExternImgFile> cameraCallback = (externImg) => 
             {
-                var tempUrl = externImg.Texture != null? CrossPickerServices.SaveTextureToTemporaryPath(externImg.Texture) : null;
+                var tempUrl = externImg != null && externImg.Texture != null? CrossPickerServices.SaveTextureToTemporaryPath(externImg.Texture) : null;
                 HandleOnFilesPickerFinish(!string.IsNullOrEmpty(tempUrl) ? new string[] { tempUrl } : null);
             };
             if (m_CameraMode == PickerSelectorForm.CameraModeEnum.ControlledByManager)

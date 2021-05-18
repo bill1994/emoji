@@ -69,16 +69,6 @@ namespace Kyub.PickerServices
             if (this == null)
                 return;
 
-            if (callHide)
-            {
-                var onDismiss = _onPickerFailedCallback;
-                _onPickerFailedCallback = null;
-
-                Hide();
-
-                _onPickerFailedCallback = onDismiss;
-            }
-
             UnregisterEvents();
             if (result != null && result.Length > 0)
             {
@@ -96,7 +86,16 @@ namespace Kyub.PickerServices
                 if(OnPickerFailed != null)
                     OnPickerFailed.Invoke();
             }
-            base.Hide();
+
+            if (callHide)
+            {
+                var onDismiss = _onPickerFailedCallback;
+                _onPickerFailedCallback = null;
+
+                Hide();
+
+                _onPickerFailedCallback = onDismiss;
+            }
         }
 
         protected virtual void RegisterEvents()
