@@ -2115,12 +2115,13 @@ namespace MaterialUI
             if (validator != null && !m_HasValidation)
                 validator.Dispose();
 
-            if (validationText == null) return;
+            //if (validationText == null) return;
 
             if (!force && !m_ValidateOnStart && !_HasBeenSelected) 
                 return;
 
-            m_ValidationText.color = IsSelected() ? m_ValidationActiveColor : m_ValidationInactiveColor;
+            if (validationText != null)
+                m_ValidationText.color = IsSelected() ? m_ValidationActiveColor : m_ValidationInactiveColor;
 
             if (m_TextValidator != null && validator != null)
             {
@@ -3045,7 +3046,6 @@ namespace MaterialUI
             protected Color m_colorActive = Color.white;
             [SerializeField, SerializeStyleProperty]
             protected Color m_colorInactive = Color.gray;
-            [Space]
             [SerializeField, SerializeStyleProperty]
             protected bool m_useValidationColor = false;
             [SerializeField, SerializeStyleProperty]
