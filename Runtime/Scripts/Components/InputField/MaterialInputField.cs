@@ -1744,7 +1744,7 @@ namespace MaterialUI
                 if (onActivate != null)
                     onActivate.Invoke();
             }
-            else if(callEvent)
+            else if (callEvent)
             {
                 if (onActivate != null)
                     onActivate.Invoke();
@@ -2117,7 +2117,7 @@ namespace MaterialUI
 
             //if (validationText == null) return;
 
-            if (!force && !m_ValidateOnStart && !_HasBeenSelected) 
+            if (!force && !m_ValidateOnStart && !_HasBeenSelected)
                 return;
 
             if (validationText != null)
@@ -2171,8 +2171,8 @@ namespace MaterialUI
                                     if (this != null && validationCanvasGroup != null)
                                         validationCanvasGroup.alpha = f;
                                 },
-                                validationCanvasGroup.alpha, 0f, m_AnimationDuration / 2, 
-                                0, 
+                                validationCanvasGroup.alpha, 0f, m_AnimationDuration / 2,
+                                0,
                                 () =>
                                 {
                                     if (this != null && validationCanvasGroup != null)
@@ -3037,17 +3037,21 @@ namespace MaterialUI
 
         #region BaseStyleElement Helper Classes
 
+
+
         [System.Serializable]
         public class InputFieldStyleProperty : StyleProperty
         {
+            public enum ColorModeEnum { Default, WithValidation, None }
+
             #region Private Variables
 
+            [SerializeField, SerializeStyleProperty]
+            protected ColorModeEnum m_colorMode = ColorModeEnum.Default;
             [SerializeField, SerializeStyleProperty]
             protected Color m_colorActive = Color.white;
             [SerializeField, SerializeStyleProperty]
             protected Color m_colorInactive = Color.gray;
-            [SerializeField, SerializeStyleProperty]
-            protected bool m_useValidationColor = false;
             [SerializeField, SerializeStyleProperty]
             protected Color m_validationActive = Color.white;
             [SerializeField, SerializeStyleProperty]
@@ -3056,6 +3060,19 @@ namespace MaterialUI
             #endregion
 
             #region Public Properties
+
+            public ColorModeEnum ColorMode
+            {
+                get
+                {
+                    return m_colorMode;
+                }
+
+                set
+                {
+                    m_colorMode = value;
+                }
+            }
 
             public Color ColorActive
             {
@@ -3080,19 +3097,6 @@ namespace MaterialUI
                 set
                 {
                     m_colorInactive = value;
-                }
-            }
-
-            public bool UseValidationColor
-            {
-                get
-                {
-                    return m_useValidationColor;
-                }
-
-                set
-                {
-                    m_useValidationColor = value;
                 }
             }
 
@@ -3148,13 +3152,14 @@ namespace MaterialUI
                 TweenManager.EndTween(_tweenId);
 
                 var graphic = GetTarget<Graphic>();
-                if (graphic != null)
+                if (graphic != null && m_colorMode != ColorModeEnum.None)
                 {
+                    var supportValidationColor = m_colorMode == ColorModeEnum.WithValidation;
                     var inputField = sender as MaterialInputField;
                     var isActive = inputField != null ? inputField.IsSelected() : true;
-                    var isTextValid = m_useValidationColor && inputField != null ? inputField.IsTextValid() : true;
+                    var isTextValid = supportValidationColor && inputField != null ? inputField.IsTextValid() : true;
 
-                    var endColor = isActive ? 
+                    var endColor = isActive ?
                         (isTextValid ? m_colorActive : m_validationActive) :
                         (isTextValid ? m_colorInactive : m_validationInactive);
                     if (canAnimate && Application.isPlaying)
