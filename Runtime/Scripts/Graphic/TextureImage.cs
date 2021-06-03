@@ -172,13 +172,13 @@ namespace Kyub.UI
                     if (localRectProportion > textureProportion)
                     {
                         var mult = localRect.width > 0 ? textureSize.x / localRect.width : 0;
-                        normalizedRect = new Rect(minMaxRect.xMin, minMaxRect.yMin, minMaxRect.xMax, (localRect.height * mult) / textureSize.y);
+                        normalizedRect = new Rect(minMaxRect.xMin, minMaxRect.yMin, minMaxRect.width, ((localRect.height * mult) / textureSize.y) * minMaxRect.height);
                         normalizedRect.y = Mathf.Max(minMaxRect.yMin, (minMaxRect.yMax - normalizedRect.height) * pivot.y);
                     }
                     else if (localRectProportion < textureProportion)
                     {
                         var mult = localRect.height > 0 ? textureSize.y / localRect.height : 0;
-                        normalizedRect = new Rect(minMaxRect.xMin, minMaxRect.yMin, (localRect.width * mult) / textureSize.x, minMaxRect.yMax);
+                        normalizedRect = new Rect(minMaxRect.xMin, minMaxRect.yMin, ((localRect.width * mult) / textureSize.x) * minMaxRect.width, minMaxRect.height);
                         normalizedRect.x = Mathf.Max(minMaxRect.xMin, (1 - normalizedRect.width) * pivot.x);
                     }
                 }
