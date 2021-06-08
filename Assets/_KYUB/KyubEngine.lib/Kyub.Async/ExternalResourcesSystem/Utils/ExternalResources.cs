@@ -11,8 +11,8 @@ namespace Kyub.Async
     {
         #region Helper Classes/Delegates
 
-        public delegate ExternImgFile CustomImgUrlDownloader(string p_url, System.Action<ExternImgFile> p_callback);
-        public delegate ExternAudioFile CustomAudioUrlDownloader(string p_url, System.Action<ExternAudioFile> p_callback);
+        public delegate ExternImgFile CustomImgUrlDownloader(string url, System.Action<ExternImgFile> callback);
+        public delegate ExternAudioFile CustomAudioUrlDownloader(string url, System.Action<ExternAudioFile> callback);
 
         #endregion
 
@@ -216,7 +216,7 @@ namespace Kyub.Async
 
         #region Level Receivers
 
-        static void HandleOnLevelLoaded(Scene p_scene, LoadSceneMode p_mode)
+        static void HandleOnLevelLoaded(Scene scene, LoadSceneMode mode)
         {
             UnloadUnusedAssetsImmediate();
         }
@@ -225,72 +225,72 @@ namespace Kyub.Async
 
         #region Public Register Functions
 
-        public static void RegisterReceiver(ExternalResourcesReceiver p_receiver)
+        public static void RegisterReceiver(ExternalResourcesReceiver receiver)
         {
-            UnregisterReceiver(p_receiver);
-            if (p_receiver != null)
-                ReferenceCounter.AddChecking(p_receiver.Key, p_receiver);
+            UnregisterReceiver(receiver);
+            if (receiver != null)
+                ReferenceCounter.AddChecking(receiver.Key, receiver);
         }
 
-        public static void UnregisterReceiver(ExternalResourcesReceiver p_receiver)
+        public static void UnregisterReceiver(ExternalResourcesReceiver receiver)
         {
-            if (p_receiver != null)
-                ReferenceCounter.RemoveChecking(p_receiver);
+            if (receiver != null)
+                ReferenceCounter.RemoveChecking(receiver);
         }
 
-        public static void RegisterCustomImgDownloaderPattern(string p_pattern, CustomImgUrlDownloader p_delegateToCallWithThisPattern)
+        public static void RegisterCustomImgDownloaderPattern(string pattern, CustomImgUrlDownloader delegateToCallWithThisPattern)
         {
-            if (!string.IsNullOrEmpty(p_pattern))
-                CustomImgDownloaderPatterns.AddReplacing(p_pattern, p_delegateToCallWithThisPattern);
+            if (!string.IsNullOrEmpty(pattern))
+                CustomImgDownloaderPatterns.AddReplacing(pattern, delegateToCallWithThisPattern);
             CustomImgDownloaderPatterns.RemovePairsWithNullValuesOrKeys();
         }
 
-        public static void RegisterCustomAudioDownloaderPattern(string p_pattern, CustomAudioUrlDownloader p_delegateToCallWithThisPattern)
+        public static void RegisterCustomAudioDownloaderPattern(string pattern, CustomAudioUrlDownloader delegateToCallWithThisPattern)
         {
-            if (!string.IsNullOrEmpty(p_pattern))
-                CustomAudioDownloaderPatterns.AddReplacing(p_pattern, p_delegateToCallWithThisPattern);
+            if (!string.IsNullOrEmpty(pattern))
+                CustomAudioDownloaderPatterns.AddReplacing(pattern, delegateToCallWithThisPattern);
             CustomAudioDownloaderPatterns.RemovePairsWithNullValuesOrKeys();
         }
 
-        public static void RegisterCustomImgDownloaderPattern(int p_index, string p_pattern, CustomImgUrlDownloader p_delegateToCallWithThisPattern)
+        public static void RegisterCustomImgDownloaderPattern(int index, string pattern, CustomImgUrlDownloader delegateToCallWithThisPattern)
         {
-            if (!string.IsNullOrEmpty(p_pattern))
+            if (!string.IsNullOrEmpty(pattern))
             {
-                CustomImgDownloaderPatterns.RemoveByKey(p_pattern);
-                var v_pair = new Kyub.Collections.KVPair<string, CustomImgUrlDownloader>(p_pattern, p_delegateToCallWithThisPattern);
-                if (p_index < 0 || p_index >= CustomImgDownloaderPatterns.Count)
-                    CustomImgDownloaderPatterns.Add(v_pair);
+                CustomImgDownloaderPatterns.RemoveByKey(pattern);
+                var pair = new Kyub.Collections.KVPair<string, CustomImgUrlDownloader>(pattern, delegateToCallWithThisPattern);
+                if (index < 0 || index >= CustomImgDownloaderPatterns.Count)
+                    CustomImgDownloaderPatterns.Add(pair);
                 else
-                    CustomImgDownloaderPatterns.Insert(p_index, v_pair);
+                    CustomImgDownloaderPatterns.Insert(index, pair);
             }
             CustomImgDownloaderPatterns.RemovePairsWithNullValuesOrKeys();
         }
 
-        public static void RegisterCustomAudioDownloaderPattern(int p_index, string p_pattern, CustomAudioUrlDownloader p_delegateToCallWithThisPattern)
+        public static void RegisterCustomAudioDownloaderPattern(int index, string pattern, CustomAudioUrlDownloader delegateToCallWithThisPattern)
         {
-            if (!string.IsNullOrEmpty(p_pattern))
+            if (!string.IsNullOrEmpty(pattern))
             {
-                CustomAudioDownloaderPatterns.RemoveByKey(p_pattern);
-                var v_pair = new Kyub.Collections.KVPair<string, CustomAudioUrlDownloader>(p_pattern, p_delegateToCallWithThisPattern);
-                if (p_index < 0 || p_index >= CustomAudioDownloaderPatterns.Count)
-                    CustomAudioDownloaderPatterns.Add(v_pair);
+                CustomAudioDownloaderPatterns.RemoveByKey(pattern);
+                var pair = new Kyub.Collections.KVPair<string, CustomAudioUrlDownloader>(pattern, delegateToCallWithThisPattern);
+                if (index < 0 || index >= CustomAudioDownloaderPatterns.Count)
+                    CustomAudioDownloaderPatterns.Add(pair);
                 else
-                    CustomAudioDownloaderPatterns.Insert(p_index, v_pair);
+                    CustomAudioDownloaderPatterns.Insert(index, pair);
             }
             CustomAudioDownloaderPatterns.RemovePairsWithNullValuesOrKeys();
         }
 
-        public static void UnregisterCustomImgDownloaderPattern(string p_pattern)
+        public static void UnregisterCustomImgDownloaderPattern(string pattern)
         {
-            if (!string.IsNullOrEmpty(p_pattern))
-                CustomImgDownloaderPatterns.RemoveByKey(p_pattern);
+            if (!string.IsNullOrEmpty(pattern))
+                CustomImgDownloaderPatterns.RemoveByKey(pattern);
             CustomImgDownloaderPatterns.RemovePairsWithNullValuesOrKeys();
         }
 
-        public static void UnregisterCustomAudioDownloaderPattern(string p_pattern)
+        public static void UnregisterCustomAudioDownloaderPattern(string pattern)
         {
-            if (!string.IsNullOrEmpty(p_pattern))
-                CustomAudioDownloaderPatterns.RemoveByKey(p_pattern);
+            if (!string.IsNullOrEmpty(pattern))
+                CustomAudioDownloaderPatterns.RemoveByKey(pattern);
             CustomAudioDownloaderPatterns.RemovePairsWithNullValuesOrKeys();
         }
 
@@ -298,25 +298,25 @@ namespace Kyub.Async
 
         #region Public Audio Functions
 
-        public static ExternAudioFile AddAudioIntoCache(ExternAudioFile p_audio)
+        public static ExternAudioFile AddAudioIntoCache(ExternAudioFile audio)
         {
-            AudioClip v_audioClip = p_audio != null ? p_audio.Clip : null;
-            return AddAudioIntoCache(p_audio != null ? p_audio.Url : "", v_audioClip);
+            AudioClip audioClip = audio != null ? audio.Clip : null;
+            return AddAudioIntoCache(audio != null ? audio.Url : "", audioClip);
         }
 
-        public static ExternAudioFile AddAudioIntoCache(string p_key, AudioClip p_audio)
+        public static ExternAudioFile AddAudioIntoCache(string key, AudioClip audio)
         {
             //Try avoid add same sprite twice
-            bool v_keyIsNull = string.IsNullOrEmpty(p_key);
-            if (!v_keyIsNull &&
-                (string.IsNullOrEmpty(TryFindKeyWithAudio(p_audio, false)))
+            bool keyIsNull = string.IsNullOrEmpty(key);
+            if (!keyIsNull &&
+                (string.IsNullOrEmpty(TryFindKeyWithAudio(audio, false)))
                )
             {
-                return AddClipIntoCache_Internal(p_key, p_audio);
+                return AddClipIntoCache_Internal(key, audio);
             }
             else
             {
-                if (v_keyIsNull)
+                if (keyIsNull)
                     Debug.LogWarning("Trying to add an empty key into ExternalResources cache");
                 else
                     Debug.LogWarning("Trying to add a duplicated Audio into ExternalResources cache");
@@ -324,54 +324,54 @@ namespace Kyub.Async
             return null;
         }
         
-        public static ExternAudioFile ReloadAudioAsync(string p_key, System.Action<ExternAudioFile> p_callback = null)
+        public static ExternAudioFile ReloadAudioAsync(string key, System.Action<ExternAudioFile> callback = null)
         {
-            return ReloadAudioFromWebInternal(p_key, p_callback);
+            return ReloadAudioFromWebInternal(key, callback);
         }
 
-        public static ExternAudioFile ReloadClipAsync(string p_key, System.Action<AudioClip> p_callback = null)
+        public static ExternAudioFile ReloadClipAsync(string key, System.Action<AudioClip> callback = null)
         {
-            return ReloadAudioFromWebInternal(p_key, p_callback);
+            return ReloadAudioFromWebInternal(key, callback);
         }
 
-        public static ExternAudioFile LoadAudioAsync(string p_key, System.Action<ExternAudioFile> p_callback = null)
+        public static ExternAudioFile LoadAudioAsync(string key, System.Action<ExternAudioFile> callback = null)
         {
-            return GetAudioInternal(p_key, p_callback);
+            return GetAudioInternal(key, callback);
         }
 
-        public static ExternAudioFile LoadClipAsync(string p_key, System.Action<AudioClip> p_callback = null)
+        public static ExternAudioFile LoadClipAsync(string key, System.Action<AudioClip> callback = null)
         {
-            return GetAudioInternal(p_key, p_callback);
+            return GetAudioInternal(key, callback);
         }
 
-        public static AudioClip LoadClipFromCache(string p_key)
+        public static AudioClip LoadClipFromCache(string key)
         {
-            return GetCachedClip(p_key);
+            return GetCachedClip(key);
         }
 
         #endregion
 
         #region Public Image Functions
 
-        public static ExternImgFile AddImageIntoCache(ExternImgFile p_image, bool p_acceptMultipleKeysWithSameTexture = true)
+        public static ExternImgFile AddImageIntoCache(ExternImgFile image, bool acceptMultipleKeysWithSameTexture = true)
         {
-            Sprite v_sprite = p_image != null ? p_image.Sprite : null;
-            return AddSpriteIntoCache(p_image != null ? p_image.Url : "", v_sprite, p_acceptMultipleKeysWithSameTexture);
+            Sprite sprite = image != null ? image.Sprite : null;
+            return AddSpriteIntoCache(image != null ? image.Url : "", sprite, acceptMultipleKeysWithSameTexture);
         }
 
-        public static ExternImgFile AddSpriteIntoCache(string p_key, Sprite p_sprite, bool p_acceptMultipleKeysWithSameTexture = true)
+        public static ExternImgFile AddSpriteIntoCache(string key, Sprite sprite, bool acceptMultipleKeysWithSameTexture = true)
         {
             //Try avoid add same sprite twice
-            bool v_keyIsNull = string.IsNullOrEmpty(p_key);
-            if (!v_keyIsNull && 
-                (p_acceptMultipleKeysWithSameTexture || string.IsNullOrEmpty(TryFindKeyWithSprite(p_sprite, false))) 
+            bool keyIsNull = string.IsNullOrEmpty(key);
+            if (!keyIsNull && 
+                (acceptMultipleKeysWithSameTexture || string.IsNullOrEmpty(TryFindKeyWithSprite(sprite, false))) 
                )
             {
-                return AddSpriteIntoCache_Internal(p_key, p_sprite);
+                return AddSpriteIntoCache_Internal(key, sprite);
             }
             else
             {
-                if (v_keyIsNull)
+                if (keyIsNull)
                     Debug.LogWarning("Trying to add an empty key into ExternalResources cache");
                 else
                     Debug.LogWarning("Trying to add a duplicated Sprite into ExternalResources cache");
@@ -379,20 +379,20 @@ namespace Kyub.Async
             return null;
         }
 
-        public static ExternImgFile AddTextureIntoCache(string p_key, Texture2D p_texture, bool p_acceptMultipleKeysWithSameTexture = true)
+        public static ExternImgFile AddTextureIntoCache(string key, Texture2D texture, bool acceptMultipleKeysWithSameTexture = true)
         {
             //Try avoid add same sprite twice
-            bool v_keyIsNull = string.IsNullOrEmpty(p_key);
-            if (!v_keyIsNull && 
-                (p_acceptMultipleKeysWithSameTexture || string.IsNullOrEmpty(TryFindKeyWithTexture(p_texture, false))) 
+            bool keyIsNull = string.IsNullOrEmpty(key);
+            if (!keyIsNull && 
+                (acceptMultipleKeysWithSameTexture || string.IsNullOrEmpty(TryFindKeyWithTexture(texture, false))) 
                )
             {
-                Sprite v_sprite = p_texture != null ? Sprite.Create(p_texture, new Rect(0, 0, p_texture.width, p_texture.height), new Vector2(0.5f, 0.5f)) : null;
-                return AddSpriteIntoCache_Internal(p_key, v_sprite);
+                Sprite sprite = texture != null ? Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f)) : null;
+                return AddSpriteIntoCache_Internal(key, sprite);
             }
             else
             {
-                if (v_keyIsNull)
+                if (keyIsNull)
                     Debug.LogWarning("Trying to add an empty key into ExternalResources cache");
                 else
                     Debug.LogWarning("Trying to add a duplicated Texture2D into ExternalResources cache");
@@ -400,144 +400,144 @@ namespace Kyub.Async
             return null;
         }
 
-        public static ExternImgFile AddTextureDataIntoCache(string p_key, byte[] p_textureData, bool p_acceptMultipleKeysWithSameTexture = true)
+        public static ExternImgFile AddTextureDataIntoCache(string key, byte[] textureData, bool acceptMultipleKeysWithSameTexture = true)
         {
-            if (!string.IsNullOrEmpty(p_key))
+            if (!string.IsNullOrEmpty(key))
             {
-                Texture2D v_texture = new Texture2D(4, 4);
-                if (!v_texture.LoadImage(p_textureData))
+                Texture2D texture = new Texture2D(4, 4);
+                if (!texture.LoadImage(textureData))
                 {
-                    if (v_texture != null)
-                        Object.DestroyImmediate(v_texture);
-                    v_texture = null;
+                    if (texture != null)
+                        Object.DestroyImmediate(texture);
+                    texture = null;
                 }
-                return AddTextureIntoCache(p_key, v_texture, p_acceptMultipleKeysWithSameTexture);
+                return AddTextureIntoCache(key, texture, acceptMultipleKeysWithSameTexture);
             }
             return null;
         }
 
-        public static ExternImgFile ReloadImageAsync(string p_key, System.Action<ExternImgFile> p_callback = null)
+        public static ExternImgFile ReloadImageAsync(string key, System.Action<ExternImgFile> callback = null)
         {
-            return ReloadImageFromWebInternal(p_key, p_callback);
+            return ReloadImageFromWebInternal(key, callback);
         }
 
-        public static ExternImgFile ReloadSpriteAsync(string p_key, System.Action<Sprite> p_callback = null)
+        public static ExternImgFile ReloadSpriteAsync(string key, System.Action<Sprite> callback = null)
         {
-            return ReloadImageFromWebInternal(p_key, p_callback);
+            return ReloadImageFromWebInternal(key, callback);
         }
 
-        public static ExternImgFile ReloadTextureAsync(string p_key, System.Action<Texture2D> p_callback = null)
+        public static ExternImgFile ReloadTextureAsync(string key, System.Action<Texture2D> callback = null)
         {
-            return ReloadImageFromWebInternal(p_key, p_callback);
+            return ReloadImageFromWebInternal(key, callback);
         }
 
-        public static ExternImgFile LoadImageAsync(string p_key, System.Action<ExternImgFile> p_callback = null)
+        public static ExternImgFile LoadImageAsync(string key, System.Action<ExternImgFile> callback = null)
         {
-            return GetImageInternal(p_key, p_callback);
+            return GetImageInternal(key, callback);
         }
 
-        public static ExternImgFile LoadSpriteAsync(string p_key, System.Action<Sprite> p_callback = null)
+        public static ExternImgFile LoadSpriteAsync(string key, System.Action<Sprite> callback = null)
         {
-            return GetImageInternal(p_key, p_callback);
+            return GetImageInternal(key, callback);
         }
 
-        public static ExternImgFile LoadTextureAsync(string p_key, System.Action<Texture2D> p_callback = null)
+        public static ExternImgFile LoadTextureAsync(string key, System.Action<Texture2D> callback = null)
         {
-            return GetImageInternal(p_key, p_callback);
+            return GetImageInternal(key, callback);
         }
 
-        public static Sprite LoadSpriteFromCache(string p_key)
+        public static Sprite LoadSpriteFromCache(string key)
         {
-            return GetCachedSprite(p_key);
+            return GetCachedSprite(key);
         }
 
-        public static Texture2D LoadTextureFromCache(string p_key)
+        public static Texture2D LoadTextureFromCache(string key)
         {
-            return GetCachedTexture(p_key);
+            return GetCachedTexture(key);
         }
 
         #endregion
 
         #region Public Asset Functions
 
-        public static void UnloadAsset(string p_key, bool p_immediate = false)
+        public static void UnloadAsset(string key, bool immediate = false)
         {
-            UnloadAssetInternal(p_key, p_immediate);
+            UnloadAssetInternal(key, immediate);
         }
 
-        public static void UnloadAssets(IEnumerable<string> p_keys, bool p_immediate = false)
+        public static void UnloadAssets(IEnumerable<string> keys, bool immediate = false)
         {
-            if (p_keys == null)
-                p_keys = new List<string>();
-            HashSet<string> v_keysToUnload = new HashSet<string>();
-            HashSet<Object> v_elementsToUnload = new HashSet<Object>();
+            if (keys == null)
+                keys = new List<string>();
+            HashSet<string> keysToUnload = new HashSet<string>();
+            HashSet<Object> elementsToUnload = new HashSet<Object>();
 
-            foreach (var v_key in p_keys)
+            foreach (var key in keys)
             {
-                if (!v_keysToUnload.Contains(v_key) && s_assetDictionary.ContainsKey(v_key))
+                if (!keysToUnload.Contains(key) && s_assetDictionary.ContainsKey(key))
                 {
-                    v_keysToUnload.Add(v_key);
-                    var v_asset = AssetDictionary[v_key];
-                    if (v_asset == null)
+                    keysToUnload.Add(key);
+                    var asset = AssetDictionary[key];
+                    if (asset == null)
                         continue;
 
-                    if (!v_elementsToUnload.Contains(v_asset))
-                        v_elementsToUnload.Add(v_asset);
+                    if (!elementsToUnload.Contains(asset))
+                        elementsToUnload.Add(asset);
 
                     //Fill sprites that we must try destroy
-                    var v_sprite = v_asset as Sprite;
-                    if (v_sprite != null)
+                    var sprite = asset as Sprite;
+                    if (sprite != null)
                     {
-                        var v_texture = v_sprite.texture;
-                        if (v_texture != null && !v_elementsToUnload.Contains(v_texture))
-                            v_elementsToUnload.Add(v_texture);
+                        var texture = sprite.texture;
+                        if (texture != null && !elementsToUnload.Contains(texture))
+                            elementsToUnload.Add(texture);
                     }
 
                 }
             }
 
             //We must skip destroy step to destroy everything in same loop (optimize find)
-            foreach (string v_key in v_keysToUnload)
+            foreach (string key in keysToUnload)
             {
-                if (!string.IsNullOrEmpty(v_key))
+                if (!string.IsNullOrEmpty(key))
                 {
-                    UnloadAssetInternal(v_key, false, UnloadMode.SkipDestroyStep);
+                    UnloadAssetInternal(key, false, UnloadMode.SkipDestroyStep);
                 }
             }
 
             //Reset to current dictionary keys
-            var v_currentDictKeys = new List<string>(AssetDictionary.Keys);
+            var currentDictKeys = new List<string>(AssetDictionary.Keys);
             //Remove elements that keep reference in dictionary of images (two keys with same texture or sprite)
-            foreach (var v_key in v_currentDictKeys)
+            foreach (var key in currentDictKeys)
             {
-                var v_asset = AssetDictionary[v_key];
-                if (v_asset == null)
+                var asset = AssetDictionary[key];
+                if (asset == null)
                     continue;
 
-                v_elementsToUnload.Remove(v_asset);
+                elementsToUnload.Remove(asset);
 
-                var v_sprite = v_asset as Sprite;
-                if (v_sprite != null)
+                var sprite = asset as Sprite;
+                if (sprite != null)
                 {
-                    var v_texture = v_sprite.texture;
-                    if (v_texture != null)
-                        v_elementsToUnload.Remove(v_texture);
+                    var texture = sprite.texture;
+                    if (texture != null)
+                        elementsToUnload.Remove(texture);
                 }
             }
             //Destroy Sprite and Texture
-            List<Object> v_elementsToDestroy = new List<Object>(v_elementsToUnload);
-            v_elementsToUnload.Clear();
-            for (int i = 0; i < v_elementsToDestroy.Count; i++)
+            List<Object> elementsToDestroy = new List<Object>(elementsToUnload);
+            elementsToUnload.Clear();
+            for (int i = 0; i < elementsToDestroy.Count; i++)
             {
-                if (v_elementsToDestroy[i] != null)
+                if (elementsToDestroy[i] != null)
                 {
-                    if (p_immediate)
-                        Object.DestroyImmediate(v_elementsToDestroy[i]);
+                    if (immediate)
+                        Object.DestroyImmediate(elementsToDestroy[i]);
                     else
-                        DestroyUtils.DestroyImmediate(v_elementsToDestroy[i]);
+                        DestroyUtils.DestroyImmediate(elementsToDestroy[i]);
                 }
             }
-            v_elementsToDestroy.Clear();
+            elementsToDestroy.Clear();
             RemoveKeysWithNullValuesInDictionary(AssetDictionary);
         }
 
@@ -551,47 +551,47 @@ namespace Kyub.Async
             }
         }
 
-        public static bool IsUselessResources(string p_key)
+        public static bool IsUselessResources(string key)
         {
             ReferenceCounter.RemovePairsWithNullValues();
-            return !ReferenceCounter.ContainsKey(p_key);
+            return !ReferenceCounter.ContainsKey(key);
         }
 
         #endregion
 
         #region Internal Resources Functions
 
-        private static void UnloadAssetInternal(string p_url, bool p_immediate = false, UnloadMode p_mode = UnloadMode.DestroyIfNeeded)
+        private static void UnloadAssetInternal(string url, bool immediate = false, UnloadMode mode = UnloadMode.DestroyIfNeeded)
         {
-            if (!string.IsNullOrEmpty(p_url))
+            if (!string.IsNullOrEmpty(url))
             {
-                if (AssetDictionary.ContainsKey(p_url) && AssetDictionary[p_url] is AudioClip)
-                    UnloadAudioInternal(p_url, false, UnloadMode.SkipDestroyStep);
+                if (AssetDictionary.ContainsKey(url) && AssetDictionary[url] is AudioClip)
+                    UnloadAudioInternal(url, false, UnloadMode.SkipDestroyStep);
                 else
-                    UnloadImageInternal(p_url, false, UnloadMode.SkipDestroyStep);
+                    UnloadImageInternal(url, false, UnloadMode.SkipDestroyStep);
             }
         }
 
         private static void UnloadUnusedAssetsImmediate()
         {
-            HashSet<string> v_keysToUnload = new HashSet<string>();
-            List<string> v_keys = new List<string>(AssetDictionary.Keys);
-            foreach (var v_key in v_keys)
+            HashSet<string> keysToUnload = new HashSet<string>();
+            List<string> keys = new List<string>(AssetDictionary.Keys);
+            foreach (var key in keys)
             {
-                if (IsUselessResources(v_key) && !v_keysToUnload.Contains(v_key))
-                    v_keysToUnload.Add(v_key);
+                if (IsUselessResources(key) && !keysToUnload.Contains(key))
+                    keysToUnload.Add(key);
             }
-            UnloadAssets(v_keysToUnload, false);
+            UnloadAssets(keysToUnload, false);
             _isUloadingAssets = false;
         }
 
-        private static void RemoveKeysWithNullValuesInDictionary<T>(Dictionary<string, T> p_dict) where T : UnityEngine.Object
+        private static void RemoveKeysWithNullValuesInDictionary<T>(Dictionary<string, T> dict) where T : UnityEngine.Object
         {
-            List<string> v_keys = new List<string>(p_dict.Keys);
-            foreach (var v_key in v_keys)
+            List<string> keys = new List<string>(dict.Keys);
+            foreach (var key in keys)
             {
-                if (p_dict[v_key] == null)
-                    p_dict.Remove(v_key);
+                if (dict[key] == null)
+                    dict.Remove(key);
             }
         }
 
@@ -599,439 +599,439 @@ namespace Kyub.Async
 
         #region Audio Cacher Internal
 
-        private static ExternAudioFile AddClipIntoCache_Internal(string p_key, AudioClip p_audioClip)
+        private static ExternAudioFile AddClipIntoCache_Internal(string key, AudioClip audioClip)
         {
             //Try avoid add same sprite twice
-            Object v_asset = null;
-            AudioClip v_loadedAudioClip = null;
-            AssetDictionary.TryGetValue(p_key, out v_asset);
-            v_loadedAudioClip = v_asset as AudioClip;
+            Object asset = null;
+            AudioClip loadedAudioClip = null;
+            AssetDictionary.TryGetValue(key, out asset);
+            loadedAudioClip = asset as AudioClip;
 
-            if (v_loadedAudioClip != p_audioClip)
+            if (loadedAudioClip != audioClip)
             {
-                UnloadAudioInternal(p_key, false, UnloadMode.SkipDestroyStep);
+                UnloadAudioInternal(key, false, UnloadMode.SkipDestroyStep);
                 //Try destroy previous sprite and textures
-                if (v_loadedAudioClip != null && v_loadedAudioClip != p_audioClip && string.IsNullOrEmpty(TryFindKeyWithAudio(v_loadedAudioClip)))
-                    DestroyUtils.DestroyImmediate(v_loadedAudioClip);
+                if (loadedAudioClip != null && loadedAudioClip != audioClip && string.IsNullOrEmpty(TryFindKeyWithAudio(loadedAudioClip)))
+                    DestroyUtils.DestroyImmediate(loadedAudioClip);
             }
-            AssetDictionary[p_key] = p_audioClip;
+            AssetDictionary[key] = audioClip;
 
-            ExternAudioFile v_externAudio = new ExternAudioFile();
-            v_externAudio.Url = p_key;
-            v_externAudio.Clip = p_audioClip;
-            v_externAudio.Status = AsyncStatusEnum.Done;
-            HandleOnAudioReceived(v_externAudio);
-            return v_externAudio;
+            ExternAudioFile externAudio = new ExternAudioFile();
+            externAudio.Url = key;
+            externAudio.Clip = audioClip;
+            externAudio.Status = AsyncStatusEnum.Done;
+            HandleOnAudioReceived(externAudio);
+            return externAudio;
         }
 
         /// <summary>
         /// Try get Cached imaged in Dictionary or in PlayerPrefs. If not loaded, the function will try load from web and cache in Dictionary. 
         /// This functions will try return image loaded in dictionary immediately
         /// </summary>
-        private static AudioClip GetCachedClip(string p_url)
+        private static AudioClip GetCachedClip(string url)
         {
-            Object v_asset = null;
-            if (!AssetDictionary.ContainsKey(p_url))
-                GetClip(p_url, null);
-            AssetDictionary.TryGetValue(p_url, out v_asset);
-            AudioClip v_audioClip = v_asset as AudioClip;
+            Object asset = null;
+            if (!AssetDictionary.ContainsKey(url))
+                GetClip(url, null);
+            AssetDictionary.TryGetValue(url, out asset);
+            AudioClip audioClip = asset as AudioClip;
 
-            return v_audioClip;
+            return audioClip;
         }
 
-        private static ExternAudioFile GetClip(string p_url, System.Action<AudioClip> p_callback)
+        private static ExternAudioFile GetClip(string url, System.Action<AudioClip> callback)
         {
-            return GetAudioInternal(p_url, p_callback);
+            return GetAudioInternal(url, callback);
         }
 
         /// <summary>
         /// Gets the image from Dictionary (If loaded), or from PlayerPrefs (If saved in prefs), or try load from Web (If not Loaded)
         /// This functions will return the Sprite Loaded in Function Callback (not immediately)
         /// </summary>
-        private static ExternAudioFile GetAudioInternal(string p_url, System.Delegate p_callback)
+        private static ExternAudioFile GetAudioInternal(string url, System.Delegate callback)
         {
-            if (string.IsNullOrEmpty(p_url))
+            if (string.IsNullOrEmpty(url))
             {
-                ExternAudioFile v_audio = CreateExternAudioFile(p_url);
-                TryScheduleAction(p_url, p_callback, true);
-                TryCallAudioAction(v_audio, true);
-                return v_audio;
+                ExternAudioFile audio = CreateExternAudioFile(url);
+                TryScheduleAction(url, callback, true);
+                TryCallAudioAction(audio, true);
+                return audio;
             }
             else
             {
-                TryScheduleAction(p_url, p_callback);
-                if (!TryGetAudioFromDictionary(p_url))
+                TryScheduleAction(url, callback);
+                if (!TryGetAudioFromDictionary(url))
                 {
-                    return ReloadAudioFromWebInternal(p_url, p_callback);
+                    return ReloadAudioFromWebInternal(url, callback);
                 }
             }
-            return CreateExternAudioFile(p_url);
+            return CreateExternAudioFile(url);
         }
 
-        private static ExternAudioFile CreateExternAudioFile(string p_url)
+        private static ExternAudioFile CreateExternAudioFile(string url)
         {
-            if (p_url == null)
-                p_url = "";
-            ExternAudioFile v_audio = new ExternAudioFile();
-            v_audio.Url = p_url;
-            Object v_asset = null;
-            AssetDictionary.TryGetValue(p_url, out v_asset);
-            AudioClip v_audioClip = v_asset as AudioClip;
+            if (url == null)
+                url = "";
+            ExternAudioFile audio = new ExternAudioFile();
+            audio.Url = url;
+            Object asset = null;
+            AssetDictionary.TryGetValue(url, out asset);
+            AudioClip audioClip = asset as AudioClip;
 
-            v_audio.Clip = v_audioClip;
-            v_audio.Status = AsyncStatusEnum.Done;
-            if (v_audio.Clip != null)
+            audio.Clip = audioClip;
+            audio.Status = AsyncStatusEnum.Done;
+            if (audio.Clip != null)
             {
-                v_audio.Error = null;
+                audio.Error = null;
             }
             else
             {
-                v_audio.Error = "Audio can't be loaded!";
+                audio.Error = "Audio can't be loaded!";
             }
-            return v_audio;
+            return audio;
         }
 
-        private static ExternAudioFile ReloadAudioFromWebInternal(string p_url, System.Delegate p_callback)
+        private static ExternAudioFile ReloadAudioFromWebInternal(string url, System.Delegate callback)
         {
-            if (string.IsNullOrEmpty(p_url))
+            if (string.IsNullOrEmpty(url))
             {
-                ExternAudioFile v_callback = CreateExternAudioFile(p_url);
-                TryScheduleAction(p_url, p_callback, true);
-                TryCallAudioAction(v_callback, true);
-                return v_callback;
+                ExternAudioFile audio = CreateExternAudioFile(url);
+                TryScheduleAction(url, callback, true);
+                TryCallAudioAction(audio, true);
+                return audio;
             }
             else
             {
-                TryScheduleAction(p_url, p_callback);
-                var v_delegate = new System.Action<ExternAudioFile>(HandleOnAudioReceived);
-                var v_customDownloader = GetCustomAudioDownloader(p_url);
-                if (v_customDownloader != null)
-                    return v_customDownloader(p_url, v_delegate);
+                TryScheduleAction(url, callback);
+                var action = new System.Action<ExternAudioFile>(HandleOnAudioReceived);
+                var customDownloader = GetCustomAudioDownloader(url);
+                if (customDownloader != null)
+                    return customDownloader(url, action);
                 else
-                    return AudioSerializer.DeserializeFromWeb(p_url, v_delegate);
+                    return AudioSerializer.DeserializeFromWeb(url, action);
             }
         }
 
-        private static void UnloadAudioInternal(string p_url, bool p_immediate = false, UnloadMode p_mode = UnloadMode.DestroyIfNeeded)
+        private static void UnloadAudioInternal(string url, bool immediate = false, UnloadMode mode = UnloadMode.DestroyIfNeeded)
         {
-            if (p_url == null)
-                p_url = "";
-            if (AssetDictionary.ContainsKey(p_url))
+            if (url == null)
+                url = "";
+            if (AssetDictionary.ContainsKey(url))
             {
-                Object v_asset = null;
-                AssetDictionary.TryGetValue(p_url, out v_asset);
-                AudioClip v_audioClip = v_asset as AudioClip;
+                Object asset = null;
+                AssetDictionary.TryGetValue(url, out asset);
+                AudioClip audioClip = asset as AudioClip;
 
-                AssetDictionary.Remove(p_url);
-                if (p_mode != UnloadMode.SkipDestroyStep)
+                AssetDictionary.Remove(url);
+                if (mode != UnloadMode.SkipDestroyStep)
                 {
                     try
                     {
-                        var v_canDestroySprite = p_mode == UnloadMode.ForceDestroy || string.IsNullOrEmpty(TryFindKeyWithAudio(v_audioClip, false));
-                        if (v_audioClip != null && v_canDestroySprite)
+                        var canDestroySprite = mode == UnloadMode.ForceDestroy || string.IsNullOrEmpty(TryFindKeyWithAudio(audioClip, false));
+                        if (audioClip != null && canDestroySprite)
                         {
-                            if (p_immediate)
-                                Object.DestroyImmediate(v_audioClip);
+                            if (immediate)
+                                Object.DestroyImmediate(audioClip);
                             else
-                                DestroyUtils.DestroyImmediate(v_audioClip);
+                                DestroyUtils.DestroyImmediate(audioClip);
                         }
                     }
                     catch { }
                 }
 
             }
-            AudioDownloader v_downloader = AudioDownloader.GetDownloader(p_url);
-            if (v_downloader != null)
-                RequestStackManager.StopAllRequestsFromSender(v_downloader);
+            AudioDownloader downloader = AudioDownloader.GetDownloader(url);
+            if (downloader != null)
+                RequestStackManager.StopAllRequestsFromSender(downloader);
         }
 
-        private static bool TryGetAudioFromDictionary(string p_url)
+        private static bool TryGetAudioFromDictionary(string url)
         {
-            if (p_url == null)
-                p_url = "";
+            if (url == null)
+                url = "";
             RemoveKeysWithNullValuesInDictionary(AssetDictionary);
-            if (AssetDictionary.ContainsKey(p_url))
+            if (AssetDictionary.ContainsKey(url))
             {
-                Object v_asset = null;
-                AssetDictionary.TryGetValue(p_url, out v_asset);
-                AudioClip v_audioClip = v_asset as AudioClip;
-                ExternAudioFile v_callback = new ExternAudioFile();
-                v_callback.Clip = v_audioClip;
-                v_callback.Url = p_url;
-                TryCallAudioAction(v_callback, false);
+                Object asset = null;
+                AssetDictionary.TryGetValue(url, out asset);
+                AudioClip audioClip = asset as AudioClip;
+                ExternAudioFile callback = new ExternAudioFile();
+                callback.Clip = audioClip;
+                callback.Url = url;
+                TryCallAudioAction(callback, false);
                 return true;
             }
             return false;
         }
 
-        private static void HandleOnAudioReceived(ExternAudioFile p_audio)
+        private static void HandleOnAudioReceived(ExternAudioFile audio)
         {
-            if (p_audio != null && p_audio.Clip != null && !string.IsNullOrEmpty(p_audio.Url) && p_audio.Error == null)
+            if (audio != null && audio.Clip != null && !string.IsNullOrEmpty(audio.Url) && audio.Error == null)
             {
-                Object v_asset = null;
-                AssetDictionary.TryGetValue(p_audio.Url, out v_asset);
-                AudioClip v_audioClip = v_asset as AudioClip;
+                Object asset = null;
+                AssetDictionary.TryGetValue(audio.Url, out asset);
+                AudioClip audioClip = asset as AudioClip;
                 //Destroy Previous Audio before replace
-                if (v_audioClip != null)
+                if (audioClip != null)
                 {
-                    if (v_audioClip != null && v_audioClip != p_audio.Clip && TryFindKeyWithAudio(v_audioClip).Length <= 1)
-                        DestroyUtils.DestroyImmediate(v_audioClip);
+                    if (audioClip != null && audioClip != audio.Clip && TryFindKeyWithAudio(audioClip).Length <= 1)
+                        DestroyUtils.DestroyImmediate(audioClip);
                 }
                 //Save in Dictionary
-                AssetDictionary[p_audio.Url] = p_audio.Clip;
+                AssetDictionary[audio.Url] = audio.Clip;
             }
-            else if (p_audio != null && p_audio.Error != null) //Try Load From PlayerPrefs
+            else if (audio != null && audio.Error != null) //Try Load From PlayerPrefs
             {
-                if (AssetDictionary.ContainsKey(p_audio.Url))
+                if (AssetDictionary.ContainsKey(audio.Url))
                 {
-                    Object v_asset = null;
-                    AssetDictionary.TryGetValue(p_audio.Url, out v_asset);
-                    AudioClip v_audioClip = v_asset as AudioClip;
+                    Object asset = null;
+                    AssetDictionary.TryGetValue(audio.Url, out asset);
+                    AudioClip audioClip = asset as AudioClip;
 
-                    p_audio.Clip = v_audioClip;
+                    audio.Clip = audioClip;
                 }
             }
             if (OnAudioLoaded != null)
-                OnAudioLoaded(p_audio);
-            TryCallAudioAction(p_audio, false);
+                OnAudioLoaded(audio);
+            TryCallAudioAction(audio, false);
         }
 
         #endregion
 
         #region Image Cacher Internal
 
-        private static ExternImgFile AddSpriteIntoCache_Internal(string p_key, Sprite p_sprite)
+        private static ExternImgFile AddSpriteIntoCache_Internal(string key, Sprite sprite)
         {
             //Try avoid add same sprite twice
-            Object v_asset = null;
-            Sprite v_loadedSprite = null;
-            AssetDictionary.TryGetValue(p_key, out v_asset);
-            v_loadedSprite = v_asset as Sprite;
+            Object asset = null;
+            Sprite loadedSprite = null;
+            AssetDictionary.TryGetValue(key, out asset);
+            loadedSprite = asset as Sprite;
 
-            if (v_loadedSprite != p_sprite)
+            if (loadedSprite != sprite)
             {
-                UnloadImageInternal(p_key, false, UnloadMode.SkipDestroyStep);
+                UnloadImageInternal(key, false, UnloadMode.SkipDestroyStep);
                 //Try destroy previous sprite and textures
-                var v_texture = v_loadedSprite != null ? v_loadedSprite.texture : null;
-                if (v_loadedSprite != null && v_loadedSprite != p_sprite && string.IsNullOrEmpty(TryFindKeyWithSprite(v_loadedSprite)))
-                    DestroyUtils.DestroyImmediate(v_loadedSprite);
-                if (v_texture != null && (p_sprite == null || v_texture != p_sprite.texture) && string.IsNullOrEmpty(TryFindKeyWithTexture(v_texture)))
-                    DestroyUtils.DestroyImmediate(v_texture);
+                var texture = loadedSprite != null ? loadedSprite.texture : null;
+                if (loadedSprite != null && loadedSprite != sprite && string.IsNullOrEmpty(TryFindKeyWithSprite(loadedSprite)))
+                    DestroyUtils.DestroyImmediate(loadedSprite);
+                if (texture != null && (sprite == null || texture != sprite.texture) && string.IsNullOrEmpty(TryFindKeyWithTexture(texture)))
+                    DestroyUtils.DestroyImmediate(texture);
             }
-            AssetDictionary[p_key] = p_sprite;
+            AssetDictionary[key] = sprite;
 
-            ExternImgFile v_externImage = new ExternImgFile();
-            v_externImage.Url = p_key;
-            v_externImage.Sprite = p_sprite;
-            v_externImage.Status = AsyncStatusEnum.Done;
-            HandleOnImageReceived(v_externImage);
-            return v_externImage;
+            ExternImgFile externImage = new ExternImgFile();
+            externImage.Url = key;
+            externImage.Sprite = sprite;
+            externImage.Status = AsyncStatusEnum.Done;
+            HandleOnImageReceived(externImage);
+            return externImage;
         }
 
         /// <summary>
         /// Try get Cached imaged in Dictionary or in PlayerPrefs. If not loaded, the function will try load from web and cache in Dictionary. 
         /// This functions will try return image loaded in dictionary immediately
         /// </summary>
-        private static Sprite GetCachedSprite(string p_url)
+        private static Sprite GetCachedSprite(string url)
         {
-            Object v_asset = null;
-            if (!AssetDictionary.ContainsKey(p_url))
-                GetSprite(p_url, null);
-            AssetDictionary.TryGetValue(p_url, out v_asset);
-            Sprite v_sprite = v_asset as Sprite;
+            Object asset = null;
+            if (!AssetDictionary.ContainsKey(url))
+                GetSprite(url, null);
+            AssetDictionary.TryGetValue(url, out asset);
+            Sprite sprite = asset as Sprite;
 
-            return v_sprite;
+            return sprite;
         }
 
-        private static Texture2D GetCachedTexture(string p_url)
+        private static Texture2D GetCachedTexture(string url)
         {
-            Sprite v_sprite = GetCachedSprite(p_url);
-            if (v_sprite != null)
-                return v_sprite.texture;
+            Sprite sprite = GetCachedSprite(url);
+            if (sprite != null)
+                return sprite.texture;
             return null;
         }
 
-        private static ExternImgFile GetSprite(string p_url, System.Action<Sprite> p_callback)
+        private static ExternImgFile GetSprite(string url, System.Action<Sprite> callback)
         {
-            return GetImageInternal(p_url, p_callback);
+            return GetImageInternal(url, callback);
         }
 
-        private static ExternImgFile GetTexture(string p_url, System.Action<Texture2D> p_callback)
+        private static ExternImgFile GetTexture(string url, System.Action<Texture2D> callback)
         {
-            return GetImageInternal(p_url, p_callback);
+            return GetImageInternal(url, callback);
         }
 
         /// <summary>
         /// Gets the image from Dictionary (If loaded), or from PlayerPrefs (If saved in prefs), or try load from Web (If not Loaded)
         /// This functions will return the Sprite Loaded in Function Callback (not immediately)
         /// </summary>
-        private static ExternImgFile GetImageInternal(string p_url, System.Delegate p_callback)
+        private static ExternImgFile GetImageInternal(string url, System.Delegate callback)
         {
-            if (string.IsNullOrEmpty(p_url))
+            if (string.IsNullOrEmpty(url))
             {
-                ExternImgFile v_image = CreateExternImgFile(p_url);
-                TryScheduleAction(p_url, p_callback, true);
-                TryCallImageAction(v_image, true);
-                return v_image;
+                ExternImgFile image = CreateExternImgFile(url);
+                TryScheduleAction(url, callback, true);
+                TryCallImageAction(image, true);
+                return image;
             }
             else
             {
-                TryScheduleAction(p_url, p_callback);
-                if (!TryGetImageFromDictionary(p_url))
+                TryScheduleAction(url, callback);
+                if (!TryGetImageFromDictionary(url))
                 {
-                    return ReloadImageFromWebInternal(p_url, p_callback);
+                    return ReloadImageFromWebInternal(url, callback);
                 }
             }
-            return CreateExternImgFile(p_url);
+            return CreateExternImgFile(url);
         }
 
-        private static ExternImgFile CreateExternImgFile(string p_url)
+        private static ExternImgFile CreateExternImgFile(string url)
         {
-            if (p_url == null)
-                p_url = "";
-            ExternImgFile v_image = new ExternImgFile();
-            v_image.Url = p_url;
-            Object v_asset = null;
-            AssetDictionary.TryGetValue(p_url, out v_asset);
-            Sprite v_sprite = v_asset as Sprite;
+            if (url == null)
+                url = "";
+            ExternImgFile image = new ExternImgFile();
+            image.Url = url;
+            Object asset = null;
+            AssetDictionary.TryGetValue(url, out asset);
+            Sprite sprite = asset as Sprite;
 
-            v_image.Sprite = v_sprite;
-            v_image.Status = AsyncStatusEnum.Done;
-            if (v_image.Sprite != null)
+            image.Sprite = sprite;
+            image.Status = AsyncStatusEnum.Done;
+            if (image.Sprite != null)
             {
-                v_image.Texture = v_image.Sprite.texture;
-                v_image.Error = null;
+                image.Texture = image.Sprite.texture;
+                image.Error = null;
             }
             else
             {
-                v_image.Error = "Image can't be loaded!";
+                image.Error = "Image can't be loaded!";
             }
-            return v_image;
+            return image;
         }
 
-        private static ExternImgFile ReloadImageFromWebInternal(string p_url, System.Delegate p_callback)
+        private static ExternImgFile ReloadImageFromWebInternal(string url, System.Delegate callback)
         {
-            if (string.IsNullOrEmpty(p_url))
+            if (string.IsNullOrEmpty(url))
             {
-                ExternImgFile v_callback = CreateExternImgFile(p_url);
-                TryScheduleAction(p_url, p_callback, true);
-                TryCallImageAction(v_callback, true);
-                return v_callback;
+                ExternImgFile img = CreateExternImgFile(url);
+                TryScheduleAction(url, callback, true);
+                TryCallImageAction(img, true);
+                return img;
             }
             else
             {
-                TryScheduleAction(p_url, p_callback);
-                var v_delegate = new System.Action<ExternImgFile>(HandleOnImageReceived);
-                var v_customDownloader = GetCustomImgDownloader(p_url);
-                if(v_customDownloader != null)
-                    return v_customDownloader(p_url, v_delegate);
+                TryScheduleAction(url, callback);
+                var action = new System.Action<ExternImgFile>(HandleOnImageReceived);
+                var customDownloader = GetCustomImgDownloader(url);
+                if(customDownloader != null)
+                    return customDownloader(url, action);
                 else
-                    return TextureSerializer.DeserializeFromWeb(p_url, v_delegate);
+                    return TextureSerializer.DeserializeFromWeb(url, action);
             }
         }
 
         enum UnloadMode { DestroyIfNeeded, SkipDestroyStep, ForceDestroy }
-        private static void UnloadImageInternal(string p_url, bool p_immediate = false, UnloadMode p_mode = UnloadMode.DestroyIfNeeded)
+        private static void UnloadImageInternal(string url, bool immediate = false, UnloadMode mode = UnloadMode.DestroyIfNeeded)
         {
-            if (p_url == null)
-                p_url = "";
-            if (AssetDictionary.ContainsKey(p_url))
+            if (url == null)
+                url = "";
+            if (AssetDictionary.ContainsKey(url))
             {
-                Object v_asset = null;
-                AssetDictionary.TryGetValue(p_url, out v_asset);
-                Sprite v_sprite = v_asset as Sprite;
-                Texture2D v_texture = null;
+                Object asset = null;
+                AssetDictionary.TryGetValue(url, out asset);
+                Sprite sprite = asset as Sprite;
+                Texture2D texture = null;
 
-                if (v_sprite != null)
-                    v_texture = v_sprite.texture;
+                if (sprite != null)
+                    texture = sprite.texture;
 
-                AssetDictionary.Remove(p_url);
-                if (p_mode != UnloadMode.SkipDestroyStep)
+                AssetDictionary.Remove(url);
+                if (mode != UnloadMode.SkipDestroyStep)
                 {
                     try
                     {
                         //If found a second key in resources cache, we cant destroy this sprite because it is used in other cached url
-                        var v_canDestroyTexture = p_mode == UnloadMode.ForceDestroy || string.IsNullOrEmpty(TryFindKeyWithTexture(v_texture, false));
-                        if (v_texture != null && v_canDestroyTexture)
+                        var canDestroyTexture = mode == UnloadMode.ForceDestroy || string.IsNullOrEmpty(TryFindKeyWithTexture(texture, false));
+                        if (texture != null && canDestroyTexture)
                         {
-                            if (p_immediate)
-                                Object.DestroyImmediate(v_texture);
+                            if (immediate)
+                                Object.DestroyImmediate(texture);
                             else
-                                DestroyUtils.DestroyImmediate(v_texture);
+                                DestroyUtils.DestroyImmediate(texture);
                         }
-                        var v_canDestroySprite = p_mode == UnloadMode.ForceDestroy || string.IsNullOrEmpty(TryFindKeyWithSprite(v_sprite, false));
-                        if (v_sprite != null && v_canDestroySprite)
+                        var canDestroySprite = mode == UnloadMode.ForceDestroy || string.IsNullOrEmpty(TryFindKeyWithSprite(sprite, false));
+                        if (sprite != null && canDestroySprite)
                         {
-                            if (p_immediate)
-                                Object.DestroyImmediate(v_sprite);
+                            if (immediate)
+                                Object.DestroyImmediate(sprite);
                             else
-                                DestroyUtils.DestroyImmediate(v_sprite);
+                                DestroyUtils.DestroyImmediate(sprite);
                         }
                     }
                     catch { }
                 }
 
             }
-            TextureDownloader v_downloader = TextureDownloader.GetDownloader(p_url);
-            if (v_downloader != null)
-                RequestStackManager.StopAllRequestsFromSender(v_downloader);
+            TextureDownloader downloader = TextureDownloader.GetDownloader(url);
+            if (downloader != null)
+                RequestStackManager.StopAllRequestsFromSender(downloader);
         }
 
-        private static bool TryGetImageFromDictionary(string p_url)
+        private static bool TryGetImageFromDictionary(string url)
         {
-            if (p_url == null)
-                p_url = "";
+            if (url == null)
+                url = "";
             RemoveKeysWithNullValuesInDictionary(AssetDictionary);
-            if (AssetDictionary.ContainsKey(p_url))
+            if (AssetDictionary.ContainsKey(url))
             {
-                Object v_asset = null;
-                AssetDictionary.TryGetValue(p_url, out v_asset);
-                Sprite v_sprite = v_asset as Sprite;
-                Texture2D v_texture = v_sprite != null ? v_sprite.texture : null;
-                ExternImgFile v_callback = new ExternImgFile();
-                v_callback.Sprite = v_sprite;
-                v_callback.Texture = v_texture;
-                v_callback.Url = p_url;
-                TryCallImageAction(v_callback, false);
+                Object asset = null;
+                AssetDictionary.TryGetValue(url, out asset);
+                Sprite sprite = asset as Sprite;
+                Texture2D texture = sprite != null ? sprite.texture : null;
+                ExternImgFile callback = new ExternImgFile();
+                callback.Sprite = sprite;
+                callback.Texture = texture;
+                callback.Url = url;
+                TryCallImageAction(callback, false);
                 return true;
             }
             return false;
         }
 
-        private static void HandleOnImageReceived(ExternImgFile p_image)
+        private static void HandleOnImageReceived(ExternImgFile image)
         {
-            if (p_image != null && p_image.Sprite != null && !string.IsNullOrEmpty(p_image.Url) && p_image.Error == null)
+            if (image != null && image.Sprite != null && !string.IsNullOrEmpty(image.Url) && image.Error == null)
             {
-                Object v_asset = null;
-                AssetDictionary.TryGetValue(p_image.Url, out v_asset);
-                Sprite v_sprite = v_asset as Sprite;
+                Object asset = null;
+                AssetDictionary.TryGetValue(image.Url, out asset);
+                Sprite sprite = asset as Sprite;
                 //Destroy Previous Sprite before replace
-                if (v_sprite != null)
+                if (sprite != null)
                 {
-                    var v_texture = v_sprite != null ? v_sprite.texture : null;
-                    if (v_sprite != null && v_sprite != p_image.Sprite && TryFindAllKeysWithSprite(v_sprite).Length <= 1)
-                        DestroyUtils.DestroyImmediate(v_sprite);
-                    if (v_texture != null && v_texture != p_image.Sprite.texture && TryFindAllKeysWithTexture(v_texture).Length <= 1)
-                        DestroyUtils.DestroyImmediate(v_texture);
+                    var texture = sprite != null ? sprite.texture : null;
+                    if (sprite != null && sprite != image.Sprite && TryFindAllKeysWithSprite(sprite).Length <= 1)
+                        DestroyUtils.DestroyImmediate(sprite);
+                    if (texture != null && texture != image.Sprite.texture && TryFindAllKeysWithTexture(texture).Length <= 1)
+                        DestroyUtils.DestroyImmediate(texture);
                 }
                 //Save in Dictionary
-                AssetDictionary[p_image.Url] = p_image.Sprite;
+                AssetDictionary[image.Url] = image.Sprite;
             }
-            else if (p_image != null && p_image.Error != null) //Try Load From PlayerPrefs
+            else if (image != null && image.Error != null) //Try Load From PlayerPrefs
             {
-                if (AssetDictionary.ContainsKey(p_image.Url))
+                if (AssetDictionary.ContainsKey(image.Url))
                 {
-                    Object v_asset = null;
-                    AssetDictionary.TryGetValue(p_image.Url, out v_asset);
-                    Sprite v_sprite = v_asset as Sprite;
+                    Object asset = null;
+                    AssetDictionary.TryGetValue(image.Url, out asset);
+                    Sprite sprite = asset as Sprite;
 
-                    p_image.Sprite = v_sprite;
-                    p_image.Texture = p_image.Sprite != null ? p_image.Sprite.texture : null;
+                    image.Sprite = sprite;
+                    image.Texture = image.Sprite != null ? image.Sprite.texture : null;
                 }
             }
             if (OnImageLoaded != null)
-                OnImageLoaded(p_image);
-            TryCallImageAction(p_image, false);
+                OnImageLoaded(image);
+            TryCallImageAction(image, false);
         }
 
         #endregion
@@ -1081,14 +1081,14 @@ namespace Kyub.Async
             return readableText;
         }
 
-        public static bool IsLoaded(string p_key)
+        public static bool IsLoaded(string key)
         {
-            return !string.IsNullOrEmpty(p_key) && AssetDictionary.ContainsKey(p_key);
+            return !string.IsNullOrEmpty(key) && AssetDictionary.ContainsKey(key);
         }
 
-        public static bool IsDownloading(string p_key)
+        public static bool IsDownloading(string key)
         {
-            return !string.IsNullOrEmpty(p_key) && PendentActions.ContainsKey(p_key);
+            return !string.IsNullOrEmpty(key) && PendentActions.ContainsKey(key);
         }
 
         public static bool IsDownloadingAnyResource()
@@ -1100,14 +1100,14 @@ namespace Kyub.Async
         /// Try find a key with respective audio (can search for null keys if second parameter is true
         /// </summary>
         /// <returns></returns>
-        public static string TryFindKeyWithAudio(AudioClip p_audioClip, bool p_acceptNull = false)
+        public static string TryFindKeyWithAudio(AudioClip audioClip, bool acceptNull = false)
         {
-            if (p_audioClip != null || p_acceptNull)
+            if (audioClip != null || acceptNull)
             {
-                foreach (var v_pair in s_assetDictionary)
+                foreach (var pair in s_assetDictionary)
                 {
-                    if (v_pair.Value == p_audioClip)
-                        return v_pair.Key;
+                    if (pair.Value == audioClip)
+                        return pair.Key;
                 }
             }
             return null;
@@ -1118,14 +1118,14 @@ namespace Kyub.Async
         /// Try find a key with respective sprite (can search for null keys if second parameter is true
         /// </summary>
         /// <returns></returns>
-        public static string TryFindKeyWithSprite(Sprite p_sprite, bool p_acceptNull = false)
+        public static string TryFindKeyWithSprite(Sprite sprite, bool acceptNull = false)
         {
-            if (p_sprite != null || p_acceptNull)
+            if (sprite != null || acceptNull)
             {
-                foreach (var v_pair in s_assetDictionary)
+                foreach (var pair in s_assetDictionary)
                 {
-                    if (v_pair.Value == p_sprite)
-                        return v_pair.Key;
+                    if (pair.Value == sprite)
+                        return pair.Key;
                 }
             }
             return null;
@@ -1136,15 +1136,15 @@ namespace Kyub.Async
         /// Try find a key with respective texture (can search for null keys if second parameter is true
         /// </summary>
         /// <returns></returns>
-        public static string TryFindKeyWithTexture(Texture2D p_texture, bool p_acceptNull = false)
+        public static string TryFindKeyWithTexture(Texture2D texture, bool acceptNull = false)
         {
-            if (p_texture != null || p_acceptNull)
+            if (texture != null || acceptNull)
             {
-                foreach (var v_pair in s_assetDictionary)
+                foreach (var pair in s_assetDictionary)
                 {
-                    var v_sprite = v_pair.Value as Sprite;
-                    if (v_sprite != null && v_sprite.texture == p_texture)
-                        return v_pair.Key;
+                    var sprite = pair.Value as Sprite;
+                    if (sprite != null && sprite.texture == texture)
+                        return pair.Key;
                 }
             }
             return null;
@@ -1154,143 +1154,143 @@ namespace Kyub.Async
         /// Try find a key with respective texture (can search for null keys if second parameter is true
         /// </summary>
         /// <returns></returns>
-        public static string[] TryFindAllKeysWithTexture(Texture2D p_texture, bool p_acceptNull = false)
+        public static string[] TryFindAllKeysWithTexture(Texture2D texture, bool acceptNull = false)
         {
-            List<string> v_keys = new List<string>();
-            if (p_texture != null || p_acceptNull)
+            List<string> keys = new List<string>();
+            if (texture != null || acceptNull)
             {
-                foreach (var v_pair in s_assetDictionary)
+                foreach (var pair in s_assetDictionary)
                 {
-                    var v_sprite = v_pair.Value as Sprite;
-                    if (v_sprite != null && v_sprite.texture == p_texture)
-                        v_keys.Add(v_pair.Key);
+                    var sprite = pair.Value as Sprite;
+                    if (sprite != null && sprite.texture == texture)
+                        keys.Add(pair.Key);
                 }
             }
-            return v_keys.ToArray();
+            return keys.ToArray();
         }
 
         /// <summary>
         /// Try find a key with respective texture (can search for null keys if second parameter is true
         /// </summary>
         /// <returns></returns>
-        public static string[] TryFindAllKeysWithSprite(Sprite p_sprite, bool p_acceptNull = false)
+        public static string[] TryFindAllKeysWithSprite(Sprite sprite, bool acceptNull = false)
         {
-            List<string> v_keys = new List<string>();
-            if (p_sprite != null || p_acceptNull)
+            List<string> keys = new List<string>();
+            if (sprite != null || acceptNull)
             {
-                foreach (var v_pair in s_assetDictionary)
+                foreach (var pair in s_assetDictionary)
                 {
-                    if (v_pair.Value == p_sprite)
-                        v_keys.Add(v_pair.Key);
+                    if (pair.Value == sprite)
+                        keys.Add(pair.Key);
                 }
             }
-            return v_keys.ToArray();
+            return keys.ToArray();
         }
 
         #endregion
 
         #region Internal Helper Functions
 
-        static CustomAudioUrlDownloader GetCustomAudioDownloader(string p_url)
+        static CustomAudioUrlDownloader GetCustomAudioDownloader(string url)
         {
-            CustomAudioUrlDownloader v_downloader = null;
+            CustomAudioUrlDownloader downloader = null;
             CustomAudioDownloaderPatterns.RemovePairsWithNullValuesOrKeys();
-            foreach (var v_pair in CustomAudioDownloaderPatterns)
+            foreach (var pair in CustomAudioDownloaderPatterns)
             {
-                var v_pattern = v_pair.Key;
-                if (Regex.IsMatch(p_url, v_pattern))
+                var pattern = pair.Key;
+                if (Regex.IsMatch(url, pattern))
                 {
-                    v_downloader = v_pair.Value;
+                    downloader = pair.Value;
                     break;
                 }
             }
-            return v_downloader;
+            return downloader;
         }
 
-        static CustomImgUrlDownloader GetCustomImgDownloader(string p_url)
+        static CustomImgUrlDownloader GetCustomImgDownloader(string url)
         {
-            CustomImgUrlDownloader v_downloader = null;
+            CustomImgUrlDownloader downloader = null;
             CustomImgDownloaderPatterns.RemovePairsWithNullValuesOrKeys();
-            foreach (var v_pair in CustomImgDownloaderPatterns)
+            foreach (var pair in CustomImgDownloaderPatterns)
             {
-                var v_pattern = v_pair.Key;
-                if (Regex.IsMatch(p_url, v_pattern))
+                var pattern = pair.Key;
+                if (Regex.IsMatch(url, pattern))
                 {
-                    v_downloader = v_pair.Value;
+                    downloader = pair.Value;
                     break;
                 }
             }
-            return v_downloader;
+            return downloader;
         }
 
-        private static void TryScheduleAction(string p_url, System.Delegate p_callback, bool p_acceptEmptyUrls = false)
+        private static void TryScheduleAction(string url, System.Delegate callback, bool acceptEmptyUrls = false)
         {
-            if (p_url == null)
-                p_url = "";
-            if (p_callback != null && p_url != null && (p_acceptEmptyUrls || !string.IsNullOrEmpty(p_url)))
+            if (url == null)
+                url = "";
+            if (callback != null && url != null && (acceptEmptyUrls || !string.IsNullOrEmpty(url)))
             {
-                bool v_canSchedule = true;
-                foreach (var p_pair in PendentActions)
+                bool canSchedule = true;
+                foreach (var pair in PendentActions)
                 {
-                    if (string.Equals(p_pair.Key, p_url) && p_callback == p_pair.Value)
-                        v_canSchedule = false;
+                    if (string.Equals(pair.Key, url) && callback == pair.Value)
+                        canSchedule = false;
                 }
-                if (v_canSchedule)
-                    PendentActions.Add(p_url, p_callback);
+                if (canSchedule)
+                    PendentActions.Add(url, callback);
             }
 
         }
 
-        private static void TryCallAudioAction(ExternAudioFile p_param, bool p_acceptEmptyUrls = false)
+        private static void TryCallAudioAction(ExternAudioFile param, bool acceptEmptyUrls = false)
         {
-            if (p_param != null)
+            if (param != null)
             {
-                TryCallActionInternal(p_param.Url, p_param.Clip, false, typeof(AudioClip));
-                TryCallActionInternal(p_param.Url, p_param, false, typeof(ExternAudioFile));
+                TryCallActionInternal(param.Url, param.Clip, false, typeof(AudioClip));
+                TryCallActionInternal(param.Url, param, false, typeof(ExternAudioFile));
             }
         }
 
-        private static void TryCallImageAction(ExternImgFile p_param, bool p_acceptEmptyUrls = false)
+        private static void TryCallImageAction(ExternImgFile param, bool acceptEmptyUrls = false)
         {
-            if (p_param != null)
+            if (param != null)
             {
-                TryCallActionInternal(p_param.Url, p_param.Sprite, false, typeof(Sprite));
-                TryCallActionInternal(p_param.Url, p_param.Texture, false, typeof(Texture2D));
-                TryCallActionInternal(p_param.Url, p_param, false, typeof(ExternImgFile));
+                TryCallActionInternal(param.Url, param.Sprite, false, typeof(Sprite));
+                TryCallActionInternal(param.Url, param.Texture, false, typeof(Texture2D));
+                TryCallActionInternal(param.Url, param, false, typeof(ExternImgFile));
             }
         }
 
-        private static void TryCallActionInternal(string p_url, object p_param, bool p_acceptEmptyUrls = false, System.Type p_delegateParameterFilter = null)
+        private static void TryCallActionInternal(string url, object param, bool acceptEmptyUrls = false, System.Type delegateParameterFilter = null)
         {
-            if (p_url == null)
-                p_url = "";
-            if (p_url != null && (p_acceptEmptyUrls || !string.IsNullOrEmpty(p_url)))
+            if (url == null)
+                url = "";
+            if (url != null && (acceptEmptyUrls || !string.IsNullOrEmpty(url)))
             {
-                ArrayDict<string, System.Delegate> v_updatedPendentActions = new ArrayDict<string, System.Delegate>();
-                foreach (var p_pair in PendentActions)
+                ArrayDict<string, System.Delegate> updatedPendentActions = new ArrayDict<string, System.Delegate>();
+                foreach (var pair in PendentActions)
                 {
-                    if (p_pair != null && p_pair.Key != null && (p_acceptEmptyUrls || !string.IsNullOrEmpty(p_pair.Key)) && p_pair.Value != null)
+                    if (pair != null && pair.Key != null && (acceptEmptyUrls || !string.IsNullOrEmpty(pair.Key)) && pair.Value != null)
                     {
-                        if (string.Equals(p_pair.Key, p_url))
+                        if (string.Equals(pair.Key, url))
                         {
-                            FunctionAndParams v_func = new FunctionAndParams();
-                            v_func.DelegatePointer = p_pair.Value;
-                            v_func.Params.Add(p_param);
-                            var v_params = v_func.GetFunctionParameterTypes();
-                            System.Type v_paramType = v_params.Length == 1 ? v_params[0] : null;
-                            bool v_hasCorrectFilterType = p_delegateParameterFilter == null || v_func.DelegatePointer == null|| Kyub.Extensions.TypeExtensions.IsSameOrSubClassOrImplementInterface(v_paramType, p_delegateParameterFilter);
-                            if (!v_hasCorrectFilterType/*|| !v_func.CallFunction()*/)
+                            FunctionAndParams func = new FunctionAndParams();
+                            func.DelegatePointer = pair.Value;
+                            func.Params.Add(param);
+                            var funcParams = func.GetFunctionParameterTypes();
+                            System.Type paramType = funcParams.Length == 1 ? funcParams[0] : null;
+                            bool hasCorrectFilterType = delegateParameterFilter == null || func.DelegatePointer == null|| Kyub.Extensions.TypeExtensions.IsSameOrSubClassOrImplementInterface(paramType, delegateParameterFilter);
+                            if (!hasCorrectFilterType/*|| !func.CallFunction()*/)
                             {
-                                v_updatedPendentActions.Add(p_pair); //Wrong Parameters, We must Call it with diff Params
+                                updatedPendentActions.Add(pair); //Wrong Parameters, We must Call it with diff Params
                             }
                         }
                         else
                         {
-                            v_updatedPendentActions.Add(p_pair);
+                            updatedPendentActions.Add(pair);
                         }
                     }
                 }
-                PendentActions = v_updatedPendentActions;
+                PendentActions = updatedPendentActions;
             }
         }
 

@@ -144,12 +144,12 @@ namespace KyubEditor.UI.Experimental
             // Rects
             Rect fieldPosition = EditorGUI.PrefixLabel(position, label);
 
-            Rect toggleRect = fieldPosition;
-            toggleRect.xMin -= 16;
-            toggleRect.width = 16 * (1 + EditorGUI.indentLevel);
+            Rect toggleRect = new Rect(fieldPosition);
+            toggleRect.xMin -= (16 * EditorGUI.indentLevel);
+            toggleRect.width = (16 * (1 + EditorGUI.indentLevel));
 
-            Rect floatFieldRect = fieldPosition;
-            floatFieldRect.xMin += 16 * (EditorGUI.indentLevel);
+            Rect floatFieldRect = new Rect(position);
+            floatFieldRect.xMin = toggleRect.xMin + (16 * (1 + EditorGUI.indentLevel));
 
             // Checkbox
             EditorGUI.BeginChangeCheck();
@@ -169,6 +169,58 @@ namespace KyubEditor.UI.Experimental
                 if (EditorGUI.EndChangeCheck())
                 {
                     property.floatValue = Mathf.Max(0, newValue);
+                }
+                EditorGUIUtility.labelWidth = 0;
+            }
+
+            EditorGUI.EndProperty();
+        }
+
+        protected void LayoutIntElementField(SerializedProperty property, int defaultValue)
+        {
+            LayoutIntElementField(property, null, _ => defaultValue);
+        }
+
+        protected void LayoutIntElementField(SerializedProperty property, GUIContent contentLabel, int defaultValue)
+        {
+            LayoutIntElementField(property, contentLabel, _ => defaultValue);
+        }
+
+        protected void LayoutIntElementField(SerializedProperty property, GUIContent contentLabel, System.Func<RectTransform, int> defaultValue)
+        {
+            Rect position = EditorGUILayout.GetControlRect();
+
+            // Label
+            GUIContent label = EditorGUI.BeginProperty(position, contentLabel, property);
+
+            // Rects
+            Rect fieldPosition = EditorGUI.PrefixLabel(position, label);
+
+            Rect toggleRect = new Rect(fieldPosition);
+            toggleRect.xMin -= (16 * EditorGUI.indentLevel);
+            toggleRect.width = (16 * (1 + EditorGUI.indentLevel));
+
+            Rect intFieldRect = new Rect(position);
+            intFieldRect.xMin = toggleRect.xMin + (16 * (1 + EditorGUI.indentLevel));
+
+            // Checkbox
+            EditorGUI.BeginChangeCheck();
+            bool enabled = EditorGUI.ToggleLeft(toggleRect, GUIContent.none, property.intValue >= 0);
+            if (EditorGUI.EndChangeCheck())
+            {
+                // This could be made better to set all of the targets to their initial width, but mimizing code change for now
+                property.intValue = (enabled ? defaultValue((target as MonoBehaviour).transform as RectTransform) : -1);
+            }
+
+            if (!property.hasMultipleDifferentValues && property.intValue >= 0)
+            {
+                // Int field
+                EditorGUIUtility.labelWidth = 4; // Small invisible label area for drag zone functionality
+                EditorGUI.BeginChangeCheck();
+                int newValue = EditorGUI.IntField(intFieldRect, new GUIContent(" "), property.intValue);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    property.intValue = Mathf.Max(0, newValue);
                 }
                 EditorGUIUtility.labelWidth = 0;
             }

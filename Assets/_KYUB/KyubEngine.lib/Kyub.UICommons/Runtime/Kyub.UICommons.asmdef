@@ -3,7 +3,9 @@
     "references": [
         "GUID:2bafac87e7f4b9b418d9448d219b01ab",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:41175c1412c601548a1d1cc8d9a7e266"
+        "GUID:41175c1412c601548a1d1cc8d9a7e266",
+        "GUID:43f813160d15da94094b77983b7241a1",
+        "GUID:af50b871d983fd2498bf363097906a11"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -52,6 +54,11 @@
             "name": "com.unity.textmeshpro",
             "expression": "2.1.0",
             "define": "TMP_2_1_0_OR_NEWER"
+        },
+        {
+            "name": "com.kyub.performance",
+            "expression": "",
+            "define": "SUSTAINED_PERFORMANCE_DEFINED"
         }
     ],
     "noEngineReferences": false

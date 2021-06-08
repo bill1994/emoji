@@ -121,6 +121,9 @@ namespace Kyub.UI.Experimental
         [SerializeField]
         float m_SpacingBetween = 0;
 
+        [SerializeField]
+        int m_GroupCapacity = -1;
+
         List<LinearGroup> _Groups = new List<LinearGroup>();
 
         #endregion
@@ -178,6 +181,21 @@ namespace Kyub.UI.Experimental
                 if (m_SpacingBetween == value)
                     return;
                 m_SpacingBetween = value;
+                SetDirty();
+            }
+        }
+
+        public int groupCapacity
+        {
+            get
+            {
+                return m_GroupCapacity;
+            }
+            set
+            {
+                if (m_GroupCapacity == value)
+                    return;
+                m_GroupCapacity = value;
                 SetDirty();
             }
         }
@@ -297,7 +315,7 @@ namespace Kyub.UI.Experimental
                 childSize += flexible * itemFlexibleMultiplier;
 
                 //Fit in current group
-                if (pos + childSize <= (startPos + innerSize))
+                if (pos + childSize <= (startPos + innerSize) && (m_GroupCapacity <= 0 || currentGroup.Children.Count < m_GroupCapacity))
                 {
                     currentGroup.Children.Add(child);
                     pos += childSize * scaleFactor + spacing;

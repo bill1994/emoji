@@ -18,6 +18,18 @@ namespace Kyub.UI
         [SerializeField, Tooltip("Support route extra drag movements to parent")]
         protected bool m_NestedDragActive = false;
 
+        [Space]
+        [SerializeField, Tooltip("Use Content MinWidth as Self MinWidth")]
+        protected bool m_UseContentMinWidth = true;
+        [SerializeField, Tooltip("Use Content MinHeight as Self MinHeight")]
+        protected bool m_UseContentMinHeight = true;
+        
+        [SerializeField, Tooltip("Use Content PreferredWidth as Self PreferredWidth")]
+        protected bool m_UseContentPreferredWidth = true;
+        [SerializeField, Tooltip("Use Content PreferredHeight as Self PreferredHeight")]
+        protected bool m_UseContentPreferredHeight = true;
+
+
         protected bool _routeToParent = false;
 
         //Used to animate
@@ -57,6 +69,62 @@ namespace Kyub.UI
             }
         }
 
+        public bool useContentMinWidth
+        {
+            get
+            {
+                return m_UseContentMinWidth;
+            }
+            set
+            {
+                if (m_UseContentMinWidth == value)
+                    return;
+                m_UseContentMinWidth = value;
+            }
+        }
+
+        public bool useContentMinHeight
+        {
+            get
+            {
+                return m_UseContentMinHeight;
+            }
+            set
+            {
+                if (m_UseContentMinHeight == value)
+                    return;
+                m_UseContentMinHeight = value;
+            }
+        }
+
+        public bool useContentPreferredWidth
+        {
+            get
+            {
+                return m_UseContentPreferredWidth;
+            }
+            set
+            {
+                if (m_UseContentPreferredWidth == value)
+                    return;
+                m_UseContentPreferredWidth = value;
+            }
+        }
+
+        public bool useContentPreferredHeight
+        {
+            get
+            {
+                return m_UseContentPreferredHeight;
+            }
+            set
+            {
+                if (m_UseContentPreferredHeight == value)
+                    return;
+                m_UseContentPreferredHeight = value;
+            }
+        }
+
         #endregion
 
         #region Constructors
@@ -71,6 +139,13 @@ namespace Kyub.UI
 
         #region Unity Functions
 
+        protected override void Awake()
+        {
+            onValueChanged.RemoveListener(OnValueChangedInternal);
+            onValueChanged.AddListener(OnValueChangedInternal);
+            base.Awake();
+        }
+
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -81,6 +156,12 @@ namespace Kyub.UI
         {
             base.LateUpdate();
             StepAnimations();
+        }
+
+        protected override void OnDestroy()
+        {
+            onValueChanged.RemoveListener(OnValueChangedInternal);
+            base.Awake();
         }
 
         /// <summary>
@@ -206,6 +287,13 @@ namespace Kyub.UI
             UpdateScrollbarVisibility();
             Scrolling = false;
         }*/
+
+        protected virtual void OnValueChangedInternal(Vector2 arg)
+        {
+#if SUSTAINED_PERFORMANCE_DEFINED
+            Performance.SustainedPerformanceManager.Refresh(this);
+#endif
+        }
 
         #endregion
 
@@ -565,6 +653,9 @@ namespace Kyub.UI
         {
             get
             {
+                if (!m_UseContentPreferredWidth)
+                    return -1;
+
                 if (_PreferredWidth == 0)
                     _PreferredWidth = -1;
                 return _PreferredWidth;
@@ -575,6 +666,9 @@ namespace Kyub.UI
         {
             get
             {
+                if (!m_UseContentPreferredHeight)
+                    return -1;
+
                 if (_PreferredHeight == 0)
                     _PreferredHeight = -1;
                 return _PreferredHeight;
@@ -585,6 +679,9 @@ namespace Kyub.UI
         {
             get
             {
+                if (!m_UseContentMinWidth)
+                    return -1;
+
                 if (_MinWidth == 0)
                     _MinWidth = -1;
                 return _MinWidth;
@@ -595,6 +692,9 @@ namespace Kyub.UI
         {
             get
             {
+                if (!m_UseContentMinHeight)
+                    return -1;
+
                 if (_MinHeight == 0)
                     _MinHeight = -1;
                 return _MinHeight;
@@ -605,7 +705,7 @@ namespace Kyub.UI
         {
             get
             {
-                return 1;
+                return 0;
             }
         }
 
