@@ -15,11 +15,13 @@ namespace KyubEditor.UI
     {
         SerializedProperty m_IsVertical = null;
         SerializedProperty m_SpacingBetween = null;
+        SerializedProperty m_GroupCapacity = null;
 
         protected override void OnEnable()
         {
             m_IsVertical = serializedObject.FindProperty("m_IsVertical");
             m_SpacingBetween = serializedObject.FindProperty("m_SpacingBetween");
+            m_GroupCapacity = serializedObject.FindProperty("m_GroupCapacity");
             base.OnEnable();
         }
 
@@ -28,6 +30,7 @@ namespace KyubEditor.UI
             serializedObject.Update();
             EditorGUILayout.PropertyField(m_IsVertical);
             EditorGUILayout.PropertyField(m_SpacingBetween);
+            LayoutIntElementField(m_GroupCapacity, 0);
             EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();
             //EditorGUILayout.Space();
