@@ -234,7 +234,7 @@ namespace MaterialUI
             [SerializeField]
             private char m_AsteriskChar = '•';
             [SerializeField]
-            private bool m_HideMobileInput = false;
+            private bool m_HideMobileInput = true;
             [SerializeField]
             ITextValidator m_CustomTextValidator = null;
 
