@@ -664,13 +664,23 @@ namespace MaterialUI
         protected bool _isMaxInclusive = true;
         protected System.DateTime _minValue = System.DateTime.MinValue;
         protected System.DateTime _maxValue = System.DateTime.MaxValue;
+        protected string _formatExact;
 
         public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, string cultureInfoName, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : 
             this(isMinInclusive, isMaxInclusive, minValue, maxValue, CultureInfo.GetCultureInfo(cultureInfoName), error)
         {
         }
 
-        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, System.IFormatProvider format, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : base(format, error)
+        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, string formatExact, string cultureInfoName, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) :
+            this(isMinInclusive, isMaxInclusive, minValue, maxValue, formatExact, CultureInfo.GetCultureInfo(cultureInfoName), error)
+        {
+        }
+
+        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, System.IFormatProvider format, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : this(isMinInclusive, isMaxInclusive,minValue, maxValue, null, format, error)
+        {
+        }
+
+        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, string formatExact, System.IFormatProvider format, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : base(format, string.Format(error, minValue.ToString("d", format), maxValue.ToString("d", format)))
         {
             _isMinInclusive = isMinInclusive;
             _isMaxInclusive = isMaxInclusive;
@@ -685,15 +695,21 @@ namespace MaterialUI
                 _maxValue = tempMin;
             }
             _formatProvider = format == null ? CultureInfo.InvariantCulture : format;
+            _formatExact = formatExact;
         }
 
         public override bool IsTextValid()
         {
             bool isValid = false;
             var text = m_MaterialInputField != null ? m_MaterialInputField.text : "";
-            System.DateTime result;
-            isValid = System.DateTime.TryParse(text, _formatProvider, System.Globalization.DateTimeStyles.None, out result);
 
+            System.DateTime result = System.DateTime.MinValue;
+            //Added support to TryParse Exact
+            if(!string.IsNullOrEmpty(_formatExact))
+                isValid = System.DateTime.TryParseExact(text, _formatExact, _formatProvider, System.Globalization.DateTimeStyles.None, out result);
+
+            isValid = isValid || System.DateTime.TryParse(text, _formatProvider, System.Globalization.DateTimeStyles.None, out result);
+            
             if (isValid)
             {
                 isValid = m_MaterialInputField != null &&
