@@ -135,7 +135,6 @@ namespace Kyub.Internal.NativeInputPlugin
         private bool _isVisible = false;
 
         //int _defaultDelayCount = 5;
-        float _defaultKeyboardStateChangedDelay = 0.5f;
 
         //private Rect _lastRect;
 
@@ -914,7 +913,7 @@ namespace Kyub.Internal.NativeInputPlugin
                 yield return null;
             }*/
 
-            var delay = isVisible ? 0.03333f : _defaultKeyboardStateChangedDelay;
+            var delay = isVisible ? 0.03333f : GetDefaultKeyboardStateChangedDelay();
             if (delay > 0)
                 yield return new WaitForSeconds(delay);
             yield return null;
@@ -964,7 +963,7 @@ namespace Kyub.Internal.NativeInputPlugin
                 yield return null;
             }*/
 
-            var delay = isVisible ? 0 : _defaultKeyboardStateChangedDelay;
+            var delay = isVisible ? 0 : GetDefaultKeyboardStateChangedDelay();
             if (delay > 0)
                 yield return new WaitForSeconds(delay);
             yield return null;
@@ -974,6 +973,14 @@ namespace Kyub.Internal.NativeInputPlugin
             data["is_visible"] = isVisible;
             this.Execute(data);
             CheckUnityFieldsVisibility();
+        }
+
+        protected float GetDefaultKeyboardStateChangedDelay()
+        {
+            var defaultDelay = 0.05f;
+            if (Environment.ProcessorCount <= 4)
+                defaultDelay = 0.2f;
+            return defaultDelay;
         }
 
         protected virtual void CheckUnityFieldsVisibility()
