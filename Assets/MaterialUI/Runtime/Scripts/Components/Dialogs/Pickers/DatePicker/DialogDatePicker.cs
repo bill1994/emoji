@@ -6,33 +6,37 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using UnityEngine.Events;
 
 namespace MaterialUI
 {
     [AddComponentMenu("MaterialUI/Dialogs/Date Picker", 1)]
     public class DialogDatePicker : MaterialDialogCompat
     {
+        [System.Serializable]
+        public class DateTimeUnityEvent : UnityEvent<DateTime> { }
+
         #region Private Variables
 
         [SerializeField, SerializeStyleProperty]
-        private Graphic m_TextDate = null;
+        protected Graphic m_TextDate = null;
         [SerializeField, SerializeStyleProperty]
-        private Graphic m_TextMonth = null;
+        protected Graphic m_TextMonth = null;
         [SerializeField, SerializeStyleProperty]
-        private Graphic m_TextYear = null;
+        protected Graphic m_TextYear = null;
         [SerializeField, SerializeStyleProperty]
-        private Image m_Header = null;
+        protected Image m_Header = null;
 
         [SerializeField]
-        private CanvasGroup m_CalendarCanvasGroup = null;
+        protected CanvasGroup m_CalendarCanvasGroup = null;
         [SerializeField]
-        private CanvasGroup m_YearCanvasGroup = null;
+        protected CanvasGroup m_YearCanvasGroup = null;
         [SerializeField]
-		private DialogDatePickerYearList m_DatePickerYearList = null;
+        protected DialogDatePickerYearList m_DatePickerYearList = null;
 
         [Space]
 		[SerializeField]
-		private Graphic[] m_DatePickerDayTexts = null;
+        protected Graphic[] m_DatePickerDayTexts = null;
         [SerializeField]
         protected DialogDatePickerDayItem[] m_DatePickerDayItems = null;
 
@@ -41,22 +45,44 @@ namespace MaterialUI
         protected DialogDatePickerMonthItem[] m_DatePickerMonthItems = null;
 
         [SerializeField]
-        private string m_DateFormatPattern = "ddd, MMM dd";
+        protected string m_DateFormatPattern = "ddd, MMM dd";
 
-        private DateTime _CurrentDate;
+        protected DateTime _CurrentDate;
 
-        private DayOfWeek _DayOfWeek = DayOfWeek.Sunday;
+        protected DayOfWeek _DayOfWeek = DayOfWeek.Sunday;
 
-        private CultureInfo _CultureInfo;
+        protected CultureInfo _CultureInfo;
 
-		private Vector2 _InitialSize;
+        protected Vector2 _InitialSize;
+
+        //Internal Callbacks
+        protected Action<DateTime> _OnAffirmativeClicked;
+        protected Action _OnDismissiveClicked;
+
+
+        //Just Used to Call OnDateChangedCallback
+        protected DateTime currentDateInternal
+        {
+            get
+            {
+                return _CurrentDate;
+            }
+            set
+            {
+                if (_CurrentDate == value)
+                    return;
+                _CurrentDate = value;
+
+                if (OnCurrentDateChangedCallback != null)
+                    OnCurrentDateChangedCallback.Invoke(_CurrentDate);
+            }
+        }
 
         #endregion
 
         #region Callbacks
 
-        private Action<DateTime> _OnAffirmativeClicked;
-        private Action _OnDismissiveClicked;
+        public DateTimeUnityEvent OnCurrentDateChangedCallback = new DateTimeUnityEvent();
 
         #endregion
 
@@ -199,8 +225,11 @@ namespace MaterialUI
 
         public virtual void SetDate(DateTime date)
         {
-            _CurrentDate = date;
-			UpdateDaysText();
+            currentDateInternal = date;
+            if (OnCurrentDateChangedCallback != null)
+                OnCurrentDateChangedCallback.Invoke(date);
+
+            UpdateDaysText();
             UpdateDateList(GetMonthDateList(_CurrentDate.Year, _CurrentDate.Month));
             UpdateYearMonthsDateList();
 
@@ -376,7 +405,7 @@ namespace MaterialUI
                 return;
             }
 
-            _CurrentDate = dayItem.dateTime;
+            currentDateInternal = dayItem.dateTime;
             UpdateDatesText();
         }
 
@@ -387,7 +416,7 @@ namespace MaterialUI
                 return;
             }
 
-            _CurrentDate = monthItem.dateTime;
+            currentDateInternal = monthItem.dateTime;
             UpdateDatesText();
         }
 

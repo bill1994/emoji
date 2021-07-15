@@ -134,7 +134,8 @@ namespace Kyub.Internal.NativeInputPlugin
         private bool _isVisibleOnCreate = false;
         private bool _isVisible = false;
 
-        int _defaultDelayCount = 5;
+        //int _defaultDelayCount = 5;
+        float _defaultKeyboardStateChangedDelay = 0.5f;
 
         //private Rect _lastRect;
 
@@ -907,11 +908,17 @@ namespace Kyub.Internal.NativeInputPlugin
 
         private IEnumerator SetFocusRoutine(bool isVisible)
         {
-            var waitCounter = (isVisible ? 1 : _defaultDelayCount);
+            /*var waitCounter = (isVisible ? 1 : _defaultDelayCount);
             for (int i = 0; i < (isVisible ? 1 : _defaultDelayCount); i++)
             {
                 yield return null;
-            }
+            }*/
+
+            var delay = isVisible ? 0.03333f : _defaultKeyboardStateChangedDelay;
+            if (delay > 0)
+                yield return new WaitForSeconds(delay);
+            yield return null;
+
             SetFocus(isVisible);
         }
 
@@ -951,11 +958,17 @@ namespace Kyub.Internal.NativeInputPlugin
 
         protected virtual IEnumerator EmitVisibleMsgRoutine(bool isVisible)
         {
-            var delay = isVisible ? 0 : _defaultDelayCount;
+            /*var delay = isVisible ? 0 : _defaultDelayCount;
             for (int i = 0; i < delay; i++)
             {
                 yield return null;
-            }
+            }*/
+
+            var delay = isVisible ? 0 : _defaultKeyboardStateChangedDelay;
+            if (delay > 0)
+                yield return new WaitForSeconds(delay);
+            yield return null;
+
             JsonObject data = new JsonObject();
             data["msg"] = SET_VISIBLE;
             data["is_visible"] = isVisible;
