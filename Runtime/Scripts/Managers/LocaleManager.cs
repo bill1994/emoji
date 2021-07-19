@@ -771,11 +771,11 @@ namespace Kyub.Localization
 
         public virtual void LoadFromJsonDictionary(string json)
         {
-            var rootData = SerializationUtils.FromJson<Kyub.Serialization.Data>(json);
+            var rootData = SerializationUtils.FromJson<Kyub.Serialization.JsonObject>(json);
 
             Dictionary<string, string> dict = new Dictionary<string, string>();
 
-            List<Kyub.Serialization.Data> datasToProcess = new List<Serialization.Data>();
+            List<Kyub.Serialization.JsonObject> datasToProcess = new List<Serialization.JsonObject>();
             if (rootData != null)
                 datasToProcess.Add(rootData);
 
