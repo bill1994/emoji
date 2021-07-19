@@ -76,9 +76,6 @@ namespace Kyub.Serialization.Internal {
 
                 StringBuilder builder = new StringBuilder();
 
-                var supportSerializeProperty = Array.Find(Serializer.Config.SerializeAttributes, 
-                    (a) => typeof(SerializePropertyAttribute) == a || typeof(SerializePropertyAttribute).IsAssignableFrom(a)) != null;
-
                 var instanceType = instance.GetType();
                 var enumValues = Enum.GetValues(storageType);
                 foreach (var enumValue in enumValues)
@@ -88,12 +85,12 @@ namespace Kyub.Serialization.Internal {
                     if (valueNames.Contains(memberName))
                     {
                         var field = instanceType.GetField(enumValue.ToString());
-                        var attrs = supportSerializeProperty? field.GetCustomAttributes(typeof(SerializePropertyAttribute), true) : null;
+                        var attrs = field.GetCustomAttributes(typeof(SerializePropertyAttribute), true);
                         var attr = attrs != null && attrs.Length > 0 ? (SerializePropertyAttribute)attrs[0] : null;
 
                         var jsonName = attr != null && !string.IsNullOrEmpty(attr.Name) ? attr.Name : memberName;
                         if (builder.Length > 0)
-                            builder.Append(", ");
+                            builder.Append(",");
                         builder.Append(jsonName);
                     }
                 }
@@ -110,9 +107,6 @@ namespace Kyub.Serialization.Internal {
 
                 HashSet<string> valueNames = new HashSet<string>(data.AsString.Split(new[] { ',', ' ', '|' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
 
-                var supportSerializeProperty = Array.Find(Serializer.Config.SerializeAttributes,
-                    (a) => typeof(SerializePropertyAttribute) == a || typeof(SerializePropertyAttribute).IsAssignableFrom(a)) != null;
-
                 var missingCount = valueNames.Count;
                 var instanceType = instance.GetType();
                 var enumValues = Enum.GetValues(storageType);
@@ -120,7 +114,7 @@ namespace Kyub.Serialization.Internal {
                 {
                     var memberName = enumValue.ToString();
                     var field = instanceType.GetField(enumValue.ToString());
-                    var attrs = supportSerializeProperty ? field.GetCustomAttributes(typeof(SerializePropertyAttribute), true) : null;
+                    var attrs = field.GetCustomAttributes(typeof(SerializePropertyAttribute), true);
                     var attr = attrs != null && attrs.Length > 0 ? (SerializePropertyAttribute)attrs[0] : null;
 
                     var jsonName = attr != null && !string.IsNullOrEmpty(attr.Name) ? attr.Name : memberName;

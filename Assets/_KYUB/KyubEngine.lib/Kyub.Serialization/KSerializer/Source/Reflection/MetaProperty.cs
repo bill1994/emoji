@@ -26,6 +26,11 @@ namespace Kyub.Serialization.Internal {
                 IsPublic = field.IsPublic;
                 CanRead = true;
                 CanWrite = true;
+
+                //Generate new Converter Instance
+                var converterType = GetConverterType(field);
+                if (converterType != null && typeof(BaseConverter).IsAssignableFrom(converterType))
+                    ConverterInstance = (BaseConverter)Activator.CreateInstance(converterType);
             }
         }
 
@@ -36,11 +41,17 @@ namespace Kyub.Serialization.Internal {
                 _memberInfo = property;
                 StorageType = property.PropertyType;
                 JsonName = GetJsonName(property);
+
                 FallbackNames = GetFallbackNames(property);
                 MemberName = property.Name;
                 IsPublic = (property.GetGetMethod() != null && property.GetGetMethod().IsPublic) && (property.GetSetMethod() != null && property.GetSetMethod().IsPublic);
                 CanRead = property.CanRead;
                 CanWrite = property.CanWrite;
+
+                //Generate new Converter Instance
+                var converterType = GetConverterType(property);
+                if (converterType != null && typeof(BaseConverter).IsAssignableFrom(converterType))
+                    ConverterInstance = (BaseConverter)Activator.CreateInstance(converterType);
             }
         }
 
@@ -54,6 +65,14 @@ namespace Kyub.Serialization.Internal {
         /// </summary>
         private MethodInfo _canSerializeInContextMethodInfo = null;
 
+        /// <summary>
+        /// Conversor used to Serialize/Deserialize
+        /// </summary>
+        public BaseConverter ConverterInstance
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// The type of value that is stored inside of the property. For example, for an int field,
@@ -109,6 +128,12 @@ namespace Kyub.Serialization.Internal {
         /// Is this member public?
         /// </summary>
         public bool IsPublic {
+            get;
+            private set;
+        }
+
+        public BaseConverter CachedConverter
+        {
             get;
             private set;
         }
@@ -248,6 +273,20 @@ namespace Kyub.Serialization.Internal {
             }
 
             return member.Name;
+        }
+
+        /// <summary>
+        /// Returns custom conversor that will be used in Json Serialization/Deserialization
+        /// </summary>
+        private static Type GetConverterType(MemberInfo member)
+        {
+            var attr = PortableReflection.GetAttribute<SerializePropertyAttribute>(member);
+            if (attr != null)
+            {
+                return attr.Converter;
+            }
+
+            return null;
         }
 
         /// <summary>

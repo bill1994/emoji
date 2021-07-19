@@ -135,7 +135,7 @@ namespace Kyub
                 try
                 {
                     List<Object> context = new List<Object>();
-                    var oldConverter = serializer.GetConverter(typeof(Object));
+                    var oldConverter = serializer.GetConverter(typeof(Object), null);
                     if (oldConverter == null || !oldConverter.GetType().IsSubclassOf(typeof(UnityObjectConverter)))
                     {
                         var converter = customConverter == null ? new UnityObjectConverter() : customConverter;
@@ -174,7 +174,7 @@ namespace Kyub
                 serializer = LockSerializer(serializer);
                 try
                 {
-                    var oldConverter = serializer.GetConverter(typeof(Object));
+                    var oldConverter = serializer.GetConverter(typeof(Object), null);
                     if (oldConverter == null || !oldConverter.GetType().IsSubclassOf(typeof(UnityObjectConverter)))
                     {
                         var converter = customConverter == null ? new UnityObjectConverter() : customConverter;
@@ -209,7 +209,7 @@ namespace Kyub
                 serializer = LockSerializer(serializer);
                 try
                 {
-                    var oldConverter = serializer.GetConverter(typeof(Object));
+                    var oldConverter = serializer.GetConverter(typeof(Object), null);
                     if (oldConverter == null || !oldConverter.GetType().IsSubclassOf(typeof(UnityObjectConverter)))
                     {
                         var converter = customConverter == null ? new UnityObjectConverter() : customConverter;
