@@ -24,17 +24,17 @@ namespace Kyub.Serialization {
             }
         }
 
-        public MetaTypeCache(SerializerConfig p_config)
+        public MetaTypeCache(SerializerConfig config)
         {
-            if (p_config == null)
-                p_config = SerializerConfig.DefaultConfig;
-            _configUsed = p_config;
+            if (config == null)
+                config = SerializerConfig.DefaultConfig;
+            _configUsed = config;
         }
 
         private ConcurrentDictionary<Type, MetaType> _metaTypes = new ConcurrentDictionary<Type, MetaType>();
         public MetaType Get(Type type)
         {
-            MetaType metaType = null;
+            MetaType metaType;
             if (!_metaTypes.TryGetValue(type, out metaType))
             {
                 metaType = MetaTypeCache.GetInGlobalCache(type, _configUsed);
@@ -57,10 +57,10 @@ namespace Kyub.Serialization {
         #region Static
 
         static ConcurrentDictionary<Type, ConcurrentDictionary<SerializerConfig, MetaType>> s_globalMetaTypes = new ConcurrentDictionary<Type, ConcurrentDictionary<SerializerConfig, MetaType>>();
-        public static MetaType GetInGlobalCache(Type type, SerializerConfig p_config)
+        public static MetaType GetInGlobalCache(Type type, SerializerConfig config)
         {
-            if (p_config == null)
-                p_config = SerializerConfig.DefaultConfig;
+            if (config == null)
+                config = SerializerConfig.DefaultConfig;
 
             //Try pick registered MetaTypes from Type
             ConcurrentDictionary<SerializerConfig, MetaType> metaTypesDict = null;
@@ -74,13 +74,13 @@ namespace Kyub.Serialization {
 
             //Try pick registered MetaType from Config
             MetaType metaType = null;
-            metaTypesDict.TryGetValue(p_config, out metaType);
+            metaTypesDict.TryGetValue(config, out metaType);
 
             //Not in cache, create new MetaType and register
             if (metaType == null)
             {
-                metaType = new MetaType(type, p_config);
-                metaTypesDict[p_config] = metaType;
+                metaType = new MetaType(type, config);
+                metaTypesDict[config] = metaType;
             }
             return metaType;
         }
@@ -107,11 +107,11 @@ namespace Kyub.Serialization {
             }
         }
 
-        internal MetaType(Type reflectedType, SerializerConfig p_config) {
+        internal MetaType(Type reflectedType, SerializerConfig config) {
             ReflectedType = reflectedType;
-            if (p_config == null)
-                p_config = SerializerConfig.DefaultConfig;
-            _configUsed = p_config.Clone();
+            if (config == null)
+                config = SerializerConfig.DefaultConfig;
+            _configUsed = config.Clone();
             List<MetaProperty> properties = new List<MetaProperty>();
             CollectProperties(properties, reflectedType);
             Properties = properties.ToArray();
@@ -119,15 +119,15 @@ namespace Kyub.Serialization {
 
         public override bool Equals(object obj)
         {
-            bool v_sucess =  base.Equals(obj);
-            MetaType v_objMetaType = obj as MetaType;
-            if (v_objMetaType != null)
+            bool sucess =  base.Equals(obj);
+            MetaType objMetaType = obj as MetaType;
+            if (objMetaType != null)
             {
-                v_sucess = !v_sucess && ReflectedType == v_objMetaType.ReflectedType && v_objMetaType._configUsed.Equals(this._configUsed);
+                sucess = !sucess && ReflectedType == objMetaType.ReflectedType && objMetaType._configUsed.Equals(this._configUsed);
             }
             else
-                v_sucess = false;
-            return v_sucess;
+                sucess = false;
+            return sucess;
         }
 
         public override int GetHashCode()
@@ -243,8 +243,8 @@ namespace Kyub.Serialization {
             }
 
             // We don't serialize indexers (like : this[int i])
-            ParameterInfo[] v_indexParameters = property.GetIndexParameters();
-            if (v_indexParameters != null && v_indexParameters.Length > 0)
+            ParameterInfo[] indexParameters = property.GetIndexParameters();
+            if (indexParameters != null && indexParameters.Length > 0)
                 return false;
 
             var publicGetMethod = property.GetGetMethod(/*nonPublic:*/ false);

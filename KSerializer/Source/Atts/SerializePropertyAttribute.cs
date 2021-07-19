@@ -18,6 +18,11 @@ namespace Kyub.Serialization {
         public string Name { get; private set; }
 
         /// <summary>
+        /// The name of that the property will use in JSON serialization.
+        /// </summary>
+        public Type Converter { get; private set; }
+
+        /// <summary>
         /// Other names that can be used while deserializing
         /// </summary>
         public ReadOnlyCollection<string> FallbackNames { get; private set; }
@@ -28,12 +33,24 @@ namespace Kyub.Serialization {
         public string ValidatorFuncName { get; set; }
 
         public SerializePropertyAttribute()
-            : this(string.Empty) {
+            : this(string.Empty) 
+        {
 
-            FallbackNames = new ReadOnlyCollection<string>(new List<string>());
         }
 
-        public SerializePropertyAttribute(string name, params string[] fallbackNames) {
+        public SerializePropertyAttribute(Type converterType) : 
+            this(converterType, string.Empty)
+        {
+        }
+
+        public SerializePropertyAttribute(string name, params string[] fallbackNames) : 
+            this(null, name, fallbackNames)
+        {
+        }
+
+        public SerializePropertyAttribute(Type converterType, string name, params string[] fallbackNames) 
+        {
+            Converter = converterType;
             Name = name != null? name.Trim() : "";
             var list = new List<string>();
             //Prevent Empty values or Same value as Name

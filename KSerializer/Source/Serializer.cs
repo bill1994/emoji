@@ -386,11 +386,11 @@ namespace Kyub.Serialization {
             }
         }
 
-        public Serializer(Serializer p_serializer)
+        public Serializer(Serializer serializer)
         {
             //Clone Converters
             
-            _config = p_serializer == null? SerializerConfig.DefaultConfig : p_serializer.Config;
+            _config = serializer == null? SerializerConfig.DefaultConfig : serializer.Config;
             _cachedConverters = new Dictionary<Type, BaseConverter>();
             _cachedProcessors = new Dictionary<Type, List<ObjectProcessor>>();
             _cachedDefaultSerializationCallbacks = new Dictionary<Type, List<System.Reflection.MethodInfo>>();
@@ -403,11 +403,11 @@ namespace Kyub.Serialization {
             };
 
             //Clone Conversors
-            if (p_serializer != null)
+            if (serializer != null)
             {
-                Context = p_serializer.Context;
+                Context = serializer.Context;
                 _availableDirectConverters = new Dictionary<Type, DirectConverter>();
-                foreach (var pair in p_serializer._availableDirectConverters)
+                foreach (var pair in serializer._availableDirectConverters)
                 {
                     if (pair.Value != null)
                     {
@@ -421,7 +421,7 @@ namespace Kyub.Serialization {
                 }
 
                 _availableConverters = new List<Converter>();
-                foreach (var converter in p_serializer._availableConverters)
+                foreach (var converter in serializer._availableConverters)
                 {
                     if (converter != null)
                     {
@@ -468,8 +468,8 @@ namespace Kyub.Serialization {
                 Context = new Context();
         }
 
-        public Serializer(SerializerConfig p_config = null) {
-            _config = p_config == null? SerializerConfig.DefaultConfig : p_config;
+        public Serializer(SerializerConfig config = null) {
+            _config = config == null? SerializerConfig.DefaultConfig : config;
             _cachedConverters = new Dictionary<Type, BaseConverter>();
             _cachedProcessors = new Dictionary<Type, List<ObjectProcessor>>();
             _cachedDefaultSerializationCallbacks = new Dictionary<Type, List<System.Reflection.MethodInfo>>();
@@ -633,9 +633,12 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Fetches a converter that can serialize/deserialize the given type.
         /// </summary>
-        public BaseConverter GetConverter(Type type) {
-            BaseConverter converter;
+        public BaseConverter GetConverter(Type type, MetaProperty property = null) {
 
+            if (property != null && property.ConverterInstance != null)
+                return property.ConverterInstance;
+
+            BaseConverter converter;
             // Check to see if the user has defined a custom converter for the type. If they
             // have, then we don't need to scan through all of the converters to check which
             // one can process the type; instead, we directly use the specified converter.
@@ -675,8 +678,8 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Helper method that simply forwards the call to TrySerialize(typeof(T), instance, out data);
         /// </summary>
-        public Result TrySerialize<T>(T instance, out JsonObject data, MetaProperty p_property = null) {
-            return TrySerialize(typeof(T), instance, out data, p_property);
+        public Result TrySerialize<T>(T instance, out JsonObject data, MetaProperty property = null) {
+            return TrySerialize(typeof(T), instance, out data, property);
         }
 
         /// <summary>
@@ -688,7 +691,7 @@ namespace Kyub.Serialization {
         /// <param name="instance">The actual object instance to serialize.</param>
         /// <param name="data">The serialized state of the object.</param>
         /// <returns>If serialization was successful.</returns>
-        public Result TrySerialize(Type storageType, object instance, out JsonObject data, MetaProperty p_property = null)
+        public Result TrySerialize(Type storageType, object instance, out JsonObject data, MetaProperty property = null)
         {
             var processors = GetProcessors(storageType);
             var defaultCallbacks = GetDefaultSerializationCallbackMethods(instance != null? instance.GetType() : storageType);
@@ -701,12 +704,12 @@ namespace Kyub.Serialization {
                 return Result.Success;
             }
 
-            var result = InternalSerialize_1_ProcessCycles(storageType, instance, out data, p_property);
+            var result = InternalSerialize_1_ProcessCycles(storageType, instance, out data, property);
             Invoke_OnAfterSerialize(defaultCallbacks, processors, storageType, instance, ref data);
             return result;
         }
 
-        private Result InternalSerialize_1_ProcessCycles(Type storageType, object instance, out JsonObject data, MetaProperty p_property) {
+        private Result InternalSerialize_1_ProcessCycles(Type storageType, object instance, out JsonObject data, MetaProperty property) {
             // We have an object definition to serialize.
             try {
                 // Note that we enter the reference group at the beginning of serialization so that we support
@@ -714,11 +717,11 @@ namespace Kyub.Serialization {
                 // the given subobject. A prime example is serialization a list of references.
                 _references.Enter();
                 if (_metaProperties != null)
-                    _metaProperties.Add(p_property);
+                    _metaProperties.Add(property);
 
                 // This type does not need cycle support.
-                if (GetConverter(instance.GetType()).RequestCycleSupport(instance.GetType()) == false) {
-                    return InternalSerialize_2_Inheritance(storageType, instance, out data);
+                if (GetConverter(instance.GetType(), property).RequestCycleSupport(instance.GetType()) == false) {
+                    return InternalSerialize_2_Inheritance(storageType, instance, out data, property);
                 }
 
                 // We've already serialized this object instance (or it is pending higher up on the call stack).
@@ -739,7 +742,7 @@ namespace Kyub.Serialization {
 
                 // We've created the cycle metadata, so we can now serialize the actual object.
                 // InternalSerialize will handle inheritance correctly for us.
-                var result = InternalSerialize_2_Inheritance(storageType, instance, out data);
+                var result = InternalSerialize_2_Inheritance(storageType, instance, out data, property);
                 if (result.Failed) return result;
 
                 EnsureDictionary(data);
@@ -755,10 +758,10 @@ namespace Kyub.Serialization {
                     _metaProperties.RemoveAt(_metaProperties.Count - 1);
             }
         }
-        private Result InternalSerialize_2_Inheritance(Type storageType, object instance, out JsonObject data) {
+        private Result InternalSerialize_2_Inheritance(Type storageType, object instance, out JsonObject data, MetaProperty property) {
             // Serialize the actual object with the field type being the same as the object
             // type so that we won't go into an infinite loop.
-            var serializeResult = InternalSerialize_3_ProcessVersioning(instance, out data);
+            var serializeResult = InternalSerialize_3_ProcessVersioning(instance, out data, property);
             if (serializeResult.Failed) return serializeResult;
 
             // Do we need to add type information? If the field type and the instance type are different
@@ -769,7 +772,7 @@ namespace Kyub.Serialization {
             if (Config.TypeWriterOption != SerializerConfig.TypeWriterEnum.Never)
             {
                 if ((Config.TypeWriterOption == SerializerConfig.TypeWriterEnum.Always) || 
-                    (storageType != instance.GetType() && GetConverter(storageType).RequestInheritanceSupport(storageType)))
+                    (storageType != instance.GetType() && GetConverter(storageType, property).RequestInheritanceSupport(storageType)))
                 {
                     System.Type instanceType = GetSerializationType(instance);
                     EnsureDictionary(data);
@@ -784,7 +787,7 @@ namespace Kyub.Serialization {
             return serializeResult;
         }
 
-        private Result InternalSerialize_3_ProcessVersioning(object instance, out JsonObject data)
+        private Result InternalSerialize_3_ProcessVersioning(object instance, out JsonObject data, MetaProperty property)
         {
             // note: We do not have to take a Type parameter here, since at this point in the serialization
             //       algorithm inheritance has *always* been handled. If we took a type parameter, it will
@@ -797,7 +800,7 @@ namespace Kyub.Serialization {
                 VersionedType versionedType = optionalVersionedType.Value;
 
                 // Serialize the actual object content; we'll just wrap it with versioning metadata here.
-                var result = InternalSerialize_4_Converter(instance, out data);
+                var result = InternalSerialize_4_Converter(instance, out data, property);
                 if (result.Failed) return result;
 
                 // Add the versioning information
@@ -808,13 +811,13 @@ namespace Kyub.Serialization {
             }
 
             // This type has no versioning information -- directly serialize it using the selected converter.
-            return InternalSerialize_4_Converter(instance, out data);
+            return InternalSerialize_4_Converter(instance, out data, property);
         }
 
-        private Result InternalSerialize_4_Converter(object instance, out JsonObject data)
+        private Result InternalSerialize_4_Converter(object instance, out JsonObject data, MetaProperty property)
         {
             var instanceType = instance.GetType();
-            return GetConverter(instanceType).TrySerialize(instance, out data, instanceType);
+            return GetConverter(instanceType, property).TrySerialize(instance, out data, instanceType);
         }
 
         private static string RemoveAssemblyDetails(string fullyQualifiedTypeName)
@@ -861,10 +864,10 @@ namespace Kyub.Serialization {
         }
 
         //Get TypeFallback if the attribute is defined
-        System.Type GetSerializationType(object p_instance)
+        System.Type GetSerializationType(object instance)
         {
-            System.Type instanceType = p_instance != null? p_instance.GetType() : null;
-            if (p_instance != null)
+            System.Type instanceType = instance != null? instance.GetType() : null;
+            if (instance != null)
             {
                 try
                 {
@@ -893,10 +896,10 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Generic wrapper around TryDeserialize that simply forwards the call.
         /// </summary>
-        public Result TryDeserialize<T>(JsonObject data, ref T instance, MetaProperty p_property = null)
+        public Result TryDeserialize<T>(JsonObject data, ref T instance, MetaProperty property = null)
         {
             object boxed = instance;
-            var fail = TryDeserialize(data, typeof(T), ref boxed, p_property);
+            var fail = TryDeserialize(data, typeof(T), ref boxed, property);
             if (fail.Succeeded)
             {
                 instance = (T)boxed;
@@ -911,7 +914,7 @@ namespace Kyub.Serialization {
         /// <param name="storageType"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public Result TryDeserialize(JsonObject data, Type storageType, ref object result, MetaProperty p_property = null) {
+        public Result TryDeserialize(JsonObject data, Type storageType, ref object result, MetaProperty property = null) {
             if (data == null)
                 data = new JsonObject();
             var processors = GetProcessors(storageType);
@@ -932,9 +935,9 @@ namespace Kyub.Serialization {
                 // with regards to the list
                 _references.Enter();
                 if (_metaProperties != null)
-                    _metaProperties.Add(p_property);
+                    _metaProperties.Add(property);
 
-                return InternalDeserialize_1_CycleReference(data, storageType, ref result, processors);
+                return InternalDeserialize_1_CycleReference(data, storageType, ref result, processors, property);
             }
             finally {
                 _references.Exit();
@@ -945,7 +948,7 @@ namespace Kyub.Serialization {
             }
         }
 
-        private Result InternalDeserialize_1_CycleReference(JsonObject data, Type storageType, ref object result, List<ObjectProcessor> processors) {
+        private Result InternalDeserialize_1_CycleReference(JsonObject data, Type storageType, ref object result, List<ObjectProcessor> processors, MetaProperty property) {
             // We handle object references first because we could be deserializing a cyclic type that is
             // inherited. If that is the case, then if we handle references after inheritances we will try
             // to create an object instance for an abstract/interface type.
@@ -962,10 +965,10 @@ namespace Kyub.Serialization {
                 return Result.Success;
             }
 
-            return InternalDeserialize_2_Version(data, storageType, ref result, processors);
+            return InternalDeserialize_2_Version(data, storageType, ref result, processors, property);
         }
 
-        private Result InternalDeserialize_2_Version(JsonObject data, Type storageType, ref object result, List<ObjectProcessor> processors) {
+        private Result InternalDeserialize_2_Version(JsonObject data, Type storageType, ref object result, List<ObjectProcessor> processors, MetaProperty property) {
             if (IsVersioned(data)) {
                 // data is versioned, but we might not need to do a migration
                 string version = data.AsDictionary[Key_Version].AsString;
@@ -982,7 +985,7 @@ namespace Kyub.Serialization {
                     if (deserializeResult.Failed) return deserializeResult;
 
                     // deserialize as the original type
-                    deserializeResult += InternalDeserialize_3_Inheritance(data, path[0].ModelType, ref result, processors);
+                    deserializeResult += InternalDeserialize_3_Inheritance(data, path[0].ModelType, ref result, processors, property);
                     if (deserializeResult.Failed) return deserializeResult;
 
                     for (int i = 1; i < path.Count; ++i) {
@@ -993,10 +996,10 @@ namespace Kyub.Serialization {
                 }
             }
 
-            return InternalDeserialize_3_Inheritance(data, storageType, ref result, processors);
+            return InternalDeserialize_3_Inheritance(data, storageType, ref result, processors, property);
         }
 
-        private Result InternalDeserialize_3_Inheritance(JsonObject data, Type storageType, ref object result, List<ObjectProcessor> processors) {
+        private Result InternalDeserialize_3_Inheritance(JsonObject data, Type storageType, ref object result, List<ObjectProcessor> processors, MetaProperty property) {
             var deserializeResult = Result.Success;
 
             Type objectType = storageType;
@@ -1038,7 +1041,7 @@ namespace Kyub.Serialization {
                 //Added Try-Catch to prevent desserialization errors when type changed inside deserialized object
                 try
                 {
-                    result = GetConverter(objectType).CreateInstance(data, objectType);
+                    result = GetConverter(objectType, property).CreateInstance(data, objectType);
                 }
                 catch
                 {
@@ -1057,10 +1060,10 @@ namespace Kyub.Serialization {
             //       return dummy values for CreateInstance() (for example, the default behavior
             //       for structs is to just return the type of the struct).
 
-            return deserializeResult += InternalDeserialize_4_Cycles(data, objectType, ref result);
+            return deserializeResult += InternalDeserialize_4_Cycles(data, objectType, ref result, property);
         }
 
-        private Result InternalDeserialize_4_Cycles(JsonObject data, Type resultType, ref object result) {
+        private Result InternalDeserialize_4_Cycles(JsonObject data, Type resultType, ref object result, MetaProperty property) {
             if (IsObjectDefinition(data)) {
                 // NOTE: object references are handled at stage 1
 
@@ -1078,15 +1081,15 @@ namespace Kyub.Serialization {
             }
 
             // Nothing special, go through the standard deserialization logic.
-            return InternalDeserialize_5_Converter(data, resultType, ref result);
+            return InternalDeserialize_5_Converter(data, resultType, ref result, property);
         }
 
-        private Result InternalDeserialize_5_Converter(JsonObject data, Type resultType, ref object result) {
+        private Result InternalDeserialize_5_Converter(JsonObject data, Type resultType, ref object result, MetaProperty property) {
             if (IsWrappedData(data)) {
                 data = data.AsDictionary[Key_Content];
             }
 
-            return GetConverter(resultType).TryDeserialize(data, ref result, resultType);
+            return GetConverter(resultType, property).TryDeserialize(data, ref result, resultType);
         }
     }
 }

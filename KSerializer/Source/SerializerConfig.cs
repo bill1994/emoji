@@ -20,11 +20,11 @@ namespace Kyub.Serialization {
             _metaTypeCache = new MetaTypeCache(this);
         }
 
-        private SerializerConfig(MetaTypeCache p_metaTypeCache)
+        private SerializerConfig(MetaTypeCache metaTypeCache)
         {
-            if (p_metaTypeCache == null)
-                p_metaTypeCache = new MetaTypeCache(this);
-            _metaTypeCache = p_metaTypeCache;
+            if (metaTypeCache == null)
+                metaTypeCache = new MetaTypeCache(this);
+            _metaTypeCache = metaTypeCache;
         }
 
         #endregion
@@ -163,43 +163,43 @@ namespace Kyub.Serialization {
 
         public SerializerConfig Clone()
         {
-            SerializerConfig v_clonedConfig = new SerializerConfig(this.MetaTypeCache);
-            v_clonedConfig.IsCaseSensitive = this.IsCaseSensitive;
-            v_clonedConfig.SerializeAttributes = new List<Type>(this.SerializeAttributes).ToArray();
-            v_clonedConfig.IgnoreSerializeAttributes = new List<Type>(this.IgnoreSerializeAttributes).ToArray();
-            v_clonedConfig.MemberSerialization = this.MemberSerialization;
-            v_clonedConfig.TypeWriterOption = this.TypeWriterOption;
-            return v_clonedConfig;
+            SerializerConfig clonedConfig = new SerializerConfig(this.MetaTypeCache);
+            clonedConfig.IsCaseSensitive = this.IsCaseSensitive;
+            clonedConfig.SerializeAttributes = new List<Type>(this.SerializeAttributes).ToArray();
+            clonedConfig.IgnoreSerializeAttributes = new List<Type>(this.IgnoreSerializeAttributes).ToArray();
+            clonedConfig.MemberSerialization = this.MemberSerialization;
+            clonedConfig.TypeWriterOption = this.TypeWriterOption;
+            return clonedConfig;
         }
 
-        public override bool Equals(object p_config)
+        public override bool Equals(object config)
         {
             try
             {
-                if (p_config == null)
-                    p_config = SerializerConfig.DefaultConfig;
-                if (!(p_config is SerializerConfig))
+                if (config == null)
+                    config = SerializerConfig.DefaultConfig;
+                if (!(config is SerializerConfig))
                     return false;
-                SerializerConfig v_config = p_config as SerializerConfig;
-                if (p_config == this)
+                SerializerConfig castedConfig = config as SerializerConfig;
+                if (config == this)
                     return true;
                 else
                 {
-                    if (this.IsCaseSensitive == v_config.IsCaseSensitive &&
-                        this.MemberSerialization == v_config.MemberSerialization &&
-                        this.SerializeAttributes.Length == v_config.SerializeAttributes.Length &&
-                        this.IgnoreSerializeAttributes.Length == v_config.IgnoreSerializeAttributes.Length)
+                    if (this.IsCaseSensitive == castedConfig.IsCaseSensitive &&
+                        this.MemberSerialization == castedConfig.MemberSerialization &&
+                        this.SerializeAttributes.Length == castedConfig.SerializeAttributes.Length &&
+                        this.IgnoreSerializeAttributes.Length == castedConfig.IgnoreSerializeAttributes.Length)
                     {
-                        List<Type> p_listOfConfig = new List<Type>(v_config.SerializeAttributes);
-                        foreach (Type v_type in this.SerializeAttributes)
+                        List<Type> listOfConfig = new List<Type>(castedConfig.SerializeAttributes);
+                        foreach (Type type in this.SerializeAttributes)
                         {
-                            if (!p_listOfConfig.Contains(v_type))
+                            if (!listOfConfig.Contains(type))
                                 return false;
                         }
-                        p_listOfConfig = new List<Type>(v_config.IgnoreSerializeAttributes);
-                        foreach (Type v_type in this.IgnoreSerializeAttributes)
+                        listOfConfig = new List<Type>(castedConfig.IgnoreSerializeAttributes);
+                        foreach (Type type in this.IgnoreSerializeAttributes)
                         {
-                            if (!p_listOfConfig.Contains(v_type))
+                            if (!listOfConfig.Contains(type))
                                 return false;
                         }
                         return true;
