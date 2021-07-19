@@ -36,7 +36,7 @@ namespace Kyub.Serialization.Internal {
             Option<VersionedType> optionalVersionedType;
 
             if (_cache.TryGetValue(type, out optionalVersionedType) == false) {
-                var attr = PortableReflection.GetAttribute<ObjectAttribute>(type);
+                var attr = PortableReflection.GetAttribute<SerializeObjectAttribute>(type);
 
                 if (attr != null) {
                     if (string.IsNullOrEmpty(attr.VersionString) == false || attr.PreviousModels != null) {

@@ -5,8 +5,8 @@ namespace Kyub.Serialization {
     /// This attribute controls some serialization behavior for a type. See the comments
     /// on each of the fields for more information.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-    public sealed class ObjectAttribute : Attribute {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum)]
+    public sealed class SerializeObjectAttribute : Attribute {
         /// <summary>
         /// The previous model that should be used if an old version of this
         /// object is encountered. Using this attribute also requires that the
@@ -43,8 +43,8 @@ namespace Kyub.Serialization {
         /// </summary>
         public Type Processor;
 
-        public ObjectAttribute() { }
-        public ObjectAttribute(string versionString, params Type[] previousModels) {
+        public SerializeObjectAttribute() { }
+        public SerializeObjectAttribute(string versionString, params Type[] previousModels) {
             VersionString = versionString;
             PreviousModels = previousModels;
         }

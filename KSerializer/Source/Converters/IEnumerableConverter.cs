@@ -13,21 +13,21 @@ namespace Kyub.Serialization.Internal {
             return GetAddMethod(type) != null;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return Serializer.Config.MetaTypeCache.Get(storageType).CreateInstance();
         }
 
-        public override Result TrySerialize(object instance_, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance_, out JsonObject serialized, Type storageType) {
             var instance = (IEnumerable)instance_;
             var result = Result.Success;
 
             Type elementType = GetElementType(storageType);
 
-            serialized = Data.CreateList(HintSize(instance));
+            serialized = JsonObject.CreateList(HintSize(instance));
             var serializedList = serialized.AsList;
 
             foreach (object item in instance) {
-                Data itemData;
+                JsonObject itemData;
 
                 // note: We don't fail the entire deserialization even if the item failed
                 var itemResult = Serializer.TrySerialize(elementType, item, out itemData, Serializer.CurrentMetaProperty);
@@ -40,11 +40,11 @@ namespace Kyub.Serialization.Internal {
             return result;
         }
 
-        public override Result TryDeserialize(Data data, ref object instance_, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance_, Type storageType) {
             var instance = (IEnumerable)instance_;
             var result = Result.Success;
 
-            if ((result += CheckType(data, DataType.Array)).Failed) return result;
+            if ((result += CheckType(data, JsonObjectType.Array)).Failed) return result;
 
             var elementStorageType = GetElementType(storageType);
             var addMethod = GetAddMethod(storageType);

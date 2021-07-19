@@ -14,13 +14,13 @@ namespace Kyub.Serialization.Internal {
             return false;
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
             var type = (Type)instance;
-            serialized = new Data(type.FullName);
+            serialized = new JsonObject(type.FullName);
             return Result.Success;
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             if (data.IsString == false) {
                 return Result.Fail("Type converter requires a string");
             }
@@ -32,7 +32,7 @@ namespace Kyub.Serialization.Internal {
             return Result.Success;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return storageType;
         }
     }

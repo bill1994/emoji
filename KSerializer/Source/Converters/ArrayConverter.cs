@@ -15,7 +15,7 @@ namespace Kyub.Serialization.Internal {
             return false;
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
             // note: IList[index] is **significantly** faster than Array.Get, so make sure we use
             //       that instead.
 
@@ -24,13 +24,13 @@ namespace Kyub.Serialization.Internal {
 
             var result = Result.Success;
 
-            serialized = Data.CreateList(arr.Count);
+            serialized = JsonObject.CreateList(arr.Count);
             var serializedList = serialized.AsList;
 
             for (int i = 0; i < arr.Count; ++i) {
                 object item = arr[i];
 
-                Data serializedItem;
+                JsonObject serializedItem;
 
                 var itemResult = Serializer.TrySerialize(elementType, item, out serializedItem, Serializer.CurrentMetaProperty);
                 result.AddMessages(itemResult);
@@ -42,11 +42,11 @@ namespace Kyub.Serialization.Internal {
             return result;
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             var result = Result.Success;
 
             // Verify that we actually have an List
-            if ((result += CheckType(data, DataType.Array)).Failed) {
+            if ((result += CheckType(data, JsonObjectType.Array)).Failed) {
                 return result;
             }
 
@@ -70,7 +70,7 @@ namespace Kyub.Serialization.Internal {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return Serializer.Config.MetaTypeCache.Get(storageType).CreateInstance();
         }
     }

@@ -39,26 +39,26 @@ namespace Kyub.Serialization.Internal {
                    type == typeof(char);
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
             var instanceType = instance.GetType();
 
             if (UseBool(instanceType)) {
-                serialized = new Data((bool)instance);
+                serialized = new JsonObject((bool)instance);
                 return Result.Success;
             }
 
             if (UseInt64(instanceType)) {
-                serialized = new Data((Int64)Convert.ChangeType(instance, typeof(Int64)));
+                serialized = new JsonObject((Int64)Convert.ChangeType(instance, typeof(Int64)));
                 return Result.Success;
             }
 
             if (UseDouble(instanceType)) {
-                serialized = new Data((double)Convert.ChangeType(instance, typeof(double)));
+                serialized = new JsonObject((double)Convert.ChangeType(instance, typeof(double)));
                 return Result.Success;
             }
 
             if (UseString(instanceType)) {
-                serialized = new Data((string)Convert.ChangeType(instance, typeof(string)));
+                serialized = new JsonObject((string)Convert.ChangeType(instance, typeof(string)));
                 return Result.Success;
             }
 
@@ -66,11 +66,11 @@ namespace Kyub.Serialization.Internal {
             return Result.Fail("Unhandled primitive type " + instance.GetType());
         }
 
-        public override Result TryDeserialize(Data storage, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject storage, ref object instance, Type storageType) {
             var result = Result.Success;
 
             if (UseBool(storageType)) {
-                var sucess = CheckType(storage, DataType.Boolean);
+                var sucess = CheckType(storage, JsonObjectType.Boolean);
 
                 //(result += CheckType(storage, DataType.Boolean)).Succeeded) {
                 if (sucess.Succeeded) { 
@@ -99,7 +99,7 @@ namespace Kyub.Serialization.Internal {
             }
 
             if (UseString(storageType)) {
-                if ((result += CheckType(storage, DataType.String)).Succeeded) {
+                if ((result += CheckType(storage, JsonObjectType.String)).Succeeded) {
                     instance = storage.AsString;
                 }
                 return result;

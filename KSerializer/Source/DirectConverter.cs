@@ -18,16 +18,16 @@ namespace Kyub.Serialization {
     public abstract class DirectConverter<TModel> : DirectConverter {
         public override Type ModelType { get { return typeof(TModel); } }
 
-        public sealed override Result TrySerialize(object instance, out Data serialized, Type storageType) {
-            var serializedDictionary = new Dictionary<string, Data>();
+        public sealed override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
+            var serializedDictionary = new Dictionary<string, JsonObject>();
             var result = DoSerialize((TModel)instance, serializedDictionary);
-            serialized = new Data(serializedDictionary);
+            serialized = new JsonObject(serializedDictionary);
             return result;
         }
 
-        public sealed override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public sealed override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             var result = Result.Success;
-            if ((result += CheckType(data, DataType.Object)).Failed) return result;
+            if ((result += CheckType(data, JsonObjectType.Object)).Failed) return result;
 
             var obj = (TModel)instance;
             result += DoDeserialize(data.AsDictionary, ref obj);
@@ -35,7 +35,7 @@ namespace Kyub.Serialization {
             return result;
         }
 
-        protected abstract Result DoSerialize(TModel model, Dictionary<string, Data> serialized);
-        protected abstract Result DoDeserialize(Dictionary<string, Data> data, ref TModel model);
+        protected abstract Result DoSerialize(TModel model, Dictionary<string, JsonObject> serialized);
+        protected abstract Result DoDeserialize(Dictionary<string, JsonObject> data, ref TModel model);
     }
 }

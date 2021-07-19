@@ -35,18 +35,18 @@ namespace Kyub.Serialization.Internal
             return p_type != null && (p_type == typeof(UnityEngine.MonoBehaviour) || p_type == typeof(UnityEngine.ScriptableObject) || p_type.IsSubclassOf(typeof(UnityEngine.MonoBehaviour)) || p_type.IsSubclassOf(typeof(UnityEngine.ScriptableObject)));
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType)
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType)
         {
             //UnityObject is the root of serialization (we must expose it)
             if (Serializer.CurrentDepth == 1 && IsValidType(storageType))
             {
                 return base.TrySerialize(instance, out serialized, storageType);
             }
-            serialized = new Data();
+            serialized = new JsonObject();
             return Result.Fail("Error Serializing Unity.Object");
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType)
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace Kyub.Serialization.Internal
             return Result.Fail("Error Deserializing Unity.Object");
         }
 
-        public override object CreateInstance(Data data, Type storageType)
+        public override object CreateInstance(JsonObject data, Type storageType)
         {
             return null;
         }

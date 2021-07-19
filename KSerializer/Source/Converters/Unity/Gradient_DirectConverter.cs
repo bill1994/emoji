@@ -11,7 +11,7 @@ namespace Kyub.Serialization {
 
 namespace Kyub.Serialization.Internal.DirectConverters {
     public class Gradient_DirectConverter : DirectConverter<Gradient> {
-        protected override Result DoSerialize(Gradient model, Dictionary<string, Data> serialized) {
+        protected override Result DoSerialize(Gradient model, Dictionary<string, JsonObject> serialized) {
             var result = Result.Success;
 
             result += SerializeMember(serialized, "alphaKeys", model.alphaKeys);
@@ -20,7 +20,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        protected override Result DoDeserialize(Dictionary<string, Data> data, ref Gradient model) {
+        protected override Result DoDeserialize(Dictionary<string, JsonObject> data, ref Gradient model) {
             var result = Result.Success;
 
             var t0 = model.alphaKeys;
@@ -34,7 +34,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return new Gradient();
         }
     }

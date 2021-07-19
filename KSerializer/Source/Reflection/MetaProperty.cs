@@ -130,9 +130,9 @@ namespace Kyub.Serialization.Internal {
             return true;
         }
 
-        public bool HasAttribute(System.Type p_type)
+        public bool HasAttribute(System.Type type)
         {
-            return PortableReflection.HasAttribute(_memberInfo, p_type);
+            return PortableReflection.HasAttribute(_memberInfo, type);
         }
 
         public bool HasAttribute<TAttribute>() where TAttribute : Attribute
@@ -140,9 +140,9 @@ namespace Kyub.Serialization.Internal {
             return HasAttribute(typeof(TAttribute));
         }
 
-        public Attribute GetAttribute(System.Type p_type)
+        public Attribute GetAttribute(System.Type type)
         {
-            return PortableReflection.GetAttribute(_memberInfo, p_type);
+            return PortableReflection.GetAttribute(_memberInfo, type);
         }
 
         public TAttribute GetAttribute<TAttribute>() where TAttribute : Attribute
@@ -150,9 +150,9 @@ namespace Kyub.Serialization.Internal {
             return PortableReflection.GetAttribute<TAttribute>(_memberInfo);
         }
 
-        public Attribute[] GetAttributes(System.Type p_type)
+        public Attribute[] GetAttributes(System.Type type)
         {
-            return PortableReflection.GetAttributes(_memberInfo, p_type);
+            return PortableReflection.GetAttributes(_memberInfo, type);
         }
 
         public TAttribute[] GetAttributes<TAttribute>() where TAttribute : Attribute
@@ -182,9 +182,9 @@ namespace Kyub.Serialization.Internal {
                     propertySet(ref context, value);
                 }
             }
-            catch (System.Exception p_exception)
+            catch (System.Exception exception)
             {
-                UnityEngine.Debug.LogWarning(p_exception.Message);
+                UnityEngine.Debug.LogWarning(exception.Message);
             }
         }
 
@@ -209,9 +209,9 @@ namespace Kyub.Serialization.Internal {
                     return propertyGet(context);
                 }
             }
-            catch (System.Exception p_exception)
+            catch (System.Exception exception)
             {
-                UnityEngine.Debug.LogWarning(p_exception.Message);
+                UnityEngine.Debug.LogWarning(exception.Message);
             }
             return null;
         }

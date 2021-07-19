@@ -16,14 +16,14 @@ namespace Kyub.Serialization {
         /// </summary>
         /// <param name="storageType">The field/property type that is storing the instance.</param>
         /// <param name="data">The data that was serialized.</param>
-        void OnAfterSerialize(Type storageType, ref Data data);
+        void OnAfterSerialize(Type storageType, ref JsonObject data);
 
         /// <summary>
         /// Called before deserialization.
         /// </summary>
         /// <param name="storageType">The field/property type that is storing the instance.</param>
         /// <param name="data">The data that will be used for deserialization.</param>
-        void OnBeforeDeserialize(Type storageType, ref Data data);
+        void OnBeforeDeserialize(Type storageType, ref JsonObject data);
 
         /// <summary>
         /// Called after deserialization.
@@ -44,11 +44,11 @@ namespace Kyub.Serialization.Internal {
             ((ISerializationCallbacks)instance).OnBeforeSerialize(storageType);
         }
 
-        public override void OnAfterSerialize(Type storageType, object instance, ref Data data) {
+        public override void OnAfterSerialize(Type storageType, object instance, ref JsonObject data) {
             ((ISerializationCallbacks)instance).OnAfterSerialize(storageType, ref data);
         }
 
-        public override void OnBeforeDeserializeAfterInstanceCreation(Type storageType, object instance, ref Data data) {
+        public override void OnBeforeDeserializeAfterInstanceCreation(Type storageType, object instance, ref JsonObject data) {
             if (instance is ISerializationCallbacks == false) {
                 throw new InvalidCastException("Please ensure the converter for " + storageType + " actually returns an instance of it, not an instance of " + instance.GetType());
             }

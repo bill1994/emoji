@@ -19,10 +19,10 @@ namespace Kyub.Serialization.Internal {
             return false;
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             var result = Result.Success;
 
-            Data keyData, valueData;
+            JsonObject keyData, valueData;
             if ((result += CheckKey(data, "Key", out keyData)).Failed) return result;
             if ((result += CheckKey(data, "Value", out valueData)).Failed) return result;
 
@@ -37,7 +37,7 @@ namespace Kyub.Serialization.Internal {
             return result;
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
             PropertyInfo keyProperty = storageType.GetDeclaredProperty("Key");
             PropertyInfo valueProperty = storageType.GetDeclaredProperty("Value");
 
@@ -49,11 +49,11 @@ namespace Kyub.Serialization.Internal {
 
             var result = Result.Success;
 
-            Data keyData, valueData;
+            JsonObject keyData, valueData;
             result.AddMessages(Serializer.TrySerialize(keyType, keyObject, out keyData, Serializer.CurrentMetaProperty));
             result.AddMessages(Serializer.TrySerialize(valueType, valueObject, out valueData, Serializer.CurrentMetaProperty));
 
-            serialized = Data.CreateDictionary(Serializer.Config);
+            serialized = JsonObject.CreateDictionary(Serializer.Config);
             if (keyData != null) serialized.AsDictionary["Key"] = keyData;
             if (valueData != null) serialized.AsDictionary["Value"] = valueData;
 

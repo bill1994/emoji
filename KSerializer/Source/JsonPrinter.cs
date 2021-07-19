@@ -87,33 +87,33 @@ namespace Kyub.Serialization {
             return result.ToString();
         }
 
-        private static void BuildCompressedString(Data data, TextWriter stream) {
+        private static void BuildCompressedString(JsonObject data, TextWriter stream) {
             switch (data.Type) {
-                case DataType.Null:
+                case JsonObjectType.Null:
                     stream.Write("null");
                     break;
 
-                case DataType.Boolean:
+                case JsonObjectType.Boolean:
                     if (data.AsBool) stream.Write("true");
                     else stream.Write("false");
                     break;
 
-                case DataType.Double:
+                case JsonObjectType.Double:
                     // doubles must *always* include a decimal
                     stream.Write(ConvertDoubleToString(data.AsDouble));
                     break;
 
-                case DataType.Int64:
+                case JsonObjectType.Int64:
                     stream.Write(data.AsInt64);
                     break;
 
-                case DataType.String:
+                case JsonObjectType.String:
                     stream.Write('"');
                     stream.Write(EscapeString(data.AsString));
                     stream.Write('"');
                     break;
 
-                case DataType.Object:
+                case JsonObjectType.Object:
                     {
                         if (data.AsDictionary.ContainsKey(Serializer.Key_Content) && data.AsDictionary.Count == 1)
                         {
@@ -138,7 +138,7 @@ namespace Kyub.Serialization {
                         break;
                     }
 
-                case DataType.Array: {
+                case JsonObjectType.Array: {
                         stream.Write('[');
                         bool comma = false;
                         foreach (var entry in data.AsList) {
@@ -155,33 +155,33 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Formats this data into the given builder.
         /// </summary>
-        private static void BuildPrettyString(Data data, TextWriter stream, int depth) {
+        private static void BuildPrettyString(JsonObject data, TextWriter stream, int depth) {
             switch (data.Type) {
-                case DataType.Null:
+                case JsonObjectType.Null:
                     stream.Write("null");
                     break;
 
-                case DataType.Boolean:
+                case JsonObjectType.Boolean:
                     if (data.AsBool) stream.Write("true");
                     else stream.Write("false");
                     break;
 
-                case DataType.Double:
+                case JsonObjectType.Double:
                     stream.Write(ConvertDoubleToString(data.AsDouble));
                     break;
 
-                case DataType.Int64:
+                case JsonObjectType.Int64:
                     stream.Write(data.AsInt64);
                     break;
 
 
-                case DataType.String:
+                case JsonObjectType.String:
                     stream.Write('"');
                     stream.Write(EscapeString(data.AsString));
                     stream.Write('"');
                     break;
 
-                case DataType.Object: {
+                case JsonObjectType.Object: {
                         //If only contains $content we can resume it to $content data 
                         if (data.AsDictionary.ContainsKey(Serializer.Key_Content) && data.AsDictionary.Count == 1)
                         {
@@ -214,7 +214,7 @@ namespace Kyub.Serialization {
                         break;
                     }
 
-                case DataType.Array:
+                case JsonObjectType.Array:
                     // special case for empty lists; we don't put an empty line between the brackets
                     if (data.AsList.Count == 0) {
                         stream.Write("[]");
@@ -247,14 +247,14 @@ namespace Kyub.Serialization {
         /// </summary>
         /// <param name="data">The data to print.</param>
         /// <param name="outputStream">Where to write the printed data.</param>
-        public static void PrettyJson(Data data, TextWriter outputStream) {
+        public static void PrettyJson(JsonObject data, TextWriter outputStream) {
             BuildPrettyString(data, outputStream, 0);
         }
 
         /// <summary>
         /// Returns the data in a pretty printed JSON format.
         /// </summary>
-        public static string PrettyJson(Data data) {
+        public static string PrettyJson(JsonObject data) {
             var sb = new StringBuilder();
             using (var writer = new StringWriter(sb)) {
                 BuildPrettyString(data, writer, 0);
@@ -267,14 +267,14 @@ namespace Kyub.Serialization {
         /// </summary>
         /// <param name="data">The data to print.</param>
         /// <param name="outputStream">Where to write the printed data.</param>
-        public static void CompressedJson(Data data, StreamWriter outputStream) {
+        public static void CompressedJson(JsonObject data, StreamWriter outputStream) {
             BuildCompressedString(data, outputStream);
         }
 
         /// <summary>
         /// Returns the data in a relatively compressed JSON format.
         /// </summary>
-        public static string CompressedJson(Data data) {
+        public static string CompressedJson(JsonObject data) {
             var sb = new StringBuilder();
             using (var writer = new StringWriter(sb)) {
                 BuildCompressedString(data, writer);

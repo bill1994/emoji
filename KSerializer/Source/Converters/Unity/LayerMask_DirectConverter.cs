@@ -11,7 +11,7 @@ namespace Kyub.Serialization {
 
 namespace Kyub.Serialization.Internal.DirectConverters {
     public class LayerMask_DirectConverter : DirectConverter<LayerMask> {
-        protected override Result DoSerialize(LayerMask model, Dictionary<string, Data> serialized) {
+        protected override Result DoSerialize(LayerMask model, Dictionary<string, JsonObject> serialized) {
             var result = Result.Success;
 
             result += SerializeMember(serialized, "value", model.value);
@@ -19,7 +19,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        protected override Result DoDeserialize(Dictionary<string, Data> data, ref LayerMask model) {
+        protected override Result DoDeserialize(Dictionary<string, JsonObject> data, ref LayerMask model) {
             var result = Result.Success;
 
             var t0 = model.value;
@@ -29,7 +29,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return new LayerMask();
         }
     }

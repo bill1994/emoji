@@ -35,14 +35,14 @@ namespace Kyub.Serialization {
         /// <param name="storageType">The field/property type that is storing the instance.</param>
         /// <param name="instance">The type of the instance.</param>
         /// <param name="data">The data that was serialized.</param>
-        public virtual void OnAfterSerialize(Type storageType, object instance, ref Data data) { }
+        public virtual void OnAfterSerialize(Type storageType, object instance, ref JsonObject data) { }
 
         /// <summary>
         /// Called before deserialization.
         /// </summary>
         /// <param name="storageType">The field/property type that is storing the instance.</param>
         /// <param name="data">The data that will be used for deserialization.</param>
-        public virtual void OnBeforeDeserialize(Type storageType, ref Data data) { }
+        public virtual void OnBeforeDeserialize(Type storageType, ref JsonObject data) { }
 
         /// <summary>
         /// Called before deserialization has begun but *after* the object instance has been created. This will get
@@ -56,7 +56,7 @@ namespace Kyub.Serialization {
         /// <param name="storageType">The field/property type that is storing the instance.</param>
         /// <param name="instance">The created object instance. No deserialization has been applied to it.</param>
         /// <param name="data">The data that will be used for deserialization.</param>
-        public virtual void OnBeforeDeserializeAfterInstanceCreation(Type storageType, object instance, ref Data data) { }
+        public virtual void OnBeforeDeserializeAfterInstanceCreation(Type storageType, object instance, ref JsonObject data) { }
 
         /// <summary>
         /// Called after deserialization.

@@ -18,29 +18,29 @@ namespace Kyub.Serialization.Internal {
             return false;
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
             var weakRef = (WeakReference)instance;
 
             var result = Result.Success;
-            serialized = Data.CreateDictionary(Serializer.Config);
+            serialized = JsonObject.CreateDictionary(Serializer.Config);
 
             if (weakRef.IsAlive) {
-                Data data;
+                JsonObject data;
                 if ((result += Serializer.TrySerialize(weakRef.Target, out data, Serializer.CurrentMetaProperty)).Failed) {
                     return result;
                 }
 
                 serialized.AsDictionary["Target"] = data;
-                serialized.AsDictionary["TrackResurrection"] = new Data(weakRef.TrackResurrection);
+                serialized.AsDictionary["TrackResurrection"] = new JsonObject(weakRef.TrackResurrection);
             }
 
             return result;
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             var result = Result.Success;
 
-            if ((result += CheckType(data, DataType.Object)).Failed) return result;
+            if ((result += CheckType(data, JsonObjectType.Object)).Failed) return result;
 
             if (data.AsDictionary.ContainsKey("Target")) {
                 var targetData = data.AsDictionary["Target"];
@@ -59,7 +59,7 @@ namespace Kyub.Serialization.Internal {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return new WeakReference(null);
         }
     }

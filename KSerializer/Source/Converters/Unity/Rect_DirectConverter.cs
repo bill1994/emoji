@@ -11,7 +11,7 @@ namespace Kyub.Serialization {
 
 namespace Kyub.Serialization.Internal.DirectConverters {
     public class Rect_DirectConverter : DirectConverter<Rect> {
-        protected override Result DoSerialize(Rect model, Dictionary<string, Data> serialized) {
+        protected override Result DoSerialize(Rect model, Dictionary<string, JsonObject> serialized) {
             var result = Result.Success;
 
             result += SerializeMember(serialized, "xMin", model.xMin);
@@ -22,7 +22,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        protected override Result DoDeserialize(Dictionary<string, Data> data, ref Rect model) {
+        protected override Result DoDeserialize(Dictionary<string, JsonObject> data, ref Rect model) {
             var result = Result.Success;
 
             var t0 = model.xMin;
@@ -44,7 +44,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return new Rect();
         }
     }

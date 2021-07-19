@@ -11,7 +11,7 @@ namespace Kyub.Serialization {
 
 namespace Kyub.Serialization.Internal.DirectConverters {
     public class AnimationCurve_DirectConverter : DirectConverter<AnimationCurve> {
-        protected override Result DoSerialize(AnimationCurve model, Dictionary<string, Data> serialized) {
+        protected override Result DoSerialize(AnimationCurve model, Dictionary<string, JsonObject> serialized) {
             var result = Result.Success;
 
             result += SerializeMember(serialized, "keys", model.keys);
@@ -21,7 +21,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        protected override Result DoDeserialize(Dictionary<string, Data> data, ref AnimationCurve model) {
+        protected override Result DoDeserialize(Dictionary<string, JsonObject> data, ref AnimationCurve model) {
             var result = Result.Success;
 
             var t0 = model.keys;
@@ -39,7 +39,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return new AnimationCurve();
         }
     }
