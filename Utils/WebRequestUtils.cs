@@ -9,132 +9,132 @@ namespace Kyub.Async
     {
         #region WebRequest Functions (Static)
 
-        public static UnityWebRequest CreatePutWebRequest(string p_url, WWWRequestForm p_formData, int p_timeout)
+        public static UnityWebRequest CreatePutWebRequest(string url, WWWRequestForm formData, int timeout)
         {
-            p_url = FormatUrl(p_url, p_formData);
+            url = FormatUrl(url, formData);
 
-            UnityWebRequest www = new UnityWebRequest(p_url, UnityWebRequest.kHttpVerbPUT,
+            UnityWebRequest www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPUT,
                 (DownloadHandler)new DownloadHandlerBuffer(),
-                p_formData.BodyData != null && p_formData.BodyData.Length > 0 ?
-                (UploadHandler)new UploadHandlerRaw(p_formData.BodyData) : null); //UnityWebRequest.Put(p_url, p_formData.BodyData);
-            if (p_timeout > 0)
-                www.timeout = p_timeout;
+                formData.BodyData != null && formData.BodyData.Length > 0 ?
+                (UploadHandler)new UploadHandlerRaw(formData.BodyData) : null); //UnityWebRequest.Put(url, formData.BodyData);
+            if (timeout > 0)
+                www.timeout = timeout;
 
-            var v_headerDict = p_formData.Header;
-            foreach (var v_pair in v_headerDict)
+            var headerDict = formData.Header;
+            foreach (var pair in headerDict)
             {
-                www.SetRequestHeader(v_pair.Key, v_pair.Value);
+                www.SetRequestHeader(pair.Key, pair.Value);
             }
 
             return www;
         }
 
-        public static UnityWebRequest CreatePostWebRequest(string p_url, WWWRequestForm p_formData, int p_timeout)
+        public static UnityWebRequest CreatePostWebRequest(string url, WWWRequestForm formData, int timeout)
         {
-            UnityWebRequest www = CreatePutWebRequest(p_url, p_formData, p_timeout);
+            UnityWebRequest www = CreatePutWebRequest(url, formData, timeout);
             www.method = UnityWebRequest.kHttpVerbPOST;
 
             return www;
         }
 
-        public static UnityWebRequest CreatePatchWebRequest(string p_url, WWWRequestForm p_formData, int p_timeout)
+        public static UnityWebRequest CreatePatchWebRequest(string url, WWWRequestForm formData, int timeout)
         {
-            UnityWebRequest www = CreatePutWebRequest(p_url, p_formData, p_timeout);
+            UnityWebRequest www = CreatePutWebRequest(url, formData, timeout);
             www.method = "PATCH";
 
             return www;
         }
 
-        public static UnityWebRequest CreateGetWebRequest(string p_url, WWWRequestForm p_formData, int p_timeout)
+        public static UnityWebRequest CreateGetWebRequest(string url, WWWRequestForm formData, int timeout)
         {
-            p_url = FormatUrl(p_url, p_formData);
+            url = FormatUrl(url, formData);
 
-            UnityWebRequest www = UnityWebRequest.Get(p_url);
-            if (p_timeout > 0)
-                www.timeout = p_timeout;
+            UnityWebRequest www = UnityWebRequest.Get(url);
+            if (timeout > 0)
+                www.timeout = timeout;
 
-            var v_headerDict = p_formData.Header;
-            foreach (var v_pair in v_headerDict)
+            var headerDict = formData.Header;
+            foreach (var pair in headerDict)
             {
-                www.SetRequestHeader(v_pair.Key, v_pair.Value);
+                www.SetRequestHeader(pair.Key, pair.Value);
             }
 
             return www;
         }
 
-        public static UnityWebRequest CreateDeleteWebRequest(string p_url, WWWRequestForm p_formData, int p_timeout)
+        public static UnityWebRequest CreateDeleteWebRequest(string url, WWWRequestForm formData, int timeout)
         {
-            p_url = FormatUrl(p_url, p_formData);
+            url = FormatUrl(url, formData);
 
-            UnityWebRequest www = UnityWebRequest.Delete(p_url);
+            UnityWebRequest www = UnityWebRequest.Delete(url);
             www.downloadHandler = new DownloadHandlerBuffer();
-            if (p_timeout > 0)
-                www.timeout = p_timeout;
+            if (timeout > 0)
+                www.timeout = timeout;
 
-            var v_headerDict = p_formData.Header;
-            foreach (var v_pair in v_headerDict)
+            var headerDict = formData.Header;
+            foreach (var pair in headerDict)
             {
-                www.SetRequestHeader(v_pair.Key, v_pair.Value);
+                www.SetRequestHeader(pair.Key, pair.Value);
             }
 
             return www;
         }
 
-        public static string FormatUrl(string p_url, WWWRequestForm p_formData)
+        public static string FormatUrl(string url, WWWRequestForm formData)
         {
-            //p_url = AuthManager.CombineWithMainRoute(p_url);
+            //url = AuthManager.CombineWithMainRoute(url);
 
-            var v_paramsDict = p_formData.ParamsDataAsDict;
-            var v_counter = 0;
-            foreach (var v_pair in v_paramsDict)
+            var paramsDict = formData.ParamsDataAsDict;
+            var counter = 0;
+            foreach (var pair in paramsDict)
             {
-                var v_key = v_pair.Key.Trim();
-                List<object> v_valuesToAdd = new List<object>();
+                var key = pair.Key.Trim();
+                List<object> valuesToAdd = new List<object>();
 
                 //Special Array Case
-                if (v_key.EndsWith("[]") && (v_pair.Value is IEnumerable))
+                if (key.EndsWith("[]") && (pair.Value is IEnumerable))
                 {
-                    var array = v_pair.Value as IEnumerable;
+                    var array = pair.Value as IEnumerable;
                     foreach (var element in array)
                     {
-                        v_valuesToAdd.Add(element);
+                        valuesToAdd.Add(element);
                     }
                 }
                 else
-                    v_valuesToAdd.Add(v_pair.Value);
+                    valuesToAdd.Add(pair.Value);
 
                 //Add all elements to process (only in special case that this loop will run more than one time)
-                foreach (var v_value in v_valuesToAdd)
+                foreach (var value in valuesToAdd)
                 {
-                    if (v_counter == 0)
-                        p_url += "?";
+                    if (counter == 0)
+                        url += "?";
                     else
-                        p_url += "&";
+                        url += "&";
 
                     //Make URL compatible with GET Escape encoding
-                    p_url += v_key + "=" + System.Uri.EscapeDataString((v_value != null ? v_value.ToString() : ""));
-                    v_counter++;
+                    url += key + "=" + System.Uri.EscapeDataString((value != null ? value.ToString() : ""));
+                    counter++;
                 }
             }
-            return p_url;
+            return url;
         }
 
-        public static string CombineRoutes(string p_route, string p_pathToCombine)
+        public static string CombineRoutes(string route, string pathToCombine)
         {
-            p_pathToCombine = p_pathToCombine == null ? "" : p_pathToCombine.Trim().Replace("\\", "/");
+            pathToCombine = pathToCombine == null ? "" : pathToCombine.Trim().Replace("\\", "/");
 
             //Combine Path with main route
-            if (!string.IsNullOrEmpty(p_route) && !p_pathToCombine.StartsWith("http") && !p_pathToCombine.StartsWith("ftp") && !p_pathToCombine.StartsWith("ws") && !p_pathToCombine.StartsWith("www"))
+            if (!string.IsNullOrEmpty(route) && !pathToCombine.StartsWith("http") && !pathToCombine.StartsWith("ftp") && !pathToCombine.StartsWith("ws") && !pathToCombine.StartsWith("www"))
             {
                 //Remove Initial Bar because Path Combine cannot start with "/" or will fail to combine both paths
-                while (p_pathToCombine.StartsWith("/"))
+                while (pathToCombine.StartsWith("/"))
                 {
-                    p_pathToCombine = p_pathToCombine.Length > 1 ? p_pathToCombine.Substring(1, p_pathToCombine.Length - 1) : "";
+                    pathToCombine = pathToCombine.Length > 1 ? pathToCombine.Substring(1, pathToCombine.Length - 1) : "";
                 }
                 //Combine with main route
-                p_pathToCombine = System.IO.Path.Combine(p_route, p_pathToCombine).Replace("\\", "/");
+                pathToCombine = System.IO.Path.Combine(route, pathToCombine).Replace("\\", "/");
             }
-            return p_pathToCombine;
+            return pathToCombine;
         }
 
         #endregion
@@ -243,34 +243,34 @@ namespace Kyub.Async
             }
         }
 
-        public void AddBodyField(string p_key, object p_value)
+        public void AddBodyField(string key, object value)
         {
             //Reset byte array
-            m_bodyData[p_key] = p_value;
+            m_bodyData[key] = value;
             _bodyDataJson = null;
             _bodyDataBytes = null;
         }
 
-        public void AddBodyObject<T>(T p_data, Serialization.Serializer p_customSerializer = null)
+        public void AddBodyObject<T>(T data, Serialization.Serializer customSerializer = null)
         {
-            if (p_data != null)
+            if (data != null)
             {
-                Serialization.JsonObject v_data;
-                if (p_customSerializer == null)
-                    p_customSerializer = SerializationUtils.DefaultSerializer;
+                Serialization.JsonObject resultData;
+                if (customSerializer == null)
+                    customSerializer = SerializationUtils.DefaultSerializer;
 
-                p_customSerializer.TrySerialize(typeof(T), p_data, out v_data, null);
+                customSerializer.TrySerialize(typeof(T), data, out resultData, null);
 
-                var v_dataDict = v_data.AsDictionary;
-                var v_sucess = false;
+                var dataDict = resultData.AsDictionary;
+                var sucess = false;
 
-                foreach (var v_pair in v_dataDict)
+                foreach (var pair in dataDict)
                 {
-                    v_sucess = true;
-                    m_bodyData[v_pair.Key] = v_pair.Value;
+                    sucess = true;
+                    m_bodyData[pair.Key] = pair.Value;
                 }
 
-                if (v_sucess)
+                if (sucess)
                 {
                     _bodyDataJson = null;
                     _bodyDataBytes = null;
@@ -278,28 +278,28 @@ namespace Kyub.Async
             }
         }
 
-        public void AddParamField(string p_key, object p_value)
+        public void AddParamField(string key, object value)
         {
-            m_paramsData[p_key] = p_value;
+            m_paramsData[key] = value;
         }
 
-        public void AddParamObject<T>(T p_data, Serialization.Serializer p_customSerializer = null)
+        public void AddParamObject<T>(T data, Serialization.Serializer customSerializer = null)
         {
-            if (p_data != null)
+            if (data != null)
             {
-                Serialization.JsonObject v_data;
-                if (p_customSerializer == null)
-                    p_customSerializer = SerializationUtils.DefaultSerializer;
+                Serialization.JsonObject resultData;
+                if (customSerializer == null)
+                    customSerializer = SerializationUtils.DefaultSerializer;
 
-                p_customSerializer.TrySerialize(typeof(T), p_data, out v_data, null);
+                customSerializer.TrySerialize(typeof(T), data, out resultData, null);
 
-                var v_dataDict = v_data.AsDictionary;
-                //var v_sucess = false;
+                var dataDict = resultData.AsDictionary;
+                //var sucess = false;
 
-                foreach (var v_pair in v_dataDict)
+                foreach (var pair in dataDict)
                 {
-                    //v_sucess = true;
-                    m_paramsData[v_pair.Key] = v_pair.Value;
+                    //sucess = true;
+                    m_paramsData[pair.Key] = pair.Value;
                 }
 
             }
