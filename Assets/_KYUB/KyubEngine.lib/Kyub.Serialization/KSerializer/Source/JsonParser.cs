@@ -171,11 +171,11 @@ namespace Kyub.Serialization {
             return Result.Success;
         }
 
-        private Result TryParseTrue(out Data data) {
+        private Result TryParseTrue(out JsonObject data) {
             var fail = TryParseExact("true");
 
             if (fail.Succeeded) {
-                data = new Data(true);
+                data = new JsonObject(true);
                 return Result.Success;
             }
 
@@ -183,11 +183,11 @@ namespace Kyub.Serialization {
             return fail;
         }
 
-        private Result TryParseFalse(out Data data) {
+        private Result TryParseFalse(out JsonObject data) {
             var fail = TryParseExact("false");
 
             if (fail.Succeeded) {
-                data = new Data(false);
+                data = new JsonObject(false);
                 return Result.Success;
             }
 
@@ -195,11 +195,11 @@ namespace Kyub.Serialization {
             return fail;
         }
 
-        private Result TryParseNull(out Data data) {
+        private Result TryParseNull(out JsonObject data) {
             var fail = TryParseExact("null");
 
             if (fail.Succeeded) {
-                data = new Data();
+                data = new JsonObject();
                 return Result.Success;
             }
 
@@ -215,7 +215,7 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Parses numbers that follow the regular expression [-+](\d+|\d*\.\d*)
         /// </summary>
-        private Result TryParseNumber(out Data data) {
+        private Result TryParseNumber(out JsonObject data) {
             int start = _start;
 
             // read until we get to a separator
@@ -235,7 +235,7 @@ namespace Kyub.Serialization {
                     return MakeFailure("Bad double format with " + numberString);
                 }
 
-                data = new Data(doubleValue);
+                data = new JsonObject(doubleValue);
                 return Result.Success;
             }
             else {
@@ -245,7 +245,7 @@ namespace Kyub.Serialization {
                     return MakeFailure("Bad Int64 format with " + numberString);
                 }
 
-                data = new Data(intValue);
+                data = new JsonObject(intValue);
                 return Result.Success;
             }
         }
@@ -304,7 +304,7 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Parses an array
         /// </summary>
-        private Result TryParseArray(out Data arr) {
+        private Result TryParseArray(out JsonObject arr) {
             if (Character() != '[') {
                 arr = null;
                 return MakeFailure("Expected initial [ when parsing an array");
@@ -317,11 +317,11 @@ namespace Kyub.Serialization {
             }
             SkipSpace();
 
-            var result = new List<Data>();
+            var result = new List<JsonObject>();
 
             while (HasValue() && Character() != ']') {
                 // parse the element
-                Data element;
+                JsonObject element;
                 var fail = RunParse(out element);
                 if (fail.Failed) {
                     arr = null;
@@ -344,11 +344,11 @@ namespace Kyub.Serialization {
                 return MakeFailure("No closing ] for array");
             }
 
-            arr = new Data(result);
+            arr = new JsonObject(result);
             return Result.Success;
         }
 
-        private Result TryParseObject(out Data obj) {
+        private Result TryParseObject(out JsonObject obj) {
             if (Character() != '{') {
                 obj = null;
                 return MakeFailure("Expected initial { when parsing an object");
@@ -361,7 +361,7 @@ namespace Kyub.Serialization {
             }
             SkipSpace();
 
-            var result = new Dictionary<string, Data>(
+            var result = new Dictionary<string, JsonObject>(
                 _configUsed.IsCaseSensitive ? StringComparer.CurrentCulture : StringComparer.CurrentCultureIgnoreCase);
 
             while (HasValue() && Character() != '}') {
@@ -385,7 +385,7 @@ namespace Kyub.Serialization {
                 SkipSpace();
 
                 // parse the value
-                Data value;
+                JsonObject value;
                 failure = RunParse(out value);
                 if (failure.Failed) {
                     obj = null;
@@ -408,11 +408,11 @@ namespace Kyub.Serialization {
                 return MakeFailure("No closing } for object");
             }
 
-            obj = new Data(result);
+            obj = new JsonObject(result);
             return Result.Success;
         }
 
-        private Result RunParse(out Data data) {
+        private Result RunParse(out JsonObject data) {
             SkipSpace();
 
             switch (Character()) {
@@ -438,7 +438,7 @@ namespace Kyub.Serialization {
                             data = null;
                             return fail;
                         }
-                        data = new Data(str);
+                        data = new JsonObject(str);
                         return Result.Success;
                     }
                 case '[': return TryParseArray(out data);
@@ -458,10 +458,10 @@ namespace Kyub.Serialization {
         /// <param name="input">The input to parse.</param>
         /// <param name="data">The parsed data. This is undefined if parsing fails.</param>
         /// <returns>The parsed input.</returns>
-        public static Result Parse(string input, Config p_config, out Data data) {
+        public static Result Parse(string input, SerializerConfig p_config, out JsonObject data) {
             if (string.IsNullOrEmpty(input))
             {
-                data = new Data();
+                data = new JsonObject();
                 return Result.Success;
             }
             else
@@ -475,24 +475,24 @@ namespace Kyub.Serialization {
         /// Helper method for Parse that does not allow the error information
         /// to be recovered.
         /// </summary>
-        public static Data Parse(string input, Config p_config) {
+        public static JsonObject Parse(string input, SerializerConfig p_config) {
             if (string.IsNullOrEmpty(input))
             {
-                return new Data();
+                return new JsonObject();
             }
             else
             {
-                Data data;
+                JsonObject data;
                 Parse(input, p_config, out data).AssertSuccess();
                 return data;
             }
         }
 
-        Config _configUsed = null;
-        private JsonParser(string input, Config p_config)
+        SerializerConfig _configUsed = null;
+        private JsonParser(string input, SerializerConfig p_config)
         {
             if (p_config == null)
-                p_config = Config.DefaultConfig;
+                p_config = SerializerConfig.DefaultConfig;
             _configUsed = p_config.Clone();
             _input = input;
             _start = 0;

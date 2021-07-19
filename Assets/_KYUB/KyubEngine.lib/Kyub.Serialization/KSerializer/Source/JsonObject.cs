@@ -6,7 +6,7 @@ namespace Kyub.Serialization {
     /// <summary>
     /// The actual type that a JsonData instance can store.
     /// </summary>
-    public enum DataType {
+    public enum JsonObjectType {
         Array,
         Object,
         Double,
@@ -20,7 +20,7 @@ namespace Kyub.Serialization {
     /// A union type that stores a serialized value. The stored type can be one of six different
     /// types: null, boolean, double, Int64, string, Dictionary, or List.
     /// </summary>
-    public sealed class Data {
+    public sealed class JsonObject {
         /// <summary>
         /// The raw value that this serialized data stores. It can be one of six different types; a
         /// boolean, a double, Int64, a string, a Dictionary, or a List.
@@ -31,85 +31,85 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Creates a Data instance that holds null.
         /// </summary>
-        public Data() {
+        public JsonObject() {
             _value = null;
         }
 
         /// <summary>
         /// Creates a Data instance that holds a boolean.
         /// </summary>
-        public Data(bool boolean) {
+        public JsonObject(bool boolean) {
             _value = boolean;
         }
 
         /// <summary>
         /// Creates a Data instance that holds a double.
         /// </summary>
-        public Data(double f) {
+        public JsonObject(double f) {
             _value = f;
         }
 
         /// <summary>
         /// Creates a new Data instance that holds an integer.
         /// </summary>
-        public Data(Int64 i) {
+        public JsonObject(Int64 i) {
             _value = i;
         }
 
         /// <summary>
         /// Creates a Data instance that holds a string.
         /// </summary>
-        public Data(string str) {
+        public JsonObject(string str) {
             _value = str;
         }
 
         /// <summary>
         /// Creates a Data instance that holds a dictionary of values.
         /// </summary>
-        public Data(Dictionary<string, Data> dict) {
+        public JsonObject(Dictionary<string, JsonObject> dict) {
             _value = dict;
         }
 
         /// <summary>
         /// Creates a Data instance that holds a list of values.
         /// </summary>
-        public Data(List<Data> list) {
+        public JsonObject(List<JsonObject> list) {
             _value = list;
         }
 
         /// <summary>
         /// Helper method to create a Data instance that holds a dictionary.
         /// </summary>
-        public static Data CreateDictionary(Config p_config) {
+        public static JsonObject CreateDictionary(SerializerConfig p_config) {
             if (p_config == null)
-                p_config = Config.DefaultConfig;
+                p_config = SerializerConfig.DefaultConfig;
 
-            return new Data(new Dictionary<string, Data>(
+            return new JsonObject(new Dictionary<string, JsonObject>(
                 p_config.IsCaseSensitive ? StringComparer.CurrentCulture : StringComparer.CurrentCultureIgnoreCase));
         }
 
         /// <summary>
         /// Helper method to create a Data instance that holds a list.
         /// </summary>
-        public static Data CreateList() {
-            return new Data(new List<Data>());
+        public static JsonObject CreateList() {
+            return new JsonObject(new List<JsonObject>());
         }
 
         /// <summary>
         /// Helper method to create a Data instance that holds a list with the initial capacity.
         /// </summary>
-        public static Data CreateList(int capacity) {
-            return new Data(new List<Data>(capacity));
+        public static JsonObject CreateList(int capacity) {
+            return new JsonObject(new List<JsonObject>(capacity));
         }
 
-        public readonly static Data True = new Data(true);
-        public readonly static Data False = new Data(true);
-        public readonly static Data Null = new Data();
+        public readonly static JsonObject True = new JsonObject(true);
+        public readonly static JsonObject False = new JsonObject(true);
+        public readonly static JsonObject Null = new JsonObject();
         #endregion
 
         #region Enumerator Functions
 
-        public Data this[int i]
+        public JsonObject this[int i]
         {
             get
             {
@@ -129,7 +129,7 @@ namespace Kyub.Serialization {
             }
         }
 
-        public Data this[string key]
+        public JsonObject this[string key]
         {
             get
             {
@@ -186,15 +186,15 @@ namespace Kyub.Serialization {
         #endregion
 
         #region Casting Predicates
-        public DataType Type {
+        public JsonObjectType Type {
             get {
-                if (_value == null) return DataType.Null;
-                if (_value is double) return DataType.Double;
-                if (_value is Int64) return DataType.Int64;
-                if (_value is bool) return DataType.Boolean;
-                if (_value is string) return DataType.String;
-                if (_value is Dictionary<string, Data>) return DataType.Object;
-                if (_value is List<Data>) return DataType.Array;
+                if (_value == null) return JsonObjectType.Null;
+                if (_value is double) return JsonObjectType.Double;
+                if (_value is Int64) return JsonObjectType.Int64;
+                if (_value is bool) return JsonObjectType.Boolean;
+                if (_value is string) return JsonObjectType.String;
+                if (_value is Dictionary<string, JsonObject>) return JsonObjectType.Object;
+                if (_value is List<JsonObject>) return JsonObjectType.Array;
 
                 throw new InvalidOperationException("unknown JSON data type");
             }
@@ -250,7 +250,7 @@ namespace Kyub.Serialization {
         /// </summary>
         public bool IsDictionary {
             get {
-                return _value is Dictionary<string, Data>;
+                return _value is Dictionary<string, JsonObject>;
             }
         }
 
@@ -259,7 +259,7 @@ namespace Kyub.Serialization {
         /// </summary>
         public bool IsList {
             get {
-                return _value is List<Data>;
+                return _value is List<JsonObject>;
             }
         }
         #endregion
@@ -311,9 +311,9 @@ namespace Kyub.Serialization {
         /// Dictionary.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Dictionary<string, Data> AsDictionary {
+        public Dictionary<string, JsonObject> AsDictionary {
             get {
-                return Cast<Dictionary<string, Data>>();
+                return Cast<Dictionary<string, JsonObject>>();
             }
         }
 
@@ -321,9 +321,9 @@ namespace Kyub.Serialization {
         /// Casts this Data to a List. Throws an exception if it is not a List.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public List<Data> AsList {
+        public List<JsonObject> AsList {
             get {
-                return Cast<List<Data>>();
+                return Cast<List<JsonObject>>();
             }
         }
 
@@ -341,21 +341,50 @@ namespace Kyub.Serialization {
         }
         #endregion
 
+        #region Public Helper Functions
+
+        public bool HasKey(string key)
+        {
+            return !string.IsNullOrEmpty(key) && IsDictionary && AsDictionary != null && AsDictionary.ContainsKey(key);
+        }
+
+        public JsonObject GetValue(string key)
+        {
+            if (!string.IsNullOrEmpty(key) && IsDictionary && AsDictionary != null)
+            {
+                JsonObject value;
+                AsDictionary.TryGetValue(key, out value);
+                return value;
+            }
+            return null;
+        }
+
+        public JsonObject GetArrayElement(int index)
+        {
+            if (IsList && index >= 0 && index < Count)
+            {
+                return AsList[index];
+            }
+            return null;
+        }
+
+        #endregion
+
         #region Internal Helper Methods
         /// <summary>
-        /// Transforms the internal fsData instance into a dictionary.
+        /// Transforms the internal JsonObject instance into a dictionary.
         /// </summary>
         internal void BecomeDictionary()
         {
-            _value = new Dictionary<string, Data>();
+            _value = new Dictionary<string, JsonObject>();
         }
 
         /// <summary>
         /// Returns a shallow clone of this data instance.
         /// </summary>
-        internal Data Clone()
+        internal JsonObject Clone()
         {
-            var clone = new Data();
+            var clone = new JsonObject();
             clone._value = _value;
                         return clone;
 
@@ -374,34 +403,34 @@ namespace Kyub.Serialization {
         /// Determines whether the specified object is equal to the current object.
         /// </summary>
         public override bool Equals(object obj) {
-            return Equals(obj as Data);
+            return Equals(obj as JsonObject);
         }
 
         /// <summary>
         /// Determines whether the specified object is equal to the current object.
         /// </summary>
-        public bool Equals(Data other) {
+        public bool Equals(JsonObject other) {
             if (other == null || Type != other.Type) {
                 return false;
             }
 
             switch (Type) {
-                case DataType.Null:
+                case JsonObjectType.Null:
                     return true;
 
-                case DataType.Double:
+                case JsonObjectType.Double:
                     return AsDouble == other.AsDouble || Math.Abs(AsDouble - other.AsDouble) < double.Epsilon;
 
-                case DataType.Int64:
+                case JsonObjectType.Int64:
                     return AsInt64 == other.AsInt64;
 
-                case DataType.Boolean:
+                case JsonObjectType.Boolean:
                     return AsBool == other.AsBool;
 
-                case DataType.String:
+                case JsonObjectType.String:
                     return AsString == other.AsString;
 
-                case DataType.Array:
+                case JsonObjectType.Array:
                     var thisList = AsList;
                     var otherList = other.AsList;
 
@@ -415,7 +444,7 @@ namespace Kyub.Serialization {
 
                     return true;
 
-                case DataType.Object:
+                case JsonObjectType.Object:
                     var thisDict = AsDictionary;
                     var otherDict = other.AsDictionary;
 
@@ -440,7 +469,7 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Returns true iff a == b.
         /// </summary>
-        public static bool operator ==(Data a, Data b) {
+        public static bool operator ==(JsonObject a, JsonObject b) {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b)) {
                 return true;
@@ -461,7 +490,7 @@ namespace Kyub.Serialization {
         /// <summary>
         /// Returns true iff a != b.
         /// </summary>
-        public static bool operator !=(Data a, Data b) {
+        public static bool operator !=(JsonObject a, JsonObject b) {
             return !(a == b);
         }
 

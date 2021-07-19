@@ -11,7 +11,7 @@ namespace Kyub.Serialization {
 
 namespace Kyub.Serialization.Internal.DirectConverters {
     public class Keyframe_DirectConverter : DirectConverter<Keyframe> {
-        protected override Result DoSerialize(Keyframe model, Dictionary<string, Data> serialized) {
+        protected override Result DoSerialize(Keyframe model, Dictionary<string, JsonObject> serialized) {
             var result = Result.Success;
 
             result += SerializeMember(serialized, "time", model.time);
@@ -23,7 +23,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        protected override Result DoDeserialize(Dictionary<string, Data> data, ref Keyframe model) {
+        protected override Result DoDeserialize(Dictionary<string, JsonObject> data, ref Keyframe model) {
             var result = Result.Success;
 
             var t0 = model.time;
@@ -49,7 +49,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return new Keyframe();
         }
     }

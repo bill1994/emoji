@@ -13,11 +13,11 @@ namespace Kyub.Serialization.Internal {
             return typeof(IDictionary).IsAssignableFrom(type);
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return Serializer.Config.MetaTypeCache.Get(storageType).CreateInstance();
         }
 
-        public override Result TryDeserialize(Data data, ref object instance_, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance_, Type storageType) {
             var instance = (IDictionary)instance_;
             var result = Result.Success;
 
@@ -29,8 +29,8 @@ namespace Kyub.Serialization.Internal {
                 for (int i = 0; i < list.Count; ++i) {
                     var item = list[i];
 
-                    Data keyData, valueData;
-                    if ((result += CheckType(item, DataType.Object)).Failed) return result;
+                    JsonObject keyData, valueData;
+                    if ((result += CheckType(item, JsonObjectType.Object)).Failed) return result;
                     if ((result += CheckKey(item, "Key", out keyData)).Failed) return result;
                     if ((result += CheckKey(item, "Value", out valueData)).Failed) return result;
 
@@ -45,7 +45,7 @@ namespace Kyub.Serialization.Internal {
                 foreach (var entry in data.AsDictionary) {
                     if (Serializer.IsReservedKeyword(entry.Key)) continue;
 
-                    Data keyData = new Data(entry.Key), valueData = entry.Value;
+                    JsonObject keyData = new JsonObject(entry.Key), valueData = entry.Value;
                     object keyInstance = null, valueInstance = null;
 
                     if ((result += Serializer.TryDeserialize(keyData, keyStorageType, ref keyInstance, Serializer.CurrentMetaProperty)).Failed) return result;
@@ -55,14 +55,14 @@ namespace Kyub.Serialization.Internal {
                 }
             }
             else {
-                return FailExpectedType(data, DataType.Array, DataType.Object);
+                return FailExpectedType(data, JsonObjectType.Array, JsonObjectType.Object);
             }
 
             return result;
         }
 
-        public override Result TrySerialize(object instance_, out Data serialized, Type storageType) {
-            serialized = Data.Null;
+        public override Result TrySerialize(object instance_, out JsonObject serialized, Type storageType) {
+            serialized = JsonObject.Null;
 
             var result = Result.Success;
 
@@ -75,10 +75,10 @@ namespace Kyub.Serialization.Internal {
             IDictionaryEnumerator enumerator = instance.GetEnumerator();
 
             bool allStringKeys = true;
-            var serializedKeys = new List<Data>(instance.Count);
-            var serializedValues = new List<Data>(instance.Count);
+            var serializedKeys = new List<JsonObject>(instance.Count);
+            var serializedValues = new List<JsonObject>(instance.Count);
             while (enumerator.MoveNext()) {
-                Data keyData, valueData;
+                JsonObject keyData, valueData;
                 if ((result += Serializer.TrySerialize(keyStorageType, enumerator.Key, out keyData, Serializer.CurrentMetaProperty)).Failed) return result;
                 if ((result += Serializer.TrySerialize(valueStorageType, enumerator.Value, out valueData, Serializer.CurrentMetaProperty)).Failed) return result;
 
@@ -89,27 +89,27 @@ namespace Kyub.Serialization.Internal {
             }
 
             if (allStringKeys) {
-                serialized = Data.CreateDictionary(Serializer.Config);
+                serialized = JsonObject.CreateDictionary(Serializer.Config);
                 var serializedDictionary = serialized.AsDictionary;
 
                 for (int i = 0; i < serializedKeys.Count; ++i) {
-                    Data key = serializedKeys[i];
-                    Data value = serializedValues[i];
+                    JsonObject key = serializedKeys[i];
+                    JsonObject value = serializedValues[i];
                     serializedDictionary[key.AsString] = value;
                 }
             }
             else {
-                serialized = Data.CreateList(serializedKeys.Count);
+                serialized = JsonObject.CreateList(serializedKeys.Count);
                 var serializedList = serialized.AsList;
 
                 for (int i = 0; i < serializedKeys.Count; ++i) {
-                    Data key = serializedKeys[i];
-                    Data value = serializedValues[i];
+                    JsonObject key = serializedKeys[i];
+                    JsonObject value = serializedValues[i];
 
-                    var container = new Dictionary<string, Data>();
+                    var container = new Dictionary<string, JsonObject>();
                     container["Key"] = key;
                     container["Value"] = value;
-                    serializedList.Add(new Data(container));
+                    serializedList.Add(new JsonObject(container));
                 }
             }
 

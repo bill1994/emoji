@@ -17,29 +17,29 @@ namespace Kyub.Serialization.Internal {
                 type == typeof(TimeSpan);
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
             if (instance is DateTime) {
                 var dateTime = (DateTime)instance;
-                serialized = new Data(dateTime.ToString(DateTimeFormatString));
+                serialized = new JsonObject(dateTime.ToString(DateTimeFormatString));
                 return Result.Success;
             }
 
             if (instance is DateTimeOffset) {
                 var dateTimeOffset = (DateTimeOffset)instance;
-                serialized = new Data(dateTimeOffset.ToString(DateTimeOffsetFormatString));
+                serialized = new JsonObject(dateTimeOffset.ToString(DateTimeOffsetFormatString));
                 return Result.Success;
             }
 
             if (instance is TimeSpan) {
                 var timeSpan = (TimeSpan)instance;
-                serialized = new Data(timeSpan.ToString());
+                serialized = new JsonObject(timeSpan.ToString());
                 return Result.Success;
             }
 
             throw new InvalidOperationException("KSerializer Internal Error -- Unexpected serialization type");
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             if (data.IsString == false) {
                 return Result.Fail("Date deserialization requires a string, not " + data.Type);
             }

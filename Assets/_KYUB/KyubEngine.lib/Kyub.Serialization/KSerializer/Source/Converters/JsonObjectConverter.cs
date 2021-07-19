@@ -13,11 +13,11 @@ namespace Kyub.Serialization.Internal
     /// of Unity objects (which Unity serializes) and serializes the index of where
     /// that storage took place.
     /// </summary>
-	public class DataConverter : ReflectedConverter
+	public class JsonObjectConverter : ReflectedConverter
     {
         public override bool CanProcess(Type type)
         {
-            return typeof(Data).IsAssignableFrom(type);
+            return typeof(JsonObject).IsAssignableFrom(type);
         }
 
         public override bool RequestCycleSupport(Type storageType)
@@ -32,22 +32,22 @@ namespace Kyub.Serialization.Internal
 
         protected virtual bool IsValidType(Type p_type)
         {
-            return p_type != null && (p_type == typeof(Data) || p_type.IsSubclassOf(typeof(Data)));
+            return p_type != null && (p_type == typeof(JsonObject) || p_type.IsSubclassOf(typeof(JsonObject)));
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType)
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType)
         {
             //UnityObject is the root of serialization (we must expose it)
-            if (instance is Data)
+            if (instance is JsonObject)
             {
-                serialized = instance as Data;
+                serialized = instance as JsonObject;
                 return Result.Success;
             }
-            serialized = new Data();
+            serialized = new JsonObject();
             return Result.Fail("Error Serializing Data");
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType)
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace Kyub.Serialization.Internal
             return Result.Fail("Error Deserializing Data");
         }
 
-        public override object CreateInstance(Data data, Type storageType)
+        public override object CreateInstance(JsonObject data, Type storageType)
         {
             return null;
         }

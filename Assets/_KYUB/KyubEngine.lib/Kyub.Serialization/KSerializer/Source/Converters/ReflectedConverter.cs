@@ -15,8 +15,8 @@ namespace Kyub.Serialization.Internal {
             return true;
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
-            serialized = Data.CreateDictionary(Serializer.Config);
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
+            serialized = JsonObject.CreateDictionary(Serializer.Config);
             var result = Result.Success;
 
             MetaType metaType = Serializer.Config.MetaTypeCache.Get(instance.GetType());
@@ -26,7 +26,7 @@ namespace Kyub.Serialization.Internal {
                 MetaProperty property = metaType.Properties[i];
                 if (!property.CanRead || !property.CanSerializeInContext(instance)) continue;
 
-                Data serializedData;
+                JsonObject serializedData;
 
                 var itemResult = Serializer.TrySerialize(property.StorageType, property.Read(instance), out serializedData, property);
                 result.AddMessages(itemResult);
@@ -40,11 +40,11 @@ namespace Kyub.Serialization.Internal {
             return result;
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             var result = Result.Success;
 
             // Verify that we actually have an Object
-            if ((result += CheckType(data, DataType.Object)).Failed) {
+            if ((result += CheckType(data, JsonObjectType.Object)).Failed) {
                 return result;
             }
 
@@ -55,7 +55,7 @@ namespace Kyub.Serialization.Internal {
                 MetaProperty property = metaType.Properties[i];
                 if (property.CanWrite == false) continue;
 
-                Data propertyData;
+                JsonObject propertyData;
                 var jsonPossibleNames = new List<string>();
                 jsonPossibleNames.Add(property.JsonName);
                 jsonPossibleNames.AddRange(property.FallbackNames);
@@ -78,7 +78,7 @@ namespace Kyub.Serialization.Internal {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             MetaType metaType = Serializer.Config.MetaTypeCache.Get(storageType);
             return metaType.CreateInstance();
         }

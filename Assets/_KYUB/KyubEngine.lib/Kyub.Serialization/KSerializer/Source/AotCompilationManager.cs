@@ -41,7 +41,7 @@ namespace Kyub.Serialization {
         /// <param name="type">The type to perform the AOT compilation on.</param>
         /// <param name="aotCompiledClassInCSharp">The AOT class. Add this C# code to your project.</param>
         /// <returns>True if AOT compilation was successful.</returns>
-        public static bool TryToPerformAotCompilation(Type type, Config p_config, out string aotCompiledClassInCSharp) {
+        public static bool TryToPerformAotCompilation(Type type, SerializerConfig p_config, out string aotCompiledClassInCSharp) {
             if (MetaTypeCache.GetInGlobalCache(type, p_config).EmitAotData()) {
                 aotCompiledClassInCSharp = AvailableAotCompilations[type];
                 return true;

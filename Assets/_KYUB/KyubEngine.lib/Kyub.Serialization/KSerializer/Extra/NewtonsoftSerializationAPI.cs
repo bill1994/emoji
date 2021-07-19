@@ -13,7 +13,7 @@ namespace Kyub.Serialization
 
         static Serializer InitNewSerializer()
         {
-            Config _newConfig = new Config();
+            SerializerConfig _newConfig = new SerializerConfig();
             _newConfig.SerializeAttributes = new Type[] { typeof(SerializePropertyAttribute), typeof(System.Xml.Serialization.XmlAttributeAttribute) };
             _newConfig.MemberSerialization = MemberSerialization.OptOut;
             _newConfig.IsCaseSensitive = true;
@@ -31,7 +31,7 @@ namespace Kyub.Serialization
             if(v_serializer == _serializer)
                 _isSerializing = true;
             // serialize the data
-            Data data;
+            JsonObject data;
             v_serializer.TrySerialize(type, value, out data, null);
             //var fail = v_serializer.TrySerialize(type, value, out data);
             //if (fail.Failed) throw new Exception(fail.FormattedMessages);
@@ -62,7 +62,7 @@ namespace Kyub.Serialization
             {
                 //Result fail;
                 // step 1: parse the JSON data
-                Data data;
+                JsonObject data;
                 JsonParser.Parse(serializedState, v_serializer.Config, out data);
                 //fail = JsonParser.Parse(serializedState, v_serializer.Config, out data);
                 //if (fail.Failed) throw new Exception(fail.FormattedMessages);

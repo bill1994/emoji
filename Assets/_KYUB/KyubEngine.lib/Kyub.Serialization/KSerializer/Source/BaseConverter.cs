@@ -22,7 +22,7 @@ namespace Kyub.Serialization {
         /// <param name="data">The data the object was serialized with.</param>
         /// <param name="storageType">The field/property type that is storing the instance.</param>
         /// <returns>An object instance</returns>
-        public virtual object CreateInstance(Data data, Type storageType) {
+        public virtual object CreateInstance(JsonObject data, Type storageType) {
             if (RequestCycleSupport(storageType)) {
                 throw new InvalidOperationException("Please override CreateInstance for " +
                     GetType().FullName + "; the object graph for " + storageType +
@@ -61,7 +61,7 @@ namespace Kyub.Serialization {
         /// <param name="serialized">The serialized state.</param>
         /// <param name="storageType">The field/property type that is storing this instance.</param>
         /// <returns>If serialization was successful.</returns>
-        public abstract Result TrySerialize(object instance, out Data serialized, Type storageType);
+        public abstract Result TrySerialize(object instance, out JsonObject serialized, Type storageType);
 
         /// <summary>
         /// Deserialize data into the object instance.
@@ -70,41 +70,41 @@ namespace Kyub.Serialization {
         /// <param name="instance">The object instance to deserialize into.</param>
         /// <param name="storageType">The field/property type that is storing the instance.</param>
         /// <returns>True if serialization was successful, false otherwise.</returns>
-        public abstract Result TryDeserialize(Data data, ref object instance, Type storageType);
+        public abstract Result TryDeserialize(JsonObject data, ref object instance, Type storageType);
 
-        protected Result FailExpectedType(Data data, params DataType[] types) {
+        protected Result FailExpectedType(JsonObject data, params JsonObjectType[] types) {
             return Result.Fail(GetType().Name + " expected one of " +
                 string.Join(", ", types.Select(t => t.ToString()).ToArray()) +
                 " but got " + data.Type + " in " + data);
         }
 
-        protected Result CheckType(Data data, DataType type) {
+        protected Result CheckType(JsonObject data, JsonObjectType type) {
             if (data.Type != type) {
                 return Result.Fail(GetType().Name + " expected " + type + " but got " + data.Type + " in " + data);
             }
             return Result.Success;
         }
 
-        protected Result CheckKey(Data data, string key, out Data subitem) {
+        protected Result CheckKey(JsonObject data, string key, out JsonObject subitem) {
             return CheckKey(data.AsDictionary, key, out subitem);
         }
 
-        protected Result CheckKey(Dictionary<string, Data> data, string key, out Data subitem) {
+        protected Result CheckKey(Dictionary<string, JsonObject> data, string key, out JsonObject subitem) {
             if (data.TryGetValue(key, out subitem) == false) {
                 return Result.Fail(GetType().Name + " requires a <" + key + "> key in the data " + data);
             }
             return Result.Success;
         }
 
-        protected Result SerializeMember<T>(Dictionary<string, Data> data, string name, T value) {
-            Data memberData;
+        protected Result SerializeMember<T>(Dictionary<string, JsonObject> data, string name, T value) {
+            JsonObject memberData;
             var result = Serializer.TrySerialize(typeof(T), value, out memberData, Serializer.CurrentMetaProperty);
             if (result.Succeeded) data[name] = memberData;
             return result;
         }
 
-        protected Result DeserializeMember<T>(Dictionary<string, Data> data, string name, out T value) {
-            Data memberData;
+        protected Result DeserializeMember<T>(Dictionary<string, JsonObject> data, string name, out T value) {
+            JsonObject memberData;
             if (data.TryGetValue(name, out memberData) == false) {
                 value = default(T);
                 return Result.Fail("Unable to find member \"" + name + "\"");

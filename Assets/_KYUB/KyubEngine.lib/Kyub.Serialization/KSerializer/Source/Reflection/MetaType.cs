@@ -15,8 +15,8 @@ namespace Kyub.Serialization {
     {
         #region Instance
 
-        readonly Config _configUsed = null;
-        public Config ConfigUsed
+        readonly SerializerConfig _configUsed = null;
+        public SerializerConfig ConfigUsed
         {
             get
             {
@@ -24,10 +24,10 @@ namespace Kyub.Serialization {
             }
         }
 
-        public MetaTypeCache(Config p_config)
+        public MetaTypeCache(SerializerConfig p_config)
         {
             if (p_config == null)
-                p_config = Config.DefaultConfig;
+                p_config = SerializerConfig.DefaultConfig;
             _configUsed = p_config;
         }
 
@@ -56,19 +56,19 @@ namespace Kyub.Serialization {
 
         #region Static
 
-        static ConcurrentDictionary<Type, ConcurrentDictionary<Config, MetaType>> s_globalMetaTypes = new ConcurrentDictionary<Type, ConcurrentDictionary<Config, MetaType>>();
-        public static MetaType GetInGlobalCache(Type type, Config p_config)
+        static ConcurrentDictionary<Type, ConcurrentDictionary<SerializerConfig, MetaType>> s_globalMetaTypes = new ConcurrentDictionary<Type, ConcurrentDictionary<SerializerConfig, MetaType>>();
+        public static MetaType GetInGlobalCache(Type type, SerializerConfig p_config)
         {
             if (p_config == null)
-                p_config = Config.DefaultConfig;
+                p_config = SerializerConfig.DefaultConfig;
 
             //Try pick registered MetaTypes from Type
-            ConcurrentDictionary<Config, MetaType> metaTypesDict = null;
+            ConcurrentDictionary<SerializerConfig, MetaType> metaTypesDict = null;
             s_globalMetaTypes.TryGetValue(type, out metaTypesDict);
 
             if (metaTypesDict == null)
             {
-                metaTypesDict = new ConcurrentDictionary<Config, MetaType>();
+                metaTypesDict = new ConcurrentDictionary<SerializerConfig, MetaType>();
                 s_globalMetaTypes[type] = metaTypesDict;
             }
 
@@ -88,7 +88,7 @@ namespace Kyub.Serialization {
         public static void ClearGlobalCache()
         {
             if (s_globalMetaTypes == null)
-                s_globalMetaTypes = new ConcurrentDictionary<Type, ConcurrentDictionary<Config, MetaType>>();
+                s_globalMetaTypes = new ConcurrentDictionary<Type, ConcurrentDictionary<SerializerConfig, MetaType>>();
             else
                 s_globalMetaTypes.Clear();
         }
@@ -98,8 +98,8 @@ namespace Kyub.Serialization {
 
     public class MetaType
     {
-        readonly Config _configUsed = null;
-        public Config ConfigUsed
+        readonly SerializerConfig _configUsed = null;
+        public SerializerConfig ConfigUsed
         {
             get
             {
@@ -107,10 +107,10 @@ namespace Kyub.Serialization {
             }
         }
 
-        internal MetaType(Type reflectedType, Config p_config) {
+        internal MetaType(Type reflectedType, SerializerConfig p_config) {
             ReflectedType = reflectedType;
             if (p_config == null)
-                p_config = Config.DefaultConfig;
+                p_config = SerializerConfig.DefaultConfig;
             _configUsed = p_config.Clone();
             List<MetaProperty> properties = new List<MetaProperty>();
             CollectProperties(properties, reflectedType);
@@ -143,7 +143,7 @@ namespace Kyub.Serialization {
             bool requireOptIn = _configUsed.MemberSerialization == MemberSerialization.OptIn;
             bool requireOptOut = _configUsed.MemberSerialization == MemberSerialization.OptOut;
 
-            ObjectAttribute attr = PortableReflection.GetAttribute<ObjectAttribute>(reflectedType);
+            SerializeObjectAttribute attr = PortableReflection.GetAttribute<SerializeObjectAttribute>(reflectedType);
             if (attr != null) {
                 requireOptIn = attr.MemberSerialization == MemberSerialization.OptIn;
                 requireOptOut = attr.MemberSerialization == MemberSerialization.OptOut;

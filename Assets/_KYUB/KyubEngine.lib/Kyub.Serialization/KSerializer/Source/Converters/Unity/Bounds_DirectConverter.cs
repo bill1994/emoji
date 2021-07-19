@@ -11,7 +11,7 @@ namespace Kyub.Serialization {
 
 namespace Kyub.Serialization.Internal.DirectConverters {
     public class Bounds_DirectConverter : DirectConverter<Bounds> {
-        protected override Result DoSerialize(Bounds model, Dictionary<string, Data> serialized) {
+        protected override Result DoSerialize(Bounds model, Dictionary<string, JsonObject> serialized) {
             var result = Result.Success;
 
             result += SerializeMember(serialized, "center", model.center);
@@ -20,7 +20,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        protected override Result DoDeserialize(Dictionary<string, Data> data, ref Bounds model) {
+        protected override Result DoDeserialize(Dictionary<string, JsonObject> data, ref Bounds model) {
             var result = Result.Success;
 
             var t0 = model.center;
@@ -34,7 +34,7 @@ namespace Kyub.Serialization.Internal.DirectConverters {
             return result;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return new Bounds();
         }
     }

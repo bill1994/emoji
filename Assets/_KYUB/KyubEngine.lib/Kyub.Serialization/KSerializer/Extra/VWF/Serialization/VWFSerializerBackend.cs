@@ -20,7 +20,7 @@ namespace Kyub.Serialization.VWF.Serialization
 
         static VWFSerializerBackend()
         {
-            Config _newConfig = new Config();
+            SerializerConfig _newConfig = new SerializerConfig();
             _newConfig.SerializeAttributes = VFWSerializationLogic.Instance.SerializeMember;
             _newConfig.IgnoreSerializeAttributes = VFWSerializationLogic.Instance.DontSerializeMember;
             Serializer = new Kyub.Serialization.Serializer(_newConfig);
@@ -32,7 +32,7 @@ namespace Kyub.Serialization.VWF.Serialization
         {
             Serializer.Context.Set(context as List<UnityObject>);
 
-            Data data;
+            JsonObject data;
             Serializer.TrySerialize(type, value, out data, null);
             //if (fail.Failed) throw new Exception(fail.FormattedMessages);
 
@@ -51,7 +51,7 @@ namespace Kyub.Serialization.VWF.Serialization
 
         public override object Deserialize(Type type, string serializedState, object context)
         {
-            Data data;
+            JsonObject data;
             Result status = JsonParser.Parse(serializedState, Serializer.Config, out data);
             if (status.Failed) throw new Exception(status.FormattedMessages);
 

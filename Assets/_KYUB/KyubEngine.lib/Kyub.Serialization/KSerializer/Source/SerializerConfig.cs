@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Kyub.Serialization {
     /// <summary>
-    /// Enables some top-level customization of Full Serializer.
+    /// Enables some top-level customization of Serializer.
     /// </summary>
-    public class Config
+    public class SerializerConfig
     {
         #region Helper Enums
 
@@ -15,12 +15,12 @@ namespace Kyub.Serialization {
 
         #region Constructors
 
-        public Config()
+        public SerializerConfig()
         {
             _metaTypeCache = new MetaTypeCache(this);
         }
 
-        private Config(MetaTypeCache p_metaTypeCache)
+        private SerializerConfig(MetaTypeCache p_metaTypeCache)
         {
             if (p_metaTypeCache == null)
                 p_metaTypeCache = new MetaTypeCache(this);
@@ -32,13 +32,13 @@ namespace Kyub.Serialization {
         #region Properties
 
         //Used when dont want to pass a custom config as parameter to members
-        static Config _defaultConfig = new Config();
-        public static Config DefaultConfig
+        static SerializerConfig _defaultConfig = new SerializerConfig();
+        public static SerializerConfig DefaultConfig
         {
             get
             {
                 if (_defaultConfig == null)
-                    _defaultConfig = new Config();
+                    _defaultConfig = new SerializerConfig();
                 return _defaultConfig;
             }
             set
@@ -161,9 +161,9 @@ namespace Kyub.Serialization {
 
         #region Helper Functions
 
-        public Config Clone()
+        public SerializerConfig Clone()
         {
-            Config v_clonedConfig = new Config(this.MetaTypeCache);
+            SerializerConfig v_clonedConfig = new SerializerConfig(this.MetaTypeCache);
             v_clonedConfig.IsCaseSensitive = this.IsCaseSensitive;
             v_clonedConfig.SerializeAttributes = new List<Type>(this.SerializeAttributes).ToArray();
             v_clonedConfig.IgnoreSerializeAttributes = new List<Type>(this.IgnoreSerializeAttributes).ToArray();
@@ -177,10 +177,10 @@ namespace Kyub.Serialization {
             try
             {
                 if (p_config == null)
-                    p_config = Config.DefaultConfig;
-                if (!(p_config is Config))
+                    p_config = SerializerConfig.DefaultConfig;
+                if (!(p_config is SerializerConfig))
                     return false;
-                Config v_config = p_config as Config;
+                SerializerConfig v_config = p_config as SerializerConfig;
                 if (p_config == this)
                     return true;
                 else

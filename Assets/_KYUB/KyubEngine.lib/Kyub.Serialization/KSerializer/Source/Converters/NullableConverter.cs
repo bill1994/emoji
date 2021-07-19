@@ -12,17 +12,17 @@ namespace Kyub.Serialization.Internal {
                 type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
             // null is automatically serialized
             return Serializer.TrySerialize(Nullable.GetUnderlyingType(storageType), instance, out serialized, Serializer.CurrentMetaProperty);
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             // null is automatically deserialized
             return Serializer.TryDeserialize(data, Nullable.GetUnderlyingType(storageType), ref instance, Serializer.CurrentMetaProperty);
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return storageType;
         }
     }

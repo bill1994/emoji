@@ -17,13 +17,13 @@ namespace Kyub.Serialization.Internal {
             return false;
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
             var guid = (Guid)instance;
-            serialized = new Data(guid.ToString());
+            serialized = new JsonObject(guid.ToString());
             return Result.Success;
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) {
             if (data.IsString) {
                 instance = new Guid(data.AsString);
                 return Result.Success;
@@ -32,7 +32,7 @@ namespace Kyub.Serialization.Internal {
             return Result.Fail("GuidConverter encountered an unknown JSON data type");
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             return new Guid();
         }
     }

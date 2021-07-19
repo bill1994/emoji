@@ -1,12 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace Kyub.Serialization.Internal {
+
+    public class EnumAsStringConverter : EnumConverter
+    {
+        public override bool ConvertAsString { get { return true; } }
+    }
+
     /// <summary>
     /// Serializes and deserializes enums by their current name.
     /// </summary>
     public class EnumConverter : Converter {
+        
+        public virtual bool ConvertAsString { get { return false; } }
+
         public override bool CanProcess(Type type) {
             return type.Resolve().IsEnum;
         }
@@ -19,66 +29,124 @@ namespace Kyub.Serialization.Internal {
             return false;
         }
 
-        public override object CreateInstance(Data data, Type storageType) {
+        public override object CreateInstance(JsonObject data, Type storageType) {
             // In .NET compact, Enum.ToObject(Type, Object) is defined but the overloads like
             // Enum.ToObject(Type, int) are not -- so we get around this by boxing the value.
             return Enum.ToObject(storageType, (object)0);
         }
 
-        public override Result TrySerialize(object instance, out Data serialized, Type storageType) {
+        public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType) {
 
-            long instanceValue = instance != null? Convert.ToInt64(instance) : 0;
-            if (PortableReflection.GetAttribute<FlagsAttribute>(storageType) != null)
+            var isFlag = PortableReflection.GetAttribute<FlagsAttribute>(storageType) != null;
+            if (!ConvertAsString)
             {
-                long resultInteger = 0;
-                //var result = new StringBuilder();
-                //bool first = true;
-                foreach (var value in Enum.GetValues(storageType)) {
-                    long integralValue = (long)value;
-                    bool isSet = (instanceValue & integralValue) != 0;
+                long instanceValue = instance != null ? Convert.ToInt64(instance) : 0;
+                if (isFlag)
+                {
+                    long resultInteger = 0;
+                    //var result = new StringBuilder();
+                    //bool first = true;
+                    var enumValues = Enum.GetValues(storageType);
+                    foreach (var value in enumValues)
+                    {
+                        long integralValue = Convert.ToInt64(value);
+                        bool isSet = (instanceValue & integralValue) != 0;
 
-                    if (isSet) {
-                        resultInteger |= integralValue;
-                        //if (first == false) result.Append(",");
-                        //first = false;
-                        //result.Append(value.ToString());
+                        if (isSet)
+                        {
+                            resultInteger |= integralValue;
+                            //if (first == false) result.Append(",");
+                            //first = false;
+                            //result.Append(value.ToString());
+                        }
+                    }
+
+                    //serialized = new Data(result.ToString());
+                    serialized = new JsonObject(resultInteger);
+                }
+                else
+                {
+                    //serialized = new Data(Enum.GetName(storageType, instance));
+                    serialized = new JsonObject(instanceValue);
+                }
+            }
+            else
+            {
+                HashSet<string> valueNames = new HashSet<string>(instance.ToString().Split(new char[] { ',', ' ', '|' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+
+                StringBuilder builder = new StringBuilder();
+
+                var supportSerializeProperty = Array.Find(Serializer.Config.SerializeAttributes, 
+                    (a) => typeof(SerializePropertyAttribute) == a || typeof(SerializePropertyAttribute).IsAssignableFrom(a)) != null;
+
+                var instanceType = instance.GetType();
+                var enumValues = Enum.GetValues(storageType);
+                foreach (var enumValue in enumValues)
+                {
+                    var memberName = enumValue.ToString();
+                    
+                    if (valueNames.Contains(memberName))
+                    {
+                        var field = instanceType.GetField(enumValue.ToString());
+                        var attrs = supportSerializeProperty? field.GetCustomAttributes(typeof(SerializePropertyAttribute), true) : null;
+                        var attr = attrs != null && attrs.Length > 0 ? (SerializePropertyAttribute)attrs[0] : null;
+
+                        var jsonName = attr != null && !string.IsNullOrEmpty(attr.Name) ? attr.Name : memberName;
+                        if (builder.Length > 0)
+                            builder.Append(", ");
+                        builder.Append(jsonName);
                     }
                 }
-
-                //serialized = new Data(result.ToString());
-                serialized = new Data(resultInteger);
-            }
-            else {
-                //serialized = new Data(Enum.GetName(storageType, instance));
-                serialized = new Data(instanceValue);
+                serialized = new JsonObject(builder.ToString());
             }
             return Result.Success;
         }
 
-        public override Result TryDeserialize(Data data, ref object instance, Type storageType) {
-            if (data.IsString) {
-                string[] enumValues = data.AsString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
+        public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType) 
+        {
+            if (data.IsString) 
+            {
                 long instanceValue = 0;
-                for (int i = 0; i < enumValues.Length; ++i) {
-                    string enumValue = enumValues[i];
 
-                    // Verify that the enum name exists; Enum.TryParse is only available in .NET 4.0
-                    // and above :(.
-                    HashSet<string> names = new HashSet<string>(Enum.GetNames(storageType), StringComparer.OrdinalIgnoreCase);
-                    if (string.IsNullOrEmpty(enumValue) || !names.Contains(enumValue)) {
-                        return Result.Fail("Cannot find enum name " + enumValue + " on type " + storageType);
+                HashSet<string> valueNames = new HashSet<string>(data.AsString.Split(new[] { ',', ' ', '|' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+
+                var supportSerializeProperty = Array.Find(Serializer.Config.SerializeAttributes,
+                    (a) => typeof(SerializePropertyAttribute) == a || typeof(SerializePropertyAttribute).IsAssignableFrom(a)) != null;
+
+                var missingCount = valueNames.Count;
+                var instanceType = instance.GetType();
+                var enumValues = Enum.GetValues(storageType);
+                foreach (var enumValue in enumValues)
+                {
+                    var memberName = enumValue.ToString();
+                    var field = instanceType.GetField(enumValue.ToString());
+                    var attrs = supportSerializeProperty ? field.GetCustomAttributes(typeof(SerializePropertyAttribute), true) : null;
+                    var attr = attrs != null && attrs.Length > 0 ? (SerializePropertyAttribute)attrs[0] : null;
+
+                    var jsonName = attr != null && !string.IsNullOrEmpty(attr.Name) ? attr.Name : memberName;
+                    var fallbackNames = attr != null ? attr.FallbackNames : null;
+
+                    if (valueNames.Contains(memberName) || 
+                        valueNames.Contains(jsonName) || 
+                        (fallbackNames != null && valueNames.Overlaps(fallbackNames)))
+                    {
+                        missingCount--;
+                        long flagValue = (long)Convert.ChangeType(Enum.Parse(storageType, memberName, true), typeof(long));
+                        instanceValue |= flagValue;
                     }
+                }
 
-                    long flagValue = (long)Convert.ChangeType(Enum.Parse(storageType, enumValue, true), typeof(long));
-                    instanceValue |= flagValue;
+                //A value was not found
+                if (missingCount > 0)
+                {
+                    return Result.Fail("Cannot find enum name " + instance + " on type " + storageType);
                 }
 
                 instance = Enum.ToObject(storageType, (object)instanceValue);
                 return Result.Success;
             }
-
-            else if (data.IsInt64) {
+            else if (data.IsInt64) 
+            {
                 int enumValue = (int)data.AsInt64;
 
                 // In .NET compact, Enum.ToObject(Type, Object) is defined but the overloads like
@@ -103,6 +171,40 @@ namespace Kyub.Serialization.Internal {
             }
 
             return false;
+        }
+
+        public enum bla { [SerializeProperty("cla")] a, b, c}
+
+
+        public static Dictionary<object, string> GetValuePerDescription(Type storageType)
+        {
+            var map = new Dictionary<object, string>();
+            Array values = null;
+            try
+            {
+                values = Enum.GetValues(storageType);
+            }
+            catch { }
+
+            if (values != null)
+            {
+                foreach (var value in values)
+                {
+                    var textValue = string.Empty;
+                    try
+                    {
+                        var field = storageType.GetField(value.ToString());
+                        if (field != null)
+                        {
+                            object[] atts = field.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                            textValue = atts.Length > 0 && atts[0] is DescriptionAttribute ? ((DescriptionAttribute)atts[0]).Description : string.Empty;
+                        }
+                    }
+                    catch { }
+                    map[value] = textValue;
+                }
+            }
+            return map;
         }
     }
 }

@@ -255,7 +255,7 @@ namespace Kyub.Async
         {
             if (p_data != null)
             {
-                Serialization.Data v_data;
+                Serialization.JsonObject v_data;
                 if (p_customSerializer == null)
                     p_customSerializer = SerializationUtils.DefaultSerializer;
 
@@ -287,7 +287,7 @@ namespace Kyub.Async
         {
             if (p_data != null)
             {
-                Serialization.Data v_data;
+                Serialization.JsonObject v_data;
                 if (p_customSerializer == null)
                     p_customSerializer = SerializationUtils.DefaultSerializer;
 

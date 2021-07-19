@@ -17,24 +17,24 @@ namespace Kyub.Serialization.VWF.Serialization
             return typeof(System.Reflection.MethodInfo).IsAssignableFrom(type);
         }
 
-		public override Result TrySerialize(object instance, out Data serialized, Type storageType)
+		public override Result TrySerialize(object instance, out JsonObject serialized, Type storageType)
 		{
             var method = instance as System.Reflection.MethodInfo;
-            serialized = Data.CreateList();
+            serialized = JsonObject.CreateList();
             var list = serialized.AsList;
 
-            Data declTypeData;
+            JsonObject declTypeData;
             Serializer.TrySerialize(method.DeclaringType, out declTypeData, Serializer.CurrentMetaProperty);
 
             list.Add(declTypeData);
-            list.Add(new Data(method.Name));
+            list.Add(new JsonObject(method.Name));
 
             var args = method.GetParameters();
-            list.Add(new Data(args.Length));
+            list.Add(new JsonObject(args.Length));
 
             for(int i = 0; i < args.Length; i++)
             { 
-                Data argData;
+                JsonObject argData;
                 Serializer.TrySerialize(args[i].ParameterType, out argData, Serializer.CurrentMetaProperty);
                 list.Add(argData);
             }
@@ -42,7 +42,7 @@ namespace Kyub.Serialization.VWF.Serialization
 			return Result.Success;
 		}
 
-		public override Result TryDeserialize(Data data, ref object instance, Type storageType)
+		public override Result TryDeserialize(JsonObject data, ref object instance, Type storageType)
 		{
             var list = data.AsList;
 
