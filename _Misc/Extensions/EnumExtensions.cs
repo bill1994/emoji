@@ -1,4 +1,4 @@
-﻿#if (UNITY_WINRT || UNITY_WP_8_1) && !UNITY_EDITOR && !UNITY_WP8
+﻿#if (UNITY_WINRT || UNITY_W8_1) && !UNITY_EDITOR && !UNITY_WP8
 #define RT_ENABLED
 #endif
 
@@ -12,13 +12,13 @@ namespace Kyub.Extensions
 {
     public static class EnumExtensions
     {
-        public static bool CheckIfIsEnum(System.Type p_type, bool withFlags)
+        public static bool CheckIfIsEnum(System.Type type, bool withFlags)
         {
-            if (p_type == null)
+            if (type == null)
                 return false;
-            if (!p_type.IsEnum())
+            if (!type.IsEnum())
                 return false;
-            if (withFlags && !p_type.IsDefined(typeof(System.FlagsAttribute), true))
+            if (withFlags && !type.IsDefined(typeof(System.FlagsAttribute), true))
                 return false;
             return true;
         }
@@ -75,21 +75,21 @@ namespace Kyub.Extensions
 	    public static List<T> GetFlags<T>(this T value) where T : struct
 #endif
         {
-            List<T> v_flags = new List<T>();
+            List<T> flags = new List<T>();
             if (CheckIfIsEnum<T>(true))
             {
                 foreach (T flag in System.Enum.GetValues(typeof(T)))
                 {
-                    if (value.ContainsFlag(flag) && !v_flags.Contains(flag))
-                        v_flags.Add(flag);
+                    if (value.ContainsFlag(flag) && !flags.Contains(flag))
+                        flags.Add(flag);
                 }
             }
             else if (CheckIfIsEnum<T>(false))
             {
-                if(!v_flags.Contains(value))
-                    v_flags.Add(value);
+                if(!flags.Contains(value))
+                    flags.Add(value);
             }
-            return v_flags;
+            return flags;
         }
 
 #if !RT_ENABLED
@@ -135,13 +135,62 @@ namespace Kyub.Extensions
         }
 
 #if !RT_ENABLED
-        public static string ToDescriptionString<T>(this T value) where T : struct, System.IConvertible
+        public static string ToDescriptionString<T>(this T value, bool useValueAsDefaultDescription = false) where T : struct, System.IConvertible
 #else
-	    public static string ToDescriptionString<T>(this T value) where T : struct
+	    public static string ToDescriptionString<T>(this T value, bool useValueAsDefaultDescription = false) where T : struct
 #endif
         {
-            DescriptionAttribute[] v_attr = (DescriptionAttribute[])value.GetType().GetField(value.ToString()).GetCustomAttributes(typeof(DescriptionAttribute), false);
-            return v_attr.Length > 0 ? v_attr[0].Description : string.Empty;
+            var type = value.GetType();
+            List<string> fieldNames = new List<string>();
+            if (!type.IsDefined(typeof(System.FlagsAttribute), true))
+            {
+                var fieldName = value.ToString();
+                if (!string.IsNullOrEmpty(fieldName))
+                    fieldNames.Add(fieldName);
+            }
+            else
+            {
+                long instanceValue = System.Convert.ToInt64(value);
+                var flagValues = System.Enum.GetValues(type);
+                foreach (var flagValue in flagValues)
+                {
+                    long integralValue = System.Convert.ToInt64(flagValue);
+                    bool isSet = (instanceValue & integralValue) != 0;
+
+                    if (isSet)
+                    {
+
+                        var flagName = flagValue.ToString();
+                        if (!string.IsNullOrEmpty(flagName))
+                            fieldNames.Add(flagName);
+
+                    }
+                }
+            }
+
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            foreach (var fieldName in fieldNames)
+            {
+                try
+                {
+                    var field = type.GetField(fieldName);
+                    if (field != null)
+                    {
+                        object[] atts = field.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                        var textValue = atts.Length > 0 && atts[0] is DescriptionAttribute ? ((DescriptionAttribute)atts[0]).Description : 
+                            (useValueAsDefaultDescription? fieldName : string.Empty);
+
+                        if (!string.IsNullOrEmpty(textValue))
+                        {
+                            if (builder.Length > 0)
+                                builder.Append(", ");
+                            builder.Append(textValue);
+                        }
+                    }
+                }
+                catch { }
+            }
+            return builder.ToString();
         }
 
         #endregion
