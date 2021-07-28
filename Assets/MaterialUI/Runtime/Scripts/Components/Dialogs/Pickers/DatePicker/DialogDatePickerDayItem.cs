@@ -12,17 +12,14 @@ namespace MaterialUI
 	{
         #region Private Variables
 
-        [SerializeField]
-		private Graphic m_Text = null;
-        [SerializeField]
-        private Toggle m_Toggle = null;
-        [SerializeField]
-        private Graphic m_SelectedImage = null;
+        [SerializeField] private Graphic m_Text = null;
+        [SerializeField] private Toggle m_Toggle = null;
+        [SerializeField] private Graphic m_SelectedImage = null;
 
-		private DateTime m_DateTime;
-        private Color m_ToggleOnColor = Color.white;
-        private Color m_ToggleOffColor = Color.black;
+        [SerializeField] private Color m_ToggleOnColor = Color.white;
+        [SerializeField] private Color m_ToggleOffColor = Color.black;
 
+        private DateTime m_DateTime;
 
         #endregion
 
@@ -71,7 +68,7 @@ namespace MaterialUI
 
         #region Helper Functions
 
-        public void Init(DateTime dateTime, Action<DialogDatePickerDayItem, bool> onItemValueChanged)
+        public virtual void Init(DateTime dateTime, Action<DialogDatePickerDayItem, bool> onItemValueChanged)
 		{
 			m_DateTime = dateTime;
 			m_OnItemValueChanged = onItemValueChanged;
@@ -81,7 +78,7 @@ namespace MaterialUI
 			m_Text.SetGraphicText(m_DateTime.Day.ToString());
 		}
 
-		public void UpdateState(DateTime currentDate)
+		public virtual void UpdateState(DateTime currentDate)
 		{
 			bool isCurrentMonth = (m_DateTime.Month == currentDate.Month) && !m_DateTime.Equals(default(DateTime));
 
@@ -105,7 +102,7 @@ namespace MaterialUI
 			}
         }
 
-		public void OnItemValueChange()
+		public virtual void OnItemValueChange()
 		{
 			m_Text.color = toggle.isOn ? m_ToggleOnColor : m_ToggleOffColor;
             Kyub.Performance.SustainedPerformanceManager.Refresh(this);
