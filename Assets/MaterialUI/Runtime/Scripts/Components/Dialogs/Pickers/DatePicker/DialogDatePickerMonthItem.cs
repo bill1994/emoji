@@ -92,9 +92,10 @@ namespace MaterialUI
 
             bool toggleState = m_DateTime.Month == currentDate.Month && m_DateTime.Year == currentDate.Year;
 
-            if (toggleState != toggle.isOn)
-			{
-				toggle.isOn = toggleState;
+            // Only sets if true, so the toggle group handles the rest
+            if ((!toggle.group || toggleState) && toggleState != toggle.isOn)
+            {
+                toggle.isOn = toggleState;
                 Kyub.Performance.SustainedPerformanceManager.Refresh(this);
 			}
         }
