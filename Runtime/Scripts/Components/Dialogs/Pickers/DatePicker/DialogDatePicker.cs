@@ -226,8 +226,6 @@ namespace MaterialUI
         public virtual void SetDate(DateTime date)
         {
             currentDateInternal = date;
-            if (OnCurrentDateChangedCallback != null)
-                OnCurrentDateChangedCallback.Invoke(date);
 
             UpdateDaysText();
             UpdateDateList(GetMonthDateList(_CurrentDate.Year, _CurrentDate.Month));
