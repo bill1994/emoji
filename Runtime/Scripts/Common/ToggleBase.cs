@@ -965,7 +965,7 @@ namespace MaterialUI
             {
                 ApplyGroupAllowSwitchOff();
 
-                if (value)
+                if (value || (m_Group.allowSwitchOff && this == m_Group.GetCurrentSelectedToggle(false)))
                     m_Group.NotifyToggleValueChanged(this, true);
 
                 if (m_LastToggleState != isOn)
