@@ -194,7 +194,7 @@ namespace MaterialUI
                 }
                 else
                 {
-                    TryApplyIndexDirty(true);
+                    TryApplyIndexDirty();
                 }
                 ApplyGroupAllowSwitchOffOnAll();
             }
@@ -523,7 +523,7 @@ namespace MaterialUI
 
         protected virtual void TryApplyIndexDirty()
         {
-            TryApplyIndexDirty(true);
+            TryApplyIndexDirty(!m_AllowSwitchOff);
         }
 
         //Delayed SetCurrentIndex
