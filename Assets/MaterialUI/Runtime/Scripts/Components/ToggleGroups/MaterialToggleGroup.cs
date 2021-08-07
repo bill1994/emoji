@@ -57,8 +57,8 @@ namespace MaterialUI
                 SetSelectedIndexInternal(value);
                 _indexIsDirty = true;
 
-                if (gameObject.activeInHierarchy && enabled && !IsInvoking("TryApplyIndexDirty"))
-                    Invoke("TryApplyIndexDirty", 0);
+                if (gameObject.activeInHierarchy && enabled && !IsInvoking("ForceApplyIndexDirty"))
+                    Invoke("ForceApplyIndexDirty", 0);
             }
         }
 
@@ -133,7 +133,7 @@ namespace MaterialUI
             }
             else if (_HasStarted)
             {
-                TryApplyIndexDirty();
+                ForceApplyIndexDirty();
             }
 
             base.OnEnable();
@@ -151,7 +151,7 @@ namespace MaterialUI
             }
             else
             {
-                TryApplyIndexDirty();
+                ForceApplyIndexDirty();
             }
 
             if (!_indexIsDirty)
@@ -194,7 +194,7 @@ namespace MaterialUI
                 }
                 else
                 {
-                    TryApplyIndexDirty();
+                    ForceApplyIndexDirty();
                 }
                 ApplyGroupAllowSwitchOffOnAll();
             }
@@ -419,7 +419,7 @@ namespace MaterialUI
                 return;
             }
 
-            TryApplyIndexDirty();
+            ForceApplyIndexDirty();
 
             //Remove Self Disabled Toggles or Nulls
             for (int i = 0; i < _Toggles.Count; i++)
@@ -521,16 +521,16 @@ namespace MaterialUI
 
         #region  Helper Functions
 
-        protected virtual void TryApplyIndexDirty()
+        protected void ForceApplyIndexDirty()
         {
-            TryApplyIndexDirty(!m_AllowSwitchOff);
+            TryApplyIndexDirty(true);
         }
 
         //Delayed SetCurrentIndex
         protected virtual void TryApplyIndexDirty(bool force)
         {
-            if (IsInvoking("TryApplyIndexDirty"))
-                CancelInvoke("TryApplyIndexDirty");
+            if (IsInvoking("ForceApplyIndexDirty"))
+                CancelInvoke("ForceApplyIndexDirty");
 
             if (_indexIsDirty || force)
             {
