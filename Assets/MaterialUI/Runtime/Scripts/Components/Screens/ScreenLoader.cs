@@ -136,7 +136,8 @@ namespace MaterialUI
                             if (onStackScreen != null) onStackScreen(screen);
                         },
                         null,
-                        false);
+                        false,
+                        m_delay);
                 }
                 else
                 {

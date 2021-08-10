@@ -413,9 +413,9 @@ namespace MaterialUI
                 _CacheDialogList.activity.destroyOnHide = true;
                 _CacheDialogList.Hide();
             }
-#if UNITY_EDITOR
-            Resources.UnloadUnusedAssets();
-#endif
+//#if UNITY_EDITOR
+//            Resources.UnloadUnusedAssets();
+//#endif
         }
 
         protected virtual void UpdateLabelState()
