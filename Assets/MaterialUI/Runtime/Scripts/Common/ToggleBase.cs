@@ -67,10 +67,8 @@ namespace MaterialUI
         //[SerializeField]
         //protected string m_Label = null;
 
-        //#if UNITY_EDITOR
         [SerializeField, HideInInspector]
         protected bool m_LastToggleState = false;
-        //#endif
 
         protected CanvasGroup m_CanvasGroup = null;
         protected MaterialRipple m_MaterialRipple;
@@ -547,24 +545,22 @@ namespace MaterialUI
                 }
             }
 
-#if UNITY_EDITOR
-            if (!Application.isPlaying)
+            if (m_Toggle != null && m_LastToggleState != m_Toggle.isOn)
             {
-                if (m_Toggle != null && m_LastToggleState != m_Toggle.isOn)
-                {
-                    m_LastToggleState = m_Toggle.isOn;
+                m_LastToggleState = m_Toggle.isOn;
 
-                    if (m_LastToggleState)
-                    {
-                        TurnOnInstant();
-                    }
-                    else
-                    {
-                        TurnOffInstant();
-                    }
+                //Force ensure that this toggle state is valid when group was used
+                EnsureGroupValidState(true, false);
+
+                if (m_LastToggleState)
+                {
+                    TurnOnInstant();
+                }
+                else
+                {
+                    TurnOffInstant();
                 }
             }
-#endif
         }
 
         protected bool _isChangingCanvasGroup = false;
@@ -619,7 +615,9 @@ namespace MaterialUI
 
         protected virtual void SetIsOnInternal(bool value, bool sendCallback)
         {
-            m_LastToggleState = isOn;
+            //Force Remember last state when we send the callback. This is usefull to prevent unnecessary calculations
+            if (sendCallback)
+                m_LastToggleState = isOn;
 
             if (Application.isPlaying && m_Toggle != null &&
                 (m_Group == null || m_Group.CanToggleValueChange(this, value)))
@@ -948,6 +946,24 @@ namespace MaterialUI
             }
         }
 
+        public virtual void EnsureGroupValidState(bool force, bool sendCallback)
+        {
+            //Validate Toggle State when setted by m_Toggle instead isOn
+            if (m_Group != null && Application.isPlaying)
+            {
+                ApplyGroupAllowSwitchOff();
+
+                if (isOn || (m_Group.allowSwitchOff && this == m_Group.GetCurrentSelectedToggle(false)))
+                    m_Group.NotifyToggleValueChanged(this, true);
+
+                if (m_LastToggleState != isOn || force)
+                {
+                    m_LastToggleState = isOn;
+                    m_Group.EnsureValidState(sendCallback);
+                }
+            }
+        }
+
         #endregion
 
         #region Receivers
@@ -960,20 +976,7 @@ namespace MaterialUI
             if (callback != null)
                 callback.Invoke();
 
-            //Validate Toggle State when setted by m_Toggle instead isOn
-            if (m_Group != null && Application.isPlaying)
-            {
-                ApplyGroupAllowSwitchOff();
-
-                if (value || (m_Group.allowSwitchOff && this == m_Group.GetCurrentSelectedToggle(false)))
-                    m_Group.NotifyToggleValueChanged(this, true);
-
-                if (m_LastToggleState != isOn)
-                {
-                    m_LastToggleState = isOn;
-                    m_Group.EnsureValidState();
-                }
-            }
+            EnsureGroupValidState(false, true);
         }
 
         #endregion
