@@ -494,26 +494,32 @@ namespace MaterialUI
             base.OnDestroy();
         }
 
-#if UNITY_EDITOR
-        bool _lastIsOn = false;
-#endif
         protected virtual void Update()
         {
-            if (!Application.isPlaying )
+            //This Part of code will handle with isOn changed when using "SetIsOnWithoutNotify" and when value changed using Inspector
+            if (m_Toggle != null && m_LastToggleState != m_Toggle.isOn)
             {
-#if UNITY_EDITOR
-                if (_lastIsOn != isOn)
+                m_LastToggleState = m_Toggle.isOn;
+
+                //Force ensure that this toggle state is valid when group was used
+                EnsureGroupValidState(true, false);
+
+                if (m_LastToggleState)
                 {
-                    _lastIsOn = isOn;
-                    if (isOn)
-                        TurnOnInstant();
-                    else
-                        TurnOffInstant();
-                    OnValidate();
+                    TurnOnInstant();
                 }
+                else
+                {
+                    TurnOffInstant();
+                }
+
+#if UNITY_EDITOR
+                if (!Application.isPlaying)
+                    OnValidate();
 #endif
                 return;
             }
+
 
             if (m_AnimState > 0)
             {
@@ -545,22 +551,7 @@ namespace MaterialUI
                 }
             }
 
-            if (m_Toggle != null && m_LastToggleState != m_Toggle.isOn)
-            {
-                m_LastToggleState = m_Toggle.isOn;
-
-                //Force ensure that this toggle state is valid when group was used
-                EnsureGroupValidState(true, false);
-
-                if (m_LastToggleState)
-                {
-                    TurnOnInstant();
-                }
-                else
-                {
-                    TurnOffInstant();
-                }
-            }
+            
         }
 
         protected bool _isChangingCanvasGroup = false;
@@ -666,14 +657,14 @@ namespace MaterialUI
                 ApplyInteractableOff();
         }
 
-        public override void RefreshVisualStyles(bool p_canAnimate = true)
+        public override void RefreshVisualStyles(bool canAnimate = true)
         {
-            SetStylePropertyColorsActive_Internal(p_canAnimate, m_AnimationDuration);
+            SetStylePropertyColorsActive_Internal(canAnimate, m_AnimationDuration);
         }
 
-        protected override bool OnLoadStyles(StyleData p_styleData)
+        protected override bool OnLoadStyles(StyleData styleData)
         {
-            var sucess = base.OnLoadStyles(p_styleData);
+            var sucess = base.OnLoadStyles(styleData);
             if (sucess)
             {
                 UpdateColorToggleState(false);
@@ -1046,14 +1037,14 @@ namespace MaterialUI
             {
             }
 
-            public ToggleBaseStyleProperty(string p_name, Component p_target, Color p_colorOn, Color p_colorOff, Color p_colorDisabled, bool p_useStyleGraphic)
+            public ToggleBaseStyleProperty(string name, Component target, Color colorOn, Color colorOff, Color colorDisabled, bool useStyleGraphic)
             {
-                m_target = p_target != null ? p_target.transform : null;
-                m_name = p_name;
-                m_colorOn = p_colorOn;
-                m_colorOff = p_colorOff;
-                m_colorDisabled = p_colorDisabled;
-                m_useStyleGraphic = p_useStyleGraphic;
+                m_target = target != null ? target.transform : null;
+                m_name = name;
+                m_colorOn = colorOn;
+                m_colorOff = colorOff;
+                m_colorDisabled = colorDisabled;
+                m_useStyleGraphic = useStyleGraphic;
             }
 
             #endregion
@@ -1072,7 +1063,7 @@ namespace MaterialUI
                     var isInteractable = toggleBase != null? toggleBase.IsInteractable() : true;
                     var canUseDisabledColor = toggleBase != null ? toggleBase.CanUseDisabledColor() : true;
 
-                    var v_endColor = !canUseDisabledColor || isInteractable ? (isActive ? m_colorOn : m_colorOff) : m_colorDisabled;
+                    var endColor = !canUseDisabledColor || isInteractable ? (isActive ? m_colorOn : m_colorOff) : m_colorDisabled;
                     if (canAnimate && Application.isPlaying)
                     {
                         _tweenId = TweenManager.TweenColor(
@@ -1082,7 +1073,7 @@ namespace MaterialUI
                                         graphic.color = color;
                                 },
                                 graphic.color,
-                                v_endColor,
+                                endColor,
                                 animationDuration,
                                 0,
                                 null,
@@ -1093,7 +1084,7 @@ namespace MaterialUI
                     }
                     else
                     {
-                        graphic.color = v_endColor;
+                        graphic.color = endColor;
                     }
                 }
             }
