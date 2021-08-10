@@ -413,6 +413,11 @@ namespace MaterialUI
 
         public virtual void EnsureValidState()
         {
+            EnsureValidState(true);
+        }
+
+        public virtual void EnsureValidState(bool sendCallback)
+        {
             if (!IsActiveAndEnabledInHierarchy())
             {
                 CancelInvoke("EnsureValidState");
@@ -449,8 +454,11 @@ namespace MaterialUI
                 SetSelectedIndexInternal(toggleIndex);
                 if (toggle != null)
                 {
-                    toggle.isOn = true;
-                    NotifyToggleValueChanged(toggle);
+                    if (sendCallback)
+                        toggle.isOn = true;
+                    else
+                        toggle.SetIsOnWithoutNotify(true);
+                    NotifyToggleValueChanged(toggle, sendCallback);
                 }
             }
             SortRegisteredMembers();
