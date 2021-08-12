@@ -11,7 +11,7 @@ namespace Kyub.UI
     [DisallowMultipleComponent]
     [ExecuteInEditMode]
     [RequireComponent(typeof(RectTransform))]
-    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement/*, ILayoutGroup*/
+    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ILayoutGroup
     {
         #region Helper Classes
 
@@ -1539,15 +1539,23 @@ namespace Kyub.UI
             _layoutSize = new Vector2(_layoutSize.x, GetLocalHeight(Content));
         }
 
-        /*public void SetLayoutHorizontal()
+        public virtual void SetLayoutHorizontal()
         {
-            //TryRecalculateLayout();
+            //As this way to recalculate layout will handle in problems in PlayMode we need only force execute in EditorMode
+#if UNITY_EDITOR
+            if(!Application.isPlaying)
+                TryRecalculateLayout();
+#endif
         }
 
-        public void SetLayoutVertical()
+        public virtual void SetLayoutVertical()
         {
-            //TryRecalculateLayout();
-        }*/
+            //As this way to recalculate layout will handle in problems in PlayMode we need only force execute in EditorMode
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+                TryRecalculateLayout();
+#endif
+        }
 
         #endregion
 
