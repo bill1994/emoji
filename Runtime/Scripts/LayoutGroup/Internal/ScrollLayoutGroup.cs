@@ -11,7 +11,7 @@ namespace Kyub.UI
     [DisallowMultipleComponent]
     [ExecuteInEditMode]
     [RequireComponent(typeof(RectTransform))]
-    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ILayoutGroup
+    public abstract class ScrollLayoutGroup : UIBehaviour, IEnumerable<GameObject>, ILayoutElement, ILayoutController
     {
         #region Helper Classes
 
