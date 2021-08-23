@@ -380,7 +380,7 @@ namespace Kyub.UI.Experimental
 
                 //TODO: FIX MIN SIZE - We removed TotalMin size as a bug found in our logic
                 //totalMin += min + axisSpacing;
-                totalPreferred += preferred + axisSpacing;
+                totalPreferred += preferred + (i == _Groups.Count - 1 ? 0 : axisSpacing);
 
                 // Increment flexible size with element's flexible size.
                 totalFlexible += flexible;
@@ -513,7 +513,7 @@ namespace Kyub.UI.Experimental
                 SetChildrenAlongGroupAxis(axis, isVertical, group);
 
                 if (alongOtherAxis)
-                    pos += groupSize[axis] + spacingBetween;
+                    pos += groupSize[axis] + (i == _Groups.Count - 1 ? 0 : spacingBetween);
             }
         }
         protected void SetChildrenAlongGroupAxis(int axis, bool isVertical, LinearGroup group)
