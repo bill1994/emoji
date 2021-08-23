@@ -586,6 +586,12 @@ namespace MaterialUI
         {
             base.OnValidateDelayed();
 
+            if (!Application.isPlaying)
+            {
+                if (m_Toggle == null)
+                    m_Toggle = GetComponent<Toggle>();
+            }
+
             if (m_Toggle != null && m_Toggle.group != null && m_Group != null)
                 m_Toggle.group = null;
 
