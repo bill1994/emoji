@@ -337,36 +337,46 @@ public class MobileInput {
             edit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean isFocus) {
-                    if (!isFocus) {
+                    try {
+                        if (!isFocus) {
+                            JSONObject data = new JSONObject();
+                            try {
+                                data.put("msg", TEXT_END_EDIT);
+                                data.put("text", input.GetText());
+                            } catch (JSONException e) {
+                            }
+                            sendData(data);
+                        }
+                        SetFocus(isFocus);
                         JSONObject data = new JSONObject();
                         try {
-                            data.put("msg", TEXT_END_EDIT);
-                            data.put("text", input.GetText());
-                        } catch (JSONException e) {}
+                            data.put("msg", (isFocus) ? ON_FOCUS : ON_UNFOCUS);
+                        } catch (JSONException e) {
+                        }
                         sendData(data);
                     }
-                    SetFocus(isFocus);
-                    JSONObject data = new JSONObject();
-                    try {
-                        data.put("msg", (isFocus) ? ON_FOCUS : ON_UNFOCUS);
-                    } catch (JSONException e) {}
-                    sendData(data);
+                    catch (Exception e){
+                    }
                 }
             });
             edit.addTextChangedListener(new TextWatcher() {
                 public void afterTextChanged(Editable s) {
-                    JSONObject data = new JSONObject();
-                    if (characterLimit > 0 && s.length() >= characterLimit + 1) {
-                        s.delete(s.length() - 1, s.length());
-                        edit.setText(s);
-                        edit.setSelection(s.length());
-                    }
                     try {
-                        data.put("msg", TEXT_CHANGE);
-                        data.put("text", s.toString());
-                    } catch (JSONException e) {
+                        JSONObject data = new JSONObject();
+                        if (characterLimit > 0 && s.length() >= characterLimit + 1) {
+                            s.delete(s.length() - 1, s.length());
+                            edit.setText(s);
+                            edit.setSelection(s.length());
+                        }
+                        try {
+                            data.put("msg", TEXT_CHANGE);
+                            data.put("text", s.toString());
+                        } catch (JSONException e) {
+                        }
+                        sendData(data);
                     }
-                    sendData(data);
+                    catch (Exception e) {
+                    }
                 }
 
                 @Override
@@ -415,7 +425,7 @@ public class MobileInput {
                 data.put("msg", READY);
             } catch (JSONException e) {}
             sendData(data);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Plugin.common.sendError(Plugin.name, "CREATE_ERROR", e.getMessage());
         }
     }
@@ -431,65 +441,83 @@ public class MobileInput {
     // Set new text
     private void SetText(String newText) {
 
-        if (edit != null) {
-            int cursorPos = edit.getSelectionStart();
-            int previousLength = edit.getText().length();
+        try {
+            if (edit != null) {
+                int cursorPos = edit.getSelectionStart();
+                int previousLength = edit.getText().length();
 
-            edit.setText(newText);
+                edit.setText(newText);
 
-            // Update text selection (cursor position) to be the same after editing text
-            // If the user had multiple characters selected, we are losing them and get the cursor in only one position
-            if (previousLength == cursorPos) {
-                //The cursor was at the end of the text, let us put it again at the end of the text in case more characters were added
-                cursorPos = newText.length();
+                // Update text selection (cursor position) to be the same after editing text
+                // If the user had multiple characters selected, we are losing them and get the cursor in only one position
+                if (previousLength == cursorPos) {
+                    //The cursor was at the end of the text, let us put it again at the end of the text in case more characters were added
+                    cursorPos = newText.length();
+                }
+
+                if (cursorPos > newText.length()) {
+                    //Text was deleted, so cursor position is after the end of the text, let's put it at the last position
+                    cursorPos = newText.length();
+                }
+                edit.setSelection(cursorPos);
             }
-
-            if (cursorPos > newText.length()) {
-                //Text was deleted, so cursor position is after the end of the text, let's put it at the last position
-                cursorPos = newText.length();
-            }
-            edit.setSelection(cursorPos);
+        }
+        catch (Exception e) {
         }
     }
 
     // Get text from MobileInput
     private String GetText() {
-        if (edit != null) {
-            return edit.getText().toString();
-        } else {
+        try {
+            if (edit != null) {
+                return edit.getText().toString();
+            } else {
+                return "";
+            }
+        }
+        catch (Exception e) {
             return "";
         }
     }
 
     // Get focused state
     private boolean isFocused() {
-        if (edit != null) {
-            return edit.isFocused();
-        } else {
+        try {
+            if (edit != null) {
+                return edit.isFocused();
+            } else {
+                return false;
+            }
+        }
+        catch (Exception e) {
             return false;
         }
     }
 
     // Set or clear focus to MobileInput
     private void SetFocus(boolean isFocus) {
-        if (edit == null) {
-            return;
-        }
-        if (isFocus) {
-            edit.requestFocus();
-        } else {
-            edit.clearFocus();
-        }
-        if (!isFocus) {
-            for (int i = 0; i < mobileInputList.size(); i++) {
-                int key = mobileInputList.keyAt(i);
-                MobileInput input = mobileInputList.get(key);
-                if (input.isFocused()) {
-                    return;
+        try {
+            if (edit == null) {
+                return;
+            }
+            if (isFocus) {
+                edit.requestFocus();
+            } else {
+                edit.clearFocus();
+            }
+            if (!isFocus) {
+                for (int i = 0; i < mobileInputList.size(); i++) {
+                    int key = mobileInputList.keyAt(i);
+                    MobileInput input = mobileInputList.get(key);
+                    if (input.isFocused()) {
+                        return;
+                    }
                 }
             }
+            this.showKeyboard(isFocus);
         }
-        this.showKeyboard(isFocus);
+        catch (Exception e) {
+        }
     }
 
     // Set new position and size
@@ -524,7 +552,7 @@ public class MobileInput {
                 edit.setLayoutParams(params);
                 edit.setPadding(0, 0, 0, offset);
             }});
-        } catch (JSONException e) {}
+        } catch (Exception e) {}
     }
 
     // Set visible to MobileEdit
