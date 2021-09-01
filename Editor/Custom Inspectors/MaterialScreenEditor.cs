@@ -134,7 +134,7 @@ namespace MaterialUI
                 EditorGUILayout.HelpBox("Please place on a ScreenView", MessageType.Warning);
             }
 
-            if (!m_MaterialScreen.optionsControlledByScreenView && hasScreen)
+            if (!m_MaterialScreen.optionsControlledByScreenView || !hasScreen)
             {
                 bool fadeIn = m_FadeIn.boolValue;
                 bool scaleIn = m_ScaleIn.boolValue;
