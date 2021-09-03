@@ -709,7 +709,8 @@ namespace Kyub.UI
 
         protected virtual bool IsFullRecalcRequired()
         {
-            return _lastFrameVisibleElementIndexes.x < 0 && _lastFrameVisibleElementIndexes.y < 0 && _cachedMinMaxIndex.x < 0 && _cachedMinMaxIndex.y < 0;
+            return !Application.isPlaying || 
+                (_lastFrameVisibleElementIndexes.x < 0 && _lastFrameVisibleElementIndexes.y < 0 && _cachedMinMaxIndex.x < 0 && _cachedMinMaxIndex.y < 0);
         }
 
         //Element RectTransform Size
