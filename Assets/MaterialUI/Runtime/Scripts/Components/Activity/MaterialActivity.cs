@@ -189,29 +189,29 @@ namespace MaterialUI
 
         protected virtual void InitializeFocusGroup()
         {
-            var v_materialKeyFocus = GetComponent<MaterialFocusGroup>();
-            if (m_UseFocusGroup && v_materialKeyFocus == null)
+            var materialKeyFocus = GetComponent<MaterialFocusGroup>();
+            if (m_UseFocusGroup && materialKeyFocus == null)
             {
-                v_materialKeyFocus = gameObject.AddComponent<MaterialFocusGroup>();
+                materialKeyFocus = gameObject.AddComponent<MaterialFocusGroup>();
 
-                ValidateKeyTriggers(v_materialKeyFocus);
+                ValidateKeyTriggers(materialKeyFocus);
             }
 
-            if (v_materialKeyFocus != null)
-                v_materialKeyFocus.enabled = m_UseFocusGroup;
+            if (materialKeyFocus != null)
+                materialKeyFocus.enabled = m_UseFocusGroup;
         }
 
-        protected virtual void ValidateKeyTriggers(MaterialFocusGroup p_materialKeyFocus)
+        protected virtual void ValidateKeyTriggers(MaterialFocusGroup materialKeyFocus)
         {
-            if (p_materialKeyFocus != null)
+            if (materialKeyFocus != null)
             {
-                var v_cancelTrigger = new MaterialFocusGroup.KeyTriggerData();
-                v_cancelTrigger.Name = "Escape KeyDown";
-                v_cancelTrigger.Key = KeyCode.Escape;
-                v_cancelTrigger.TriggerType = MaterialFocusGroup.KeyTriggerData.KeyTriggerType.KeyDown;
-                AddEventListener(v_cancelTrigger.OnCallTrigger, Hide);
+                var cancelTrigger = new MaterialFocusGroup.KeyTriggerData();
+                cancelTrigger.Name = "Escape KeyDown";
+                cancelTrigger.Key = KeyCode.Escape;
+                cancelTrigger.TriggerType = MaterialFocusGroup.KeyTriggerData.KeyTriggerType.KeyDown;
+                AddEventListener(cancelTrigger.OnCallTrigger, Hide);
 
-                p_materialKeyFocus.KeyTriggers = new System.Collections.Generic.List<MaterialFocusGroup.KeyTriggerData> { v_cancelTrigger };
+                materialKeyFocus.KeyTriggers = new System.Collections.Generic.List<MaterialFocusGroup.KeyTriggerData> { cancelTrigger };
             }
         }
 
@@ -245,53 +245,53 @@ namespace MaterialUI
             }
         }
 
-        public static void AddEventListener(UnityEvent p_event, UnityAction p_action)
+        public static void AddEventListener(UnityEvent eventAction, UnityAction action)
         {
-            if (p_event != null)
+            if (eventAction != null)
             {
 #if UNITY_EDITOR
-                UnityEditor.Events.UnityEventTools.AddPersistentListener(p_event, p_action);
+                UnityEditor.Events.UnityEventTools.AddPersistentListener(eventAction, action);
 #else
-            p_event.AddListener(p_action);
+                eventAction.AddListener(action);
 #endif
             }
         }
 
-        public static void AddEventListener<T>(UnityEvent<T> p_event, UnityAction<T> p_action)
+        public static void AddEventListener<T>(UnityEvent<T> eventAction, UnityAction<T> action)
         {
-            if (p_event != null)
+            if (eventAction != null)
             {
 #if UNITY_EDITOR
-                UnityEditor.Events.UnityEventTools.AddPersistentListener<T>(p_event, p_action);
+                UnityEditor.Events.UnityEventTools.AddPersistentListener<T>(eventAction, action);
 #else
-                p_event.AddListener(p_action);
+                eventAction.AddListener(action);
 #endif
             }
         }
 
-        public static void RemoveEventListener(UnityEvent p_event, UnityAction p_action)
+        public static void RemoveEventListener(UnityEvent eventAction, UnityAction action)
         {
-            if (p_event != null)
+            if (eventAction != null)
             {
 #if UNITY_EDITOR
-                UnityEditor.Events.UnityEventTools.RemovePersistentListener(p_event, p_action);
+                UnityEditor.Events.UnityEventTools.RemovePersistentListener(eventAction, action);
 #else
-                p_event.RemoveListener(p_action);
+                eventAction.RemoveListener(action);
 #endif
-            }
         }
+    }
 
-        public static void RemoveEventListener<T>(UnityEvent<T> p_event, UnityAction<T> p_action)
+        public static void RemoveEventListener<T>(UnityEvent<T> eventAction, UnityAction<T> action)
         {
-            if (p_event != null)
+            if (eventAction != null)
             {
 #if UNITY_EDITOR
-                UnityEditor.Events.UnityEventTools.RemovePersistentListener(p_event, p_action);
+                UnityEditor.Events.UnityEventTools.RemovePersistentListener(eventAction, action);
 #else
-                p_event.RemoveListener(p_action);
+                eventAction.RemoveListener(action);
 #endif
-            }
         }
+    }
 
         #endregion
     }

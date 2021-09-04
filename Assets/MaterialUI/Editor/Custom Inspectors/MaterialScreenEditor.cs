@@ -12,6 +12,8 @@ namespace MaterialUI
     {
         private MaterialScreen m_MaterialScreen;
 
+        private SerializedProperty m_UseFocusGroup;
+
         private SerializedProperty m_OptionsControlledByScreenView;
         private SerializedProperty m_DisableWhenNotVisible;
         private SerializedProperty m_DestroyOnHide;
@@ -68,6 +70,7 @@ namespace MaterialUI
             m_OptionsControlledByScreenView = serializedObject.FindProperty("m_OptionsControlledByScreenView");
             m_DisableWhenNotVisible = serializedObject.FindProperty("m_DisableWhenNotVisible");
             m_DestroyOnHide = serializedObject.FindProperty("m_DestroyOnHide");
+            m_UseFocusGroup = serializedObject.FindProperty("m_UseFocusGroup");
 
             m_FadeIn = serializedObject.FindProperty("m_FadeIn");
             m_FadeInTweenType = serializedObject.FindProperty("m_FadeInTweenType");
@@ -122,6 +125,8 @@ namespace MaterialUI
             EditorGUILayout.PropertyField(m_DestroyOnHide, true);
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(m_DisableWhenNotVisible, true);
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_UseFocusGroup, true);
 
             bool hasScreen = m_MaterialScreen.screenView != null;
 
