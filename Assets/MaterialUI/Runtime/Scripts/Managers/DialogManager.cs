@@ -906,7 +906,7 @@ namespace MaterialUI
             ShowCustomDialogAsync<DialogDatePicker>(PrefabManager.ResourcePrefabs.dialogMonthPicker.Name, initialize, progressIndicator);
         }
 
-        public static DialogDatePicker ShowMontPicker(int year, int month, Action<DateTime> onAffirmativeClicked)
+        public static DialogDatePicker ShowMonthPicker(int year, int month, Action<DateTime> onAffirmativeClicked)
         {
             return ShowMonthPicker(year, month, onAffirmativeClicked, MaterialColor.teal500);
         }
