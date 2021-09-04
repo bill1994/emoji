@@ -1818,6 +1818,7 @@ namespace MaterialUI
 
         protected virtual void OnTextChangedInternal(string value, bool canFixText)
         {
+            ValidateText();
             if (onValueChanged != null)
                 onValueChanged.Invoke(value);
 
@@ -1831,7 +1832,6 @@ namespace MaterialUI
 
             SetLayoutDirty();
             UpdateCounter();
-            ValidateText();
             if (!m_FloatingHint)
                 SetHintLayoutToFloatingValue();
 
