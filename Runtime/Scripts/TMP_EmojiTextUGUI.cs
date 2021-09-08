@@ -316,7 +316,16 @@ namespace Kyub.EmojiSearch.UI
             return base.GetTextInfo(text);
         }
 
-#if TMP_2_1_0_PREVIEW_8_OR_NEWER
+#if (TMP_2_2_0_PREVIEW_1_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_2_0_PREVIEW_1_OR_NEWER
+        protected virtual Vector2 CalculatePreferredValues(ref float fontSize, Vector2 marginSize, bool isTextAutoSizingEnabled, TextWrappingModes textWrapMode)
+        {
+            if (_emojiParsingRequired)
+                ParseInputTextAndEmojiCharSequence();
+
+            return base.CalculatePreferredValues(ref fontSize, marginSize, isTextAutoSizingEnabled, textWrapMode);
+        }
+
+#elif TMP_2_1_0_PREVIEW_8_OR_NEWER
         protected override Vector2 CalculatePreferredValues(ref float defaultFontSize, Vector2 marginSize, bool ignoreTextAutoSizing, bool isWordWrappingEnabled)
         {
             if (_emojiParsingRequired)
@@ -342,9 +351,9 @@ namespace Kyub.EmojiSearch.UI
         }
 #endif
 
-        #endregion
+#endregion
 
-        #region Layout Overriden Functions
+#region Layout Overriden Functions
 
 #if (TMP_2_1_3_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_0_3_OR_NEWER
         public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
@@ -445,6 +454,6 @@ namespace Kyub.EmojiSearch.UI
         }
 #endif
 
-        #endregion
+#endregion
     }
 }

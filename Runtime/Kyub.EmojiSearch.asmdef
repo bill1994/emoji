@@ -78,6 +78,11 @@
         },
         {
             "name": "com.unity.textmeshpro",
+            "expression": "2.2.0-preview.1",
+            "define": "TMP_2_2_0_PREVIEW_1_OR_NEWER"
+        },
+        {
+            "name": "com.unity.textmeshpro",
             "expression": "3.0.0",
             "define": "TMP_3_0_0_OR_NEWER"
         },
@@ -90,6 +95,11 @@
             "name": "com.unity.textmeshpro",
             "expression": "3.0.5",
             "define": "TMP_3_0_5_OR_NEWER"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "3.2.0-preview.1",
+            "define": "TMP_3_2_0_PREVIEW_1_OR_NEWER"
         }
     ],
     "noEngineReferences": false
