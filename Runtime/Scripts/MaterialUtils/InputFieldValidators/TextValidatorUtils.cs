@@ -555,12 +555,12 @@ namespace MaterialUI
     {
         public const string DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG = "Value must be a number between '<localeparam=0>{0}</localeparam>' and '<localeparam=1>{1}</localeparam>' (Inclusive)";
 
-        double _minValue = double.MinValue;
-        double _maxValue = double.MaxValue;
-        bool _isMinInclusive = true;
-        bool _isMaxInclusive = true;
-        System.IFormatProvider _formatProvider = null;
-        const string DECIMAL_VALIDATOR = @"^[-+]?\d+(\.\d+)?$";
+        protected double _minValue = double.MinValue;
+        protected double _maxValue = double.MaxValue;
+        protected bool _isMinInclusive = true;
+        protected bool _isMaxInclusive = true;
+        protected System.IFormatProvider _formatProvider = null;
+        protected const string DECIMAL_VALIDATOR = @"^[-+]?\d+(\.\d+)?$";
 
         public DecimalValidator(string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : this(true, double.MinValue, double.MaxValue, error)
         {
