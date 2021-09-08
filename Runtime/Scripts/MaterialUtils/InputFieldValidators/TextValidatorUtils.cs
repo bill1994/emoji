@@ -604,9 +604,11 @@ namespace MaterialUI
 
             if (isValid)
             {
+                var text = m_MaterialInputField.text.Replace(",", ".");
                 double parsedValue;
-                0                isValid = m_MaterialInputField != null &&
-                                    double.TryParse(m_MaterialInputField.text, NumberStyles.Float, _formatProvider, out parsedValue) &&
+                isValid = m_MaterialInputField != null &&
+                                    (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out parsedValue) ||
+                                    double.TryParse(m_MaterialInputField.text, NumberStyles.Float, _formatProvider, out parsedValue)) &&
                                     ((_isMinInclusive && parsedValue == _minValue) || parsedValue > _minValue) &&
                                     ((_isMaxInclusive && parsedValue == _maxValue) || parsedValue < _maxValue);
             }
