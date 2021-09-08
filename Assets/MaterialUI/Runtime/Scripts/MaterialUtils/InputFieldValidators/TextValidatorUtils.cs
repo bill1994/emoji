@@ -15,7 +15,7 @@ namespace MaterialUI
     /// Base class for a Text validator.
     /// </summary>
     public class BaseTextValidator
-	{
+    {
         #region Private Variables
 
         protected MaterialInputField m_MaterialInputField;
@@ -152,7 +152,7 @@ namespace MaterialUI
             _formatTextCoroutine = null;
             UnregisterEvents();
             FormatText();
-            RegisterEvents(); 
+            RegisterEvents();
         }
 
         #endregion
@@ -164,36 +164,36 @@ namespace MaterialUI
     /// <seealso cref="MaterialUI.BaseTextValidator" />
     /// <seealso cref="MaterialUI.ITextValidator" />
     public class EmptyTextValidator : BaseTextValidator, ITextValidator
-	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		private string m_ErrorMessage;
+    {
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        private string m_ErrorMessage;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MaterialUI.EmptyTextValidator"/> class.
-		/// </summary>
-		/// <param name="errorMessage">Error message.</param>
-		public EmptyTextValidator(string errorMessage = "Can't be empty")
-		{
-			m_ErrorMessage = errorMessage;
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaterialUI.EmptyTextValidator"/> class.
+        /// </summary>
+        /// <param name="errorMessage">Error message.</param>
+        public EmptyTextValidator(string errorMessage = "Can't be empty")
+        {
+            m_ErrorMessage = errorMessage;
+        }
 
         /// <summary>
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text contains characters, otherwise false.</returns>
         public override bool IsTextValid()
-		{
-			if (string.IsNullOrEmpty(m_MaterialInputField.text))
-			{
-                if(m_MaterialInputField != null && m_MaterialInputField.validationText != null)
-				    m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
-				return false;
-			}
+        {
+            if (string.IsNullOrEmpty(m_MaterialInputField.text))
+            {
+                if (m_MaterialInputField != null && m_MaterialInputField.validationText != null)
+                    m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+                return false;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
         public virtual ITextValidator Clone()
         {
@@ -207,37 +207,37 @@ namespace MaterialUI
     /// <seealso cref="MaterialUI.BaseTextValidator" />
     /// <seealso cref="MaterialUI.ITextValidator" />
     public class EmailTextValidator : BaseTextValidator, ITextValidator
-	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		private string m_ErrorMessage;
+    {
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        private string m_ErrorMessage;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MaterialUI.EmailTextValidator"/> class with a custom error message.
-		/// </summary>
-		/// <param name="errorMessage">Error message.</param>
-		public EmailTextValidator(string errorMessage = "Format is invalid")
-		{
-			m_ErrorMessage = errorMessage;
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaterialUI.EmailTextValidator"/> class with a custom error message.
+        /// </summary>
+        /// <param name="errorMessage">Error message.</param>
+        public EmailTextValidator(string errorMessage = "Format is invalid")
+        {
+            m_ErrorMessage = errorMessage;
+        }
 
         /// <summary>
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text appears to be an email, otherwise false.</returns>
         public override bool IsTextValid()
-		{
-			Regex regex = new Regex(@"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*" + "@" + @"((([\-\w]+\.)+[a-zA-Z]{2,4})|(([0-9]{1,3}\.){3}[0-9]{1,3}))$");
-			Match match = regex.Match(m_MaterialInputField.text);
-			if (!match.Success)
-			{
-				m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
-				return false;
-			}
+        {
+            Regex regex = new Regex(@"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*" + "@" + @"((([\-\w]+\.)+[a-zA-Z]{2,4})|(([0-9]{1,3}\.){3}[0-9]{1,3}))$");
+            Match match = regex.Match(m_MaterialInputField.text);
+            if (!match.Success)
+            {
+                m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+                return false;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
         public virtual ITextValidator Clone()
         {
@@ -251,11 +251,11 @@ namespace MaterialUI
     /// <seealso cref="MaterialUI.BaseTextValidator" />
     /// <seealso cref="MaterialUI.ITextValidator" />
     public class NameTextValidator : BaseTextValidator, ITextValidator
-	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		private string m_ErrorMessage;
+    {
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        private string m_ErrorMessage;
 
         /// <summary>
         /// The minimum length.
@@ -266,10 +266,10 @@ namespace MaterialUI
         /// Initializes a new instance of the <see cref="NameTextValidator"/> class.
 		/// </summary>
 		/// <param name="errorMessage">The error message.</param>
-		public NameTextValidator(string errorMessage = "Format is invalid") 
-		{
-			m_ErrorMessage = errorMessage;
-		}
+		public NameTextValidator(string errorMessage = "Format is invalid")
+        {
+            m_ErrorMessage = errorMessage;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NameTextValidator"/> class.
@@ -277,33 +277,33 @@ namespace MaterialUI
 		/// <param name="minimumLength">The minimum length.</param>
 		/// <param name="errorMessage">The error message.</param>
 		public NameTextValidator(int minimumLength, string errorMessage = "Format is invalid")
-		{
-			m_MinimumLength = minimumLength;
-			m_ErrorMessage = errorMessage;
-		}
+        {
+            m_MinimumLength = minimumLength;
+            m_ErrorMessage = errorMessage;
+        }
 
         /// <summary>
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text appears to be a name, otherwise false.</returns>
         public override bool IsTextValid()
-		{
-			if (m_MaterialInputField.text.Length < m_MinimumLength)
-			{
-				m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
-				return false;
-			}
+        {
+            if (m_MaterialInputField.text.Length < m_MinimumLength)
+            {
+                m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+                return false;
+            }
 
-			Regex regex = new Regex(@"^\p{L}+(\s+\p{L}+)*$");
-			Match match = regex.Match(m_MaterialInputField.text);
-			if (!match.Success)
-			{
-				m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
-				return false;
-			}
+            Regex regex = new Regex(@"^\p{L}+(\s+\p{L}+)*$");
+            Match match = regex.Match(m_MaterialInputField.text);
+            if (!match.Success)
+            {
+                m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+                return false;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
         public virtual ITextValidator Clone()
         {
@@ -317,11 +317,11 @@ namespace MaterialUI
     /// <seealso cref="MaterialUI.BaseTextValidator" />
     /// <seealso cref="MaterialUI.ITextValidator" />
     public class MinLengthTextValidator : BaseTextValidator, ITextValidator
-	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		private string m_ErrorMessage;
+    {
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        private string m_ErrorMessage;
 
         /// <summary>
         /// The minimum length
@@ -334,26 +334,26 @@ namespace MaterialUI
         /// <param name="minimumLength">The minimum length.</param>
 		/// <param name="errorMessage">The error message.</param>
 		public MinLengthTextValidator(int minimumLength, string errorMessage = "Require at least {0} characters")
-		{
-			m_MinimumLength = minimumLength;
+        {
+            m_MinimumLength = minimumLength;
 
-			m_ErrorMessage = errorMessage;
-		}
+            m_ErrorMessage = errorMessage;
+        }
 
         /// <summary>
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text is at least the length of or longer than m_MinimumLength, otherwise false.</returns>
         public override bool IsTextValid()
-		{
-			if (m_MaterialInputField.text.Length < m_MinimumLength)
-			{
-				m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage, m_MinimumLength);
-				return false;
-			}
+        {
+            if (m_MaterialInputField.text.Length < m_MinimumLength)
+            {
+                m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage, m_MinimumLength);
+                return false;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
         public virtual ITextValidator Clone()
         {
@@ -361,56 +361,56 @@ namespace MaterialUI
         }
     }
 
-	/// <summary>
-	/// Text validator that checks for maximum length.
-	/// </summary>
-	/// <seealso cref="MaterialUI.BaseTextValidator" />
-	/// <seealso cref="MaterialUI.ITextValidator" />
-	public class MaxLengthTextValidator : BaseTextValidator, ITextValidator
-	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		private string m_ErrorMessage;
+    /// <summary>
+    /// Text validator that checks for maximum length.
+    /// </summary>
+    /// <seealso cref="MaterialUI.BaseTextValidator" />
+    /// <seealso cref="MaterialUI.ITextValidator" />
+    public class MaxLengthTextValidator : BaseTextValidator, ITextValidator
+    {
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        private string m_ErrorMessage;
 
-		/// <summary>
-		/// The minimum length
-		/// </summary>
-		private int m_MaximumLength = 6;
+        /// <summary>
+        /// The minimum length
+        /// </summary>
+        private int m_MaximumLength = 6;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="PasswordTextValidator"/> class.
-		/// </summary>
-		/// <param name="minimumLength">The minimum length.</param>
-		/// <param name="errorMessage">The error message.</param>
-		public MaxLengthTextValidator(int maximumLength, string errorMessage)
-		{
-			m_MaximumLength = maximumLength;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PasswordTextValidator"/> class.
+        /// </summary>
+        /// <param name="minimumLength">The minimum length.</param>
+        /// <param name="errorMessage">The error message.</param>
+        public MaxLengthTextValidator(int maximumLength, string errorMessage)
+        {
+            m_MaximumLength = maximumLength;
 
-			if (string.IsNullOrEmpty(errorMessage))
-			{
-				m_ErrorMessage = "Limited to " + m_MaximumLength + " characters";
-			}
-			else
-			{
-				m_ErrorMessage = errorMessage;
-			}
-		}
+            if (string.IsNullOrEmpty(errorMessage))
+            {
+                m_ErrorMessage = "Limited to " + m_MaximumLength + " characters";
+            }
+            else
+            {
+                m_ErrorMessage = errorMessage;
+            }
+        }
 
-		/// <summary>
-		/// Determines whether the text is valid.
-		/// </summary>
-		/// <returns>True if the text is lower than m_MaximumLength, otherwise false.</returns>
-		public override bool IsTextValid()
-		{
-			if (m_MaterialInputField.text.Length > m_MaximumLength)
-			{
-				m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
-				return false;
-			}
+        /// <summary>
+        /// Determines whether the text is valid.
+        /// </summary>
+        /// <returns>True if the text is lower than m_MaximumLength, otherwise false.</returns>
+        public override bool IsTextValid()
+        {
+            if (m_MaterialInputField.text.Length > m_MaximumLength)
+            {
+                m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+                return false;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
         public virtual ITextValidator Clone()
         {
@@ -424,11 +424,11 @@ namespace MaterialUI
     /// <seealso cref="MaterialUI.BaseTextValidator" />
     /// <seealso cref="MaterialUI.ITextValidator" />
     public class SamePasswordTextValidator : BaseTextValidator, ITextValidator
-	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		private string m_ErrorMessage;
+    {
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        private string m_ErrorMessage;
 
         /// <summary>
         /// The original password input field
@@ -441,26 +441,26 @@ namespace MaterialUI
 		/// <param name="originalPasswordInputField">The original password input field.</param>
 		/// <param name="errorMessage">The error message.</param>
 		public SamePasswordTextValidator(MaterialInputField originalPasswordInputField, string errorMessage = "Passwords are different!")
-		{
-			m_OriginalPasswordInputField = originalPasswordInputField;
-			m_ErrorMessage = errorMessage;
-		}
+        {
+            m_OriginalPasswordInputField = originalPasswordInputField;
+            m_ErrorMessage = errorMessage;
+        }
 
         /// <summary>
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the text in the two fields match, otherwise false.</returns>
         public override bool IsTextValid()
-		{
-            
-			if (!m_MaterialInputField.text.Equals(m_OriginalPasswordInputField.text))
-			{
-				m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
-				return false;
-			}
+        {
 
-			return true;
-		}
+            if (!m_MaterialInputField.text.Equals(m_OriginalPasswordInputField.text))
+            {
+                m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+                return false;
+            }
+
+            return true;
+        }
 
         public virtual ITextValidator Clone()
         {
@@ -474,35 +474,35 @@ namespace MaterialUI
     /// <seealso cref="MaterialUI.BaseTextValidator" />
     /// <seealso cref="MaterialUI.ITextValidator" />
     public class DirectoryExistTextValidator : BaseTextValidator, ITextValidator
-	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		private string m_ErrorMessage;
+    {
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        private string m_ErrorMessage;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MaterialUI.DirectoryExistTextValidator"/> class.
-		/// </summary>
-		/// <param name="errorMessage">Error message.</param>
-		public DirectoryExistTextValidator(string errorMessage = "This directory does not exist")
-		{
-			m_ErrorMessage = errorMessage;
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaterialUI.DirectoryExistTextValidator"/> class.
+        /// </summary>
+        /// <param name="errorMessage">Error message.</param>
+        public DirectoryExistTextValidator(string errorMessage = "This directory does not exist")
+        {
+            m_ErrorMessage = errorMessage;
+        }
 
         /// <summary>
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the directory given by the text value exists, otherwise false.</returns>
         public override bool IsTextValid()
-		{
-			bool directoryExists = Directory.Exists(m_MaterialInputField.text);
-			if (!directoryExists)
-			{
-				m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
-			}
+        {
+            bool directoryExists = Directory.Exists(m_MaterialInputField.text);
+            if (!directoryExists)
+            {
+                m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+            }
 
-			return directoryExists;
-		}
+            return directoryExists;
+        }
 
         public virtual ITextValidator Clone()
         {
@@ -516,35 +516,35 @@ namespace MaterialUI
     /// <seealso cref="MaterialUI.BaseTextValidator" />
     /// <seealso cref="MaterialUI.ITextValidator" />
     public class FileExistTextValidator : BaseTextValidator, ITextValidator
-	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		private string m_ErrorMessage;
+    {
+        /// <summary>
+        /// The error message.
+        /// </summary>
+        private string m_ErrorMessage;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MaterialUI.DirectoryExistTextValidator"/> class.
-		/// </summary>
-		/// <param name="errorMessage">Error message.</param>
-		public FileExistTextValidator(string errorMessage = "This file does not exist")
-		{
-			m_ErrorMessage = errorMessage;
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaterialUI.DirectoryExistTextValidator"/> class.
+        /// </summary>
+        /// <param name="errorMessage">Error message.</param>
+        public FileExistTextValidator(string errorMessage = "This file does not exist")
+        {
+            m_ErrorMessage = errorMessage;
+        }
 
         /// <summary>
         /// Determines whether the text is valid.
         /// </summary>
         /// <returns>True if the filepath given by the text value exists, otherwise false.</returns>
         public override bool IsTextValid()
-		{
-			bool fileExists = File.Exists(m_MaterialInputField.text);
-			if (!fileExists)
-			{
-				m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
-			}
+        {
+            bool fileExists = File.Exists(m_MaterialInputField.text);
+            if (!fileExists)
+            {
+                m_MaterialInputField.validationText.SetGraphicText(m_ErrorMessage);
+            }
 
-			return fileExists;
-		}
+            return fileExists;
+        }
         public virtual ITextValidator Clone()
         {
             return new FileExistTextValidator(m_ErrorMessage);
@@ -560,7 +560,7 @@ namespace MaterialUI
         protected bool _isMinInclusive = true;
         protected bool _isMaxInclusive = true;
         protected System.IFormatProvider _formatProvider = null;
-        protected const string DECIMAL_VALIDATOR = @"^[-+]?\d+(\.\d+)?$";
+        protected const string DECIMAL_VALIDATOR = @"^[-+]?\d+([.,]\d+)?$";
 
         public DecimalValidator(string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : this(true, double.MinValue, double.MaxValue, error)
         {
@@ -576,7 +576,7 @@ namespace MaterialUI
         {
         }
 
-        public DecimalValidator(System.IFormatProvider format, bool isInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) : 
+        public DecimalValidator(System.IFormatProvider format, bool isInclusive, double minValue = double.MinValue, double maxValue = double.MaxValue, string error = DEFAULT_DECIMAL_INCLUSIVE_VALIDATOR_ERROR_MSG) :
             this(format, isInclusive, isInclusive, minValue, maxValue, error)
         {
         }
@@ -605,10 +605,10 @@ namespace MaterialUI
             if (isValid)
             {
                 double parsedValue;
-                isValid = m_MaterialInputField != null &&
-                    double.TryParse(m_MaterialInputField.text, NumberStyles.Float, _formatProvider, out parsedValue) &&
-                    ((_isMinInclusive && parsedValue == _minValue) || parsedValue > _minValue) &&
-                    ((_isMaxInclusive && parsedValue == _maxValue) || parsedValue < _maxValue);
+                0                isValid = m_MaterialInputField != null &&
+                                    double.TryParse(m_MaterialInputField.text, NumberStyles.Float, _formatProvider, out parsedValue) &&
+                                    ((_isMinInclusive && parsedValue == _minValue) || parsedValue > _minValue) &&
+                                    ((_isMaxInclusive && parsedValue == _maxValue) || parsedValue < _maxValue);
             }
             if (!isValid)
             {
@@ -666,7 +666,7 @@ namespace MaterialUI
         protected System.DateTime _maxValue = System.DateTime.MaxValue;
         protected string _formatExact;
 
-        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, string cultureInfoName, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : 
+        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, string cultureInfoName, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) :
             this(isMinInclusive, isMaxInclusive, minValue, maxValue, CultureInfo.GetCultureInfo(cultureInfoName), error)
         {
         }
@@ -676,7 +676,7 @@ namespace MaterialUI
         {
         }
 
-        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, System.IFormatProvider format, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : this(isMinInclusive, isMaxInclusive,minValue, maxValue, null, format, error)
+        public DateMinMaxFormatValidator(bool isMinInclusive, bool isMaxInclusive, System.DateTime minValue, System.DateTime maxValue, System.IFormatProvider format, string error = DEFAULT_DATE_INCLUSIVE_VALIDATOR_ERROR_MSG) : this(isMinInclusive, isMaxInclusive, minValue, maxValue, null, format, error)
         {
         }
 
@@ -705,11 +705,11 @@ namespace MaterialUI
 
             System.DateTime result = System.DateTime.MinValue;
             //Added support to TryParse Exact
-            if(!string.IsNullOrEmpty(_formatExact))
+            if (!string.IsNullOrEmpty(_formatExact))
                 isValid = System.DateTime.TryParseExact(text, _formatExact, _formatProvider, System.Globalization.DateTimeStyles.None, out result);
 
             isValid = isValid || System.DateTime.TryParse(text, _formatProvider, System.Globalization.DateTimeStyles.None, out result);
-            
+
             if (isValid)
             {
                 isValid = m_MaterialInputField != null &&
@@ -821,7 +821,7 @@ namespace MaterialUI
                 return text;
 
             char[] maskChars = mask.ToCharArray();
-            
+
             //Calculate valid text chars nad converted caret position
             List<char> textChars = new List<char>();
             var lastValidIndex = -1;
@@ -833,7 +833,7 @@ namespace MaterialUI
                 if (string.IsNullOrEmpty(validTextChars) || Regex.IsMatch(sh.ToString(), "[" + validTextChars + "]"))
                 {
                     textChars.Add(sh);
-                    lastValidIndex = textChars.Count-1;
+                    lastValidIndex = textChars.Count - 1;
                 }
                 if (caretPosition - 1 == i)
                     convertedCaretPosition = lastValidIndex;
