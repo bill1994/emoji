@@ -8,6 +8,13 @@ namespace Kyub.Serialization.Internal {
     public class EnumAsStringConverter : EnumConverter
     {
         public override bool ConvertAsString { get { return true; } }
+
+#if UNITY_5_5_OR_NEWER
+        [UnityEngine.Scripting.Preserve]
+#endif
+        public EnumAsStringConverter()
+        {
+        }
     }
 
     /// <summary>

@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.serialization",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "displayName": "Kyub Serialization",
   "description": "This package contains Kyub Serialization JSON Api",
   "unity": "2019.1",
