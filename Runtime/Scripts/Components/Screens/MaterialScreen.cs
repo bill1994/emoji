@@ -598,6 +598,75 @@ namespace MaterialUI
             }
         }
 
+        public void RemoveSelfFromScreenStack()
+        {
+            RemoveFromScreenStack(this);
+        }
+
+        public void RemoveFromScreenStack(MaterialScreen screen)
+        {
+            if (screenView != null)
+            {
+                screenView.RemoveFromScreenStack(screen);
+            }
+        }
+
+        public void RemoveFromScreenStack(int screenIndex)
+        {
+            if (screenView != null)
+            {
+                screenView.RemoveFromScreenStack(screenIndex);
+            }
+        }
+
+        public void RemoveFromScreenStack(string screenName)
+        {
+            if (screenView != null)
+            {
+                screenView.RemoveFromScreenStack(screenName);
+            }
+        }
+
+        public virtual void ClearScreenStack()
+        {
+            if (screenView != null)
+            {
+                screenView.ClearScreenStack();
+            }
+        }
+
+        public virtual void RevertStackToScreenWithIndex(int screenIndex)
+        {
+            if (screenView != null)
+            {
+                screenView.RevertStackToScreenWithIndex(screenIndex);
+            }
+        }
+
+        public virtual void RevertStackToScreenWithName(string screenName)
+        {
+            if (screenView != null)
+            {
+                screenView.RevertStackToScreenWithName(screenName);
+            }
+        }
+
+        public virtual void RevertStackToIndex(int stackIndex)
+        {
+            if (screenView != null)
+            {
+                screenView.RevertStackToIndex(stackIndex);
+            }
+        }
+
+        public virtual void RevertStackToScreen(MaterialScreen materialScreen)
+        {
+            if (screenView != null)
+            {
+                screenView.RevertStackToScreen(materialScreen);
+            }
+        }
+
         public virtual void Interrupt(bool canDestroy = false)
         {
             SetupFrameAnimator();
