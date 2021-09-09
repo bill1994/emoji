@@ -589,7 +589,7 @@ namespace MaterialUI
             //Only accept screens of this ScreenView
             if (screen != null && m_MaterialScreens.IndexOf(screen) >= 0)
             {
-                RemoveFromScreenStack(screen);
+                TryRemoveFromScreenStack(screen);
                 m_ScreenStack.Add(screen);
                 return true;
             }
@@ -605,7 +605,7 @@ namespace MaterialUI
                 var screenIndex = m_ScreenStack.Count - 1;
                 screen = m_ScreenStack[screenIndex];
                 //We removed the last screen
-                if (m_MaterialScreens.IndexOf(screen) >= 0 && RemoveFromScreenStack(screen))
+                if (m_MaterialScreens.IndexOf(screen) >= 0 && TryRemoveFromScreenStack(screen))
                 {
                     break;
                 }
@@ -619,19 +619,27 @@ namespace MaterialUI
             return screen;
         }
 
-        public MaterialScreen RemoveFromScreenStack(string screenName)
+        public bool TryRemoveFromScreenStack(string screenName, out MaterialScreen materialScreen)
         {
-            var materialScreen = GetScreenWithName(screenName);
-            return RemoveFromScreenStack(materialScreen) ? materialScreen : null;
+            materialScreen = GetScreenWithName(screenName);
+            var result = TryRemoveFromScreenStack(materialScreen);
+            if (!result)
+                materialScreen = null;
+
+            return result;
         }
 
-        public MaterialScreen RemoveFromScreenStack(int screenIndex)
+        public bool TryRemoveFromScreenStack(int screenIndex, out MaterialScreen materialScreen)
         {
-            var materialScreen = m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null;
-            return RemoveFromScreenStack(materialScreen) ? materialScreen : null;
+            materialScreen = m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null;
+            var result = TryRemoveFromScreenStack(materialScreen);
+            if (!result)
+                materialScreen = null;
+
+            return result;
         }
 
-        public virtual bool RemoveFromScreenStack(MaterialScreen screen)
+        public virtual bool TryRemoveFromScreenStack(MaterialScreen screen)
         {
             if (screen != null)
             {
@@ -645,9 +653,56 @@ namespace MaterialUI
             return false;
         }
 
+        public void RemoveFromScreenStack(string screenName)
+        {
+            MaterialScreen dummy;
+            TryRemoveFromScreenStack(screenName, out dummy);
+        }
+
+        public void RemoveFromScreenStack(int screenIndex)
+        {
+            MaterialScreen dummy;
+            TryRemoveFromScreenStack(screenIndex, out dummy);
+        }
+
+        public virtual void RemoveFromScreenStack(MaterialScreen screen)
+        {
+            TryRemoveFromScreenStack(screen);
+        }
+
         public virtual void ClearScreenStack()
         {
             m_ScreenStack.Clear();
+        }
+
+        public virtual void RevertStackToScreenWithIndex(int screenIndex)
+        {
+            var materialScreen = m_MaterialScreens.Count > screenIndex && screenIndex >= 0 ? m_MaterialScreens[screenIndex] : null;
+            RevertStackToScreen(materialScreen);
+        }
+
+        public virtual void RevertStackToScreenWithName(string screenName)
+        {
+            var materialScreen = GetScreenWithName(screenName);
+            RevertStackToScreen(materialScreen);
+        }
+
+        public virtual void RevertStackToIndex(int stackIndex)
+        {
+            var materialScreen = stackIndex < m_ScreenStack.Count && stackIndex >= 0?  m_ScreenStack[stackIndex] : null;
+            RevertStackToScreen(materialScreen);
+        }
+
+        public virtual void RevertStackToScreen(MaterialScreen materialScreen)
+        {
+            if (materialScreen != null)
+            {
+                var indexToRevert = m_ScreenStack.IndexOf(materialScreen);
+                while (indexToRevert >= 0 && indexToRevert < m_ScreenStack.Count - 1)
+                {
+                    m_ScreenStack.RemoveAt(m_ScreenStack.Count - 1);
+                }
+            }
         }
 
         #endregion
@@ -733,7 +788,7 @@ namespace MaterialUI
                 {
                     processingScreenStack[i].TransitionOut();
                     processingScreenStack[i].Interrupt(true);
-                    RemoveFromScreenStack(processingScreenStack[i]);
+                    TryRemoveFromScreenStack(processingScreenStack[i]);
                 }
             }
 
