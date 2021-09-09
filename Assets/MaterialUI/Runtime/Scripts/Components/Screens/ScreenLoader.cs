@@ -99,25 +99,45 @@ namespace MaterialUI
 
         public void ForceLoadAndShowScreen(string screenResourcesName)
         {
-            LoadAndShowScreen_Internal(screenResourcesName, false, null);
+            LoadAndShowScreen_Internal(screenResourcesName, false, false, null);
         }
 
         public void ForceLoadAndShowScreen(string screenResourcesName, System.Action<MaterialScreen> onStackScreen)
         {
-            LoadAndShowScreen_Internal(screenResourcesName, false, onStackScreen);
+            LoadAndShowScreen_Internal(screenResourcesName, false, false, onStackScreen);
+        }
+
+        public void ForceLoadAndReplaceScreen(string screenResourcesName)
+        {
+            LoadAndShowScreen_Internal(screenResourcesName, false, true, null);
+        }
+
+        public void ForceLoadAndReplaceScreen(string screenResourcesName, System.Action<MaterialScreen> onStackScreen)
+        {
+            LoadAndShowScreen_Internal(screenResourcesName, false, true, onStackScreen);
         }
 
         public void LoadAndShowScreen(string screenResourcesName)
         {
-            LoadAndShowScreen_Internal(screenResourcesName, true, null);
+            LoadAndShowScreen_Internal(screenResourcesName, true, false, null);
         }
 
         public void LoadAndShowScreen(string screenResourcesName, System.Action<MaterialScreen> onStackScreen)
         {
-            LoadAndShowScreen_Internal(screenResourcesName, true, onStackScreen);
+            LoadAndShowScreen_Internal(screenResourcesName, true, false, onStackScreen);
         }
 
-        protected void LoadAndShowScreen_Internal(string screenResourcesName, bool searchForScreensWithSameName, System.Action<MaterialScreen> onStackScreen)
+        public void LoadAndReplaceScreen(string screenResourcesName)
+        {
+            LoadAndShowScreen_Internal(screenResourcesName, true, true, null);
+        }
+
+        public void LoadAndReplaceScreen(string screenResourcesName, System.Action<MaterialScreen> onStackScreen)
+        {
+            LoadAndShowScreen_Internal(screenResourcesName, true, true, onStackScreen);
+        }
+
+        protected void LoadAndShowScreen_Internal(string screenResourcesName, bool searchForScreensWithSameName, bool removePreviousStack, System.Action<MaterialScreen> onStackScreen)
         {
             if (ScreenView == null)
             {
@@ -129,10 +149,18 @@ namespace MaterialUI
                 MaterialScreen screenWithSameName = searchForScreensWithSameName ? ScreenView.GetScreenWithName(screenResourcesName) : null;
                 if (screenWithSameName == null)
                 {
+                    var lastScreen = ScreenView.currentScreen;
                     ScreenManager.ShowCustomScreenAsync<MaterialScreen>(screenResourcesName,
                         ScreenView != null ? ScreenView.transform : null,
                         (screen) =>
                         {
+                            if (this == null)
+                                return;
+
+                            if (screen != null && screen != lastScreen && removePreviousStack)
+                            {
+                                ScreenView.RemoveFromScreenStack(lastScreen);
+                            }
                             if (onStackScreen != null) onStackScreen(screen);
                         },
                         null,
@@ -142,7 +170,14 @@ namespace MaterialUI
                 else
                 {
                     if (ScreenView.currentScreen != screenWithSameName)
+                    {
+                        var lastScreen = ScreenView.currentScreen;
+                        if (removePreviousStack)
+                        {
+                            ScreenView.RemoveFromScreenStack(lastScreen);
+                        }
                         screenWithSameName.Show();
+                    }
                     else
                     {
                         //Debug.Log("Screen already instantiated");
