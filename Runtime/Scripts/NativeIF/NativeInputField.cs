@@ -346,7 +346,7 @@ namespace Kyub.UI
                     var shouldContinue = KeyPressed(ProcessingEvent);
                     if (shouldContinue == EditState.Finish)
                     {
-                        DeactivateInputField();
+                        SafeDeactivateInputFieldInternal();
                         shouldBreak = true;
                     }
                     //Extra feature to check KeyPress Down in non supported platforms
@@ -869,7 +869,7 @@ namespace Kyub.UI
             }
         }
 
-        private void SafeActivateInputFieldInternal()
+        protected void SafeActivateInputFieldInternal()
         {
             if (IsUnityKeyboardSupported())
             {
@@ -913,6 +913,11 @@ namespace Kyub.UI
                 m_SetCaretVisibleInfo.Invoke(this, null);
         }
 
+        protected virtual void SafeDeactivateInputFieldInternal()
+        {
+            base.DeactivateInputField();
+        }
+
         public new void DeactivateInputField()
         {
             if (IsNativeKeyboardSupported())
@@ -923,7 +928,7 @@ namespace Kyub.UI
                     nativeBox.Hide();
                 }
             }
-            base.DeactivateInputField();
+            SafeDeactivateInputFieldInternal();
         }
 
         #endregion
