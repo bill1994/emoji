@@ -222,6 +222,9 @@ public class MobileInput {
                         case "NumberPad":
                             editInputType = InputType.TYPE_CLASS_NUMBER;
                             break;
+                        case "DecimalPad":
+                            editInputType = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
+                            break;
                         case "PhonePad":
                             editInputType = InputType.TYPE_CLASS_PHONE;
                             break;
