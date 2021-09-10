@@ -977,9 +977,7 @@ namespace Kyub.Internal.NativeInputPlugin
 
         protected float GetDefaultKeyboardStateChangedDelay()
         {
-            var defaultDelay = 0.05f;
-            if (Environment.ProcessorCount <= 4)
-                defaultDelay = 0.2f;
+            var defaultDelay = 0.1f;
             return defaultDelay;
         }
 
