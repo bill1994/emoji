@@ -396,7 +396,7 @@ namespace Kyub.UI
                     var shouldContinue = KeyPressed(ProcessingEvent);
                     if (shouldContinue == EditState.Finish)
                     {
-                        DeactivateInputField();
+                        SafeDeactivateInputFieldInternal();
                         shouldBreak = true;
                     }
                     //Extra feature to check KeyPress Down in non supported platforms
@@ -1000,21 +1000,20 @@ namespace Kyub.UI
                 m_SetCaretVisibleInfo.Invoke(this, null);
         }
 
+        protected virtual void SafeDeactivateInputFieldInternal()
+        {
+#if TMP_1_4_0_OR_NEWER
+            base.DeactivateInputField(false);
+#else
+            base.DeactivateInputField();
+#endif
+        }
+
 #if TMP_1_4_0_OR_NEWER
         public void DeactivateInputField()
-        {
-            if (IsNativeKeyboardSupported())
-            {
-                var nativeBox = GetComponent<MobileInputBehaviour>();
-                if (nativeBox != null)
-                {
-                    nativeBox.Hide();
-                }
-            }
-            DeactivateInputField(false);
-        }
 #else
         public new void DeactivateInputField()
+#endif
         {
             if (IsNativeKeyboardSupported())
             {
@@ -1024,9 +1023,9 @@ namespace Kyub.UI
                     nativeBox.Hide();
                 }
             }
-            base.DeactivateInputField();
+            SafeDeactivateInputFieldInternal();
         }
-#endif
+
         #endregion
 
         #region Internal Important Fields
