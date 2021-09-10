@@ -913,6 +913,19 @@ namespace Kyub.UI
                 m_SetCaretVisibleInfo.Invoke(this, null);
         }
 
+        public new void DeactivateInputField()
+        {
+            if (IsNativeKeyboardSupported())
+            {
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null)
+                {
+                    nativeBox.Hide();
+                }
+            }
+            base.DeactivateInputField();
+        }
+
         #endregion
 
         #region Internal Important Fields

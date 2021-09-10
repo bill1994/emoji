@@ -1992,22 +1992,26 @@ namespace MaterialUI
         {
             if (inputField != null)
             {
-                if (inputField is TMP_InputField)
-                    (inputField as TMP_InputField).DeactivateInputField();
-                else
-                {
-                    var method = inputField.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).FirstOrDefault(m =>
-                                m.Name == "DeactivateInputField" &&
-                                m.GetParameters().Length == 0);
 
-                    if (method != null)
+                var invoked = false;
+                var method = inputField.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).FirstOrDefault(m =>
+                            m.Name == "DeactivateInputField" &&
+                            m.GetParameters().Length == 0);
+
+                if (method != null)
+                {
+                    var parameters = method.GetParameters();
+                    if (parameters == null || parameters.Length == 0)
                     {
-                        var parameters = method.GetParameters();
-                        if (parameters == null || parameters.Length == 0)
-                        {
-                            method.Invoke(inputField, null);
-                        }
+                        method.Invoke(inputField, null);
+                        invoked = true;
                     }
+                }
+
+                if (!invoked)
+                {
+                    if (inputField is TMP_InputField)
+                        (inputField as TMP_InputField).DeactivateInputField();
                 }
             }
 

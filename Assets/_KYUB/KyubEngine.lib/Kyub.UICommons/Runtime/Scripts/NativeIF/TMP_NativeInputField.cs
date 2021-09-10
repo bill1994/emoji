@@ -1003,7 +1003,28 @@ namespace Kyub.UI
 #if TMP_1_4_0_OR_NEWER
         public void DeactivateInputField()
         {
+            if (IsNativeKeyboardSupported())
+            {
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null)
+                {
+                    nativeBox.Hide();
+                }
+            }
             DeactivateInputField(false);
+        }
+#else
+        public new void DeactivateInputField()
+        {
+            if (IsNativeKeyboardSupported())
+            {
+                var nativeBox = GetComponent<MobileInputBehaviour>();
+                if (nativeBox != null)
+                {
+                    nativeBox.Hide();
+                }
+            }
+            base.DeactivateInputField();
         }
 #endif
         #endregion
