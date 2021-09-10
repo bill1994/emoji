@@ -258,6 +258,8 @@ BOOL multiline;
             keyType = UIKeyboardTypeURL;
         } else if ([keyboardType isEqualToString:@"NumberPad"]) {
             keyType = UIKeyboardTypeNumberPad;
+        } else if ([keyboardType isEqualToString:@"DecimalPad"]) {
+            keyType = UIKeyboardTypeDecimalPad;
         } else if ([keyboardType isEqualToString:@"PhonePad"]) {
             keyType = UIKeyboardTypePhonePad;
         } else if ([keyboardType isEqualToString:@"NamePhonePad"]) {
