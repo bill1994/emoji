@@ -30,7 +30,31 @@ namespace Kyub.UI
         [SerializeField]
         TextAnchor m_InnerAlign = TextAnchor.MiddleCenter;
 
-        public bool reverseOrder { get { return m_ReverseOrder; } set { SetProperty(ref m_ReverseOrder, value); } }
+#if UNITY_2020_3_OR_NEWER
+        //New Unity included new reverseArragenment in its core, we must include it in our logic
+        public new bool reverseArrangement { get { return reverseOrder; } set { reverseOrder = value; } }
+#endif
+        public bool reverseOrder
+        {
+            get
+            {
+#if UNITY_2020_3_OR_NEWER
+                if (m_ReverseArrangement)
+                {
+                    SetProperty(ref m_ReverseOrder, true);
+                    SetProperty(ref m_ReverseArrangement, false);
+                }
+#endif
+                return m_ReverseOrder;
+            }
+            set
+            {
+                SetProperty(ref m_ReverseOrder, value);
+#if UNITY_2020_3_OR_NEWER
+                SetProperty(ref m_ReverseArrangement, false);
+#endif
+            }
+        }
         public ForceExpandMode forceExpandMode { get { return m_ForceExpandMode; } set { SetProperty(ref m_ForceExpandMode, value); } }
 
         public TextAnchor innerAlign { get { return m_InnerAlign; } set { SetProperty(ref m_InnerAlign, value); } }
@@ -38,6 +62,20 @@ namespace Kyub.UI
         public float maxInnerHeight { get { return m_MaxInnerHeight; } set { SetProperty(ref m_MaxInnerHeight, value); } }
 
         Dictionary<int, List<int>> m_AxisPreFilterIndexes = new Dictionary<int, List<int>>() { { 0, new List<int>() }, { 1, new List<int>() } };
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+#if UNITY_2020_3_OR_NEWER
+            if (m_ReverseArrangement)
+            {
+                SetProperty(ref m_ReverseOrder, true);
+                SetProperty(ref m_ReverseArrangement, false);
+            }
+#endif
+        }
+#endif
 
         public override void CalculateLayoutInputHorizontal()
         {
