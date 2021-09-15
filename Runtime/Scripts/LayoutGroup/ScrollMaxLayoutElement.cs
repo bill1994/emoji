@@ -67,7 +67,7 @@ namespace Kyub.UI
         {
             get
             {
-                return _isVisible;
+                return _isVisible || (!Application.isPlaying && gameObject.activeInHierarchy);
             }
         }
 
@@ -157,7 +157,7 @@ namespace Kyub.UI
         protected void ApplyElementSize()
         {
             CancelInvoke("ApplyElementSize");
-            if (ScrollLayoutGroup != null && LayoutElementIndex >= 0 && _isVisible)
+            if (ScrollLayoutGroup != null && LayoutElementIndex >= 0 && IsVisible)
             {
                 if (IsReloading())
                     SetElementSizeDirty();

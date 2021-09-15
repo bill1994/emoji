@@ -677,7 +677,7 @@ namespace Kyub.UI
 
         public virtual void TryRecalculateLayout(bool force = false)
         {
-            if (_elementsLayoutPosition.Count != _scrollElementsCachedSize.Count || _scrollElementsCachedSize.Count != m_elements.Count)
+            if (_elementsLayoutPosition.Count != _scrollElementsCachedSize.Count || _scrollElementsCachedSize.Count != m_elements.Count || force)
                 _layoutDirty = true;
             if (_layoutDirty)
             {
@@ -709,7 +709,7 @@ namespace Kyub.UI
 
         protected virtual bool IsFullRecalcRequired()
         {
-            return !Application.isPlaying || 
+            return !Application.isPlaying ||
                 (_lastFrameVisibleElementIndexes.x < 0 && _lastFrameVisibleElementIndexes.y < 0 && _cachedMinMaxIndex.x < 0 && _cachedMinMaxIndex.y < 0);
         }
 
@@ -1544,8 +1544,8 @@ namespace Kyub.UI
         {
             //As this way to recalculate layout will handle in problems in PlayMode we need only force execute in EditorMode
 #if UNITY_EDITOR
-            if(!Application.isPlaying)
-                TryRecalculateLayout();
+            if (!Application.isPlaying)
+                TryRecalculateLayout(true);
 #endif
         }
 
