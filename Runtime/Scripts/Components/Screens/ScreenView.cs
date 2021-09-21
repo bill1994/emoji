@@ -689,7 +689,7 @@ namespace MaterialUI
 
         public virtual void RevertStackToIndex(int stackIndex)
         {
-            var materialScreen = stackIndex < m_ScreenStack.Count && stackIndex >= 0?  m_ScreenStack[stackIndex] : null;
+            var materialScreen = stackIndex < m_ScreenStack.Count && stackIndex >= 0 ? m_ScreenStack[stackIndex] : null;
             RevertStackToScreen(materialScreen);
         }
 
@@ -716,9 +716,9 @@ namespace MaterialUI
         /// <returns></returns>
         public virtual MaterialScreen[] GetValidScreens()
         {
-            var validScreens = m_MaterialScreens != null? m_MaterialScreens.FindAll((a) => a != null && a.enabled) : null;
+            var validScreens = m_MaterialScreens != null ? m_MaterialScreens.FindAll((a) => a != null && a.enabled) : null;
 
-            return validScreens != null? validScreens.ToArray() : new MaterialScreen[0];
+            return validScreens != null ? validScreens.ToArray() : new MaterialScreen[0];
         }
 
         public virtual MaterialScreen GetScreenWithName(string screenPrefabPath)
@@ -974,7 +974,7 @@ namespace MaterialUI
             var validScreenIndex = GetNextScreenIndex(wrap);
             if (validScreenIndex >= 0)
             {
-                Transition(currentScreenIndex - 1);
+                Transition(validScreenIndex);
             }
         }
 
@@ -983,7 +983,7 @@ namespace MaterialUI
             var validScreenIndex = GetPreviousScreenIndex(wrap);
             if (validScreenIndex >= 0)
             {
-                Transition(currentScreenIndex - 1);
+                Transition(validScreenIndex);
             }
         }
 
@@ -992,7 +992,7 @@ namespace MaterialUI
             var validScreenIndex = GetNextValidScreenIndex(wrap);
             if (validScreenIndex >= 0)
             {
-                Transition(currentScreenIndex - 1);
+                Transition(validScreenIndex);
             }
         }
 
@@ -1001,7 +1001,7 @@ namespace MaterialUI
             var validScreenIndex = GetPreviousValidScreenIndex(wrap);
             if (validScreenIndex >= 0)
             {
-                Transition(currentScreenIndex - 1);
+                Transition(validScreenIndex);
             }
         }
 
@@ -1106,7 +1106,7 @@ namespace MaterialUI
             }
 
             if (validIndex < 0 || validIndex >= materialScreen.Count)
-                validIndex = wrap ? defaultWrapScreenIndex : - 1;
+                validIndex = wrap ? defaultWrapScreenIndex : -1;
 
             return validIndex;
         }
@@ -1135,7 +1135,7 @@ namespace MaterialUI
         #region Editor Only Functions
 
 #if UNITY_EDITOR
-        public virtual void TrackScreens()
+        public void TrackScreens()
         {
             if (IsDestroyed() || Application.isPlaying) return;
 
