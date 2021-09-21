@@ -709,7 +709,19 @@ namespace MaterialUI
 
         #region Public Helper Functions
 
-        public MaterialScreen GetScreenWithName(string screenPrefabPath)
+
+        /// <summary>
+        /// A valid screens is enabled one in materialScreen list
+        /// </summary>
+        /// <returns></returns>
+        public virtual MaterialScreen[] GetValidScreens()
+        {
+            var validScreens = m_MaterialScreens != null? m_MaterialScreens.FindAll((a) => a != null && a.enabled) : null;
+
+            return validScreens != null? validScreens.ToArray() : new MaterialScreen[0];
+        }
+
+        public virtual MaterialScreen GetScreenWithName(string screenPrefabPath)
         {
             MaterialScreen screenWithSameName = null;
             var partialNamePath = screenPrefabPath != null ? System.IO.Path.GetFileName(screenPrefabPath) : string.Empty;
@@ -803,17 +815,17 @@ namespace MaterialUI
             }
         }
 
-        public void Back()
+        public virtual void Back()
         {
             Back(Type.Out);
         }
 
-        public void Back(Type transitionType)
+        public virtual void Back(Type transitionType)
         {
             Back(transitionType, true);
         }
 
-        public void Back(Type transitionType, bool animate)
+        public virtual void Back(Type transitionType, bool animate)
         {
             var currentScreenIndex = m_CurrentScreenIndex;
             var lastScreen = PopFromScreenStack();
@@ -823,35 +835,35 @@ namespace MaterialUI
             RemoveFromScreenStack(currentScreenIndex);
         }
 
-        public void Transition(string screenName)
+        public virtual void Transition(string screenName)
         {
             Transition(screenName, transitionType);
         }
 
-        public void Transition(string screenName, Type transitionType, bool animate = true)
+        public virtual void Transition(string screenName, Type transitionType, bool animate = true)
         {
             var materialScreen = GetScreenWithName(screenName);
             Transition(materialScreen, transitionType, animate);
         }
 
-        public void Transition(MaterialScreen screen)
+        public virtual void Transition(MaterialScreen screen)
         {
             Transition(screen, transitionType);
         }
 
-        public void Transition(MaterialScreen screen, Type transitionType, bool animate = true)
+        public virtual void Transition(MaterialScreen screen, Type transitionType, bool animate = true)
         {
             var screenIndex = m_MaterialScreens.IndexOf(screen);
             if (screenIndex >= 0)
                 Transition(screenIndex, transitionType, animate);
         }
 
-        public void Transition(int screenIndex)
+        public virtual void Transition(int screenIndex)
         {
             Transition(screenIndex, transitionType);
         }
 
-        public void Transition(int screenIndex, Type transitionType, bool animate = true)
+        public virtual void Transition(int screenIndex, Type transitionType, bool animate = true)
         {
             if (0 > screenIndex || screenIndex >= materialScreen.Count || screenIndex == currentScreenIndex) return;
 
@@ -925,84 +937,100 @@ namespace MaterialUI
             onScreenBeginTransition.InvokeIfNotNull(screenIndex);
         }
 
-        public void TransitionImmediate(int screenIndex)
+        public virtual void TransitionImmediate(int screenIndex)
         {
             Transition(screenIndex, transitionType, false);
         }
 
-        public void TransitionImmediate(int screenIndex, Type transitionType)
+        public virtual void TransitionImmediate(int screenIndex, Type transitionType)
         {
             Transition(screenIndex, transitionType, false);
         }
 
-        public void TransitionImmediate(string screenName)
+        public virtual void TransitionImmediate(string screenName)
         {
             Transition(screenName, transitionType, false);
         }
 
-        public void TransitionImmediate(string screenName, Type transitionType)
+        public virtual void TransitionImmediate(string screenName, Type transitionType)
         {
             Transition(screenName, transitionType, false);
         }
 
-        public void TransitionImmediate(MaterialScreen screen)
+        public virtual void TransitionImmediate(MaterialScreen screen)
         {
             TransitionImmediate(screen, transitionType);
         }
 
-        public void TransitionImmediate(MaterialScreen screen, Type transitionType)
+        public virtual void TransitionImmediate(MaterialScreen screen, Type transitionType)
         {
             var screenIndex = m_MaterialScreens.IndexOf(screen);
             if (screenIndex >= 0)
                 Transition(screenIndex, transitionType, false);
         }
 
-        public void NextScreen(bool wrap = true)
+        public virtual void NextScreen(bool wrap = true)
         {
-            var nextScreenIndex = GetNextScreenIndex(wrap);
-            if (nextScreenIndex >= 0)
-                Transition(nextScreenIndex);
-        }
-
-        public void PreviousScreen(bool wrap = true)
-        {
-            if (currentScreenIndex >= 1)
+            var validScreenIndex = GetNextScreenIndex(wrap);
+            if (validScreenIndex >= 0)
             {
                 Transition(currentScreenIndex - 1);
             }
-            else if (wrap)
-            {
-                Transition(materialScreen.Count - 1);
-            }
         }
 
-        public int GetNextScreenIndex(bool wrap = true)
+        public virtual void PreviousScreen(bool wrap = true)
         {
-            if (currentScreenIndex < materialScreen.Count - 1 && currentScreenIndex >= 0)
+            var validScreenIndex = GetPreviousScreenIndex(wrap);
+            if (validScreenIndex >= 0)
             {
-                return currentScreenIndex + 1;
+                Transition(currentScreenIndex - 1);
             }
-            else if (wrap)
-            {
-                return 0;
-            }
-            return -1;
         }
 
-        public int GetPreviousScreenIndex(bool wrap = true)
+        public virtual void NextValidScreen(bool wrap = true)
         {
-            if (currentScreenIndex >= 1)
+            var validScreenIndex = GetNextValidScreenIndex(wrap);
+            if (validScreenIndex >= 0)
             {
-                return currentScreenIndex - 1;
+                Transition(currentScreenIndex - 1);
             }
-            else if (wrap)
-            {
-                return materialScreen.Count - 1;
-            }
-            return -1;
         }
 
-        public void RemoveInvalidScreens()
+        public virtual void PreviousValidScreen(bool wrap = true)
+        {
+            var validScreenIndex = GetPreviousValidScreenIndex(wrap);
+            if (validScreenIndex >= 0)
+            {
+                Transition(currentScreenIndex - 1);
+            }
+        }
+
+        public virtual int GetNextScreenIndex(bool wrap = true)
+        {
+            return GetNextScreenIndexInternal(wrap, false);
+        }
+
+        public virtual int GetNextValidScreenIndex(bool wrap = true)
+        {
+            return GetNextScreenIndexInternal(wrap, true);
+        }
+
+        public virtual int GetPreviousScreenIndex(bool wrap = true)
+        {
+            return GetPreviousScreenIndexInternal(wrap, false);
+        }
+
+        public virtual int GetPreviousValidScreenIndex(bool wrap = true)
+        {
+            return GetPreviousScreenIndexInternal(wrap, true);
+        }
+
+        public virtual void RemoveInvalidScreens()
+        {
+            RemoveInvalidScreens(false);
+        }
+
+        public virtual void RemoveInvalidScreens(bool removeDisabledScreens)
         {
             //Fix Material Screens
             if (m_MaterialScreens == null)
@@ -1010,7 +1038,7 @@ namespace MaterialUI
 
             for (int i = 0; i < m_MaterialScreens.Count; i++)
             {
-                if (m_MaterialScreens[i] == null)
+                if (m_MaterialScreens[i] == null || (removeDisabledScreens && !m_MaterialScreens[i].enabled))
                 {
                     m_MaterialScreens.RemoveAt(i);
 
@@ -1025,6 +1053,62 @@ namespace MaterialUI
             }
 
             m_CurrentScreenIndex = Mathf.Clamp(m_CurrentScreenIndex, 0, Math.Max(0, m_MaterialScreens.Count - 1));
+        }
+
+        protected virtual int GetNextScreenIndexInternal(bool wrap, bool checkIfIsValid)
+        {
+            int defaultWrapScreenIndex = 0;
+            var validIndex = -1;
+
+            if (currentScreenIndex < materialScreen.Count - 1 && currentScreenIndex >= 0)
+            {
+                validIndex = currentScreenIndex + 1;
+            }
+            else if (wrap)
+            {
+                validIndex = defaultWrapScreenIndex;
+            }
+
+            if (checkIfIsValid)
+            {
+                while (validIndex >= 0 && validIndex < materialScreen.Count && (materialScreen == null || !materialScreen[validIndex].enabled))
+                {
+                    validIndex++;
+                }
+            }
+
+            if (validIndex < 0 || validIndex >= materialScreen.Count)
+                validIndex = wrap ? defaultWrapScreenIndex : -1;
+
+            return validIndex;
+        }
+
+        protected virtual int GetPreviousScreenIndexInternal(bool wrap, bool checkIfIsValid)
+        {
+            int defaultWrapScreenIndex = materialScreen.Count - 1;
+            var validIndex = -1;
+
+            if (currentScreenIndex >= 1)
+            {
+                validIndex = currentScreenIndex - 1;
+            }
+            else if (wrap)
+            {
+                validIndex = defaultWrapScreenIndex;
+            }
+
+            if (checkIfIsValid)
+            {
+                while (validIndex >= 0 && validIndex < materialScreen.Count && (materialScreen == null || !materialScreen[validIndex].enabled))
+                {
+                    validIndex--;
+                }
+            }
+
+            if (validIndex < 0 || validIndex >= materialScreen.Count)
+                validIndex = wrap ? defaultWrapScreenIndex : - 1;
+
+            return validIndex;
         }
 
         #endregion
@@ -1051,7 +1135,7 @@ namespace MaterialUI
         #region Editor Only Functions
 
 #if UNITY_EDITOR
-        public void TrackScreens()
+        public virtual void TrackScreens()
         {
             if (IsDestroyed() || Application.isPlaying) return;
 
