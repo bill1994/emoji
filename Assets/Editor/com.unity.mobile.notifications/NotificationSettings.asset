@@ -14,9 +14,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toolbarInt: 0
   iOSNotificationEditorSettingsValues:
-    keys: []
-    values: []
+    keys:
+    - UnityNotificationRequestAuthorizationOnAppLaunch
+    - UnityNotificationDefaultAuthorizationOptions
+    - UnityAddRemoteNotificationCapability
+    - UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch
+    - UnityRemoteNotificationForegroundPresentationOptions
+    - UnityUseAPSReleaseEnvironment
+    - UnityUseLocationNotificationTrigger
+    values:
+    - True
+    - 7
+    - False
+    - False
+    - -1
+    - False
+    - False
   AndroidNotificationEditorSettingsValues:
-    keys: []
-    values: []
+    keys:
+    - UnityNotificationAndroidRescheduleOnDeviceRestart
+    - UnityNotificationAndroidUseCustomActivity
+    - UnityNotificationAndroidCustomActivityString
+    values:
+    - False
+    - False
+    - com.unity3d.player.UnityPlayerActivity
   TrackedResourceAssets: []

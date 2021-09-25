@@ -131,7 +131,7 @@ namespace Kyub.LocalNotification
         /// <summary>
         /// Gets a collection of notifications that are scheduled or queued.
         /// </summary>
-        public List<PendingNotification> PendingNotifications { get; private set; }
+        public List<PendingNotification> PendingNotifications { get; private set; } = new List<PendingNotification>();
 
         /// <summary>
         /// Gets or sets the serializer to use to save pending notifications to disk if we're in
@@ -392,9 +392,11 @@ namespace Kyub.LocalNotification
                     ((AndroidNotificationsPlatform)Platform).DefaultChannelId = notificationChannel.Id;
                 }
 
-                long[] vibrationPattern = null;
+                long[] vibrationPattern = new long[0];
                 if (notificationChannel.VibrationPattern != null)
+                {
                     vibrationPattern = notificationChannel.VibrationPattern.Select(v => (long)v).ToArray();
+                }
 
                 // Wrap channel in Android object
                 var androidChannel = new AndroidNotificationChannel(notificationChannel.Id, notificationChannel.Name,
