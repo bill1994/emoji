@@ -26,6 +26,9 @@ namespace Kyub.LocalNotification
         /// <inheritdoc />
         public void Serialize(IList<PendingNotification> notifications)
         {
+            if (notifications == null)
+                notifications = new List<PendingNotification>();
+
             using (var file = new FileStream(filename, FileMode.Create))
             {
                 using (var writer = new BinaryWriter(file))
