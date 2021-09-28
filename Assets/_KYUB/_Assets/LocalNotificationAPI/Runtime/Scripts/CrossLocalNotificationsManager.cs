@@ -385,7 +385,7 @@ namespace Kyub.LocalNotification
 
             Initialized = true;
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
             Platform = new AndroidNotificationsPlatform();
 
             // Register the notification channels
@@ -419,7 +419,7 @@ namespace Kyub.LocalNotification
 
                 AndroidNotificationCenter.RegisterNotificationChannel(androidChannel);
             }
-#elif UNITY_IOS
+#elif UNITY_IOS && !UNITY_EDITOR
             Platform = new iOSNotificationsPlatform();
 #else
             if ((m_genericPlatformMode.HasFlag(GenericPlatformModeEnum.Editor) && Application.isEditor) ||
