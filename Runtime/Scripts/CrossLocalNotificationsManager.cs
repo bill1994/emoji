@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
 using Unity.Notifications.Android;
 using Kyub.LocalNotification.Android;
-#elif UNITY_IOS
+#elif UNITY_IOS && !UNITY_EDITOR
 using Kyub.LocalNotification.iOS;
 #endif
 using UnityEngine;
