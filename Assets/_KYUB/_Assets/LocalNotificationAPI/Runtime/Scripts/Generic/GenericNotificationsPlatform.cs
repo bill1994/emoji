@@ -71,12 +71,17 @@ namespace Kyub.LocalNotification.Generic
         {
             if (_scheduledNotifications != null && _scheduledNotifications.Count > 0)
             {
-                var notifications = _scheduledNotifications[0];
+                var notification = _scheduledNotifications[0];
 
-                if (notifications == null || notifications.DeliveryTime == null || notifications.DeliveryTime >= DateTime.Now)
+                if (notification == null || notification.DeliveryTime == null || notification.DeliveryTime >= DateTime.Now)
                 {
                     _scheduledNotifications.RemoveAt(0);
-                    NotificationReceived?.Invoke(notifications);
+                    if (notification != null)
+                    {
+                        NotificationReceived?.Invoke(notification);
+
+                        Debug.Log($"NotificationId: '{notification.Id}'\nTitle: {notification.Title}\nBody: {notification.Body}");
+                     }
                 }
             }
         }
@@ -95,7 +100,7 @@ namespace Kyub.LocalNotification.Generic
             else
             {
                 if (notification.DeliveryTime == null)
-                    _scheduledNotifications.Add(notification);
+                    _scheduledNotifications.Insert(0, notification);
 
                 int addIndex = 0;
                 for (int i = 0; i < _scheduledNotifications.Count; i++)
