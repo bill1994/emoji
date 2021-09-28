@@ -257,7 +257,7 @@ namespace MaterialUI
 
         protected bool? _CachedSupportPromptStatus = null;
 
-        protected bool _CachedIsTextValid = true;
+        protected bool? _CachedIsTextValid = null;
 
         //#if UNITY_EDITOR
         //        private string m_LastHintText;
@@ -322,11 +322,11 @@ namespace MaterialUI
         {
             get
             {
-                return _CachedIsTextValid;
+                return _CachedIsTextValid != null && _CachedIsTextValid.Value;
             }
             set
             {
-                if (_CachedIsTextValid == value)
+                if (_CachedIsTextValid != null && _CachedIsTextValid.Value == value)
                     return;
                 _CachedIsTextValid = value;
                 RefreshVisualStyles();
@@ -2153,7 +2153,7 @@ namespace MaterialUI
                 {
                     TweenManager.EndTween(_ValidationTweener);
 
-                    if (!_CachedIsTextValid)
+                    if (!cachedIsTextValid)
                     {
                         if (Application.isPlaying)
                         {
@@ -2402,7 +2402,18 @@ namespace MaterialUI
 
         public bool IsTextValid()
         {
-            return !m_HasValidation || _CachedIsTextValid;
+            if (_CachedIsTextValid == null)
+            {
+                ITextValidator validator = m_TextValidator != null ? m_TextValidator.GetComponent<ITextValidator>() : null;
+                if (_CustomTextValidator != null)
+                {
+                    if (validator != null && validator != customTextValidator)
+                        validator.Dispose();
+                    validator = customTextValidator;
+                }
+                cachedIsTextValid = validator != null && m_HasValidation && validator.IsTextValid();
+            }
+            return !m_HasValidation || cachedIsTextValid;
         }
 
         public bool IsSelected()
