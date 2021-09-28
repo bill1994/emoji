@@ -1,3 +1,4 @@
+using Kyub.LocalNotification.Generic;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,9 @@ namespace Kyub.LocalNotification
     public class CrossLocalNotificationsManager : Singleton<CrossLocalNotificationsManager>
     {
         #region Helper Classes
+
+        [System.Flags]
+        public enum GenericPlatformModeEnum { Editor = 1, Build = 2 }
 
         [Flags]
         public enum OperatingMode
@@ -83,6 +87,8 @@ namespace Kyub.LocalNotification
         #endregion
 
         #region Private Variables
+        [SerializeField, Tooltip("Activate Generic Platform on Unsupported Runtime Platforms")]
+        protected GenericPlatformModeEnum m_genericPlatformMode = GenericPlatformModeEnum.Editor | GenericPlatformModeEnum.Build;
 
         [SerializeField, Tooltip("Auto Initialize Notification Center OnStart")]
         protected bool m_autoInitialize = true;
@@ -415,8 +421,13 @@ namespace Kyub.LocalNotification
             }
 #elif UNITY_IOS
             Platform = new iOSNotificationsPlatform();
+#else
+            if ((m_genericPlatformMode.HasFlag(GenericPlatformModeEnum.Editor) && Application.isEditor) ||
+                (m_genericPlatformMode.HasFlag(GenericPlatformModeEnum.Build) && Application.isPlaying && !Application.isEditor))
+            {
+                Platform = new GenericNotificationsPlatform();
+            }
 #endif
-
             if (Platform == null)
             {
                 return;
