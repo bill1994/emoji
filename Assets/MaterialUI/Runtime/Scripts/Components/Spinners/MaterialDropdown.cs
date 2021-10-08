@@ -42,6 +42,8 @@ namespace MaterialUI
         protected Graphic m_IconComponent = null;
         [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_SupportEmptySelection")]
         protected bool m_AllowSwitchOff = true;
+        [SerializeField, Tooltip("Use this property if dropdown require to be just an Action List Button")]
+        protected bool m_PreventSelection = false;
         [SerializeField, Tooltip("Will always apply hint option to text/icon or will only show option when selectedIndex is -1?")]
         protected bool m_AlwaysDisplayHintOption = false;
         [Space]
@@ -174,6 +176,18 @@ namespace MaterialUI
         {
             get { return m_AllowSwitchOff; }
             set { m_AllowSwitchOff = value; }
+        }
+
+        public bool preventSelection
+        {
+            get { return m_PreventSelection; }
+            set 
+            {
+                if (m_PreventSelection == value)
+                    return;
+                m_PreventSelection = value;
+                Select(m_SelectedIndex);
+            }
         }
 
         public OptionData hintOption
@@ -381,11 +395,11 @@ namespace MaterialUI
             else
                 selectedItemIndex = m_AllowSwitchOff ? selectedItemIndex : Mathf.Clamp(selectedItemIndex, 0, options.Count - 1);
 
-            m_SelectedIndex = selectedItemIndex;
-
             var option = selectedItemIndex >= 0 && selectedItemIndex < options.Count ? options[selectedItemIndex] : null;
             if (option == null)
                 option = m_HintOption;
+
+            m_SelectedIndex = m_PreventSelection ? -1 : selectedItemIndex;
 
             UpdateLabelState();
 
