@@ -34,6 +34,7 @@ namespace MaterialUI
         private SerializedProperty m_HintIconComponent;
 
         private SerializedProperty m_AllowSwitchOff;
+        private SerializedProperty m_PreventSelection;
         private SerializedProperty m_SelectedIndex;
 
         private SerializedProperty OnCancelCallback;
@@ -69,6 +70,7 @@ namespace MaterialUI
 
             m_SelectedIndex = serializedObject.FindProperty("m_SelectedIndex");
             m_AllowSwitchOff = serializedObject.FindProperty("m_AllowSwitchOff");
+            m_PreventSelection = serializedObject.FindProperty("m_PreventSelection");
 
             OnCancelCallback = serializedObject.FindProperty("OnCancelCallback");
             OnShowCallback = serializedObject.FindProperty("OnShowRadioDialogCallback");
@@ -82,6 +84,7 @@ namespace MaterialUI
 
         public override void OnInspectorGUI()
         {
+            var cachedEnabled = GUI.enabled;
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(m_UIShowTriggerMode);
@@ -89,6 +92,8 @@ namespace MaterialUI
             EditorGUILayout.Space();
 
             LayoutStyle_PropertyField(m_AllowSwitchOff);
+            LayoutStyle_PropertyField(m_PreventSelection);
+
             EditorGUILayout.IntSlider(m_SelectedIndex, -1, m_OptionDataList.FindPropertyRelative("m_Options").arraySize - 1);
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(m_CustomFramePrefabAddress, new GUIContent("Custom Address"));

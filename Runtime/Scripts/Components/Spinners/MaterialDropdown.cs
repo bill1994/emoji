@@ -228,7 +228,13 @@ namespace MaterialUI
 
         public int selectedIndex
         {
-            get { return m_SelectedIndex; }
+            get 
+            {
+                if (m_SelectedIndex >= 0 && m_PreventSelection)
+                    m_SelectedIndex = -1;
+
+                return m_SelectedIndex; 
+            }
             set
             {
                 var clampedValue = Mathf.Clamp(value, -1, options.Count - 1);
