@@ -377,20 +377,77 @@ namespace Kyub.Performance
 
         #region Helper Functions
 
+        /// <summary>
+        /// Last Buffer that grabbed the Mouse/Touch Event
+        /// </summary>
+        /// <returns></returns>
         public static BufferRawImage GetEventBuffer()
         {
             return s_eventBuffer;
         }
 
-        public static Vector2 ConvertPosition(Vector2 mousePosition)
+        /// <summary>
+        /// Use this function to detect if position is valid for interaction (click not blocked by other Non-BufferRawImage UIs)
+        /// </summary>
+        /// <param name="screenPosition"></param>
+        /// <returns></returns>
+        public static bool IsValidInteractionPosition(Vector2 screenPosition)
+        {
+            var isValid = true;
+
+            var unitySystem = UnityEngine.EventSystems.EventSystem.current;
+            if (unitySystem != null)
+            {
+                var buffer = BufferRawImage.GetEventBuffer();
+
+                var eventDataCurrentPosition = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
+                eventDataCurrentPosition.position = new Vector2(screenPosition.x, screenPosition.y);
+                var results = new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+                unitySystem.RaycastAll(eventDataCurrentPosition, results);
+
+                if (results.Count > 0 && (buffer == null || results[0].gameObject != buffer.gameObject))
+                {
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Convert UI screen position to real mapped screen position.
+        /// </summary>
+        /// <param name="uiScreenPosition"></param>
+        /// <returns></returns>
+        public static Vector2 ConvertPosition(Vector2 uiScreenPosition)
         {
             if (s_eventBuffer != null)
             {
-                var normalizedPosition = Rect.PointToNormalized(s_eventBuffer.ScreenRect, mousePosition);
+                var normalizedPosition = Rect.PointToNormalized(s_eventBuffer.ScreenRect, uiScreenPosition);
                 var convertedNormalizedPosition = Rect.NormalizedToPoint(s_eventBuffer.uvRect, normalizedPosition); //normalized relative to screen (with conversion applied)
                 return Rect.NormalizedToPoint(new Rect(0, 0, Screen.width, Screen.height), convertedNormalizedPosition);
             }
-            return mousePosition;
+            return uiScreenPosition;
+        }
+
+        /// <summary>
+        /// Mouse position converted using last event buffer click position
+        /// </summary>
+        public static Vector2 ConvertedMousePosition
+        {
+            get
+            {
+                return ConvertPosition(InputCompat.mousePosition);
+            }
+        }
+
+        /// <summary>
+        /// Touch Position converted using last event buffer click position
+        /// </summary>
+        public static Vector2 GetConvertedTouchPosition(int index)
+        {
+            var touch = InputCompat.GetTouch(index);
+            return ConvertPosition(touch.position);
         }
 
         #endregion
