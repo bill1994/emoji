@@ -430,26 +430,6 @@ namespace Kyub.Performance
             return uiScreenPosition;
         }
 
-        /// <summary>
-        /// Mouse position converted using last event buffer click position
-        /// </summary>
-        public static Vector2 ConvertedMousePosition
-        {
-            get
-            {
-                return ConvertPosition(InputCompat.mousePosition);
-            }
-        }
-
-        /// <summary>
-        /// Touch Position converted using last event buffer click position
-        /// </summary>
-        public static Vector2 GetConvertedTouchPosition(int index)
-        {
-            var touch = InputCompat.GetTouch(index);
-            return ConvertPosition(touch.position);
-        }
-
         #endregion
     }
 }
