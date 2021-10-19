@@ -151,8 +151,6 @@ namespace Kyub.EventSystems
         {
             get
             {
-
-
 #if NEW_INPUT_SYSTEM_ACTIVE
                 if (Touchscreen.current != null)
                 {
@@ -161,6 +159,8 @@ namespace Kyub.EventSystems
 
                     return UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count;
                 }
+                return 0;
+
                 //return Touchscreen.current != null ? Touchscreen.current.touches.Count : 0;
 #else
                 return Input.touchCount;
