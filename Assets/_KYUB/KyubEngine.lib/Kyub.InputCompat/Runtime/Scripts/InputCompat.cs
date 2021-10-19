@@ -108,6 +108,14 @@ namespace Kyub.EventSystems
             get
             {
 #if NEW_INPUT_SYSTEM_ACTIVE
+                if(Mouse.current == null && Touchscreen.current != null)
+                {
+                    if(!UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
+                        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+
+                    if(UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches > 0)
+                        return UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches[0].screenPosition;
+                }
                 return Pointer.current != null && Pointer.current.position != null ? Pointer.current.position.ReadValue() : Vector2.zero;
 #else
                 return Input.mousePosition;
@@ -146,7 +154,13 @@ namespace Kyub.EventSystems
 
 
 #if NEW_INPUT_SYSTEM_ACTIVE
-                return UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count;
+                if (Touchscreen.current != null)
+                {
+                    if(!UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
+                        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+
+                    return UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count;
+                }
                 //return Touchscreen.current != null ? Touchscreen.current.touches.Count : 0;
 #else
                 return Input.touchCount;
@@ -627,7 +641,6 @@ namespace Kyub.EventSystems
 #if NEW_INPUT_SYSTEM_ACTIVE
         static void HandleOnSceneLoaded(Scene scene1, Scene scene2)
         {
-            UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             RegisterEvents();
         }
 
