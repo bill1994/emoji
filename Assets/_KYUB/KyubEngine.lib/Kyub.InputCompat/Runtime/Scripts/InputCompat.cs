@@ -143,8 +143,11 @@ namespace Kyub.EventSystems
         {
             get
             {
+
+
 #if NEW_INPUT_SYSTEM_ACTIVE
-                return Touchscreen.current != null ? Touchscreen.current.touches.Count : 0;
+                return UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count;
+                //return Touchscreen.current != null ? Touchscreen.current.touches.Count : 0;
 #else
                 return Input.touchCount;
 #endif
@@ -269,11 +272,21 @@ namespace Kyub.EventSystems
         public static Touch GetTouch(int index)
         {
 #if NEW_INPUT_SYSTEM_ACTIVE
-            TouchControl touch = null;
-            if (Touchscreen.current != null && index >= 0 && index < Touchscreen.current.touches.Count)
-                touch = Touchscreen.current.touches[index];
+            //TouchControl touch = null;
+            //if (Touchscreen.current != null && index >= 0 && index < Touchscreen.current.touches.Count)
+            //   touch = Touchscreen.current.touches[index];
 
-            return ConvertToLegacyTouch(touch);
+            //return ConvertToLegacyTouch(touch);
+
+            var enhacedTouch = default(UnityEngine.InputSystem.EnhancedTouch.Touch);
+            if (UnityEngine.InputSystem.Touchscreen.current != null &&
+                index >= 0 &&
+                index < UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count)
+            {
+                enhacedTouch = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches[index];
+            }
+
+            return ConvertToLegacyTouch(enhacedTouch);
 #else
             return Input.GetTouch(index);
 #endif
@@ -508,6 +521,38 @@ namespace Kyub.EventSystems
             return keyWithName;
         }
 
+        static Touch ConvertToLegacyTouch(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+        {
+            Touch uiTouch = new Touch();
+
+            var isPrimary = UnityEngine.InputSystem.Touchscreen.current != null && 
+                UnityEngine.InputSystem.Touchscreen.current.primaryTouch != null
+                && touch.touchId == UnityEngine.InputSystem.Touchscreen.current.primaryTouch.touchId.ReadValue();
+            uiTouch = new Touch();
+            uiTouch.type = isPrimary ? TouchType.Direct : TouchType.Indirect;
+            uiTouch.altitudeAngle = 0;
+            uiTouch.azimuthAngle = 0;
+            uiTouch.deltaPosition = touch.delta;
+            uiTouch.deltaTime = Time.realtimeSinceStartup - (float)touch.startTime;
+            uiTouch.fingerId = touch.touchId;
+            uiTouch.maximumPossiblePressure = 1f;
+
+            UnityEngine.TouchPhase touchPhase;
+            if (!System.Enum.TryParse(touch.phase.ToString(), out touchPhase))
+                touchPhase = (UnityEngine.TouchPhase)0;
+            uiTouch.phase = touchPhase;
+            uiTouch.position = touch.screenPosition;
+            uiTouch.pressure = touch.pressure;
+
+            var pressureRadiusValue = touch.radius;
+            uiTouch.radius = Mathf.Max(pressureRadiusValue.x, pressureRadiusValue.y);
+            uiTouch.radiusVariance = Mathf.Abs(pressureRadiusValue.x - pressureRadiusValue.y);
+            uiTouch.rawPosition = uiTouch.position;
+            uiTouch.tapCount = touch.tapCount;
+
+            return uiTouch;
+        }
+
         static Touch ConvertToLegacyTouch(TouchControl touch)
         {
             Touch uiTouch = new Touch();
@@ -582,6 +627,7 @@ namespace Kyub.EventSystems
 #if NEW_INPUT_SYSTEM_ACTIVE
         static void HandleOnSceneLoaded(Scene scene1, Scene scene2)
         {
+            UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
             RegisterEvents();
         }
 
