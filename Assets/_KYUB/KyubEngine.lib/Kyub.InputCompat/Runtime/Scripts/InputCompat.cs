@@ -113,7 +113,7 @@ namespace Kyub.EventSystems
                     if(!UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled)
                         UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
 
-                    if(UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches > 0)
+                    if(UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count > 0)
                         return UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches[0].screenPosition;
                 }
                 return Pointer.current != null && Pointer.current.position != null ? Pointer.current.position.ReadValue() : Vector2.zero;
