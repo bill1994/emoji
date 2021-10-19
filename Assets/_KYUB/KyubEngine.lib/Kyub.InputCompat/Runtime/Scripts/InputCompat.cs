@@ -102,7 +102,9 @@ namespace Kyub.EventSystems
 #endif
             }
         }
-
+#if NEW_INPUT_SYSTEM_ACTIVE
+        static Vector2 _trackedMousePosition = Vector2.zero;
+#endif
         public static Vector2 mousePosition
         {
             get
@@ -114,9 +116,14 @@ namespace Kyub.EventSystems
                         UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
 
                     if(UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count > 0)
-                        return UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches[0].screenPosition;
+                    {
+                        _trackedMousePosition = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches[0].screenPosition;
+                        return _trackedMousePosition;
+                    }
                 }
-                return Pointer.current != null && Pointer.current.position != null ? Pointer.current.position.ReadValue() : Vector2.zero;
+
+                _trackedMousePosition = Pointer.current != null && Pointer.current.position != null ? Pointer.current.position.ReadValue() : _trackedMousePosition;
+                return _trackedMousePosition;
 #else
                 return Input.mousePosition;
 #endif
