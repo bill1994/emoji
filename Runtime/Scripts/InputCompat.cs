@@ -135,7 +135,9 @@ namespace Kyub.EventSystems
             get
             {
 #if NEW_INPUT_SYSTEM_ACTIVE
-                return Mouse.current != null && Mouse.current.scroll != null ? Mouse.current.scroll.ReadValue() : Vector2.zero;
+                var value = Mouse.current != null && Mouse.current.scroll != null ? Mouse.current.scroll.ReadValue() : Vector2.zero;
+                value.y = value.y/1000.0f;
+                return value;
 #else
                 return Input.mouseScrollDelta;
 #endif
@@ -371,7 +373,7 @@ namespace Kyub.EventSystems
             else if (axisName == "Mouse ScrollWheel")
             {
                 if (Mouse.current != null)
-                    return Mouse.current.scroll != null ? Mouse.current.scroll.ReadValue().y : 0;
+                    return mouseScrollDelta.y;
                 else if (Joystick.current != null)
                     return Joystick.current.twist != null ? Joystick.current.twist.ReadValue() : 0;
             }
@@ -546,30 +548,33 @@ namespace Kyub.EventSystems
         {
             Touch uiTouch = new Touch();
 
-            var isPrimary = UnityEngine.InputSystem.Touchscreen.current != null && 
-                UnityEngine.InputSystem.Touchscreen.current.primaryTouch != null
-                && touch.touchId == UnityEngine.InputSystem.Touchscreen.current.primaryTouch.touchId.ReadValue();
-            uiTouch = new Touch();
-            uiTouch.type = isPrimary ? TouchType.Direct : TouchType.Indirect;
-            uiTouch.altitudeAngle = 0;
-            uiTouch.azimuthAngle = 0;
-            uiTouch.deltaPosition = touch.delta;
-            uiTouch.deltaTime = Time.realtimeSinceStartup - (float)touch.startTime;
-            uiTouch.fingerId = touch.touchId;
-            uiTouch.maximumPossiblePressure = 1f;
+            if(touch.valid)
+            {
+                var isPrimary = UnityEngine.InputSystem.Touchscreen.current != null && 
+                    UnityEngine.InputSystem.Touchscreen.current.primaryTouch != null
+                    && touch.touchId == UnityEngine.InputSystem.Touchscreen.current.primaryTouch.touchId.ReadValue();
+                uiTouch = new Touch();
+                uiTouch.type = isPrimary ? TouchType.Direct : TouchType.Indirect;
+                uiTouch.altitudeAngle = 0;
+                uiTouch.azimuthAngle = 0;
+                uiTouch.deltaPosition = touch.delta;
+                uiTouch.deltaTime = Time.realtimeSinceStartup - (float)touch.startTime;
+                uiTouch.fingerId = touch.touchId;
+                uiTouch.maximumPossiblePressure = 1f;
 
-            UnityEngine.TouchPhase touchPhase;
-            if (!System.Enum.TryParse(touch.phase.ToString(), out touchPhase))
-                touchPhase = (UnityEngine.TouchPhase)0;
-            uiTouch.phase = touchPhase;
-            uiTouch.position = touch.screenPosition;
-            uiTouch.pressure = touch.pressure;
+                UnityEngine.TouchPhase touchPhase;
+                if (!System.Enum.TryParse(touch.phase.ToString(), out touchPhase))
+                    touchPhase = (UnityEngine.TouchPhase)0;
+                uiTouch.phase = touchPhase;
+                uiTouch.position = touch.screenPosition;
+                uiTouch.pressure = touch.pressure;
 
-            var pressureRadiusValue = touch.radius;
-            uiTouch.radius = Mathf.Max(pressureRadiusValue.x, pressureRadiusValue.y);
-            uiTouch.radiusVariance = Mathf.Abs(pressureRadiusValue.x - pressureRadiusValue.y);
-            uiTouch.rawPosition = uiTouch.position;
-            uiTouch.tapCount = touch.tapCount;
+                var pressureRadiusValue = touch.radius;
+                uiTouch.radius = Mathf.Max(pressureRadiusValue.x, pressureRadiusValue.y);
+                uiTouch.radiusVariance = Mathf.Abs(pressureRadiusValue.x - pressureRadiusValue.y);
+                uiTouch.rawPosition = uiTouch.position;
+                uiTouch.tapCount = touch.tapCount;
+            }
 
             return uiTouch;
         }
