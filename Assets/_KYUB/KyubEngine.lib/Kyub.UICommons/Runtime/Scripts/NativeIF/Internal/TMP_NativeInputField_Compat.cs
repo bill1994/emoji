@@ -597,7 +597,7 @@ namespace Kyub.UI
             {
                 if (m_CompositionLengthInfo == null)
                     m_CompositionLengthInfo = typeof(Selectable).GetProperty("compositionLength", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_CompositionLengthInfo.GetValue(this);
+                var value = m_CompositionLengthInfo != null? m_CompositionLengthInfo.GetValue(this) : (object)0;
                 return value is int ? (int)value : 0;
             }
         }
@@ -619,7 +619,7 @@ namespace Kyub.UI
             {
                 if (m_IsPointerDownInfo == null)
                     m_IsPointerDownInfo = typeof(Selectable).GetProperty("isPointerDown", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_IsPointerDownInfo.GetValue(this);
+                var value = m_IsPointerDownInfo != null? m_IsPointerDownInfo.GetValue(this) : (object)false;
                 return value is bool ? (bool)value : false;
             }
             set
@@ -638,7 +638,7 @@ namespace Kyub.UI
             {
                 if (m_SelectedObjectInfo == null)
                     m_SelectedObjectInfo = typeof(TMPro.TMP_InputField).GetField("m_SelectedObject", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_SelectedObjectInfo.GetValue(this);
+                var value = m_SelectedObjectInfo != null? m_SelectedObjectInfo.GetValue(this) : (object)null;
                 return value as GameObject;
             }
             set
@@ -657,7 +657,7 @@ namespace Kyub.UI
             {
                 if (m_HasDoneFocusTransitionInfo == null)
                     m_HasDoneFocusTransitionInfo = typeof(TMPro.TMP_InputField).GetField("m_HasDoneFocusTransition", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_HasDoneFocusTransitionInfo.GetValue(this);
+                var value = m_HasDoneFocusTransitionInfo != null? m_HasDoneFocusTransitionInfo.GetValue(this) : (object)false;
                 return value is bool ? (bool)value : false;
             }
             set
@@ -676,7 +676,7 @@ namespace Kyub.UI
             {
                 if (m_ReleaseSelectionInfo == null)
                     m_ReleaseSelectionInfo = typeof(TMPro.TMP_InputField).GetField("m_ReleaseSelection", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_ReleaseSelectionInfo.GetValue(this);
+                var value = m_ReleaseSelectionInfo != null? m_ReleaseSelectionInfo.GetValue(this) : (object)false;
                 return value is bool ? (bool)value : false;
             }
             set
@@ -695,7 +695,7 @@ namespace Kyub.UI
             {
                 if (m_SelectionStillActiveInfo == null)
                     m_SelectionStillActiveInfo = typeof(TMPro.TMP_InputField).GetField("m_SelectionStillActive", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_SelectionStillActiveInfo.GetValue(this);
+                var value = m_SelectionStillActiveInfo != null? m_SelectionStillActiveInfo.GetValue(this) : (object)false;
                 return value is bool ? (bool)value : false;
             }
             set
@@ -713,8 +713,8 @@ namespace Kyub.UI
             get
             {
                 if (m_IsScrollbarUpdateRequiredInfo == null)
-                    m_IsScrollbarUpdateRequiredInfo = typeof(TMPro.TMP_InputField).GetField("m_IsScrollbarUpdateRequired", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_IsScrollbarUpdateRequiredInfo.GetValue(this);
+                    m_IsScrollbarUpdateRequiredInfo = typeof(TMPro.TMP_InputField).GetField("m_IsUpdatingScrollbarValues", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var value = m_IsScrollbarUpdateRequiredInfo != null? m_IsScrollbarUpdateRequiredInfo.GetValue(this) : (object)false;
                 return value is bool ? (bool)value : false;
             }
             set
@@ -733,7 +733,7 @@ namespace Kyub.UI
             {
                 if (m_IsUpdatingScrollbarValuesInfo == null)
                     m_IsUpdatingScrollbarValuesInfo = typeof(TMPro.TMP_InputField).GetField("m_IsUpdatingScrollbarValues", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_IsUpdatingScrollbarValuesInfo.GetValue(this);
+                var value = m_IsUpdatingScrollbarValuesInfo != null? m_IsUpdatingScrollbarValuesInfo.GetValue(this) : (object)false;
                 return value is bool ? (bool)value : false;
             }
             set
@@ -752,7 +752,7 @@ namespace Kyub.UI
             {
                 if (m_BlinkStartTimeInfo == null)
                     m_BlinkStartTimeInfo = typeof(TMPro.TMP_InputField).GetField("m_BlinkStartTime", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_BlinkStartTimeInfo.GetValue(this);
+                var value = m_BlinkStartTimeInfo != null? m_BlinkStartTimeInfo.GetValue(this) : (object)0;
                 return value is float ? (float)value : 0;
             }
             set
@@ -771,7 +771,7 @@ namespace Kyub.UI
             {
                 if (m_ScrollPositionInfo == null)
                     m_ScrollPositionInfo = typeof(TMPro.TMP_InputField).GetField("m_ScrollPosition", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_ScrollPositionInfo.GetValue(this);
+                var value = m_ScrollPositionInfo != null? m_ScrollPositionInfo.GetValue(this) : (float)0;
                 return value is float ? (float)value : 0;
             }
             set
@@ -790,7 +790,7 @@ namespace Kyub.UI
             {
                 if (m_KeyDownStartTimeInfo == null)
                     m_KeyDownStartTimeInfo = typeof(TMPro.TMP_InputField).GetField("m_KeyDownStartTime", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_KeyDownStartTimeInfo.GetValue(this);
+                var value = m_KeyDownStartTimeInfo != null? m_KeyDownStartTimeInfo.GetValue(this) : (float)0;
                 return value is float ? (float)value : 0;
             }
             set
@@ -809,7 +809,7 @@ namespace Kyub.UI
             {
                 if (m_DoubleClickDelayInfo == null)
                     m_DoubleClickDelayInfo = typeof(TMPro.TMP_InputField).GetField("m_DoubleClickDelay", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_DoubleClickDelayInfo.GetValue(this);
+                var value = m_DoubleClickDelayInfo != null? m_DoubleClickDelayInfo.GetValue(this) : (object)0;
                 return value is float ? (float)value : 0;
             }
             set
@@ -828,7 +828,7 @@ namespace Kyub.UI
             {
                 if (m_PointerDownClickStartTimeInfo == null)
                     m_PointerDownClickStartTimeInfo = typeof(TMPro.TMP_InputField).GetField("m_PointerDownClickStartTime", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var value = m_PointerDownClickStartTimeInfo.GetValue(this);
+                var value = m_PointerDownClickStartTimeInfo != null? m_PointerDownClickStartTimeInfo.GetValue(this) : (object)0;
                 return value is float ? (float)value : 0;
             }
             set
