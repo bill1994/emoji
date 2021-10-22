@@ -1,5 +1,4 @@
 ﻿using System;
-using Unity.Notifications.iOS;
 using UnityEngine;
 using UnityEngine.Assertions;
 

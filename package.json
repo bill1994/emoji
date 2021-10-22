@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.localnotification",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "Kyub Local Notification",
   "description": "This package contains a Cross Local Notification Api",
   "unity": "2019.1",
