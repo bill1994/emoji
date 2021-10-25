@@ -239,6 +239,7 @@ namespace Kyub.Performance
                     return;
                 m_useHighPrecDepthBuffer = value;
 
+                ReleaseRenderBuffers();
                 CheckBufferTextures();
                 Invalidate();
             }
@@ -1192,8 +1193,7 @@ namespace Kyub.Performance
                 {
                     var screenSize = GetScreenSizeClamped(maxSize);
                     if (renderBuffer == null || !renderBuffer.IsCreated() ||
-                        renderBuffer.width != screenSize.x || renderBuffer.height != screenSize.y ||
-                        renderBuffer.depth != depthBufferSize)
+                        renderBuffer.width != screenSize.x || renderBuffer.height != screenSize.y)
                     {
                         ReleaseRenderBuffer(ref renderBuffer, cameraViews);
 
