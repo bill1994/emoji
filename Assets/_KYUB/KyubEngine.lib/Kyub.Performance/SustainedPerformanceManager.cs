@@ -203,7 +203,7 @@ namespace Kyub.Performance
         [SerializeField, IntPopup(-1, "ScreenSize", 16, 32, 64, 128, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2560, 3072, 4096)]
         int m_maxRenderBufferSize = -1;
         [SerializeField, Tooltip("Enable 32bits Depth Buffer")]
-        bool m_useHighPrecDepthBuffer = true;
+        bool m_useHighPrecDepthBuffer = false;
 
         [Space]
         [SerializeField, Tooltip("Enable this to activate DynamicFps Controller")]
