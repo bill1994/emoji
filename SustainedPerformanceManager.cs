@@ -61,6 +61,12 @@ namespace Kyub.Performance
             return instance != null ? instance.m_maxRenderBufferSize : -1;
         }
 
+        public static int GetDepthBufferSize()
+        {
+            var instance = GetInstanceFastSearch();
+            return instance != null && instance.UseHighPrecDepthBuffer ? 32 : 24;
+        }
+
         protected static Dictionary<int, RenderTexture> s_renderBufferDict = new Dictionary<int, RenderTexture>();
         public static RenderTexture GetRenderBuffer(int bufferIndex)
         {
@@ -73,7 +79,7 @@ namespace Kyub.Performance
                 renderBuffer = s_renderBufferDict[bufferIndex];
                 if ((s_useRenderBuffer && renderBuffer == null) || (!s_useRenderBuffer && renderBuffer != null))
                 {
-                    CheckBufferTexture(ref renderBuffer, GetRenderBufferMaxSize(bufferIndex));
+                    CheckBufferTexture(ref renderBuffer, GetRenderBufferMaxSize(bufferIndex), GetDepthBufferSize());
 
                     if (renderBuffer != null)
                         s_renderBufferDict[bufferIndex] = renderBuffer;
@@ -196,6 +202,8 @@ namespace Kyub.Performance
         [Space]
         [SerializeField, IntPopup(-1, "ScreenSize", 16, 32, 64, 128, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2560, 3072, 4096)]
         int m_maxRenderBufferSize = -1;
+        [SerializeField, Tooltip("Enable 32bits Depth Buffer")]
+        bool m_useHighPrecDepthBuffer = true;
 
         [Space]
         [SerializeField, Tooltip("Enable this to activate DynamicFps Controller")]
@@ -218,6 +226,23 @@ namespace Kyub.Performance
         #endregion
 
         #region Properties
+
+        public bool UseHighPrecDepthBuffer
+        {   
+            get
+            {
+                return m_useHighPrecDepthBuffer;
+            }
+            set
+            {
+                if (m_useHighPrecDepthBuffer == value)
+                    return;
+                m_useHighPrecDepthBuffer = value;
+
+                CheckBufferTextures();
+                Invalidate();
+            }
+        }
 
         public RenderTechniqueEnum RenderTechnique
         {
@@ -1131,7 +1156,7 @@ namespace Kyub.Performance
                 //Update Render Buffer Texture
                 else
                 {
-                    sucess = CheckBufferTexture(ref renderBuffer, GetRenderBufferMaxSize(bufferIndex), sceneViews) || sucess;
+                    sucess = CheckBufferTexture(ref renderBuffer, GetRenderBufferMaxSize(bufferIndex), GetDepthBufferSize(), sceneViews) || sucess;
                     s_renderBufferDict[bufferIndex] = renderBuffer;
                 }
             }
@@ -1154,12 +1179,12 @@ namespace Kyub.Performance
             return sucess;
         }
 
-        protected static bool CheckBufferTexture(ref RenderTexture renderBuffer, int maxSize, ICollection<SustainedCameraView> cameraViews = null)
+        protected static bool CheckBufferTexture(ref RenderTexture renderBuffer, int maxSize, int depthBufferSize, ICollection<SustainedCameraView> cameraViews = null)
         {
-            return CheckBufferTexture(ref renderBuffer, s_useRenderBuffer, maxSize, cameraViews);
+            return CheckBufferTexture(ref renderBuffer, s_useRenderBuffer, maxSize, depthBufferSize, cameraViews);
         }
 
-        protected static bool CheckBufferTexture(ref RenderTexture renderBuffer, bool isActive, int maxSize, ICollection<SustainedCameraView> cameraViews = null)
+        protected static bool CheckBufferTexture(ref RenderTexture renderBuffer, bool isActive, int maxSize, int depthBufferSize, ICollection<SustainedCameraView> cameraViews = null)
         {
             if (Application.isPlaying)
             {
@@ -1167,11 +1192,12 @@ namespace Kyub.Performance
                 {
                     var screenSize = GetScreenSizeClamped(maxSize);
                     if (renderBuffer == null || !renderBuffer.IsCreated() ||
-                        renderBuffer.width != screenSize.x || renderBuffer.height != screenSize.y)
+                        renderBuffer.width != screenSize.x || renderBuffer.height != screenSize.y ||
+                        renderBuffer.depth != depthBufferSize)
                     {
                         ReleaseRenderBuffer(ref renderBuffer, cameraViews);
 
-                        renderBuffer = new RenderTexture(screenSize.x, screenSize.y, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+                        renderBuffer = new RenderTexture(screenSize.x, screenSize.y, depthBufferSize, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
                         renderBuffer.antiAliasing = Mathf.Max(1, QualitySettings.antiAliasing);
                         renderBuffer.name = "RenderBuffer (" + renderBuffer.GetInstanceID() + ")";
                         renderBuffer.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
