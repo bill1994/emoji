@@ -230,7 +230,7 @@ namespace Kyub.LocalNotification
         /// </summary>
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
-            if (s_instance == this)
+            if (s_instance != this)
                 return;
 
             if (Platform == null || !Initialized)
@@ -247,7 +247,7 @@ namespace Kyub.LocalNotification
                 return;
             }
 
-            Platform.OnBackground();
+            Platform?.OnBackground();
 
             // Backgrounding
             // Queue future dated notifications
@@ -258,15 +258,15 @@ namespace Kyub.LocalNotification
                 {
                     PendingNotification pendingNotification = PendingNotifications[i];
                     // Ignore already scheduled ones
-                    if (pendingNotification.Notification.Scheduled)
+                    if (pendingNotification != null && pendingNotification.Notification.Scheduled)
                     {
                         continue;
                     }
 
                     // If a non-scheduled notification is in the past (or not within our threshold)
                     // just remove it immediately
-                    if (pendingNotification.Notification.DeliveryTime != null &&
-                        pendingNotification.Notification.DeliveryTime - DateTime.Now < MinimumNotificationTime)
+                    if (pendingNotification != null && pendingNotification.Notification?.DeliveryTime != null &&
+                        pendingNotification.Notification?.DeliveryTime - DateTime.Now < MinimumNotificationTime)
                     {
                         PendingNotifications.RemoveAt(i);
                     }
@@ -274,18 +274,18 @@ namespace Kyub.LocalNotification
 
                 // Sort notifications by delivery time, if no notifications have a badge number set
                 bool noBadgeNumbersSet =
-                    PendingNotifications.All(notification => notification.Notification.BadgeNumber == null);
+                    PendingNotifications.All(notification => notification == null || notification.Notification == null || notification.Notification.BadgeNumber == null);
 
                 if (noBadgeNumbersSet && AutoBadging)
                 {
                     PendingNotifications.Sort((a, b) =>
                     {
-                        if (!a.Notification.DeliveryTime.HasValue)
+                        if (a == null || a.Notification == null || a.Notification.DeliveryTime == null || !a.Notification.DeliveryTime.HasValue)
                         {
-                            return 1;
+                            return -1;
                         }
 
-                        if (!b.Notification.DeliveryTime.HasValue)
+                        if (b == null || b.Notification == null || b.Notification.DeliveryTime == null || !b.Notification.DeliveryTime.HasValue)
                         {
                             return -1;
                         }
@@ -309,7 +309,9 @@ namespace Kyub.LocalNotification
                 {
                     PendingNotification pendingNotification = PendingNotifications[i];
                     // Ignore already scheduled ones
-                    if (pendingNotification.Notification.Scheduled)
+                    if (pendingNotification == null || 
+                        pendingNotification.Notification == null || 
+                        pendingNotification.Notification.Scheduled)
                     {
                         continue;
                     }
@@ -323,7 +325,10 @@ namespace Kyub.LocalNotification
                 {
                     foreach (PendingNotification pendingNotification in PendingNotifications)
                     {
-                        if (pendingNotification.Notification.DeliveryTime.HasValue)
+                        if (pendingNotification != null && 
+                            pendingNotification.Notification != null && 
+                            pendingNotification.Notification.DeliveryTime != null && 
+                            pendingNotification.Notification.DeliveryTime.HasValue)
                         {
                             pendingNotification.Notification.BadgeNumber = null;
                         }
@@ -346,7 +351,9 @@ namespace Kyub.LocalNotification
 
                     // In reschedule mode, add ones that have been scheduled, are marked for
                     // rescheduling, and that have a time
-                    if (pendingNotification.Reschedule &&
+                    if (pendingNotification != null &&
+                        pendingNotification.Notification != null &&
+                        pendingNotification.Reschedule &&
                         pendingNotification.Notification.Scheduled &&
                         pendingNotification.Notification.DeliveryTime.HasValue)
                     {
@@ -356,7 +363,9 @@ namespace Kyub.LocalNotification
                 else
                 {
                     // In non-clear mode, just add all scheduled notifications
-                    if (pendingNotification.Notification.Scheduled)
+                    if (pendingNotification != null && 
+                        pendingNotification.Notification != null && 
+                        pendingNotification.Notification.Scheduled)
                     {
                         notificationsToSave.Add(pendingNotification);
                     }
@@ -364,7 +373,10 @@ namespace Kyub.LocalNotification
             }
 
             // Save to disk
-            Serializer.Serialize(notificationsToSave);
+            if (Serializer != null)
+            {
+                Serializer.Serialize(notificationsToSave);
+            }
         }
 
         #endregion
