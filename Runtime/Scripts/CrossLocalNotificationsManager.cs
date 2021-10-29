@@ -230,7 +230,7 @@ namespace Kyub.LocalNotification
         /// </summary>
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
-            if (s_instance != this)
+            if (s_instance == this)
                 return;
 
             if (Platform == null || !Initialized)
