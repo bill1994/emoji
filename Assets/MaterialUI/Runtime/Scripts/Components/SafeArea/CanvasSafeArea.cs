@@ -101,7 +101,7 @@ namespace MaterialUI
             if (m_Content == null)
             {
                 Debug.LogWarning("Cannot apply safe area - no Content RectTransform found on " + name);
-                Refresh();
+                Refresh(true);
                 //Destroy(this);
             }
             else
@@ -131,7 +131,7 @@ namespace MaterialUI
             if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
             {
                 ClearCachedInteropInfos();
-                Refresh();
+                Refresh(true);
             }
         }
 
@@ -179,7 +179,7 @@ namespace MaterialUI
             if (Application.isPlaying && this.isActiveAndEnabled && !IsPrefab())
             {
                 ClearCachedInteropInfos();
-                Refresh();
+                Refresh(true);
             }
         }
 
@@ -346,7 +346,7 @@ namespace MaterialUI
                     safeArea = new Rect(Screen.width * nsa.x, Screen.height * nsa.y, Screen.width * nsa.width, Screen.height * nsa.height);
 #endif
                 }
-                else if (IsStatusBarActiveWithLayoutStable() && Screen.safeArea == nsa)
+                else if (IsStatusBarActiveWithLayoutStable() && (Screen.safeArea.height == nsa.height))
                 {
                     //This is the size of statusbar in IOS/Android without notch
                     safeArea.height = Mathf.Max(0, safeArea.height - GetStatusBarHeight());
