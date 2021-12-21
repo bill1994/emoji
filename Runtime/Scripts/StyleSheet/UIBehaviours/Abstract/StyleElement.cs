@@ -123,7 +123,7 @@ namespace MaterialUI
         }
 #endif
 
-#endregion
+        #endregion
 
     }
 
@@ -256,7 +256,6 @@ namespace MaterialUI
         }
 
 #if UNITY_EDITOR
-
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -287,8 +286,12 @@ namespace MaterialUI
                 if (_isFirstOnValidate)
                 {
                     _isFirstOnValidate = false;
-                    if(!Application.isPlaying)
+                    if (!Application.isPlaying)
                         UnityEditor.EditorApplication.update += EditorOnValidateDelayed;
+                }
+                else
+                {
+                    UnityEditor.EditorApplication.update -= EditorOnValidateDelayed;
                 }
             }
         }
@@ -356,8 +359,8 @@ namespace MaterialUI
 
         public virtual StyleData GetStyleDataTemplate(bool force = false)
         {
-            if (m_styleGroup != null && 
-                (_styleData == null || force || 
+            if (m_styleGroup != null &&
+                (_styleData == null || force ||
                 (!string.IsNullOrEmpty(m_styleDataName) && _styleData.Name != m_styleDataName)))
             {
                 if (m_supportStyleGroup)
@@ -478,7 +481,7 @@ namespace MaterialUI
                             var otherStyleProperty = pair.Value;
                             selfStyleProperty.LoadStyles(otherStyleProperty);
 
-                            
+
                             //Disable/Enable GameObject based in Template (prevent apply if selfStyleProperty.Target is self transform)
                             if (selfStyleProperty.Target != this.transform && selfStyleProperty.Target != null && otherStyleProperty.Target != null)
                                 StyleUtils.ApplyObjectActive(selfStyleProperty.Target, otherStyleProperty.Target);
@@ -572,7 +575,7 @@ namespace MaterialUI
             }
 
 #if UNITY_EDITOR
-            if(sucess)
+            if (sucess)
                 UnityEditor.EditorUtility.SetDirty(this);
 #endif
 
@@ -710,7 +713,7 @@ namespace MaterialUI
         public virtual HashSet<object> CollectStyleResources(HashSet<BaseStyleElement> excludedElements = null)
         {
             var metaType = StyleMetaType.GetOrCreateStyleMetaType(GetType());
-            
+
             return metaType.CollectStyleResources(this, excludedElements);
         }
 
