@@ -744,6 +744,8 @@ namespace MaterialUI
             }
             set
             {
+                var clearValidator = !_HasBeenSelected && !m_ValidateOnStart && m_HasValidation;
+
                 var unityInputField = inputField as InputField;
                 var tmpInputField = _InputField as TMP_InputField;
 
@@ -751,16 +753,22 @@ namespace MaterialUI
                 if (unityInputField != null)
                 {
                     changed = unityInputField.text != value;
+                    if (changed && clearValidator)
+                        _CachedIsTextValid = null;
                     unityInputField.text = value;
                 }
                 else if (tmpInputField != null)
                 {
                     changed = tmpInputField.text != value;
+                    if (changed && clearValidator)
+                        _CachedIsTextValid = null;
                     tmpInputField.text = value;
                 }
                 else if (m_InputText != null)
                 {
                     changed = m_InputText.GetGraphicText() != value;
+                    if (changed && clearValidator)
+                        _CachedIsTextValid = null;
                     m_InputText.SetGraphicText(value);
                 }
 
@@ -770,7 +778,11 @@ namespace MaterialUI
                         _PromptDisplayer.SetTextToPromptDialog(value);
 
                     if (changed)
+                    {
+                        if (changed && clearValidator)
+                            _CachedIsTextValid = null;
                         _PromptDisplayer.SendOnValueChangedAndUpdateLabel();
+                    }
                 }
             }
         }
@@ -2410,6 +2422,10 @@ namespace MaterialUI
                     if (validator != null && validator != customTextValidator)
                         validator.Dispose();
                     validator = customTextValidator;
+                }
+                if (m_TextValidator != null && validator != null)
+                {
+                    validator.Init(this);
                 }
                 cachedIsTextValid = validator != null && m_HasValidation && validator.IsTextValid();
             }
