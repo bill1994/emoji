@@ -58,6 +58,9 @@ namespace MaterialUI
         [SerializeField]
         protected bool m_Interactable = true;
 
+        [SerializeField]
+        protected bool m_ForceUseDisableColor = false;
+
         [SerializeField, Tooltip("Try find a MaterialToggleGroup in Parent if group is null")]
         bool m_AutoRegisterInParentGroup = true;
         [SerializeField]
@@ -93,6 +96,23 @@ namespace MaterialUI
         #endregion
 
         #region Properties
+
+        public bool forceUseDisableColor
+        {
+            get
+            {
+                return m_ForceUseDisableColor;
+            }
+            set
+            {
+                if (m_ForceUseDisableColor == value) 
+                    return;
+                m_ForceUseDisableColor = value;
+
+                UpdateGraphicToggleState();
+                ApplyCanvasGroupChanged();
+            }
+        }
 
         public UnityEngine.UI.Toggle.ToggleEvent OnValueChanged
         {
@@ -607,7 +627,7 @@ namespace MaterialUI
 
         public virtual bool CanUseDisabledColor()
         {
-            return canvasGroup == null || !canvasGroup.enabled;
+            return m_ForceUseDisableColor || canvasGroup == null || !canvasGroup.enabled;
         }
 
         protected virtual void SetIsOnInternal(bool value, bool sendCallback)
@@ -928,7 +948,7 @@ namespace MaterialUI
             {
                 canvasGroup.blocksRaycasts = m_Interactable;
                 canvasGroup.interactable = m_Interactable;
-                canvasGroup.alpha = interactable ? 1f : 0.5f;
+                canvasGroup.alpha = interactable || m_ForceUseDisableColor ? 1f : 0.5f;
             }
         }
 
@@ -983,8 +1003,12 @@ namespace MaterialUI
         [System.Serializable]
         public class ToggleBaseStyleProperty : StyleProperty
         {
+            public enum ColorModeEnum { Default, ForceUseDisableColor, None }
+
             #region Private Variables
 
+            [SerializeField, SerializeStyleProperty]
+            protected ColorModeEnum m_colorMode = ColorModeEnum.Default;
             [SerializeField, SerializeStyleProperty]
             protected Color m_colorOn = Color.white;
             [SerializeField, SerializeStyleProperty]
@@ -995,6 +1019,19 @@ namespace MaterialUI
             #endregion
 
             #region Public Properties
+
+            public ColorModeEnum ColorMode
+            {
+                get
+                {
+                    return m_colorMode;
+                }
+
+                set
+                {
+                    m_colorMode = value;
+                }
+            }
 
             public Color ColorOn
             {
@@ -1062,12 +1099,12 @@ namespace MaterialUI
                 TweenManager.EndTween(_tweenId);
 
                 var graphic = GetTarget<Graphic>();
-                if (graphic != null)
+                if (graphic != null && m_colorMode != ColorModeEnum.None)
                 {
                     var toggleBase = sender as ToggleBase;
                     var isActive = toggleBase != null ? toggleBase.toggle.isOn : true;
                     var isInteractable = toggleBase != null? toggleBase.IsInteractable() : true;
-                    var canUseDisabledColor = toggleBase != null ? toggleBase.CanUseDisabledColor() : true;
+                    var canUseDisabledColor = m_colorMode != ColorModeEnum.ForceUseDisableColor && toggleBase != null ? toggleBase.CanUseDisabledColor() : true;
 
                     var endColor = !canUseDisabledColor || isInteractable ? (isActive ? m_colorOn : m_colorOff) : m_colorDisabled;
                     if (canAnimate && Application.isPlaying)

@@ -26,12 +26,36 @@ namespace MaterialUI
 
         public virtual void OnPointerClick(PointerEventData eventData)
         {
-            HandleOnItemClicked();
+            if (IsInteractable())
+            {
+                HandleOnItemClicked();
+            }
         }
 
         public virtual void OnSubmit(BaseEventData eventData)
         {
-            HandleOnItemClicked();
+            if (IsInteractable())
+            {
+                HandleOnItemClicked();
+            }
+        }
+
+        public virtual bool IsInteractable()
+        {
+            bool interactable = true;
+            if (interactable)
+            {
+                var allCanvas = GetComponentsInParent<CanvasGroup>();
+                for (int i = 0; i < allCanvas.Length; i++)
+                {
+                    var canvas = allCanvas[i];
+
+                    interactable = interactable && canvas.interactable;
+                    if (!interactable || canvas.ignoreParentGroups)
+                        break;
+                }
+            }
+            return interactable;
         }
 
         #endregion

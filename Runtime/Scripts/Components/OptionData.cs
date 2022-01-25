@@ -52,14 +52,30 @@ namespace MaterialUI
     [Serializable]
     public class OptionData
     {
-        /// <summary>
-        /// The option's text.
-        /// </summary>
+        [System.Flags]
+        public enum OptionsHiddenFlagEnum : int { Hidden = 1, Disabled = 2 }
+
+        #region Private Variables
+
         [SerializeField]
         private string m_Text = string.Empty;
-        /// <summary>
-        /// The option's text.
-        /// </summary>
+        [SerializeField]
+        private ImageData m_ImageData = null;
+        [SerializeField]
+        OptionsHiddenFlagEnum m_HiddenFlags = (OptionsHiddenFlagEnum)0;
+
+        Action _OnOptionSelectedAction = null;
+
+        #endregion
+
+        #region Callback
+
+        public UnityEvent onOptionSelected = new UnityEvent();
+
+        #endregion
+
+        #region Properties
+
         public string text
 		{
 			get
@@ -71,18 +87,56 @@ namespace MaterialUI
 			set { m_Text = value; }
 		}
 
-        /// <summary>
-        /// The option's ImageData.
-        /// </summary>
-        [SerializeField]
-        private ImageData m_ImageData = null;
-        /// <summary>
-        /// The option's ImageData.
-        /// </summary>
         public ImageData imageData
         {
             get { return m_ImageData; }
             set { m_ImageData = value; }
+        }
+
+        public OptionsHiddenFlagEnum hiddenFlags
+        {
+            get { return m_HiddenFlags; }
+            set { m_HiddenFlags = value; }
+        }
+
+        public bool visible
+        {
+            get
+            {
+                return !m_HiddenFlags.HasFlag(OptionsHiddenFlagEnum.Hidden);
+            }
+            set
+            {
+
+                if (value)
+                {
+                    m_HiddenFlags |= OptionsHiddenFlagEnum.Hidden;
+                }
+                else
+                {
+                    m_HiddenFlags &= ~OptionsHiddenFlagEnum.Hidden;
+                }
+            }
+        }
+
+        public bool interactable
+        {
+            get
+            {
+                return !m_HiddenFlags.HasFlag(OptionsHiddenFlagEnum.Disabled);
+            }
+            set
+            {
+
+                if (value)
+                {
+                    m_HiddenFlags |= OptionsHiddenFlagEnum.Disabled;
+                }
+                else
+                {
+                    m_HiddenFlags &= ~OptionsHiddenFlagEnum.Disabled;
+                }
+            }
         }
 
         public Action OnOptionSelectedAction
@@ -91,24 +145,12 @@ namespace MaterialUI
             set { _OnOptionSelectedAction = value; }
         }
 
-        /// <summary>
-        /// Called when the option is selected.
-        /// </summary>
-        public UnityEvent onOptionSelected = new UnityEvent();
+        #endregion
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OptionData"/> class.
-        /// </summary>
+        #region Constructors
+
         public OptionData() { }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OptionData"/> class.
-        /// </summary>
-        /// <param name="text">The text.</param>
-        /// <param name="imageData">The image data.</param>
-        /// <param name="onOptionSelected">Called when the option is selected.</param>
-
-        Action _OnOptionSelectedAction = null;
         public OptionData(string text, ImageData imageData, Action onOptionSelectedAction = null)
         {
             m_Text = text;
@@ -125,5 +167,7 @@ namespace MaterialUI
                 }));
             }
         }
+
+        #endregion
     }
 }

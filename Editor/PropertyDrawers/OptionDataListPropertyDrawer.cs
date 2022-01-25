@@ -54,7 +54,14 @@ namespace MaterialUI
             SerializedProperty itemImageType = itemData.FindPropertyRelative("m_ImageData.m_ImageDataType");
             SerializedProperty onSelectEvent = itemData.FindPropertyRelative("onOptionSelected");
 
-            var size = itemData.isExpanded ? (m_ImageTypeHeight + EditorGUI.GetPropertyHeight(onSelectEvent) + 6) : m_ImageTypeHeight;
+            var isExpanded = itemData.isExpanded;
+            var size = isExpanded ? (m_ImageTypeHeight + EditorGUI.GetPropertyHeight(onSelectEvent) + 6) : m_ImageTypeHeight;
+
+            if (isExpanded)
+            {
+                size += (EditorGUIUtility.singleLineHeight * 2) + 7;
+            }
+
             if (m_ImageType.enumValueIndex == 0)
             {
                 return size + (itemData.isExpanded ? m_ImageTypeHeight + 7 : 0);
@@ -70,6 +77,7 @@ namespace MaterialUI
             SerializedProperty itemData = m_ReorderableList.serializedProperty.GetArrayElementAtIndex(index);
             SerializedProperty itemText = itemData.FindPropertyRelative("m_Text");
             SerializedProperty onSelectEvent = itemData.FindPropertyRelative("onOptionSelected");
+            SerializedProperty hiddenProperties = itemData.FindPropertyRelative("m_HiddenFlags");
 
             SerializedProperty itemSprite = itemData.FindPropertyRelative("m_ImageData.m_Sprite");
             SerializedProperty imgUrl = itemData.FindPropertyRelative("m_ImageData.m_ImgUrl");
@@ -184,6 +192,53 @@ namespace MaterialUI
 
                     rect.y += EditorGUIUtility.singleLineHeight + 7;
                 }
+
+                var cachedValue = EditorGUI.showMixedValue;
+                var hiddenPropertiesValue = (OptionData.OptionsHiddenFlagEnum)hiddenProperties.intValue;
+                var newHiddenPropertiesValue = hiddenPropertiesValue;
+                EditorGUI.BeginChangeCheck();
+                {
+                    EditorGUI.showMixedValue = hiddenProperties.hasMultipleDifferentValues;
+
+                    var cachedVisible = !hiddenPropertiesValue.HasFlag(OptionData.OptionsHiddenFlagEnum.Hidden);
+                    var visible = EditorGUI.Toggle(rect, "Visible", cachedVisible);
+                    if (cachedVisible != visible)
+                    {
+                        if (!visible)
+                        {
+                            newHiddenPropertiesValue |= OptionData.OptionsHiddenFlagEnum.Hidden;
+                        }
+                        else
+                        {
+                            newHiddenPropertiesValue &= ~OptionData.OptionsHiddenFlagEnum.Hidden;
+                        }
+                    }
+
+                    rect.y += EditorGUIUtility.singleLineHeight;
+                    var cachedInteractable = !hiddenPropertiesValue.HasFlag(OptionData.OptionsHiddenFlagEnum.Disabled);
+                    var interactable = EditorGUI.Toggle(rect, "Interactable", cachedInteractable);
+                    if (cachedInteractable != interactable)
+                    {
+                        if (!interactable)
+                        {
+                            newHiddenPropertiesValue |= OptionData.OptionsHiddenFlagEnum.Disabled;
+                        }
+                        else
+                        {
+                            newHiddenPropertiesValue &= ~OptionData.OptionsHiddenFlagEnum.Disabled;
+                        }
+                    }
+                    rect.y += EditorGUIUtility.singleLineHeight + 7;
+                }
+                if (EditorGUI.EndChangeCheck())
+                {
+                    if (hiddenPropertiesValue != newHiddenPropertiesValue)
+                    {
+                        hiddenProperties.intValue = (int)newHiddenPropertiesValue;
+                    }
+                }
+                EditorGUI.showMixedValue = cachedValue;
+
                 EditorGUI.PropertyField(rect, onSelectEvent);
             }
         }

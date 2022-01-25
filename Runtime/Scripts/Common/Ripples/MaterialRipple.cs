@@ -614,7 +614,7 @@ namespace MaterialUI
         /// <param name="eventData">Current event data.</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!enabled) return;
+            if (!enabled || !IsInteractable()) return;
 
             if (highlightWhen == HighlightActive.Hovered)
             {
@@ -631,7 +631,7 @@ namespace MaterialUI
 
             DestroyRipple();
 
-            if (!enabled) return;
+            if (!enabled || !IsInteractable()) return;
 
             if (checkForScroll)
             {
@@ -852,6 +852,24 @@ namespace MaterialUI
             {
                 OnLastRippleDestroy();
             }
+        }
+
+        public virtual bool IsInteractable()
+        {
+            bool interactable = true;
+            if (interactable)
+            {
+                var allCanvas = GetComponentsInParent<CanvasGroup>();
+                for (int i = 0; i < allCanvas.Length; i++)
+                {
+                    var canvas = allCanvas[i];
+
+                    interactable = interactable && canvas.interactable;
+                    if (!interactable || canvas.ignoreParentGroups)
+                        break;
+                }
+            }
+            return interactable;
         }
 
         /// <summary>

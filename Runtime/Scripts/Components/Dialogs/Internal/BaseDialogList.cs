@@ -222,7 +222,10 @@ namespace MaterialUI
             {
                 m_ScrollDataView.DefaultTemplate = m_OptionTemplate != null ? m_OptionTemplate.gameObject : m_ScrollDataView.DefaultTemplate;
                 m_ScrollDataView.OnReloadElement.AddListener(HandleOnReloadElement);
-                m_ScrollDataView.Setup(options is IList || options == null ? (IList)options : options.ToArray());
+
+                var filteredOption = options == null ? null : new List<OptionData>(options);
+                ApplyFilterInList(filteredOption, m_SearchInputField != null ? m_SearchInputField.text : string.Empty, optionsLocaleMap);
+                m_ScrollDataView.Setup(filteredOption);
             }
 
             if (m_TitleSection != null)
@@ -415,13 +418,13 @@ namespace MaterialUI
 
         protected static void ApplyFilterInList(IList<OptionData> list, string filterKeys, Dictionary<string, string> indexedLocale)
         {
-            if (string.IsNullOrEmpty(filterKeys) || list == null || list.Count == 0)
+            if (/*string.IsNullOrEmpty(filterKeys) ||*/ list == null || list.Count == 0)
                 return;
 
             var filters = !string.IsNullOrEmpty(filterKeys) ? filterKeys.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries) : null;
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i] == null || !IsValidFilter(list[i].text, filters, indexedLocale))
+                if (list[i] == null || !list[i].visible || !IsValidFilter(list[i].text, filters, indexedLocale))
                 {
                     list.RemoveAt(i);
                     i--;
