@@ -107,8 +107,7 @@ namespace MaterialUI
             }
             set
             {
-
-                if (value)
+                if (!value)
                 {
                     m_HiddenFlags |= OptionsHiddenFlagEnum.Hidden;
                 }
@@ -127,8 +126,7 @@ namespace MaterialUI
             }
             set
             {
-
-                if (value)
+                if (!value)
                 {
                     m_HiddenFlags |= OptionsHiddenFlagEnum.Disabled;
                 }
