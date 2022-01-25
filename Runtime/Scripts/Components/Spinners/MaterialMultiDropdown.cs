@@ -419,35 +419,12 @@ namespace MaterialUI
             selectedIndexes = new int[0];
         }
 
-        public virtual int GetFirstValidIndex()
-        {
-            if (options != null)
-            {
-                for (int i = 0; i < options.Count; i++)
-                {
-                    if (options[i] != null && options[i].interactable)
-                        return i;
-                }
-            }
-            return -1;
-        }
-
-        public virtual bool IsValidIndex(int index)
-        {
-            if (options != null && index >= 0 && index < options.Count)
-            {
-                return options[index] != null && options[index].interactable;
-            }
-
-            return false;
-        }
-
         public virtual void Select(int[] selectedItemIndexes)
         {
             if (selectedItemIndexes == null || options.Count == 0)
                 selectedItemIndexes = new int[0];
 
-            m_SelectedIndexes = new HashSet<int>(Array.FindAll(selectedItemIndexes, (a) => IsValidIndex(a))).ToArray();
+            m_SelectedIndexes = new HashSet<int>(selectedItemIndexes).ToArray();
 
             var selectedOptions = GetCurrentSelectedDatas();
             if (selectedOptions.Count > 1 && m_MixedOption != null)

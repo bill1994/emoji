@@ -40,8 +40,6 @@ namespace MaterialUI
                 m_SelectedIndexes = value;
                 if (m_SelectedIndexes != null)
                 {
-                    m_SelectedIndexes = new HashSet<int>(Array.FindAll(m_SelectedIndexes.ToArray(), (a) => IsValidIndex(a)));
-
                     foreach (var index in m_SelectedIndexes)
                     {
                         if (onSelectedIndexChanged != null)
@@ -83,29 +81,6 @@ namespace MaterialUI
         public override bool IsDataIndexSelected(int dataIndex)
         {
             return selectedIndexes.Contains(dataIndex);
-        }
-
-        public virtual int GetFirstValidIndex()
-        {
-            if (options != null)
-            {
-                for (int i = 0; i < options.Count; i++)
-                {
-                    if (options[i] != null && options[i].interactable)
-                        return i;
-                }
-            }
-            return -1;
-        }
-
-        public virtual bool IsValidIndex(int index)
-        {
-            if (options != null && index >= 0 && index < options.Count)
-            {
-                return options[index] != null && options[index].interactable;
-            }
-
-            return false;
         }
 
         #endregion

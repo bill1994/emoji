@@ -399,28 +399,24 @@ namespace MaterialUI
                 input.ValidateText(force);
         }
 
-        public virtual int GetFirstValidIndex()
+        public virtual int GetPreferredIndex(bool isLastIndex = false)
         {
+            int index = -1;
             if (options != null)
             {
-                for (int i = 0; i < options.Count; i++)
+                for (int i = isLastIndex? options.Count - 1 : 0; isLastIndex? i >= 0 : i < options.Count; i += isLastIndex? -1 : 1)
                 {
-                    if (options[i] != null && options[i].interactable)
-                        return i;
+                    if (options[i] != null)
+                    {
+                        if (options[i].interactable && options[i].visible)
+                            return i;
+                        else if(index == -1 && (options[i].interactable || options[i].visible))
+                            index = i;
+                    }
                 }
             }
 
-            return -1;
-        }
-
-        public virtual bool IsValidIndex(int index)
-        {
-            if (options != null && index >= 0 && index < options.Count)
-            {
-                return options[index] != null && options[index].interactable;
-            }
-
-            return false;
+            return index;
         }
 
         public virtual void Select(int selectedItemIndex)
@@ -429,13 +425,12 @@ namespace MaterialUI
                 selectedItemIndex = -1;
             else
             {
-                selectedItemIndex = m_AllowSwitchOff ? selectedItemIndex : Mathf.Clamp(selectedItemIndex, 0, options.Count - 1);
-                if (selectedItemIndex >= 0 && !IsValidIndex(selectedItemIndex))
+                if(!m_AllowSwitchOff)
                 {
-                    if (m_AllowSwitchOff)
-                        selectedItemIndex = -1;
-                    else
-                        selectedItemIndex = GetFirstValidIndex();
+                    if (selectedItemIndex < 0)
+                        selectedItemIndex = GetPreferredIndex(false);
+                    else if(selectedItemIndex > options.Count - 1)
+                        selectedItemIndex = GetPreferredIndex(true);
                 }
             }
 
