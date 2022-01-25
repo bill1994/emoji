@@ -283,6 +283,11 @@ namespace MaterialUI
 
 #endif
 
+        protected virtual void OnStart()
+        {
+            selectedIndex = selectedIndex;
+        }
+
         #endregion
 
         #region Overriden Functions
@@ -394,12 +399,45 @@ namespace MaterialUI
                 input.ValidateText(force);
         }
 
+        public virtual int GetFirstValidIndex()
+        {
+            if (options != null)
+            {
+                for (int i = 0; i < options.Count; i++)
+                {
+                    if (options[i] != null && options[i].interactable)
+                        return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public virtual bool IsValidIndex(int index)
+        {
+            if (options != null && index >= 0 && index < options.Count)
+            {
+                return options[index] != null && options[index].interactable;
+            }
+
+            return false;
+        }
+
         public virtual void Select(int selectedItemIndex)
         {
             if (options.Count == 0)
                 selectedItemIndex = -1;
             else
+            {
                 selectedItemIndex = m_AllowSwitchOff ? selectedItemIndex : Mathf.Clamp(selectedItemIndex, 0, options.Count - 1);
+                if (selectedItemIndex >= 0 && !IsValidIndex(selectedItemIndex))
+                {
+                    if (m_AllowSwitchOff)
+                        selectedItemIndex = -1;
+                    else
+                        selectedItemIndex = GetFirstValidIndex();
+                }
+            }
 
             var option = selectedItemIndex >= 0 && selectedItemIndex < options.Count ? options[selectedItemIndex] : null;
             if (option == null)

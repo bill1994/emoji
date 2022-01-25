@@ -36,6 +36,14 @@ namespace MaterialUI
             {
                 value = value < 0 ? (!m_AllowSwitchOff ? _SelectedIndex : -1) : value;
                 value = Mathf.Clamp(value, -1, (_Options != null ? _Options.Count : 0) - 1);
+                if (value >= 0 && !IsValidIndex(value))
+                {
+                    if (m_AllowSwitchOff)
+                        value = -1;
+                    else
+                        value = GetFirstValidIndex();
+                }
+
                 if (_SelectedIndex == value)
                     return;
                 _SelectedIndex = value;
@@ -93,13 +101,35 @@ namespace MaterialUI
 
             _onAffirmativeButtonClicked = onAffirmativeButtonClicked;
             BaseInitialize(options, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
-            _SelectedIndex = selectedIndexStart < 0 ? (!m_AllowSwitchOff && options.Count > 0 ? 0 : -1) : selectedIndexStart;
-            _SelectedIndex = Mathf.Clamp(_SelectedIndex, -1, (_Options != null ? _Options.Count : 0) - 1);
+            selectedIndex = selectedIndexStart < 0 ? (!m_AllowSwitchOff && options.Count > 0 ? 0 : -1) : selectedIndexStart;
         }
 
         public override bool IsDataIndexSelected(int dataIndex)
         {
             return dataIndex >= 0 && dataIndex < options.Count && dataIndex == selectedIndex;
+        }
+
+        public virtual int GetFirstValidIndex()
+        {
+            if (options != null)
+            {
+                for (int i = 0; i < options.Count; i++)
+                {
+                    if (options[i] != null && options[i].interactable)
+                        return i;
+                }
+            }
+            return -1;
+        }
+
+        public virtual bool IsValidIndex(int index)
+        {
+            if (options != null && index >= 0 && index < options.Count)
+            {
+                return options[index] != null && options[index].interactable;
+            }
+
+            return false;
         }
 
         #endregion
