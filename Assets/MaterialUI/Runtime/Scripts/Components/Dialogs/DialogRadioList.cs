@@ -16,7 +16,7 @@ namespace MaterialUI
         [SerializeField]
         protected bool m_AllowSwitchOff = false;
 
-        protected int _SelectedIndex = 0;
+        protected int _SelectedIndex = -1;
 
         protected System.Action<int> _onAffirmativeButtonClicked = null;
         #endregion
@@ -35,14 +35,14 @@ namespace MaterialUI
             protected set
             {
                 value = value < 0 ? (!m_AllowSwitchOff ? _SelectedIndex : -1) : value;
-                value = Mathf.Clamp(value, -1, (_Options != null ? _Options.Count : 0) - 1);
-                if (value >= 0 && !IsValidIndex(value))
+                if (!m_AllowSwitchOff)
                 {
-                    if (m_AllowSwitchOff)
-                        value = -1;
-                    else
-                        value = GetFirstValidIndex();
+                    if (value < 0)
+                        value = GetPreferredIndex(false);
+                    else if (value > options.Count - 1)
+                        value = GetPreferredIndex(true);
                 }
+                value = Mathf.Clamp(value, -1, (_Options != null ? _Options.Count : 0) - 1);
 
                 if (_SelectedIndex == value)
                     return;
@@ -101,7 +101,9 @@ namespace MaterialUI
 
             _onAffirmativeButtonClicked = onAffirmativeButtonClicked;
             BaseInitialize(options, affirmativeButtonText, titleText, icon, onDismissiveButtonClicked, dismissiveButtonText);
-            selectedIndex = selectedIndexStart < 0 ? (!m_AllowSwitchOff && options.Count > 0 ? 0 : -1) : selectedIndexStart;
+
+            _SelectedIndex = -1;
+            selectedIndex = selectedIndexStart;
         }
 
         public override bool IsDataIndexSelected(int dataIndex)
@@ -109,27 +111,24 @@ namespace MaterialUI
             return dataIndex >= 0 && dataIndex < options.Count && dataIndex == selectedIndex;
         }
 
-        public virtual int GetFirstValidIndex()
+        public virtual int GetPreferredIndex(bool isLastIndex = false)
         {
+            int index = -1;
             if (options != null)
             {
-                for (int i = 0; i < options.Count; i++)
+                for (int i = isLastIndex ? options.Count - 1 : 0; isLastIndex ? i >= 0 : i < options.Count; i += isLastIndex ? -1 : 1)
                 {
-                    if (options[i] != null && options[i].interactable)
-                        return i;
+                    if (options[i] != null)
+                    {
+                        if (options[i].interactable && options[i].visible)
+                            return i;
+                        else if (index == -1 && (options[i].interactable || options[i].visible))
+                            index = i;
+                    }
                 }
             }
-            return -1;
-        }
 
-        public virtual bool IsValidIndex(int index)
-        {
-            if (options != null && index >= 0 && index < options.Count)
-            {
-                return options[index] != null && options[index].interactable;
-            }
-
-            return false;
+            return index;
         }
 
         #endregion
