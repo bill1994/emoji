@@ -103,7 +103,21 @@ MonoBehaviour:
   m_styleDataName: 
   m_styleGroup: {fileID: 0}
   m_disabledFieldStyles: []
-  m_extraStyleProperties: []
+  m_extraStyleProperties:
+  - m_name: Text
+    m_target: {fileID: 22487426}
+    m_useStyleGraphic: 0
+    m_colorMode: 1
+    m_colorOn: {r: 0, g: 0, b: 0, a: 0.8745098}
+    m_colorOff: {r: 0, g: 0, b: 0, a: 0.8745098}
+    m_colorDisabled: {r: 0, g: 0, b: 0, a: 0.39215687}
+  - m_name: Icon
+    m_target: {fileID: 8951124726936080368}
+    m_useStyleGraphic: 0
+    m_colorMode: 1
+    m_colorOn: {r: 0, g: 0, b: 0, a: 0.8745098}
+    m_colorOff: {r: 0, g: 0, b: 0, a: 0.8745098}
+    m_colorDisabled: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_OnColor: {r: 0, g: 0, b: 0, a: 0.5411765}
   m_OffColor: {r: 0, g: 0, b: 0, a: 0.5411765}
   m_DisabledColor: {r: 0, g: 0, b: 0, a: 0.2627451}
@@ -138,6 +152,7 @@ MonoBehaviour:
       m_Font: {fileID: 0}
     m_ImgUrl: 
   m_Interactable: 1
+  m_ForceUseDisableColor: 0
   m_AutoRegisterInParentGroup: 1
   m_Group: {fileID: 0}
   m_LastToggleState: 1
@@ -268,7 +283,12 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+  m_SnapToDuration: 0.05
   m_NestedDragActive: 0
+  m_UseContentMinWidth: 1
+  m_UseContentMinHeight: 1
+  m_UseContentPreferredWidth: 1
+  m_UseContentPreferredHeight: 1
 --- !u!114 &11463410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -688,6 +708,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20a7ec82741566d4297f816a1d0e3fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_activity: {fileID: 0}
   onShow:
     m_PersistentCalls:
       m_Calls: []
@@ -712,6 +733,9 @@ MonoBehaviour:
   m_ScrollDataView: {fileID: 3836119412114358087}
   m_OptionTemplate: {fileID: 11425922}
   m_SearchInputField: {fileID: 8544612406281804111}
+  m_SearchVisibilityMode: 0
+  m_MinAmountOfElementsToShowSearch: 20
+  m_SupportLocalizedSearch: 1
   m_AllowSwitchOff: 0
   onSelectedIndexChanged:
     m_PersistentCalls:
@@ -1146,6 +1170,9 @@ MonoBehaviour:
   m_autoPickElements: 1
   m_minVisibleElements: 0
   m_elementsToAwakePerStep: 1
+  m_extraVisibleElementsCount:
+    m_before: 0
+    m_after: 0
   m_optimizeDeepHierarchy: 1
   m_elements:
   - {fileID: 179608}
@@ -2049,6 +2076,7 @@ GameObject:
   - component: {fileID: 11404560}
   - component: {fileID: 11425922}
   - component: {fileID: 633631919600375874}
+  - component: {fileID: 430249636289753424}
   m_Layer: 5
   m_Name: Option Template
   m_TagString: Untagged
@@ -2220,7 +2248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef2c877673cbdbd4aa7dd3f730f96cff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_delayedReload: 0
   OnReload:
     m_PersistentCalls:
       m_Calls: []
@@ -2233,6 +2260,7 @@ MonoBehaviour:
   m_ItemText: {fileID: 11459652}
   m_ItemIcon: {fileID: 107968603529730319}
   m_ItemCheckbox: {fileID: 11424348}
+  m_InteractionCanvasGroup: {fileID: 430249636289753424}
 --- !u!114 &633631919600375874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2260,7 +2288,22 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
+--- !u!225 &430249636289753424
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 179608}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &184322
 GameObject:
   m_ObjectHideFlags: 0
@@ -3568,6 +3611,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &3351026623178447327
 GameObject:
@@ -3636,6 +3682,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!114 &3275039624137240863
 MonoBehaviour:
@@ -3735,8 +3784,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 2315255808
-  m_fontColor: {r: 0, g: 0, b: 0, a: 0.5411765}
+    rgba: 3741319168
+  m_fontColor: {r: 0, g: 0, b: 0, a: 0.8745098}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4355,12 +4404,12 @@ PrefabInstance:
     - target: {fileID: 1510700236296278006, guid: a9a34641c8f7c3a4fa510e9ba1423874,
         type: 3}
       propertyPath: m_fontSize
-      value: 56
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1510700236296278006, guid: a9a34641c8f7c3a4fa510e9ba1423874,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 56
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1510700236296278006, guid: a9a34641c8f7c3a4fa510e9ba1423874,
         type: 3}

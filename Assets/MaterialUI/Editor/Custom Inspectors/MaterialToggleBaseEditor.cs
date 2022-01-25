@@ -35,6 +35,8 @@ namespace MaterialUI
         protected SerializedProperty m_RippleOnColor;
         protected SerializedProperty m_RippleOffColor;
 
+        protected SerializedProperty m_ForceUseDisableColor;
+
         protected bool m_IsControllingChildren = false;
 
         protected override void OnEnable()
@@ -68,6 +70,8 @@ namespace MaterialUI
 
             m_OnToggleOn = serializedObject.FindProperty("onToggleOn");
             m_OnToggleOff = serializedObject.FindProperty("onToggleOff");
+
+            m_ForceUseDisableColor = serializedObject.FindProperty("m_ForceUseDisableColor");
         }
 
         protected override void OnDisable()
@@ -95,6 +99,7 @@ namespace MaterialUI
             LayoutStyle_PropertyField(m_AutoRegisterInParentGroup);
             LayoutStyle_PropertyField(m_Group);
             EditorGUILayout.Space();
+
             if (m_Graphic.objectReferenceValue != null)
             {
                 LayoutStyle_PropertyField(m_GraphicChangesWithToggleState);
@@ -183,6 +188,8 @@ namespace MaterialUI
                     LayoutStyle_PropertyField(m_RippleOffColor);
                 }
             }
+            EditorGUILayout.Space();
+            LayoutStyle_PropertyField(m_ForceUseDisableColor);
             EditorGUI.indentLevel--;
         }
 

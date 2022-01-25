@@ -82,7 +82,12 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+  m_SnapToDuration: 0.05
   m_NestedDragActive: 0
+  m_UseContentMinWidth: 1
+  m_UseContentMinHeight: 1
+  m_UseContentPreferredWidth: 1
+  m_UseContentPreferredHeight: 1
 --- !u!114 &11463410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -650,6 +655,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a51f6a260f74b74c8d4651af2763e58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_activity: {fileID: 0}
   onShow:
     m_PersistentCalls:
       m_Calls: []
@@ -674,6 +680,9 @@ MonoBehaviour:
   m_ScrollDataView: {fileID: 3789866140772429485}
   m_OptionTemplate: {fileID: 11418136}
   m_SearchInputField: {fileID: 8988400912386616274}
+  m_SearchVisibilityMode: 0
+  m_MinAmountOfElementsToShowSearch: 20
+  m_SupportLocalizedSearch: 1
   onSelectedIndexChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1019,6 +1028,9 @@ MonoBehaviour:
   m_autoPickElements: 1
   m_minVisibleElements: 0
   m_elementsToAwakePerStep: 1
+  m_extraVisibleElementsCount:
+    m_before: 0
+    m_after: 0
   m_optimizeDeepHierarchy: 1
   m_elements:
   - {fileID: 179608}
@@ -1626,7 +1638,21 @@ MonoBehaviour:
   m_styleDataName: 
   m_styleGroup: {fileID: 0}
   m_disabledFieldStyles: []
-  m_extraStyleProperties: []
+  m_extraStyleProperties:
+  - m_name: Text
+    m_target: {fileID: 2454218260385504515}
+    m_useStyleGraphic: 0
+    m_colorMode: 1
+    m_colorOn: {r: 0, g: 0, b: 0, a: 0.8745098}
+    m_colorOff: {r: 0, g: 0, b: 0, a: 0.8745098}
+    m_colorDisabled: {r: 0, g: 0, b: 0, a: 0.47058824}
+  - m_name: Icon
+    m_target: {fileID: 5448471869145345906}
+    m_useStyleGraphic: 0
+    m_colorMode: 1
+    m_colorOn: {r: 0, g: 0, b: 0, a: 0.8745098}
+    m_colorOff: {r: 0, g: 0, b: 0, a: 0.8745098}
+    m_colorDisabled: {r: 0, g: 0, b: 0, a: 0.47058824}
   m_OnColor: {r: 0.25882354, g: 0.25882354, b: 0.25882354, a: 1}
   m_OffColor: {r: 0.25882354, g: 0.25882354, b: 0.25882354, a: 1}
   m_DisabledColor: {r: 0.7411765, g: 0.7411765, b: 0.7411765, a: 1}
@@ -1661,6 +1687,7 @@ MonoBehaviour:
       m_Font: {fileID: 0}
     m_ImgUrl: 
   m_Interactable: 1
+  m_ForceUseDisableColor: 0
   m_AutoRegisterInParentGroup: 1
   m_Group: {fileID: 0}
   m_LastToggleState: 0
@@ -1968,6 +1995,7 @@ GameObject:
   - component: {fileID: 11404560}
   - component: {fileID: 11418136}
   - component: {fileID: 2906341266070901958}
+  - component: {fileID: 6984698827730591103}
   m_Layer: 5
   m_Name: Option Template
   m_TagString: Untagged
@@ -2139,7 +2167,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef2c877673cbdbd4aa7dd3f730f96cff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_delayedReload: 0
   OnReload:
     m_PersistentCalls:
       m_Calls: []
@@ -2152,6 +2179,7 @@ MonoBehaviour:
   m_ItemText: {fileID: 3340482952289497414}
   m_ItemIcon: {fileID: 6665009513735576661}
   m_ItemCheckbox: {fileID: 11405902}
+  m_InteractionCanvasGroup: {fileID: 6984698827730591103}
 --- !u!114 &2906341266070901958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2179,7 +2207,22 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
+--- !u!225 &6984698827730591103
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 179608}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &184322
 GameObject:
   m_ObjectHideFlags: 0
@@ -3282,8 +3325,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 2315255808
-  m_fontColor: {r: 0, g: 0, b: 0, a: 0.5411765}
+    rgba: 3741319168
+  m_fontColor: {r: 0, g: 0, b: 0, a: 0.8745098}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3539,6 +3582,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!114 &6410071010909871321
 MonoBehaviour:
@@ -3803,6 +3849,9 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ForceExpandMode: 0
   m_ReverseOrder: 0
+  m_MaxInnerWidth: -1
+  m_MaxInnerHeight: -1
+  m_InnerAlign: 4
   m_IsVertical: 0
 --- !u!1 &9102045697282974255
 GameObject:
@@ -4541,12 +4590,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a9a34641c8f7c3a4fa510e9ba1423874, type: 3}
---- !u!224 &9094587230170243648 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 344622793476092434, guid: a9a34641c8f7c3a4fa510e9ba1423874,
-    type: 3}
-  m_PrefabInstance: {fileID: 8862572227958984786}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &8988400912386616274 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 451232414914919296, guid: a9a34641c8f7c3a4fa510e9ba1423874,
@@ -4559,3 +4602,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf202a8573b613548ab9631cceee47a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &9094587230170243648 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 344622793476092434, guid: a9a34641c8f7c3a4fa510e9ba1423874,
+    type: 3}
+  m_PrefabInstance: {fileID: 8862572227958984786}
+  m_PrefabAsset: {fileID: 0}

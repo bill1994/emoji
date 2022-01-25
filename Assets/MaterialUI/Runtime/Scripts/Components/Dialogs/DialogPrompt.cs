@@ -131,6 +131,9 @@ namespace MaterialUI
                 if (firstFieldConfig != null)
                     firstFieldConfig.Apply(m_FirstInputField);
                 m_FirstInputField.inputPromptDisplayOption = (MaterialInputField.InputPromptDisplayMode)0;
+
+                m_FirstInputField.onValueChanged.AddListener(HandleOnInputTextChanged);
+                m_FirstInputField.onEndEdit.AddListener(HandleOnInputTextChanged);
             }
             if (m_SecondInputField)
             {
@@ -139,6 +142,9 @@ namespace MaterialUI
 
                 m_SecondInputField.inputPromptDisplayOption = (MaterialInputField.InputPromptDisplayMode)0;
                 m_SecondInputField.gameObject.SetActive(secondFieldConfig != null);
+
+                m_SecondInputField.onValueChanged.AddListener(HandleOnInputTextChanged);
+                m_SecondInputField.onEndEdit.AddListener(HandleOnInputTextChanged);
             }
 
             UpdateAffirmativeButtonState();
@@ -199,6 +205,11 @@ namespace MaterialUI
         #endregion
 
         #region Receivers
+
+        protected virtual void HandleOnInputTextChanged(string arg0)
+        {
+            UpdateAffirmativeButtonState();
+        }
 
         public override void OnActivityEndShow()
         {
