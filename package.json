@@ -1,12 +1,12 @@
 {
   "name": "com.kyub.localnotification",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "displayName": "Kyub Local Notification",
   "description": "This package contains a Cross Local Notification Api",
   "unity": "2019.1",
   "dependencies": {
     "com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core",
-    "com.unity.mobile.notifications" : "1.0.3"
+    "com.unity.mobile.notifications" : "https://github.com/Unity-Technologies/com.unity.mobile.notifications.git?path=/com.unity.mobile.notifications#f5251ebb3313d63bc84a0d6d40d56040923c9048"
   },
   "keywords": [
     "LocalNotification"
