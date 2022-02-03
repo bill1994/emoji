@@ -311,7 +311,7 @@ namespace Kyub.Localization.UI
                 if (!sucess)
                     localizedValue = text;
 
-                _lastLocalizedLanguage = LocaleManager.Instance.CurrentLanguage;
+                _lastLocalizedLanguage = KyubEditor.Localization.EditorLocaleConfigAsset.Instance.CurrentLanguage;
             }
 #endif
             else
