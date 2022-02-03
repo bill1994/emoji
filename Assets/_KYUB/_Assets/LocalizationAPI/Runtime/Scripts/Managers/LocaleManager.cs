@@ -11,7 +11,6 @@ namespace Kyub.Localization
     {
         #region Consts
 
-
         public const string LOCALE_SKIP_TAG = @"<skiplocale>";
         public static Dictionary<string, string> s_localeClearTagsDict = new Dictionary<string, string>() {
                     { @"<locale>", "" },
@@ -498,6 +497,12 @@ namespace Kyub.Localization
             TryGetLocalizedText(key, out localizedText, supportLocaleTag);
 
             return localizedText;
+        }
+
+        protected internal static void CallOnLocalizedChanged(bool forceReapply)
+        {
+            if (OnLocalizeChanged != null)
+                OnLocalizeChanged.Invoke(forceReapply);
         }
 
         #endregion

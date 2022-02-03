@@ -34,8 +34,10 @@ namespace Kyub.Localization.UI
         [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_supportLocaleTag")]
         protected bool m_supportLocaleRichTextTags = false;
 
+        [System.NonSerialized]
         protected bool _localeParsingRequired = true;
 
+        [System.NonSerialized]
         protected string _lastLocalizedLanguage = "";
 
 #if TMP_NEW_PREPROCESSOR
@@ -289,7 +291,8 @@ namespace Kyub.Localization.UI
         protected bool TryGetLocalizedText(string text, out string localizedValue)
         {
             bool sucess = false;
-            if (m_isLocalized && !string.IsNullOrEmpty(text) && LocaleManager.InstanceExists())
+
+            if (Application.isPlaying && m_isLocalized && !string.IsNullOrEmpty(text) && LocaleManager.InstanceExists())
             {
                 sucess = LocaleManager.TryGetLocalizedText(text, out localizedValue, m_supportLocaleRichTextTags && m_isRichText);
 
@@ -299,6 +302,18 @@ namespace Kyub.Localization.UI
 
                 _lastLocalizedLanguage = LocaleManager.Instance.CurrentLanguage;
             }
+#if UNITY_EDITOR
+            else if(!Application.isPlaying && m_isLocalized && !string.IsNullOrEmpty(text))
+            {
+                sucess = KyubEditor.Localization.EditorLocaleConfigAsset.TryGetLocalizedText(text, out localizedValue, m_supportLocaleRichTextTags && m_isRichText);
+
+                //Return Key value if localization is empty
+                if (!sucess)
+                    localizedValue = text;
+
+                _lastLocalizedLanguage = LocaleManager.Instance.CurrentLanguage;
+            }
+#endif
             else
                 localizedValue = text != null ? text : "";
 
@@ -350,7 +365,7 @@ namespace Kyub.Localization.UI
                 if (IsInputParsingRequired_Internal)
                     text = text != null ? text.Replace("\n", "\\n").Replace("\r", "") : null;
 
-                if (!Application.isPlaying || (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized))
+                if (m_supportLocaleRichTextTags && m_isRichText && !m_isLocalized)
                 {
                     success = TryClearLocaleTags(text, out text);
                 }
@@ -575,11 +590,18 @@ namespace Kyub.Localization.UI
 
         protected virtual void HandleOnLocalize(bool forceReapply)
         {
-            if (LocaleManager.InstanceExists() && m_isLocalized && (forceReapply || !string.Equals(_lastLocalizedLanguage, LocaleManager.Instance.CurrentLanguage)))
+            if (Application.isPlaying && LocaleManager.InstanceExists() && m_isLocalized && (forceReapply || !string.Equals(_lastLocalizedLanguage, LocaleManager.Instance.CurrentLanguage)))
             {
                 //Invalidate Text
                 SetText(m_text);
             }
+#if UNITY_EDITOR
+            else if(!Application.isPlaying && KyubEditor.Localization.EditorLocaleConfigAsset.Instance && m_isLocalized && (forceReapply || !string.Equals(_lastLocalizedLanguage, KyubEditor.Localization.EditorLocaleConfigAsset.Instance.CurrentLanguage)))
+            {
+                //Invalidate Text in EditorMode
+                SetText(m_text);
+            }
+#endif
         }
 
 #endregion
