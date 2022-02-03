@@ -5,7 +5,6 @@ using Kyub.Collections;
 using System.Globalization;
 using System.Collections.Specialized;
 using Kyub.Localization;
-using UnityEditor;
 
 namespace KyubEditor.Localization
 {
@@ -16,7 +15,7 @@ namespace KyubEditor.Localization
     public class EditorLocaleConfigAsset : ScriptableObject
     {
 #if UNITY_EDITOR
-        internal class AssetPostProcessorListener : AssetPostprocessor
+        internal class AssetPostProcessorListener : UnityEditor.AssetPostprocessor
         {
             public static event System.Action OnAssetsReload;
 
