@@ -41,7 +41,7 @@ namespace KyubEditor.Localization
         {
             //Force Refresh
             s_instance = null;
-            if(Instance != null) { }
+            if (Instance != null) { }
         }
 
         const string MAIN_PATH = "EditorLocaleConfigAsset";
@@ -51,10 +51,14 @@ namespace KyubEditor.Localization
         {
             get
             {
-                if (s_instance == null)
+                if (Application.isPlaying)
+                {
+                    s_instance = null;
+                }
+                else if (s_instance == null)
                 {
                     s_instance = Resources.Load<EditorLocaleConfigAsset>(MAIN_PATH);
-                    if(s_instance != null)
+                    if (s_instance != null)
                         s_instance.Init();
                 }
                 return s_instance;
@@ -168,7 +172,7 @@ namespace KyubEditor.Localization
 
         protected virtual void OnDestroy()
         {
-            if(s_instance == this)
+            if (s_instance == this)
             {
                 s_instance = null;
                 LocaleManager.CallOnLocalizedChanged(true);
@@ -226,6 +230,9 @@ namespace KyubEditor.Localization
 
         public virtual void Init()
         {
+            if (this == null || Application.isPlaying)
+                return;
+
             CurrentLanguage = StartingLanguage;
 
             //Unload all other localization datas
@@ -244,6 +251,9 @@ namespace KyubEditor.Localization
 
         protected virtual void ApplySystemLanguageAsInitial()
         {
+            if (this == null || Application.isPlaying)
+                return;
+
             string sysLanguageString = CultureInfo.CurrentUICulture.Name;
             string unitySysLanguageString = Application.systemLanguage.ToString();
             //Try Match Name
@@ -267,6 +277,9 @@ namespace KyubEditor.Localization
 
         protected virtual LocalizationData GetOrLoadCurrentData()
         {
+            if (this == null || Application.isPlaying)
+                return null;
+
             var loc = LocalizationDatas.Count > _index ? LocalizationDatas[_index] : null;
             if (loc != null)
             {
@@ -280,36 +293,36 @@ namespace KyubEditor.Localization
         protected bool _isDirty = false;
         public virtual void SetLocaleDirty()
         {
-            if (!_isDirty)
+            if (this == null || Application.isPlaying)
+                return;
+
+            _isDirty = true;
+
+            Kyub.ApplicationContext.RunOnMainThread(() =>
             {
-                _isDirty = true;
+                if (this == null)
+                    return;
 
-                Kyub.ApplicationContext.RunOnMainThread(() =>
-                {
-                    if (this == null)
-                        return;
-
-                    TryApply();
-                });
-            }
+                TryApply();
+            });
         }
 
         protected bool _forceReapplyToAll = false;
         public virtual void SetLocaleDirtyAndReapplyToAll()
         {
-            if (!_isDirty || !_forceReapplyToAll)
+            if (this == null || Application.isPlaying)
+                return;
+
+            _isDirty = true;
+            _forceReapplyToAll = true;
+
+            Kyub.ApplicationContext.RunOnMainThread(() =>
             {
-                _isDirty = true;
-                _forceReapplyToAll = true;
+                if (this == null)
+                    return;
 
-                Kyub.ApplicationContext.RunOnMainThread(() =>
-                {
-                    if (this == null)
-                        return;
-
-                    TryApply();
-                });
-            }
+                TryApply();
+            });
         }
 
         public void TryApply(bool force = false)
@@ -323,6 +336,9 @@ namespace KyubEditor.Localization
 
         protected virtual void Apply()
         {
+            if (this == null || Application.isPlaying)
+                return;
+
             //Unload all other localization datas
             for (int i = 0; i < LocalizationDatas.Count; i++)
             {
@@ -345,6 +361,12 @@ namespace KyubEditor.Localization
 
         protected internal virtual bool TryGetLocalizedText_Internal(string key, out string val)
         {
+            if (this == null || Application.isPlaying)
+            {
+                val = key;
+                return false;
+            }
+
             key = key != null ? Kyub.RegexUtils.BulkReplace(key, LocaleManager.s_uselessCharsDict).Trim() : "";
             var dictionary = GetCurrentDictionaryData();
 
@@ -357,6 +379,12 @@ namespace KyubEditor.Localization
 
         protected internal virtual bool TryGetLocalizedText_Internal(string key, Dictionary<string, string> dict, out string val)
         {
+            if (this == null || Application.isPlaying)
+            {
+                val = key;
+                return false;
+            }
+
             key = key != null ? Kyub.RegexUtils.BulkReplace(key, LocaleManager.s_uselessCharsDict).Trim() : "";
 
             bool sucess = false;
@@ -371,6 +399,12 @@ namespace KyubEditor.Localization
 
         protected internal bool TryClearLocaleTags_Internal(string text, out string outText)
         {
+            if (this == null || Application.isPlaying)
+            {
+                outText = text;
+                return false;
+            }
+
             bool sucess = false;
 
             outText = Kyub.RegexUtils.BulkReplace(text, LocaleManager.s_localeClearTagsDict);
@@ -382,6 +416,12 @@ namespace KyubEditor.Localization
 
         protected internal virtual bool TryLocalizeByLocaleTag_Internal(string text, out string localizedValue)
         {
+            if (this == null || Application.isPlaying)
+            {
+                localizedValue = text;
+                return false;
+            }
+
             if (text.StartsWith(LocaleManager.LOCALE_SKIP_TAG, System.StringComparison.InvariantCultureIgnoreCase))
             {
                 TryClearLocaleTags_Internal(text, out localizedValue);
@@ -432,6 +472,9 @@ namespace KyubEditor.Localization
 
         protected virtual bool TryUpdateCurrentCulture()
         {
+            if (this == null || Application.isPlaying)
+                return false;
+
             CultureInfo[] availableCultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
 
             foreach (CultureInfo culture in availableCultures)
@@ -452,7 +495,7 @@ namespace KyubEditor.Localization
 
         public static bool TryGetLocalizedText(string key, out string localizedText, bool supportLocaleTag = false)
         {
-            if (Instance != null && Instance.Enabled)
+            if (!Application.isPlaying && Instance != null && Instance.Enabled)
             {
                 if (supportLocaleTag && Instance.TryLocalizeByLocaleTag_Internal(key, out localizedText))
                     return true;
@@ -481,6 +524,12 @@ namespace KyubEditor.Localization
         [ContextMenu("Refresh")]
         protected virtual void RefreshInstance()
         {
+            if (Application.isPlaying)
+            {
+                s_instance = null;
+                return;
+            }
+
             s_instance = this;
             s_instance.Init();
         }
