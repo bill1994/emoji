@@ -10,11 +10,13 @@ namespace KyubEditor.Localization
     public class EditorLocaleConfigAssetEditor : Editor
     {
         SerializedProperty m_script;
-        protected string[] elementsToIgnore = new string[] { "m_startingLanguage", "m_Script" };
+        SerializedProperty m_enabled;
+        protected string[] elementsToIgnore = new string[] { "m_startingLanguage", "m_Script", "m_enabled" };
 
         protected virtual void OnEnable()
         {
             m_script = serializedObject.FindProperty("m_Script");
+            m_enabled = serializedObject.FindProperty("m_enabled");
         }
 
         public override void OnInspectorGUI()
@@ -25,7 +27,8 @@ namespace KyubEditor.Localization
             GUI.enabled = false;
             EditorGUILayout.PropertyField(m_script);
             GUI.enabled = oldGuiEnabled;
-
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(m_enabled);
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("General Config Fields", EditorStyles.boldLabel);
             DrawLanguegePicker();
@@ -56,10 +59,9 @@ namespace KyubEditor.Localization
             if (newIndex != index)
             {
                 serializedObject.ApplyModifiedProperties();
-                if (Application.isPlaying)
-                    guiTarget.CurrentLanguage = possibleLanguages[newIndex];
-                else
-                    guiTarget.StartingLanguage = possibleLanguages[newIndex];
+                guiTarget.CurrentLanguage = possibleLanguages[newIndex];
+                guiTarget.StartingLanguage = possibleLanguages[newIndex];
+                guiTarget.Init();
                 serializedObject.Update();
                 EditorUtility.SetDirty(target);
             }
