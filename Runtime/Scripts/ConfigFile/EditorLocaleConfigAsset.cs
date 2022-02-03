@@ -65,11 +65,12 @@ namespace KyubEditor.Localization
 
         #region Variables
 
+        [SerializeField]
+        bool m_enabled = true;
+
         [Header("General Config Fields")]
         [SerializeField]
         string m_startingLanguage = "en-US";
-        [SerializeField]
-        bool m_alwaysPickFromSystemLanguage = true;
         [Space]
         [SerializeField]
         List<LocalizationData> m_localizationDatas = new List<LocalizationData>() { new LocalizationData("en-US", "English") };
@@ -79,6 +80,21 @@ namespace KyubEditor.Localization
         #endregion
 
         #region Properties
+
+        public bool Enabled
+        {
+            get
+            {
+                return m_enabled;
+            }
+            set
+            {
+                if (m_enabled == value)
+                    return;
+                m_enabled = value;
+                SetLocaleDirtyAndReapplyToAll();
+            }
+        }
 
         public List<LocalizationData> LocalizationDatas
         {
@@ -93,6 +109,7 @@ namespace KyubEditor.Localization
                 if (m_localizationDatas == value)
                     return;
                 m_localizationDatas = value;
+                SetLocaleDirtyAndReapplyToAll();
             }
         }
 
@@ -107,6 +124,7 @@ namespace KyubEditor.Localization
                 if (m_startingLanguage == value)
                     return;
                 m_startingLanguage = value;
+                SetLocaleDirty();
             }
         }
 
@@ -144,17 +162,16 @@ namespace KyubEditor.Localization
             }
         }
 
-        public bool AlwaysPickFromSystemLanguage
+        #endregion
+
+        #region Unity Functions
+
+        protected virtual void OnDestroy()
         {
-            get
+            if(s_instance == this)
             {
-                return m_alwaysPickFromSystemLanguage;
-            }
-            set
-            {
-                if (m_alwaysPickFromSystemLanguage == value)
-                    return;
-                m_alwaysPickFromSystemLanguage = value;
+                s_instance = null;
+                LocaleManager.CallOnLocalizedChanged(true);
             }
         }
 
@@ -207,14 +224,9 @@ namespace KyubEditor.Localization
             return selectedIndex;
         }
 
-        protected virtual void Init()
+        public virtual void Init()
         {
-            if (AlwaysPickFromSystemLanguage)
-                ApplySystemLanguageAsInitial();
-            else
-            {
-                CurrentLanguage = StartingLanguage;
-            }
+            CurrentLanguage = StartingLanguage;
 
             //Unload all other localization datas
             for (int i = 0; i < LocalizationDatas.Count; i++)
@@ -440,7 +452,7 @@ namespace KyubEditor.Localization
 
         public static bool TryGetLocalizedText(string key, out string localizedText, bool supportLocaleTag = false)
         {
-            if (Instance != null)
+            if (Instance != null && Instance.Enabled)
             {
                 if (supportLocaleTag && Instance.TryLocalizeByLocaleTag_Internal(key, out localizedText))
                     return true;
