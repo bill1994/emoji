@@ -220,7 +220,7 @@ namespace Kyub.Localization.UI
 
         #region Locale Parser Functions
 
-        protected virtual bool ParseInputTextAndLocalizeTags()
+        protected internal virtual bool ParseInputTextAndLocalizeTags()
         {
             _localeParsingRequired = false;
 
@@ -257,7 +257,7 @@ namespace Kyub.Localization.UI
             return false;
         }
 
-        protected virtual bool ApplyMonoSpacingValues(string text, out string outText)
+        protected internal virtual bool ApplyMonoSpacingValues(string text, out string outText)
         {
             bool sucess = false;
 
@@ -272,7 +272,7 @@ namespace Kyub.Localization.UI
             return sucess;
         }
 
-        protected bool TryClearLocaleTags(string text, out string outText)
+        protected internal bool TryClearLocaleTags(string text, out string outText)
         {
             bool sucess = false;
 
@@ -288,7 +288,7 @@ namespace Kyub.Localization.UI
             return sucess;
         }
 
-        protected bool TryGetLocalizedText(string text, out string localizedValue)
+        protected internal bool TryGetLocalizedText(string text, out string localizedValue)
         {
             bool sucess = false;
 
@@ -324,7 +324,7 @@ namespace Kyub.Localization.UI
 
         #region New TMP PreProcessor Functions
 
-        protected bool IsUsingNewPreprocessor()
+        protected internal bool IsUsingNewPreprocessor()
         {
 #if TMP_NEW_PREPROCESSOR
             InitTextPreProcessor();
@@ -335,7 +335,7 @@ namespace Kyub.Localization.UI
             return false;
         }
 
-        protected virtual void InitTextPreProcessor()
+        protected internal virtual void InitTextPreProcessor()
         {
 #if TMP_NEW_PREPROCESSOR
             if (m_SecondaryPreprocessor as Object == this)
@@ -606,4 +606,27 @@ namespace Kyub.Localization.UI
 
 #endregion
     }
+
+    #region Gizmos Drawer
+
+#if UNITY_EDITOR
+    public class TMP_LocaleTextUGUIGizmoDrawer
+    {
+        [UnityEditor.DrawGizmo(UnityEditor.GizmoType.Selected | UnityEditor.GizmoType.Active | UnityEditor.GizmoType.NonSelected)]
+        protected static void DrawGizmoForMyScript(TMP_LocaleTextUGUI scr, UnityEditor.GizmoType gizmoType)
+        {
+            if (!Application.isPlaying && scr != null && scr.IsLocalized && !string.IsNullOrEmpty(scr.text))
+            {
+                var instance = KyubEditor.Localization.EditorLocaleConfigAsset.Instance;
+                if (instance != null && instance.EnableVisualDebug && !scr.TryGetLocalizedText(scr.text, out _))
+                {
+                    //Draw Gizmos when localization failed to find key and we support visual debug
+                    instance.DrawDebugRect(scr.rectTransform);
+                }
+            }
+        }
+    }
+#endif
+
+#endregion
 }

@@ -58,8 +58,10 @@ namespace KyubEditor.Localization
                 else if (s_instance == null)
                 {
                     s_instance = Resources.Load<EditorLocaleConfigAsset>(MAIN_PATH);
-                    if (s_instance != null)
-                        s_instance.Init();
+                    if (s_instance == null)
+                        s_instance = ScriptableObject.CreateInstance<EditorLocaleConfigAsset>();
+
+                    s_instance.Init();
                 }
                 return s_instance;
             }
@@ -77,6 +79,11 @@ namespace KyubEditor.Localization
         string m_startingLanguage = "en-US";
         [Space]
         [SerializeField]
+        bool m_enableVisualDebug = true;
+        [SerializeField]
+        Color m_debugColor = new Color(1, 0, 0, 0.25f);
+        [Space]
+        [SerializeField]
         List<LocalizationData> m_localizationDatas = new List<LocalizationData>() { new LocalizationData("en-US", "English") };
 
         int _index = 0;
@@ -84,6 +91,35 @@ namespace KyubEditor.Localization
         #endregion
 
         #region Properties
+
+        public bool EnableVisualDebug
+        {
+            get
+            {
+                return m_enableVisualDebug;
+            }
+            set
+            {
+                if (m_enableVisualDebug == value)
+                    return;
+                m_enableVisualDebug = value;
+                SetLocaleDirtyAndReapplyToAll();
+            }
+        }
+        public Color DebugColor
+        {
+            get
+            {
+                return m_debugColor;
+            }
+            set
+            {
+                if (m_debugColor == value)
+                    return;
+                m_debugColor = value;
+                SetLocaleDirtyAndReapplyToAll();
+            }
+        }
 
         public bool Enabled
         {
@@ -182,6 +218,40 @@ namespace KyubEditor.Localization
         #endregion
 
         #region Helper Functions
+
+        public bool IsCurrentDataLoaded()
+        {
+            var loc = LocalizationDatas.Count > _index ? LocalizationDatas[_index] : null;
+            return loc != null && loc.IsLoaded;
+        }
+
+        public void DrawDebugRect(RectTransform rectTransform)
+        {
+#if UNITY_EDITOR
+            if (m_enableVisualDebug && rectTransform != null && IsCurrentDataLoaded())
+            {
+                Vector3[] worldPos = new Vector3[4];
+                rectTransform.GetWorldCorners(worldPos);
+
+                Vector2 min = worldPos[0];
+                Vector2 max = worldPos[0];
+                for (int i = 1; i < worldPos.Length; i++)
+                {
+                    var currentPos = worldPos[i];
+                    if (currentPos.x < min.x)
+                        min.x = currentPos.x;
+                    if (currentPos.y < min.y)
+                        min.y = currentPos.y;
+
+                    if (currentPos.x > max.x)
+                        max.x = currentPos.x;
+                    if (currentPos.y > max.y)
+                        max.y = currentPos.y;
+                }
+                DrawDebugRectInternal(Rect.MinMaxRect(min.x, min.y, max.x, max.y), m_debugColor);
+            }
+#endif
+        }
 
         public virtual bool HasLanguage(string language)
         {
@@ -514,6 +584,21 @@ namespace KyubEditor.Localization
             TryGetLocalizedText(key, out localizedText, supportLocaleTag);
 
             return localizedText;
+        }
+
+        protected static void DrawDebugRectInternal(Rect worldRect, Color color)
+        {
+#if UNITY_EDITOR
+            var cachedGizmoColor = Gizmos.color;
+            Gizmos.color = color;
+            Gizmos.DrawCube(worldRect.center, new Vector3(worldRect.width, worldRect.height, 1));
+            Gizmos.color = cachedGizmoColor;
+
+            //Debug.DrawLine(new Vector3(worldRect.x, worldRect.y), new Vector3(worldRect.x + worldRect.width, worldRect.y), color);
+            //Debug.DrawLine(new Vector3(worldRect.x, worldRect.y), new Vector3(worldRect.x, worldRect.y + worldRect.height), color);
+            //Debug.DrawLine(new Vector3(worldRect.x + worldRect.width, worldRect.y + worldRect.height), new Vector3(worldRect.x + worldRect.width, worldRect.y), color);
+            //Debug.DrawLine(new Vector3(worldRect.x + worldRect.width, worldRect.y + worldRect.height), new Vector3(worldRect.x, worldRect.y + worldRect.height), color);
+#endif
         }
 
         #endregion
