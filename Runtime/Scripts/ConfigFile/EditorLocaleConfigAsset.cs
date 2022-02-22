@@ -591,7 +591,7 @@ namespace KyubEditor.Localization
 #if UNITY_EDITOR
             var cachedGizmoColor = Gizmos.color;
             Gizmos.color = color;
-            Gizmos.DrawWireCube(worldRect.center, new Vector3(worldRect.width, worldRect.height, 1));
+            Gizmos.DrawCube(worldRect.center, new Vector3(worldRect.width, worldRect.height, 1));
             Gizmos.color = cachedGizmoColor;
 
             //Debug.DrawLine(new Vector3(worldRect.x, worldRect.y), new Vector3(worldRect.x + worldRect.width, worldRect.y), color);
