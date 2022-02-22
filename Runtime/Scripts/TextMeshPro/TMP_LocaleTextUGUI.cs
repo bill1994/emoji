@@ -214,6 +214,30 @@ namespace Kyub.Localization.UI
             InitTextPreProcessor();
             base.OnValidate();
         }
+
+        protected bool _canRefreshLocalizedText = true;
+        protected virtual void OnDrawGizmos()
+        {
+            if (_canRefreshLocalizedText && !Application.isPlaying && this != null && this.IsLocalized && !string.IsNullOrEmpty(this.text))
+            {
+                var instance = KyubEditor.Localization.EditorLocaleConfigAsset.Instance;
+                _canRefreshLocalizedText = false;
+
+                UnityEditor.EditorApplication.CallbackFunction updateCallback = null;
+                updateCallback = () =>
+                {
+                    UnityEditor.EditorApplication.update -= updateCallback;
+                    _canRefreshLocalizedText = true;
+                };
+
+                if (instance != null && instance.EnableVisualDebug && !this.TryGetLocalizedText(this.text, out _))
+                {
+                    //Draw Gizmos when localization failed to find key and we support visual debug
+                    instance.DrawDebugRect(this.rectTransform);
+                }
+                UnityEditor.EditorApplication.update += updateCallback;
+            }
+        }
 #endif
 
         #endregion
@@ -303,7 +327,7 @@ namespace Kyub.Localization.UI
                 _lastLocalizedLanguage = LocaleManager.Instance.CurrentLanguage;
             }
 #if UNITY_EDITOR
-            else if(!Application.isPlaying && m_isLocalized && !string.IsNullOrEmpty(text))
+            else if (!Application.isPlaying && m_isLocalized && !string.IsNullOrEmpty(text))
             {
                 sucess = KyubEditor.Localization.EditorLocaleConfigAsset.TryGetLocalizedText(text, out localizedValue, m_supportLocaleRichTextTags && m_isRichText);
 
@@ -346,7 +370,7 @@ namespace Kyub.Localization.UI
                 if (m_TextPreprocessor != null)
                     m_SecondaryPreprocessor = m_TextPreprocessor;
                 m_TextPreprocessor = this;
-            } 
+            }
 #endif
         }
 
@@ -465,9 +489,9 @@ namespace Kyub.Localization.UI
         }
 #endif
 
-#endregion
+        #endregion
 
-#region Layout Overriden Functions
+        #region Layout Overriden Functions
 
 #if (TMP_2_1_3_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_0_3_OR_NEWER
         public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
@@ -498,12 +522,12 @@ namespace Kyub.Localization.UI
 
             //if (IsInputParsingRequired_Internal || m_isTextTruncated)
             //{
-                m_isCalculatingPreferredValues = true;
-                ParseInputText();
+            m_isCalculatingPreferredValues = true;
+            ParseInputText();
 
-                _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
-                if (_localeParsingRequired)
-                    ParseInputTextAndLocalizeTags();
+            _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
+            if (_localeParsingRequired)
+                ParseInputTextAndLocalizeTags();
             //}
 
             m_AutoSizeIterationCount = 0;
@@ -538,12 +562,12 @@ namespace Kyub.Localization.UI
 
             //if (IsInputParsingRequired_Internal || m_isTextTruncated)
             //{
-                m_isCalculatingPreferredValues = true;
-                ParseInputText();
+            m_isCalculatingPreferredValues = true;
+            ParseInputText();
 
-                _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
-                if (_localeParsingRequired)
-                    ParseInputTextAndLocalizeTags();
+            _localeParsingRequired = m_isLocalized || (m_supportLocaleRichTextTags && m_isRichText) || (m_monospaceDistEm != 0 && m_isRichText);
+            if (_localeParsingRequired)
+                ParseInputTextAndLocalizeTags();
             //}
 
             // Reset Text Auto Size iteration tracking.
@@ -568,9 +592,9 @@ namespace Kyub.Localization.UI
         }
 #endif
 
-#endregion
+        #endregion
 
-#region Register Functions
+        #region Register Functions
 
         protected virtual void RegisterEvents()
         {
@@ -584,9 +608,9 @@ namespace Kyub.Localization.UI
             LocaleManager.OnLocalizeChanged -= HandleOnLocalize;
         }
 
-#endregion
+        #endregion
 
-#region Receivers
+        #region Receivers
 
         protected virtual void HandleOnLocalize(bool forceReapply)
         {
@@ -596,7 +620,7 @@ namespace Kyub.Localization.UI
                 SetText(m_text);
             }
 #if UNITY_EDITOR
-            else if(!Application.isPlaying && KyubEditor.Localization.EditorLocaleConfigAsset.Instance && m_isLocalized && (forceReapply || !string.Equals(_lastLocalizedLanguage, KyubEditor.Localization.EditorLocaleConfigAsset.Instance.CurrentLanguage)))
+            else if (!Application.isPlaying && KyubEditor.Localization.EditorLocaleConfigAsset.Instance && m_isLocalized && (forceReapply || !string.Equals(_lastLocalizedLanguage, KyubEditor.Localization.EditorLocaleConfigAsset.Instance.CurrentLanguage)))
             {
                 //Invalidate Text in EditorMode
                 SetText(m_text);
@@ -604,10 +628,10 @@ namespace Kyub.Localization.UI
 #endif
         }
 
-#endregion
+        #endregion
     }
 
-    #region Gizmos Drawer
+    /*#region Gizmos Drawer
 
 #if UNITY_EDITOR
     public class TMP_LocaleTextUGUIGizmoDrawer
@@ -628,5 +652,5 @@ namespace Kyub.Localization.UI
     }
 #endif
 
-#endregion
+    #endregion*/
 }
