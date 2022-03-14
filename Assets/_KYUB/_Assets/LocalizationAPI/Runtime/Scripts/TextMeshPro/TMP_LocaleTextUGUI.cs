@@ -407,7 +407,10 @@ namespace Kyub.Localization.UI
 
             //TODO: Find a better option
             //TMP drop support to automatic convert \\n into \n
-            text = text.Replace("\\n", "\n").Replace("\\t", "\t");
+            if (m_parseCtrlCharacters)
+            {
+                text = text.Replace("\\n", "\n").Replace("\\t", "\t");
+            }
 #endif
             parsedString = text;
 
