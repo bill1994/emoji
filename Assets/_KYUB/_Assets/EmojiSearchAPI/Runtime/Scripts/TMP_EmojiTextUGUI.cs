@@ -273,8 +273,13 @@ namespace Kyub.EmojiSearch.UI
 #if TMP_NEW_PREPROCESSOR
             if (m_SecondaryPreprocessor != null)
                 text = m_SecondaryPreprocessor.PreprocessText(text);
+
+            //TODO: Find a better option
+            //TMP drop support to automatic convert \\n into \n
+            text = text.Replace("\\n", "\n").Replace("\\t", "\t");
 #endif
             parsedString = text;
+
             return success;
         }
 
