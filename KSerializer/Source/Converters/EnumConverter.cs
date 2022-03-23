@@ -79,29 +79,9 @@ namespace Kyub.Serialization.Internal {
             }
             else
             {
-                HashSet<string> valueNames = new HashSet<string>(instance.ToString().Split(new char[] { ',', ' ', '|' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+                var serializedValueStr = GetSerializedString(instance, storageType);
 
-                StringBuilder builder = new StringBuilder();
-
-                var instanceType = instance.GetType();
-                var enumValues = Enum.GetValues(storageType);
-                foreach (var enumValue in enumValues)
-                {
-                    var memberName = enumValue.ToString();
-                    
-                    if (valueNames.Contains(memberName))
-                    {
-                        var field = instanceType.GetField(enumValue.ToString());
-                        var attrs = field.GetCustomAttributes(typeof(SerializePropertyAttribute), true);
-                        var attr = attrs != null && attrs.Length > 0 ? (SerializePropertyAttribute)attrs[0] : null;
-
-                        var jsonName = attr != null && !string.IsNullOrEmpty(attr.Name) ? attr.Name : memberName;
-                        if (builder.Length > 0)
-                            builder.Append(",");
-                        builder.Append(jsonName);
-                    }
-                }
-                serialized = new JsonObject(builder.ToString());
+                serialized = new JsonObject(serializedValueStr);
             }
             return Result.Success;
         }
@@ -163,7 +143,7 @@ namespace Kyub.Serialization.Internal {
         /// <summary>
         /// Returns true if the given value is contained within the specified array.
         /// </summary>
-        private static bool ArrayContains<T>(T[] values, T value) {
+        protected static bool ArrayContains<T>(T[] values, T value) {
             // note: We don't use LINQ because this function will *not* allocate
             for (int i = 0; i < values.Length; ++i) {
                 if (EqualityComparer<T>.Default.Equals(values[i], value)) {
@@ -173,9 +153,6 @@ namespace Kyub.Serialization.Internal {
 
             return false;
         }
-
-        public enum bla { [SerializeProperty("cla")] a, b, c}
-
 
         public static Dictionary<object, string> GetValuePerDescription(Type storageType)
         {
@@ -206,6 +183,38 @@ namespace Kyub.Serialization.Internal {
                 }
             }
             return map;
+        }
+
+        public static string GetSerializedString<T>(T instance) where T : struct
+        {
+            return GetSerializedString(instance, typeof(T));
+        }
+
+        public static string GetSerializedString(object instance, Type storageType)
+        {
+            HashSet<string> valueNames = new HashSet<string>(instance.ToString().Split(new char[] { ',', ' ', '|' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+
+            StringBuilder builder = new StringBuilder();
+
+            var instanceType = instance.GetType();
+            var enumValues = Enum.GetValues(storageType);
+            foreach (var enumValue in enumValues)
+            {
+                var memberName = enumValue.ToString();
+
+                if (valueNames.Contains(memberName))
+                {
+                    var field = instanceType.GetField(enumValue.ToString());
+                    var attrs = field.GetCustomAttributes(typeof(SerializePropertyAttribute), true);
+                    var attr = attrs != null && attrs.Length > 0 ? (SerializePropertyAttribute)attrs[0] : null;
+
+                    var jsonName = attr != null && !string.IsNullOrEmpty(attr.Name) ? attr.Name : memberName;
+                    if (builder.Length > 0)
+                        builder.Append(",");
+                    builder.Append(jsonName);
+                }
+            }
+            return builder.ToString();
         }
     }
 }
