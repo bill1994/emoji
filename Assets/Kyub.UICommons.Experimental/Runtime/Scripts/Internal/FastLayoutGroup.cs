@@ -620,10 +620,7 @@ namespace Kyub.UI.Experimental
         void ILayoutElement.CalculateLayoutInputHorizontal()
         {
             if (isDirty)
-            {
-                Debug.Log("Recalculate " + name);
                 CalculateLayoutInputHorizontal();
-            }
         }
 
         void ILayoutElement.CalculateLayoutInputVertical()
