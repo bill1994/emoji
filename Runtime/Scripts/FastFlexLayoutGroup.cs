@@ -307,6 +307,9 @@ namespace Kyub.UI.Experimental
             for (int i = 0; i < children.Count; i++)
             {
                 var child = children[i];
+                if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                    continue;
+
                 float min, preferred, flexible;
                 GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible);
                 float scaleFactor = useScale ? child.rectTransform.localScale[axis] : 1f;
@@ -422,6 +425,9 @@ namespace Kyub.UI.Experimental
             for (int i = 0; i < group.Children.Count; i++)
             {
                 var child = group.Children[i];
+                if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                    continue;
+
                 float min, preferred, flexible, max;
                 GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
 
@@ -531,6 +537,9 @@ namespace Kyub.UI.Experimental
                 for (int i = 0; i < group.Children.Count; i++)
                 {
                     var child = group.Children[i];
+                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                        continue;
+
                     float min, preferred, flexible, max;
                     GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
                     float scaleFactor = useScale ? child.rectTransform.localScale[axis] : 1f;
@@ -586,6 +595,9 @@ namespace Kyub.UI.Experimental
                 for (int i = 0; i < group.Children.Count; i++)
                 {
                     var child = group.Children[i];
+                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                        continue;
+
                     float min, preferred, flexible, max;
                     GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
                     float scaleFactor = useScale ? child.rectTransform.localScale[axis] : 1f;

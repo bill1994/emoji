@@ -27,6 +27,8 @@ namespace Kyub.UI.Experimental
         float cachedRectHeight { get; }
         bool cachedLayoutIgnore { get; }
 
+        void CalculateLayoutIgnore();
+
         void SendFeedback();
     }
 
