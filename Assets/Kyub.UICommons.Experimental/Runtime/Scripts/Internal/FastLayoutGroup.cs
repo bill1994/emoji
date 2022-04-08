@@ -279,8 +279,8 @@ namespace Kyub.UI.Experimental
 
         protected virtual void CalculateRectTransformDimensions()
         {
-            cachedRectWidth = rectTransform.sizeDelta.x;
-            cachedRectHeight = rectTransform.sizeDelta.y;
+            cachedRectWidth = rectTransform.rect.size.x;
+            cachedRectHeight = rectTransform.rect.size.y;
         }
 
         /// <summary>
@@ -525,11 +525,11 @@ namespace Kyub.UI.Experimental
 
             if (!CanvasUpdateRegistry.IsRebuildingLayout())
             {
-                CancelInvoke("MarkLayoutForRebuild");
+                CancelInvoke(nameof(MarkLayoutForRebuild));
                 LayoutRebuilder.MarkLayoutForRebuild(this.rectTransform);
             }
-            else if (!IsInvoking("MarkLayoutForRebuild"))
-                Invoke("MarkLayoutForRebuild", 0);
+            else if (!IsInvoking(nameof(MarkLayoutForRebuild)))
+                Invoke(nameof(MarkLayoutForRebuild), 0);
         }
 
         #endregion
@@ -561,6 +561,10 @@ namespace Kyub.UI.Experimental
                     layoutFeedbackElement = rect.gameObject.AddComponent<FastLayoutFeedback>();
                     layoutFeedbackElement.CalculateLayoutInputHorizontal();
                     layoutFeedbackElement.CalculateLayoutInputVertical();
+                }
+                else
+                {
+                    layoutFeedbackElement.CalculateLayoutIgnore();
                 }
 
                 if (!layoutFeedbackElement.cachedLayoutIgnore)
@@ -616,7 +620,10 @@ namespace Kyub.UI.Experimental
         void ILayoutElement.CalculateLayoutInputHorizontal()
         {
             if (isDirty)
+            {
+                Debug.Log("Recalculate " + name);
                 CalculateLayoutInputHorizontal();
+            }
         }
 
         void ILayoutElement.CalculateLayoutInputVertical()

@@ -288,8 +288,8 @@ namespace Kyub.UI.Experimental
         protected override void OnValidate()
         {
             base.OnValidate();
-            if(!IsInvoking("CheckAutoDestroy"))
-                Invoke("CheckAutoDestroy", 0);
+            if(!IsInvoking(nameof(CheckAutoDestroy)))
+                Invoke(nameof(CheckAutoDestroy), 0);
         }
 #endif
 
@@ -300,7 +300,7 @@ namespace Kyub.UI.Experimental
         internal void CheckAutoDestroy()
         {
 #if UNITY_EDITOR
-            CancelInvoke("CheckAutoDestroy");
+            CancelInvoke(nameof(CheckAutoDestroy));
             hideFlags = HideFlags.HideInInspector | HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
 #endif
             if (group == null || group.rectTransform == null)
@@ -326,7 +326,7 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        DrivenAxis _dirtyAxis = DrivenAxis.None;
+        internal DrivenAxis _dirtyAxis = DrivenAxis.None;
         internal void SetAxisDirty(DrivenAxis dirtyAxis)
         {
             _dirtyAxis |= dirtyAxis;
@@ -346,7 +346,7 @@ namespace Kyub.UI.Experimental
             }
         }
 
-        internal void CalculateLayoutIgnore()
+        public void CalculateLayoutIgnore()
         {
             var toIgnoreList = ListPool<Component>.Get();
             rectTransform.GetComponents(typeof(ILayoutIgnorer), toIgnoreList);
@@ -356,11 +356,15 @@ namespace Kyub.UI.Experimental
             {
                 for (int j = 0; j < toIgnoreList.Count; j++)
                 {
-                    var ignorer = (ILayoutIgnorer)toIgnoreList[j];
-                    if (!ignorer.ignoreLayout)
+                    var layoutIgnore = toIgnoreList[j];
+                    if (layoutIgnore != null && layoutIgnore != this)
                     {
-                        canAdd = true;
-                        break;
+                        var ignorer = (ILayoutIgnorer)layoutIgnore;
+                        if (!ignorer.ignoreLayout)
+                        {
+                            canAdd = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -393,18 +397,19 @@ namespace Kyub.UI.Experimental
 
         public void CalculateLayoutInputHorizontal()
         {
-            cachedMinWidth = LayoutUtility.GetMinWidth(this.rectTransform);
-            cachedPreferredWidth = LayoutUtility.GetPreferredWidth(this.rectTransform);
-            cachedFlexibleWidth = LayoutUtility.GetFlexibleWidth(this.rectTransform);
+            cachedMinWidth = LayoutUtilityEx.GetMinWidth(this.rectTransform);
+            cachedPreferredWidth = LayoutUtilityEx.GetPreferredWidth(this.rectTransform);
+            cachedFlexibleWidth = LayoutUtilityEx.GetFlexibleWidth(this.rectTransform);
             cachedMaxWidth = LayoutUtilityEx.GetMaxWidth(this.rectTransform, -1);
             CalculateLayoutIgnore();
+            SendFeedback();
         }
 
         public void CalculateLayoutInputVertical()
         {
-            cachedMinHeight = LayoutUtility.GetMinHeight(this.rectTransform);
-            cachedPreferredHeight = LayoutUtility.GetPreferredHeight(this.rectTransform);
-            cachedFlexibleHeight = LayoutUtility.GetFlexibleHeight(this.rectTransform);
+            cachedMinHeight = LayoutUtilityEx.GetMinHeight(this.rectTransform);
+            cachedPreferredHeight = LayoutUtilityEx.GetPreferredHeight(this.rectTransform);
+            cachedFlexibleHeight = LayoutUtilityEx.GetFlexibleHeight(this.rectTransform);
             cachedMaxHeight = LayoutUtilityEx.GetMaxHeight(this.rectTransform, -1);
             SendFeedback();
         }

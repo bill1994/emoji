@@ -124,8 +124,8 @@ namespace Kyub.UI.Experimental
             {
                 IFastLayoutFeedback child = children[i];
 
-                if (child == null)
-                    return;
+                if (child == null || child.cachedLayoutIgnore)
+                    continue;
 
                 float min, preferred, flexible, max;
                 GetChildSizes(children[i], axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
@@ -194,8 +194,8 @@ namespace Kyub.UI.Experimental
                 var elements = (isAxisDirty ? (ICollection<IFastLayoutFeedback>)children : _dirtyChildren);
                 foreach (IFastLayoutFeedback child in elements)
                 {
-                    if (child.rectTransform == null || child.rectTransform.parent != this.transform)
-                        return;
+                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                        continue;
 
                     float min, preferred, flexible, max;
                     GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
@@ -259,6 +259,9 @@ namespace Kyub.UI.Experimental
                 for (int i = 0; i < children.Count; i++)
                 {
                     IFastLayoutFeedback child = children[i];
+                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                        continue;
+
                     float min, preferred, flexible, max;
                     GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
 
@@ -369,6 +372,9 @@ namespace Kyub.UI.Experimental
                 for (int i = 0; i < preFilterIndexes.Count; i++)
                 {
                     IFastLayoutFeedback child = children[preFilterIndexes[i]];
+                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                        continue;
+
                     float min, preferred, flexible, max;
 
                     GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
