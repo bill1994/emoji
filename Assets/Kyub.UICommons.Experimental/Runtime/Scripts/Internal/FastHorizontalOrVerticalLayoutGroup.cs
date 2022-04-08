@@ -128,7 +128,7 @@ namespace Kyub.UI.Experimental
                     continue;
 
                 float min, preferred, flexible, max;
-                GetChildSizes(children[i], axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
+                GetChildSizes(child, axis, controlSize, childForceExpandSize, out min, out preferred, out flexible, out max);
 
                 //Add this child to be pre-processed before SetLayout (We must pre-process elements with Max Value)
                 if (max >= 0 && flexible > 0)
@@ -194,7 +194,7 @@ namespace Kyub.UI.Experimental
                 var elements = (isAxisDirty ? (ICollection<IFastLayoutFeedback>)children : _dirtyChildren);
                 foreach (IFastLayoutFeedback child in elements)
                 {
-                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                    if (child == null || child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
                         continue;
 
                     float min, preferred, flexible, max;
@@ -259,7 +259,7 @@ namespace Kyub.UI.Experimental
                 for (int i = 0; i < children.Count; i++)
                 {
                     IFastLayoutFeedback child = children[i];
-                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                    if (child == null || child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
                         continue;
 
                     float min, preferred, flexible, max;
@@ -372,7 +372,7 @@ namespace Kyub.UI.Experimental
                 for (int i = 0; i < preFilterIndexes.Count; i++)
                 {
                     IFastLayoutFeedback child = children[preFilterIndexes[i]];
-                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                    if (child == null || child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
                         continue;
 
                     float min, preferred, flexible, max;
