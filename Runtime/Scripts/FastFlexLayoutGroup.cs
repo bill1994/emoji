@@ -307,7 +307,7 @@ namespace Kyub.UI.Experimental
             for (int i = 0; i < children.Count; i++)
             {
                 var child = children[i];
-                if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                if (child == null || child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
                     continue;
 
                 float min, preferred, flexible;
@@ -425,7 +425,7 @@ namespace Kyub.UI.Experimental
             for (int i = 0; i < group.Children.Count; i++)
             {
                 var child = group.Children[i];
-                if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                if (child == null || child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
                     continue;
 
                 float min, preferred, flexible, max;
@@ -537,7 +537,7 @@ namespace Kyub.UI.Experimental
                 for (int i = 0; i < group.Children.Count; i++)
                 {
                     var child = group.Children[i];
-                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                    if (child == null || child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
                         continue;
 
                     float min, preferred, flexible, max;
@@ -595,7 +595,7 @@ namespace Kyub.UI.Experimental
                 for (int i = 0; i < group.Children.Count; i++)
                 {
                     var child = group.Children[i];
-                    if (child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
+                    if (child == null || child.cachedLayoutIgnore || child.rectTransform == null || child.rectTransform.parent != this.transform)
                         continue;
 
                     float min, preferred, flexible, max;
