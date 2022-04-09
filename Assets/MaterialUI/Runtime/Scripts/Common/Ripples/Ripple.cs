@@ -1,5 +1,5 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
+﻿// Based in MaterialUI originally found in https://github.com/InvexGames/MaterialUI
+// Kyub Interactive LTDA 2022. 
 
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,6 @@ using UnityEngine.UI;
 
 namespace MaterialUI
 {
-    /// <summary>
-    /// Component that controls the lifecycle of a ripple and animates it.
-    /// </summary>
-    /// <seealso cref="UnityEngine.MonoBehaviour" />
     public class Ripple : Image
     {
         #region Coefficients
@@ -74,6 +70,8 @@ namespace MaterialUI
         private static readonly float m_Tier7Value = 0.01f;
 
         #endregion
+
+        #region Fields
 
         /// <summary>
         /// The global identifier of the ripple.
@@ -187,192 +185,36 @@ namespace MaterialUI
         /// </summary>
         private static List<int> m_AverageSizes = new List<int>();
 
-        /// <summary>
-        /// See MonoBehaviour.OnApplicationQuit.
-        /// </summary>
-        protected virtual void OnApplicationQuit()
-        {
-            ResetMaterial();
-        }
+        #endregion
 
+        #region Unity Functions
 
-        /// <summary>
-        /// Resets the ripple material to its default value.
-        /// </summary>
-        public static void ResetMaterial()
+        protected override void OnPopulateMesh(VertexHelper vh)
         {
-            if (!m_MaterialIsReset)
+            base.OnPopulateMesh(vh);
+
+            List<UIVertex> verts = new List<UIVertex>();
+            List<int> indicies = new List<int>();
+
+            vh.GetUIVertexStream(verts);
+            vh.Clear();
+
+            for (int i = 0; i < verts.Count; i++)
             {
-                m_MaterialIsReset = true;
-                if (m_RippleMaterial != null)
-                {
-                    m_RippleMaterial.SetFloat("_Softening", 0.25f);
-                }
-            }
-        }
+                var vert = verts[i];
 
-        /// <summary>
-        /// Creates the ripple. Only called when a ripple is actually created and not needed when reused.
-        /// </summary>
-        /// <param name="id">The global identifier of the ripple.</param>
-        /// <param name="imageData">The image data to use for the ripple.</param>
-        public void Create(int id, VectorImageData imageData)
-        {
-            if (m_Id != 0)
-            {
-                Debug.Log("Cannot Setup a Ripple more than once");
-                return;
+                vert.position *= 1.36f;
+                vert.position += new Vector3(2.209f, 0f, 0f) * (vert.position.x < 0 ? 1 : -1);
+                vert.position += new Vector3(0f, 2.209f, 0f) * (vert.position.y < 0 ? 1 : -1);
+
+                verts[i] = vert;
+                indicies.Add(i);
             }
 
-            m_Id = id;
-            m_CanvasGroup = GetComponent<CanvasGroup>();
-
-            gameObject.GetAddComponent<Canvas>();
-
-            var layoutElement = gameObject.GetAddComponent<LayoutElement>();
-            layoutElement.ignoreLayout = true;
-
-            if (m_RippleMaterial == null)
-            {
-                m_RippleMaterial = m_Material;
-            }
+            vh.AddUIVertexStream(verts, indicies);
         }
 
-        /// <summary>
-        /// Clears the rippleData, call when resetting the ripple.
-        /// </summary>
-        public void ClearData()
-        {
-            m_RippleData = null;
-        }
-
-        /// <summary>
-        /// Sets the ripple's transform and rippleData, and prepares it to start expanding.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="positon">The positon.</param>
-        /// <param name="creator">The creator to send callbacks to.</param>
-        /// <param name="oscillate">If true, the ripple will oscillate when expanded.</param>
-        public void Setup(RippleData data, Vector2 positon, IRippleCreator creator, bool oscillate = false)
-        {
-            m_RippleData = data;
-            m_RippleParent = (RectTransform)data.RippleParent;
-            rectTransform.SetParent(m_RippleParent);
-            rectTransform.SetSiblingIndex(0);
-            m_Oscillate = oscillate;
-            rectTransform.sizeDelta = Vector2.zero;
-            rectTransform.position = new Vector3(positon.x, positon.y, m_RippleParent.position.z);
-
-            rectTransform.localEulerAngles = Vector3.zero;
-            color = data.Color;
-            canvasGroup.alpha = data.StartAlpha;
-            m_AnimationDuration = 4f / data.Speed;
-            m_RippleCreator = creator;
-
-            if (data.PlaceRippleBehind)
-            {
-                int index = m_RippleParent.GetSiblingIndex();
-                rectTransform.SetParent(m_RippleParent.parent);
-                rectTransform.SetSiblingIndex(index);
-            }
-
-        }
-
-        /// <summary>
-        /// Calculates the fully-expanded size of a ripple based on the parent and the rippleData's size settings.
-        /// </summary>
-        /// <returns>The calculated fully-expanded size.</returns>
-        private float CalculateSize()
-        {
-            float size;
-
-            if (rippleData.AutoSize)
-            {
-                float x = rectTransform.parent.GetComponent<RectTransform>().GetProperSize().x;
-                float y = rectTransform.parent.GetComponent<RectTransform>().GetProperSize().y;
-
-                if (rippleData.SizeMode == RippleData.SizeModeType.FillRect)
-                {
-                    x *= x;
-                    y *= y;
-
-                    x *= (rippleData.SizePercent / 100f);
-                    y *= (rippleData.SizePercent / 100f);
-
-                    size = Mathf.Sqrt(x + y);
-
-                }
-                else
-                {
-                    size = Mathf.Max(x, y) * rippleData.SizePercent / 100f;
-                }
-            }
-            else
-            {
-                size = rippleData.ManualSize;
-            }
-
-            if (m_Oscillate)
-            {
-                size *= 0.75f;
-            }
-
-            return size;
-        }
-
-        /// <summary>
-        /// Starts the expand animation.
-        /// </summary>
-        public void Expand()
-        {
-            rectTransform.localScale = Vector3.one;
-            if (m_RippleCreator != null)
-            {
-                m_RippleCreator.OnCreateRipple();
-            }
-            m_CurrentAlpha = canvasGroup.alpha;
-            m_CurrentSize = rectTransform.rect.width;
-            rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y, 0);
-            m_CurrentPosition = rectTransform.position;
-            SubmitSizeForSoftening();
-
-            m_AnimStartTime = Time.realtimeSinceStartup;
-            m_State = 1;
-        }
-
-        /// <summary>
-        /// Starts the contract animation.
-        /// </summary>
-        public void Contract()
-        {
-            m_CurrentAlpha = canvasGroup.alpha;
-            m_CurrentSize = rectTransform.rect.width;
-            rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y, 0);
-            m_CurrentPosition = rectTransform.position;
-            SubmitSizeForSoftening();
-
-            m_AnimStartTime = Time.realtimeSinceStartup;
-            m_State = 2;
-        }
-
-        public void InstantContract()
-        {
-            canvasGroup.alpha = 0f;
-            rectTransform.sizeDelta = Vector2.zero;
-            SubmitSizeForSoftening();
-            m_State = 0;
-            if (m_RippleCreator != null)
-            {
-                m_RippleCreator.OnDestroyRipple();
-            }
-            if(RippleManager.InstanceExists())
-                RippleManager.Instance.ReleaseRipple(this);
-        }
-
-        /// <summary>
-        /// See MonoBehaviour.Update.
-        /// </summary>
-        void Update()
+        protected virtual void Update()
         {
             m_AnimDeltaTime = Time.realtimeSinceStartup - m_AnimStartTime;
 
@@ -444,11 +286,7 @@ namespace MaterialUI
             }
         }
 
-
-        /// <summary>
-        /// See MonoBehaviour.LateUpdate.
-        /// </summary>
-        void LateUpdate()
+        protected virtual void LateUpdate()
         {
             if (m_AverageSizes.Count > 0)
             {
@@ -456,11 +294,187 @@ namespace MaterialUI
             }
         }
 
+        protected virtual void OnApplicationQuit()
+        {
+            ResetMaterial();
+        }
+
+        #endregion
+
+        #region Helper Functions
+
+        /// <summary>
+        /// Creates the ripple. Only called when a ripple is actually created and not needed when reused.
+        /// </summary>
+        /// <param name="id">The global identifier of the ripple.</param>
+        /// <param name="imageData">The image data to use for the ripple.</param>
+        public virtual void Create(int id, VectorImageData imageData)
+        {
+            if (m_Id != 0)
+            {
+                Debug.Log("Cannot Setup a Ripple more than once");
+                return;
+            }
+
+            m_Id = id;
+            m_CanvasGroup = GetComponent<CanvasGroup>();
+
+            gameObject.GetAddComponent<Canvas>();
+
+            var layoutElement = gameObject.GetAddComponent<LayoutElement>();
+            layoutElement.ignoreLayout = true;
+
+            if (m_RippleMaterial == null)
+            {
+                m_RippleMaterial = m_Material;
+            }
+
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
+        }
+
+        /// <summary>
+        /// Clears the rippleData, call when resetting the ripple.
+        /// </summary>
+        public virtual void ClearData()
+        {
+            m_RippleData = null;
+        }
+
+        /// <summary>
+        /// Sets the ripple's transform and rippleData, and prepares it to start expanding.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="positon">The positon.</param>
+        /// <param name="creator">The creator to send callbacks to.</param>
+        /// <param name="oscillate">If true, the ripple will oscillate when expanded.</param>
+        public virtual void Setup(RippleData data, Vector2 positon, IRippleCreator creator, bool oscillate = false)
+        {
+            m_RippleData = data;
+            m_RippleParent = (RectTransform)data.RippleParent;
+            rectTransform.SetParent(m_RippleParent);
+            rectTransform.SetSiblingIndex(0);
+            m_Oscillate = oscillate;
+            rectTransform.sizeDelta = Vector2.zero;
+            rectTransform.position = new Vector3(positon.x, positon.y, m_RippleParent.position.z);
+
+            rectTransform.localEulerAngles = Vector3.zero;
+            color = data.Color;
+            canvasGroup.alpha = data.StartAlpha;
+            m_AnimationDuration = 4f / data.Speed;
+            m_RippleCreator = creator;
+
+            if (data.PlaceRippleBehind)
+            {
+                int index = m_RippleParent.GetSiblingIndex();
+                rectTransform.SetParent(m_RippleParent.parent);
+                rectTransform.SetSiblingIndex(index);
+            }
+
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
+
+        }
+
+        /// <summary>
+        /// Calculates the fully-expanded size of a ripple based on the parent and the rippleData's size settings.
+        /// </summary>
+        /// <returns>The calculated fully-expanded size.</returns>
+        protected virtual float CalculateSize()
+        {
+            float size;
+
+            if (rippleData.AutoSize)
+            {
+                float x = rectTransform.parent.GetComponent<RectTransform>().GetProperSize().x;
+                float y = rectTransform.parent.GetComponent<RectTransform>().GetProperSize().y;
+
+                if (rippleData.SizeMode == RippleData.SizeModeType.FillRect)
+                {
+                    x *= x;
+                    y *= y;
+
+                    x *= (rippleData.SizePercent / 100f);
+                    y *= (rippleData.SizePercent / 100f);
+
+                    size = Mathf.Sqrt(x + y);
+
+                }
+                else
+                {
+                    size = Mathf.Max(x, y) * rippleData.SizePercent / 100f;
+                }
+            }
+            else
+            {
+                size = rippleData.ManualSize;
+            }
+
+            if (m_Oscillate)
+            {
+                size *= 0.75f;
+            }
+
+            return size;
+        }
+
+        /// <summary>
+        /// Starts the expand animation.
+        /// </summary>
+        public virtual void Expand()
+        {
+            rectTransform.localScale = Vector3.one;
+            if (m_RippleCreator != null)
+            {
+                m_RippleCreator.OnCreateRipple();
+            }
+            m_CurrentAlpha = canvasGroup.alpha;
+            m_CurrentSize = rectTransform.rect.width;
+            rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y, 0);
+            m_CurrentPosition = rectTransform.position;
+            SubmitSizeForSoftening();
+
+            m_AnimStartTime = Time.realtimeSinceStartup;
+            m_State = 1;
+
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
+        }
+
+        /// <summary>
+        /// Starts the contract animation.
+        /// </summary>
+        public virtual void Contract()
+        {
+            m_CurrentAlpha = canvasGroup.alpha;
+            m_CurrentSize = rectTransform.rect.width;
+            rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y, 0);
+            m_CurrentPosition = rectTransform.position;
+            SubmitSizeForSoftening();
+
+            m_AnimStartTime = Time.realtimeSinceStartup;
+            m_State = 2;
+
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
+        }
+
+        public virtual void InstantContract()
+        {
+            canvasGroup.alpha = 0f;
+            rectTransform.sizeDelta = Vector2.zero;
+            SubmitSizeForSoftening();
+            m_State = 0;
+            if (m_RippleCreator != null)
+            {
+                m_RippleCreator.OnDestroyRipple();
+            }
+            if(RippleManager.InstanceExists())
+                RippleManager.Instance.ReleaseRipple(this);
+
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
+        }
 
         /// <summary>
         /// Submits the size of this ripple to the list, for softening calculations.
         /// </summary>
-        public void SubmitSizeForSoftening()
+        public virtual void SubmitSizeForSoftening()
         {
             float size = (rectTransform.GetProperSize().x + rectTransform.GetProperSize().y) / 2f;
 
@@ -481,11 +495,29 @@ namespace MaterialUI
             m_AverageSizes.Add(Mathf.FloorToInt(size));
         }
 
+        #endregion
+
+        #region Static Functions
+
+        /// <summary>
+        /// Resets the ripple material to its default value.
+        /// </summary>
+        public static void ResetMaterial()
+        {
+            if (!m_MaterialIsReset)
+            {
+                m_MaterialIsReset = true;
+                if (m_RippleMaterial != null)
+                {
+                    m_RippleMaterial.SetFloat("_Softening", 0.25f);
+                }
+            }
+        }
 
         /// <summary>
         /// Calculates the best amount of softening to use for all ripples based on their sizes, and applies it to the material.
         /// </summary>
-        private static void CalculateAverageSoftening()
+        protected static void CalculateAverageSoftening()
         {
             float averageSizeInital = 0;
             float averageSizeFinal = 0;
@@ -558,40 +590,12 @@ namespace MaterialUI
         /// <param name="x">The x value.</param>
         /// <param name="c">The set of coefficients to use.</param>
         /// <returns></returns>
-        private static float PowerExp(float x, double[] c)
+        protected static float PowerExp(float x, double[] c)
         {
             return (float)(c[0] * Math.Pow(x, c[1]) * Math.Pow(Math.E, c[2] * x + c[3] * Mathf.Pow(x, 2) + c[4] * Mathf.Pow(x, 3)));
         }
 
-
-        /// <summary>
-        /// Callback function when a UI element needs to generate vertices.
-        /// </summary>
-        /// <param name="vh">The VertexHelper used.</param>
-        protected override void OnPopulateMesh(VertexHelper vh)
-        {
-            base.OnPopulateMesh(vh);
-
-            List<UIVertex> verts = new List<UIVertex>();
-            List<int> indicies = new List<int>();
-
-            vh.GetUIVertexStream(verts);
-            vh.Clear();
-
-            for (int i = 0; i < verts.Count; i++)
-            {
-                var vert = verts[i];
-
-                vert.position *= 1.36f;
-                vert.position += new Vector3(2.209f, 0f, 0f) * (vert.position.x < 0 ? 1 : -1);
-                vert.position += new Vector3(0f, 2.209f, 0f) * (vert.position.y < 0 ? 1 : -1);
-
-                verts[i] = vert;
-                indicies.Add(i);
-            }
-
-            vh.AddUIVertexStream(verts, indicies);
-        }
+        #endregion
     }
 
     /// <summary>

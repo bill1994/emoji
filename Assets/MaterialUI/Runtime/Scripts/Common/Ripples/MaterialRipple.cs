@@ -1,5 +1,5 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
+﻿// Based in MaterialUI originally found in https://github.com/InvexGames/MaterialUI
+// Kyub Interactive LTDA 2022. 
 
 using System.Collections;
 using UnityEngine;
@@ -27,15 +27,7 @@ namespace MaterialUI
     [ExecuteInEditMode]
     public class MaterialRipple : MonoBehaviour, IPointerEnterHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IRippleCreator, ISelectHandler, IDeselectHandler, ISubmitHandler
     {
-        protected BaseInput input
-        {
-            get
-            {
-                if (EventSystem.current && EventSystem.current.currentInputModule)
-                    return EventSystem.current.currentInputModule.input;
-                return null;
-            }
-        }
+        #region Enums
 
         /// <summary>
         /// The type of event that can trigger a ripple animation.
@@ -46,6 +38,41 @@ namespace MaterialUI
             Hovered,
             Clicked
         }
+
+
+        /// <summary>
+        /// The different types of mask handling modes a MaterialRipple can use.
+        /// </summary>
+        public enum MaskMode
+        {
+            /// <summary>
+            /// No mask is created/destroyed when creating/destroying ripples. Best option if you don't want to clip the ripples, or there is already a mask on the graphic.
+            /// </summary>
+            None,
+            /// <summary>
+            /// Uses a Mask component to clip the ripples to the graphic. Best option for non-rectangular graphics, but more expensive than RectMask2D.
+            /// </summary>
+            Mask,
+            /// <summary>
+            /// Uses a RectMask2D component to clip the ripples to the graphic. Cheaper than the Mask component, but will only work for rectangular graphics (most cases).
+            /// </summary>
+            RectMask2D
+        }
+
+        #endregion
+
+        #region Fields
+
+        protected BaseInput input
+        {
+            get
+            {
+                if (EventSystem.current && EventSystem.current.currentInputModule)
+                    return EventSystem.current.currentInputModule.input;
+                return null;
+            }
+        }
+
 
         [SerializeField]
         private bool m_RipplesEnabled = true;
@@ -191,26 +218,6 @@ namespace MaterialUI
             get { return m_HighlightColor; }
             set { m_HighlightColor = value; }
         }
-
-        /// <summary>
-        /// The different types of mask handling modes a MaterialRipple can use.
-        /// </summary>
-        public enum MaskMode
-        {
-            /// <summary>
-            /// No mask is created/destroyed when creating/destroying ripples. Best option if you don't want to clip the ripples, or there is already a mask on the graphic.
-            /// </summary>
-            None,
-            /// <summary>
-            /// Uses a Mask component to clip the ripples to the graphic. Best option for non-rectangular graphics, but more expensive than RectMask2D.
-            /// </summary>
-            Mask,
-            /// <summary>
-            /// Uses a RectMask2D component to clip the ripples to the graphic. Cheaper than the Mask component, but will only work for rectangular graphics (most cases).
-            /// </summary>
-            RectMask2D
-        }
-
 
         /// <summary>
         /// The type of mask handling modes the MaterialRipple will use.
@@ -361,6 +368,10 @@ namespace MaterialUI
         /// </summary>
         private bool m_Clicked;
 
+        #endregion
+
+        #region Unity Functions
+
         protected virtual void OnEnable()
         {
             if (Application.isPlaying)
@@ -370,9 +381,6 @@ namespace MaterialUI
             }
         }
 
-        /// <summary>
-        /// See Monobehaviour.Start.
-        /// </summary>
         protected virtual void Start()
         {
             if (Application.isPlaying)
@@ -409,15 +417,17 @@ namespace MaterialUI
             }
         }
 
-        /// <summary>
-        /// See Monobehaviour.Update.
-        /// </summary>
         protected virtual void Update()
         {
             if (!highlightGraphic)
             {
                 m_AnimState = 0;
                 return;
+            }
+
+            if(m_AnimState > 0)
+            {
+                Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             }
 
             if (m_AnimState == 1)
@@ -455,6 +465,115 @@ namespace MaterialUI
                 }
             }
         }
+
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (!enabled || !IsInteractable()) return;
+
+            if (highlightWhen == HighlightActive.Hovered)
+            {
+                Highlight(1);
+            }
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            m_Clicked = true;
+
+            DestroyRipple();
+
+            if (!enabled || !IsInteractable()) return;
+
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
+
+            if (checkForScroll)
+            {
+                StopCoroutine(nameof(ScrollCheck));
+                StartCoroutine(nameof(ScrollCheck));
+            }
+            else
+            {
+                CreateRipple(eventData.position, eventData.pressEventCamera);
+
+                if (highlightWhen == HighlightActive.Clicked)
+                {
+                    Highlight(1);
+                }
+            }
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
+
+            if (m_CheckForScroll)
+            {
+                StopCoroutine(nameof(ScrollCheckUp));
+                StartCoroutine(nameof(ScrollCheckUp));
+                return;
+            }
+
+            DestroyRipple();
+            m_Clicked = false;
+
+            if (highlightWhen == HighlightActive.Clicked)
+            {
+                Highlight(2);
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            DestroyRipple();
+            m_Clicked = false;
+
+            if (highlightWhen != HighlightActive.Never)
+            {
+                Highlight(2);
+            }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="eventData">Current event data.</param>
+        public void OnSelect(BaseEventData eventData)
+        {
+            StartCoroutine(SelectCheck());
+        }
+
+        /// <summary>
+        /// Called by the EventSystem when a new object is being selected.
+        /// </summary>
+        /// <param name="eventData">Current event data.</param>
+        public void OnDeselect(BaseEventData eventData)
+        {
+            DestroyRipple();
+            if (highlightWhen == HighlightActive.Hovered)
+            {
+                Highlight(2);
+            }
+            m_Clicked = false;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="eventData">Current event data.</param>
+        public void OnSubmit(BaseEventData eventData)
+        {
+            DestroyRipple();
+            if (highlightWhen == HighlightActive.Hovered)
+            {
+                Highlight(2);
+            }
+            StartCoroutine(SelectCheck());
+        }
+
+
+        #endregion
+
+        #region Helper Functions
 
         /// <summary>
         /// Checks if the highlight graphic is transparent (alpha is less than or equal to 0.015).
@@ -610,79 +729,6 @@ namespace MaterialUI
         }
 
         /// <summary>
-        /// </summary>
-        /// <param name="eventData">Current event data.</param>
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            if (!enabled || !IsInteractable()) return;
-
-            if (highlightWhen == HighlightActive.Hovered)
-            {
-                Highlight(1);
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="eventData">Current event data.</param>
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            m_Clicked = true;
-
-            DestroyRipple();
-
-            if (!enabled || !IsInteractable()) return;
-
-            if (checkForScroll)
-            {
-                StartCoroutine(ScrollCheck());
-            }
-            else
-            {
-                CreateRipple(eventData.position, eventData.pressEventCamera);
-
-                if (highlightWhen == HighlightActive.Clicked)
-                {
-                    Highlight(1);
-                }
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="eventData">Current event data.</param>
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            if (m_CheckForScroll)
-            {
-                StartCoroutine(ScrollCheckUp());
-                return;
-            }
-
-            DestroyRipple();
-            m_Clicked = false;
-
-            if (highlightWhen == HighlightActive.Clicked)
-            {
-                Highlight(2);
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="eventData">Current event data.</param>
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            DestroyRipple();
-            m_Clicked = false;
-
-            if (highlightWhen != HighlightActive.Never)
-            {
-                Highlight(2);
-            }
-        }
-
-        /// <summary>
         /// Begins animating the graphic color (if one exists).
         /// </summary>
         /// <param name="state">1 animates to normal color, 2 animates to highlight color.</param>
@@ -731,7 +777,7 @@ namespace MaterialUI
             CreateRipple(camera != null ? camera.ScreenToWorldPoint(screenPosition) : (Vector3)screenPosition, oscillate);
         }
 
-        private void CreateRipple(Vector3 worldPosition, bool oscillate = false)
+        protected void CreateRipple(Vector3 worldPosition, bool oscillate = false)
         {
             if (!m_RipplesEnabled) return;
 
@@ -784,7 +830,7 @@ namespace MaterialUI
         /// <summary>
         /// Called when a ripple is created and there are no other active ripples.
         /// </summary>
-        private void OnFirstRippleCreate()
+        protected void OnFirstRippleCreate()
         {
             if (m_ImageIsTransparent && highlightGraphic.color.a < 0.015f)
             {
@@ -806,7 +852,7 @@ namespace MaterialUI
         /// <summary>
         /// Called when a ripple is destroyed and there are no other active ripples.
         /// </summary>
-        private void OnLastRippleDestroy()
+        protected void OnLastRippleDestroy()
         {
             if (m_MaskMode == MaskMode.Mask)
             {
@@ -885,7 +931,7 @@ namespace MaterialUI
 
             Vector2 endPos = input.mousePosition;
 
-            if (Vector2.Distance(startPos, endPos) < 2f)
+            if (Vector2.Distance(startPos, endPos) < EventSystem.current.pixelDragThreshold)
             {
                 CreateRipple(startPos);
 
@@ -933,39 +979,6 @@ namespace MaterialUI
             }
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="eventData">Current event data.</param>
-        public void OnSelect(BaseEventData eventData)
-        {
-            StartCoroutine(SelectCheck());
-        }
-
-        /// <summary>
-        /// Called by the EventSystem when a new object is being selected.
-        /// </summary>
-        /// <param name="eventData">Current event data.</param>
-        public void OnDeselect(BaseEventData eventData)
-        {
-            DestroyRipple();
-            if (highlightWhen == HighlightActive.Hovered)
-            {
-                Highlight(2);
-            }
-            m_Clicked = false;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="eventData">Current event data.</param>
-        public void OnSubmit(BaseEventData eventData)
-        {
-            DestroyRipple();
-            if (highlightWhen == HighlightActive.Hovered)
-            {
-                Highlight(2);
-            }
-            StartCoroutine(SelectCheck());
-        }
+        #endregion
     }
 }

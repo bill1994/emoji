@@ -1,5 +1,5 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
+﻿// Based in MaterialUI originally found in https://github.com/InvexGames/MaterialUI
+// Kyub Interactive LTDA 2022. 
 
 //  Credit to author Jonathan Czeck (aarku)
 //	See more here: http://wiki.unity3d.com/index.php?title=HSBColor

@@ -1,5 +1,5 @@
-﻿//  Copyright 2017 MaterialUI for Unity http://materialunity.com
-//  Please see license file for terms and conditions of use, and more information.
+﻿// Based in MaterialUI originally found in https://github.com/InvexGames/MaterialUI
+// Kyub Interactive LTDA 2022. 
 
 using System;
 using System.IO;
@@ -60,8 +60,8 @@ namespace MaterialUI
 		private void GenerateIconEnum(List<Glyph> glyphList)
 		{
 			#if UNITY_EDITOR
-			string content = "//  Copyright 2017 MaterialUI for Unity http://materialunity.com";
-			content += "\n//  Please see license file for terms and conditions of use, and more information.";
+			string content = "// Based in MaterialUI originally found in https://github.com/InvexGames/MaterialUI";
+			content += "\n// Kyub Interactive LTDA 2022. ";
 			content += "\n";
 			content += "\nnamespace MaterialUI";
 			content += "\n{";
