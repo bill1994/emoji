@@ -190,34 +190,37 @@ namespace Kyub.Performance
         #region Private Variables
 
         [SerializeField, Tooltip("This property will try to add a SustainedRenderView on each Camera/Canvas in Scene")]
-        bool m_autoConfigureRenderViews = true;
+        protected bool m_autoConfigureRenderViews = true;
         [SerializeField, Tooltip("Change the Adaptative Render Mode Technique.\n* Legacy: Draw with ClearFlag None (only works in stadalone and will fallback to 'ForceSimulateFrameBuffer' in Mobile).\n* ForceSimulateFrameBuffer: Take Screenshot of the Screen to simulate ClearFlag None in Non-Supported Platforms.\n* OnDemandRendering: Use Unity OnDemandRendering with Legacy Mode.\n*All: Use OnDemandRendering with ForceSimulateFrameBuffer Mode.")]
-        RenderTechniqueEnum m_renderTechnique = RenderTechniqueEnum.All;
+        protected RenderTechniqueEnum m_renderTechnique = RenderTechniqueEnum.All;
         [Space]
         [SerializeField, Tooltip("This property will force invalidate even if not emitted by this canvas hierarchy (Prevent Alpha-Overlap bug)")]
-        bool m_safeRefreshMode = true;
+        protected bool m_safeRefreshMode = true;
         [Space]
         [SerializeField, Tooltip("Useful for debug purpose (will force invalidate every frame)")]
-        bool m_forceAlwaysInvalidate = false;
+        protected bool m_forceAlwaysInvalidate = false;
         [Space]
         [SerializeField, IntPopup(-1, "ScreenSize", 16, 32, 64, 128, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2560, 3072, 4096)]
-        int m_maxRenderBufferSize = -1;
+        protected int m_maxRenderBufferSize = -1;
         [SerializeField, Tooltip("Enable 32bits Depth Buffer")]
-        bool m_useHighPrecDepthBuffer = false;
+        protected bool m_useHighPrecDepthBuffer = false;
 
         [Space]
         [SerializeField, Tooltip("Enable this to activate DynamicFps Controller")]
-        bool m_canControlFps = true;
+        protected bool m_canControlFps = true;
         [SerializeField, MinMaxSlider(5, 150)]
-        Vector2 m_performanceFpsRange = new Vector2(30, 60);
+        protected Vector2 m_performanceFpsRange = new Vector2(30, 60);
+        [Space]
+        [SerializeField, MinMaxSlider(1, 20), Tooltip("When OnDemandRendering is active, this value will be used when low performance is active. Set 1 to draw all frame.")]
+        protected int m_demandRenderingSkipInterval = 5;
         [Space]
         [SerializeField, Range(0.5f, 5.0f)]
-        float m_autoDisableHighPerformanceTime = 1.0f;
+        protected float m_autoDisableHighPerformanceTime = 1.0f;
 
-        int _defaultInvalidCullingMask = 0;
-        bool _performanceIsDirty = false;
-        bool _bufferIsDirty = false;
-        bool _isHighPerformance = true;
+        protected int _defaultInvalidCullingMask = 0;
+        protected bool _performanceIsDirty = false;
+        protected bool _bufferIsDirty = false;
+        protected bool _isHighPerformance = true;
 
         protected internal static LowPerformanceView s_lowPerformanceView = null;
         protected static bool s_canGenerateLowPerformanceView = false;
@@ -300,6 +303,24 @@ namespace Kyub.Performance
                 if (m_performanceFpsRange == value)
                     return;
                 m_performanceFpsRange = value;
+
+                if (enabled && gameObject.activeInHierarchy)
+                    Refresh();
+            }
+        }
+
+        public int DemandRenderingSkipInterval
+        {
+            get
+            {
+                return m_demandRenderingSkipInterval;
+            }
+
+            set
+            {
+                if (m_demandRenderingSkipInterval == value)
+                    return;
+                m_demandRenderingSkipInterval = value;
 
                 if (enabled && gameObject.activeInHierarchy)
                     Refresh();
@@ -608,9 +629,9 @@ namespace Kyub.Performance
             var useOnDemandRendering = RenderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering) && !RequiresConstantRepaint && !RequiresConstantBufferRepaint;
             if (useOnDemandRendering)
             {
-                var renderFrameInterval = Mathf.Max(Application.targetFrameRate / Mathf.Max(QualitySettings.vSyncCount + 1, 1), minFramerate);
-                //Try to set to 1 RenderFrame Per Second
-                OnDemandRendering.renderFrameInterval = renderFrameInterval;
+                //var renderFrameInterval = Mathf.Max(Application.targetFrameRate / Mathf.Max(QualitySettings.vSyncCount + 1, 1), minFramerate);
+                //Try to skip 'DemandRenderingSkipInterval' before render
+                OnDemandRendering.renderFrameInterval = DemandRenderingSkipInterval;
             }
 #endif
 
