@@ -214,7 +214,7 @@ namespace Kyub.Performance
         protected Vector2 m_targetFpsRange = new Vector2(30, 60);
         [Space]
         [SerializeField, Range(5, 150), Tooltip("When OnDemandRendering is active, this value will be used when low performance is active. Set 1 to draw all frame.")]
-        protected int m_renderingTargetFps = 15;
+        protected int m_renderingTargetFps = 30;
         [Space]
         [SerializeField, Range(0.5f, 5.0f)]
         protected float m_autoDisableHighPerformanceTime = 1.0f;
