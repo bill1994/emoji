@@ -931,7 +931,7 @@ namespace MaterialUI
 
             Vector2 endPos = input.mousePosition;
 
-            if (Vector2.Distance(startPos, endPos) < EventSystem.current.pixelDragThreshold)
+            if (Vector2.Distance(startPos, endPos) < 2f)
             {
                 CreateRipple(startPos);
 
