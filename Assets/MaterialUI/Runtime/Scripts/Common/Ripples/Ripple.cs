@@ -185,6 +185,8 @@ namespace MaterialUI
         /// </summary>
         private static List<int> m_AverageSizes = new List<int>();
 
+        private const int AVERAGE_SIZE_CAPACITY = 25;
+
         #endregion
 
         #region Unity Functions
@@ -218,8 +220,6 @@ namespace MaterialUI
         {
             m_AnimDeltaTime = Time.realtimeSinceStartup - m_AnimStartTime;
 
-            if (m_State > 0)
-                Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             if (m_State == 1)
             {
                 if (m_AnimDeltaTime <= m_AnimationDuration)
@@ -234,7 +234,7 @@ namespace MaterialUI
                         Vector3 parentPosition = m_RippleParent.GetPositionRegardlessOfPivot();
                         rectTransform.position = Tween.QuintOut(m_CurrentPosition, new Vector3(parentPosition.x, parentPosition.y, m_RippleParent.position.z), m_AnimDeltaTime, m_AnimationDuration);
                     }
-
+                    Kyub.Performance.SustainedPerformanceManager.Refresh(this);
                 }
                 else
                 {
@@ -244,6 +244,7 @@ namespace MaterialUI
                         m_AnimStartTime = Time.realtimeSinceStartup;
                         m_CurrentSize = rectTransform.rect.width;
                         m_CurrentSize *= 0.95f;
+                        Kyub.Performance.SustainedPerformanceManager.Refresh(this);
                     }
                     else
                     {
@@ -265,6 +266,7 @@ namespace MaterialUI
                         Vector3 parentPosition = m_RippleParent.GetPositionRegardlessOfPivot();
                         rectTransform.position = Tween.QuintOut(m_CurrentPosition, new Vector3(parentPosition.x, parentPosition.y, m_RippleParent.position.z), m_AnimDeltaTime, m_AnimationDuration);
                     }
+                    Kyub.Performance.SustainedPerformanceManager.Refresh(this);
                 }
                 else
                 {
@@ -328,8 +330,6 @@ namespace MaterialUI
             {
                 m_RippleMaterial = m_Material;
             }
-
-            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
         }
 
         /// <summary>
@@ -369,9 +369,6 @@ namespace MaterialUI
                 rectTransform.SetParent(m_RippleParent.parent);
                 rectTransform.SetSiblingIndex(index);
             }
-
-            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
-
         }
 
         /// <summary>
@@ -434,8 +431,6 @@ namespace MaterialUI
 
             m_AnimStartTime = Time.realtimeSinceStartup;
             m_State = 1;
-
-            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
         }
 
         /// <summary>
@@ -451,8 +446,6 @@ namespace MaterialUI
 
             m_AnimStartTime = Time.realtimeSinceStartup;
             m_State = 2;
-
-            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
         }
 
         public virtual void InstantContract()
@@ -467,8 +460,6 @@ namespace MaterialUI
             }
             if(RippleManager.InstanceExists())
                 RippleManager.Instance.ReleaseRipple(this);
-
-            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
         }
 
         /// <summary>
@@ -492,6 +483,9 @@ namespace MaterialUI
                 }
             }
 
+            //Prevent tracking huge amount of data
+            if (m_AverageSizes.Count > AVERAGE_SIZE_CAPACITY)
+                m_AverageSizes.RemoveAt(0);
             m_AverageSizes.Add(Mathf.FloorToInt(size));
         }
 
