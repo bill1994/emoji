@@ -17,8 +17,10 @@ namespace Kyub.Performance
 {
     public class SustainedPerformanceManager : Kyub.Singleton<SustainedPerformanceManager>
     {
-        public enum RenderTechniqueEnum { Legacy = 0, ForceSimulateFrameBuffer = 1, OnDemandRendering = 2, All = 3 }
-
+        public enum RenderTechniqueEnum { PreserveFrameBuffer = 1, ForceSimulateFrameBuffer = 2}
+        
+        [System.Flags]
+        public enum FpsTechniqueEnum { TargetFps = 1, OnDemandRendering = 2 }
         #region Static Events
 
         public static event Action OnBeforeSetPerformance; //Before Process Performances (Useful to know if LowPerformanceView will be activated)
@@ -98,8 +100,7 @@ namespace Kyub.Performance
                 if (s_instance == null)
                     s_instance = GetInstanceFastSearch();
 
-                var renderTechnique = s_instance != null ? s_instance.RenderTechnique : RenderTechniqueEnum.Legacy;
-                return renderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering);
+                return s_instance != null? s_instance.CanControlRenderingFps : false;
             }
         }
 
@@ -114,7 +115,7 @@ namespace Kyub.Performance
 #if UNITY_EDITOR && UNITY_IOS
                 return true;
 #else
-                var renderTechnique = s_instance != null ? s_instance.RenderTechnique : RenderTechniqueEnum.Legacy;
+                var renderTechnique = s_instance != null ? s_instance.SustainedRenderTechnique : RenderTechniqueEnum.PreserveFrameBuffer;
                 var forceSimulateFrameBuffer = renderTechnique.HasFlag(RenderTechniqueEnum.ForceSimulateFrameBuffer);
                 //Metal/Mobile require simulate frameBuffer in Legacy Mode
                 return forceSimulateFrameBuffer ||
@@ -179,7 +180,7 @@ namespace Kyub.Performance
             {
                 var instance = GetInstanceFastSearch();
                 if (instance != null)
-                    return Mathf.Clamp(s_minimumSupportedFps, (int)instance.m_performanceFpsRange.x, (int)instance.m_performanceFpsRange.y);
+                    return Mathf.Clamp(s_minimumSupportedFps, (int)instance.m_targetFpsRange.x, (int)instance.m_targetFpsRange.y);
 
                 return s_minimumSupportedFps;
             }
@@ -191,8 +192,8 @@ namespace Kyub.Performance
 
         [SerializeField, Tooltip("This property will try to add a SustainedRenderView on each Camera/Canvas in Scene")]
         protected bool m_autoConfigureRenderViews = true;
-        [SerializeField, Tooltip("Change the Adaptative Render Mode Technique.\n* Legacy: Draw with ClearFlag None (only works in stadalone and will fallback to 'ForceSimulateFrameBuffer' in Mobile).\n* ForceSimulateFrameBuffer: Take Screenshot of the Screen to simulate ClearFlag None in Non-Supported Platforms.\n* OnDemandRendering: Use Unity OnDemandRendering with Legacy Mode.\n*All: Use OnDemandRendering with ForceSimulateFrameBuffer Mode.")]
-        protected RenderTechniqueEnum m_renderTechnique = RenderTechniqueEnum.All;
+        [SerializeField, Tooltip("Change the Adaptative Render Mode Technique.\n* PreserveFrameBuffer: Draw with ClearFlag None (only works in stadalone and will fallback to 'ForceSimulateFrameBuffer' in Mobile).\n* ForceSimulateFrameBuffer: Take Screenshot of the Screen to simulate ClearFlag None in Non-Supported Platforms.")]
+        protected RenderTechniqueEnum m_sustainedRenderTechnique = RenderTechniqueEnum.ForceSimulateFrameBuffer;
         [Space]
         [SerializeField, Tooltip("This property will force invalidate even if not emitted by this canvas hierarchy (Prevent Alpha-Overlap bug)")]
         protected bool m_safeRefreshMode = true;
@@ -206,13 +207,14 @@ namespace Kyub.Performance
         protected bool m_useHighPrecDepthBuffer = false;
 
         [Space]
-        [SerializeField, Tooltip("Enable this to activate DynamicFps Controller")]
-        protected bool m_canControlFps = true;
-        [SerializeField, MinMaxSlider(5, 150)]
-        protected Vector2 m_performanceFpsRange = new Vector2(30, 60);
+        [SerializeField, Tooltip("DynamicFps Controller Options.\n* TargetFps: reduce fps from all threads.\n* OnDemandRendering: reduce FPS from render thread")]
+        protected FpsTechniqueEnum m_fpsTechnique = (FpsTechniqueEnum)(-1);
         [Space]
-        [SerializeField, Range(1, 15), Tooltip("When OnDemandRendering is active, this value will be used when low performance is active. Set 1 to draw all frame.")]
-        protected int m_demandRenderingSkipInterval = 3;
+        [SerializeField, MinMaxSlider(5, 150)]
+        protected Vector2 m_targetFpsRange = new Vector2(30, 60);
+        [Space]
+        [SerializeField, Range(5, 150), Tooltip("When OnDemandRendering is active, this value will be used when low performance is active. Set 1 to draw all frame.")]
+        protected int m_renderingTargetFps = 15;
         [Space]
         [SerializeField, Range(0.5f, 5.0f)]
         protected float m_autoDisableHighPerformanceTime = 1.0f;
@@ -248,31 +250,71 @@ namespace Kyub.Performance
             }
         }
 
-        public RenderTechniqueEnum RenderTechnique
+        public RenderTechniqueEnum SustainedRenderTechnique
         {
             get
             {
 #if !SUPPORT_ONDEMAND_RENDERING
-                if (m_renderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering))
+                if (m_sustainedRenderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering))
                 {
                     //Clear OnDemandRendering Flag
-                    var renderTechnique = m_renderTechnique & ~RenderTechniqueEnum.OnDemandRendering;
+                    var renderTechnique = m_sustainedRenderTechnique & ~RenderTechniqueEnum.OnDemandRendering;
                     if (Application.isPlaying)
-                        m_renderTechnique = renderTechnique;
+                        m_sustainedRenderTechnique = renderTechnique;
                     else
                         return renderTechnique;
                 }
 #endif
-                return m_renderTechnique;
+                return m_sustainedRenderTechnique;
             }
             set
             {
-                if (m_renderTechnique == value)
+                if (m_sustainedRenderTechnique == value)
                     return;
-                m_renderTechnique = value;
+                m_sustainedRenderTechnique = value;
 
                 CheckBufferTextures();
                 Invalidate();
+            }
+        }
+
+        public FpsTechniqueEnum FpsTechnique
+        {
+            get
+            {
+                var isPlaying = Application.isPlaying;
+                var fpsTechnique = m_fpsTechnique;
+#if !SUPPORT_ONDEMAND_RENDERING
+                if (m_fpsTechnique.HasFlag(FpsTechniqueEnum.OnDemandRendering))
+                {
+                    //Clear OnDemandRendering Flag
+                    fpsTechnique = m_fpsTechnique & ~FpsTechniqueEnum.OnDemandRendering;
+                    if (isPlaying)
+                    {
+                        m_fpsTechnique = fpsTechnique;
+                    }
+                }
+#endif
+                if (Application.platform == RuntimePlatform.WebGLPlayer && m_fpsTechnique.HasFlag(FpsTechniqueEnum.TargetFps))
+                {
+                    //Clear Fps Flag
+                    fpsTechnique = m_fpsTechnique & ~FpsTechniqueEnum.TargetFps;
+                    if (isPlaying)
+                    {
+                        m_fpsTechnique = fpsTechnique;
+                    }
+                }
+
+                return isPlaying? m_fpsTechnique : fpsTechnique;
+            }
+            set
+            {
+                if (m_fpsTechnique == value)
+                    return;
+                m_fpsTechnique = value;
+
+                if (enabled && gameObject.activeInHierarchy)
+                    Refresh();
             }
         }
 
@@ -291,39 +333,67 @@ namespace Kyub.Performance
             }
         }
 
-        public Vector2 PerformanceFpsRange
+        public Vector2 TargetFpsRange
         {
             get
             {
-                return m_performanceFpsRange;
+                return m_targetFpsRange;
             }
 
             set
             {
-                if (m_performanceFpsRange == value)
+                if (m_targetFpsRange == value)
                     return;
-                m_performanceFpsRange = value;
+                m_targetFpsRange = value;
 
                 if (enabled && gameObject.activeInHierarchy)
                     Refresh();
             }
         }
 
-        public int DemandRenderingSkipInterval
+        public int RenderingTargetFps
         {
             get
             {
-                return m_demandRenderingSkipInterval;
+                return m_renderingTargetFps;
             }
 
             set
             {
-                if (m_demandRenderingSkipInterval == value)
+                if (m_renderingTargetFps == value)
                     return;
-                m_demandRenderingSkipInterval = value;
+                m_renderingTargetFps = value;
 
                 if (enabled && gameObject.activeInHierarchy)
                     Refresh();
+            }
+        }
+
+        public bool CanControlRenderingFps
+        {
+            get
+            {
+                return FpsTechnique.HasFlag(FpsTechniqueEnum.OnDemandRendering);
+            }
+
+            set
+            {
+                var result = m_fpsTechnique;
+                if (value)
+                {
+                    result |= FpsTechniqueEnum.OnDemandRendering;
+                }
+                else
+                {
+                    result &= ~FpsTechniqueEnum.OnDemandRendering;
+                }
+
+                if (m_fpsTechnique != result)
+                {
+                    m_fpsTechnique = result;
+                    if (enabled && gameObject.activeInHierarchy)
+                        Refresh();
+                }
             }
         }
 
@@ -331,19 +401,27 @@ namespace Kyub.Performance
         {
             get
             {
-                if (Application.platform == RuntimePlatform.WebGLPlayer)
-                    return false;
-                return m_canControlFps;
+                return FpsTechnique.HasFlag(FpsTechniqueEnum.TargetFps);
             }
 
             set
             {
-                if (m_canControlFps == value)
-                    return;
-                m_canControlFps = value;
+                var result = m_fpsTechnique;
+                if (value)
+                {
+                    result |= FpsTechniqueEnum.TargetFps;
+                }
+                else
+                {
+                    result &= ~FpsTechniqueEnum.TargetFps;
+                }
 
-                if (enabled && gameObject.activeInHierarchy)
-                    Refresh();
+                if (m_fpsTechnique != result)
+                {
+                    m_fpsTechnique = result;
+                    if (enabled && gameObject.activeInHierarchy)
+                        Refresh();
+                }
             }
         }
 
@@ -401,7 +479,7 @@ namespace Kyub.Performance
         {
             get
             {
-                var renderTechnique = RenderTechnique;
+                var renderTechnique = SustainedRenderTechnique;
                 return renderTechnique.HasFlag(RenderTechniqueEnum.ForceSimulateFrameBuffer);
             }
         }
@@ -487,7 +565,7 @@ namespace Kyub.Performance
 #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
-            m_performanceFpsRange = new Vector2(Mathf.RoundToInt(m_performanceFpsRange.x), Mathf.RoundToInt(m_performanceFpsRange.y));
+            m_targetFpsRange = new Vector2(Mathf.RoundToInt(m_targetFpsRange.x), Mathf.RoundToInt(m_targetFpsRange.y));
             RecalculateMaxTextureSize();
             MarkToSetHighPerformance(true);
         }
@@ -609,7 +687,7 @@ namespace Kyub.Performance
             var minFramerate = s_minimumSupportedFps;
             if (CanControlFps)
             {
-                minFramerate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.x);
+                minFramerate = (int)Mathf.Max(5, MinimumSupportedFps, m_targetFpsRange.x);
                 QualitySettings.vSyncCount = 0;
                 Application.targetFrameRate = minFramerate;
             }
@@ -626,12 +704,16 @@ namespace Kyub.Performance
             CallOnAfterSetPerformance();
 
 #if SUPPORT_ONDEMAND_RENDERING
-            var useOnDemandRendering = RenderTechnique.HasFlag(RenderTechniqueEnum.OnDemandRendering) && !RequiresConstantRepaint && !RequiresConstantBufferRepaint;
+            var useOnDemandRendering = CanControlRenderingFps && !RequiresConstantRepaint && !RequiresConstantBufferRepaint;
             if (useOnDemandRendering)
             {
-                //var renderFrameInterval = Mathf.Max(Application.targetFrameRate / Mathf.Max(QualitySettings.vSyncCount + 1, 1), minFramerate);
-                //Try to skip 'DemandRenderingSkipInterval' before render
-                OnDemandRendering.renderFrameInterval = DemandRenderingSkipInterval;
+                //Calculate render frame interval
+                var maxRenderFps = OnDemandRendering.effectiveRenderFrameRate * OnDemandRendering.renderFrameInterval;
+                int targetRenderFrameInterval = RenderingTargetFps < maxRenderFps && RenderingTargetFps > 0?
+                    (maxRenderFps) / RenderingTargetFps : 1;
+
+                targetRenderFrameInterval = Mathf.Max(1, targetRenderFrameInterval);
+                OnDemandRendering.renderFrameInterval = targetRenderFrameInterval;
             }
 #endif
 
@@ -718,7 +800,7 @@ namespace Kyub.Performance
             if (CanControlFps)
             {
                 QualitySettings.vSyncCount = 0;
-                Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_performanceFpsRange.y);
+                Application.targetFrameRate = (int)Mathf.Max(5, MinimumSupportedFps, m_targetFpsRange.y);
             }
             else
                 Application.targetFrameRate = -1;
@@ -1388,7 +1470,7 @@ namespace Kyub.Performance
                         _defaultInvalidCullingMask |= element.CullingMask;
                 }
             }
-            s_minimumSupportedFps = Mathf.Clamp(s_minimumSupportedFps, (int)m_performanceFpsRange.x, (int)m_performanceFpsRange.y);
+            s_minimumSupportedFps = Mathf.Clamp(s_minimumSupportedFps, (int)m_targetFpsRange.x, (int)m_targetFpsRange.y);
 
             var textureSizeChanged = RecalculateMaxTextureSize();
             if (oldRequireConstantRepaint != s_requireConstantRepaint ||
