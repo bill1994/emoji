@@ -211,8 +211,8 @@ namespace Kyub.Performance
         [SerializeField, MinMaxSlider(5, 150)]
         protected Vector2 m_performanceFpsRange = new Vector2(30, 60);
         [Space]
-        [SerializeField, Range(1, 20), Tooltip("When OnDemandRendering is active, this value will be used when low performance is active. Set 1 to draw all frame.")]
-        protected int m_demandRenderingSkipInterval = 5;
+        [SerializeField, Range(1, 15), Tooltip("When OnDemandRendering is active, this value will be used when low performance is active. Set 1 to draw all frame.")]
+        protected int m_demandRenderingSkipInterval = 3;
         [Space]
         [SerializeField, Range(0.5f, 5.0f)]
         protected float m_autoDisableHighPerformanceTime = 1.0f;
