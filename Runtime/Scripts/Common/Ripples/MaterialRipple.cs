@@ -485,8 +485,6 @@ namespace MaterialUI
 
             if (!enabled || !IsInteractable()) return;
 
-            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
-
             if (checkForScroll)
             {
                 StopCoroutine(nameof(ScrollCheck));
@@ -505,8 +503,6 @@ namespace MaterialUI
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            Kyub.Performance.SustainedPerformanceManager.Refresh(this);
-
             if (m_CheckForScroll)
             {
                 StopCoroutine(nameof(ScrollCheckUp));
