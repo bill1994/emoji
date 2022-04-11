@@ -6,9 +6,9 @@
   "unity": "2019.1",
 	"dependencies": {
 			"com.unity.ugui": "1.0.0",
-			"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core",
-			"com.kyub.uicommons": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.uicommons",
-			"com.kyub.performance": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.performance"
+			"com.kyub.core": "https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core",
+			"com.kyub.uicommons": "https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.uicommons",
+			"com.kyub.performance": "https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.performance"
 	},
   "keywords": [
     "UI",

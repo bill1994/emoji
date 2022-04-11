@@ -5,7 +5,7 @@
   "description": "Geometry Math Support API",
   "unity": "2019.1",
   "dependencies": {
-	"com.kyub.core": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core"
+	"com.kyub.core": "https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.core"
   },
   "keywords": [
     "Geometry"

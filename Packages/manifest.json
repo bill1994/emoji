@@ -1,5 +1,6 @@
 {
   "dependencies": {
+	"com.kyub.sharpcodec": "https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyubwebrtc.git#com.kyub.sharpcodec-0.1.6",
     "com.unity.collab-proxy": "1.2.16",
     "com.unity.device-simulator": "2.2.4-preview",
     "com.unity.ide.rider": "1.1.4",
