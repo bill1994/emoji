@@ -6,7 +6,7 @@
   "unity": "2019.1",
 	"dependencies": {
 		"com.unity.ugui": "1.0.0",
-		"com.kyub.inputcompat": "https://gitlab-ci-token:zF563oCqvXdJmiDuMShq@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.inputcompat",
+		"com.kyub.inputcompat": "https://gitlab-ci-token:glpat-c6ymx9eBXkdQhFhCMaLg@gitlab.com/KyubInteractive/kyublibs.git#com.kyub.inputcompat",
 		"com.unity.textmeshpro": "2.1.0-preview.2"
 	},
   "keywords": [
