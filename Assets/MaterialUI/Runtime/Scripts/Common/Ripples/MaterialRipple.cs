@@ -25,7 +25,7 @@ namespace MaterialUI
     /// <seealso cref="UnityEngine.EventSystems.ISubmitHandler" />
     [AddComponentMenu("MaterialUI/Material Ripple", 50)]
     [ExecuteInEditMode]
-    public class MaterialRipple : MonoBehaviour, IPointerEnterHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IRippleCreator, ISelectHandler, IDeselectHandler, ISubmitHandler
+    public class MaterialRipple : MonoBehaviour, IPointerEnterHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IRippleCreator, ISelectHandler, IDeselectHandler, ISubmitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         #region Enums
 
@@ -234,22 +234,6 @@ namespace MaterialUI
         }
 
         /// <summary>
-        /// Should the ripple/highlight effect not be applied if the pointer drags?
-        /// Useful for ripples in scrollable lists.
-        /// </summary>
-        [SerializeField]
-        private bool m_CheckForScroll = false;
-        /// <summary>
-        /// Should the ripple/highlight effect not be applied if the pointer drags?
-        /// Useful for ripples in scrollable lists.
-        /// </summary>
-        public bool checkForScroll
-        {
-            get { return m_CheckForScroll; }
-            set { m_CheckForScroll = value; }
-        }
-
-        /// <summary>
         /// The number of active ripples.
         /// </summary>
         private int m_RippleCount;
@@ -425,7 +409,7 @@ namespace MaterialUI
                 return;
             }
 
-            if(m_AnimState > 0)
+            if (m_AnimState > 0)
             {
                 Kyub.Performance.SustainedPerformanceManager.Refresh(this);
             }
@@ -466,6 +450,62 @@ namespace MaterialUI
             }
         }
 
+        protected bool _propagateDragForParent = false;
+        protected bool _dragBegin = false;
+        public virtual void OnBeginDrag(PointerEventData eventData)
+        {
+            //When using keyboard we always want to drag when focuses.. only in PC that we need special cases
+            _propagateDragForParent = GetComponents<IBeginDragHandler>().Length <= 1;
+            _dragBegin = true;
+            if (m_Clicked)
+            {
+                ScrollCheckUpImmediate();
+            }
+            if (_propagateDragForParent)
+                ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
+        }
+
+        public virtual void OnDrag(PointerEventData eventData)
+        {
+            if (transform.parent != null)
+            {
+                if (!_dragBegin &&
+                    !RectTransformUtility.RectangleContainsScreenPoint((RectTransform)this.transform, eventData.position, eventData.pressEventCamera))
+                {
+                    _dragBegin = true;
+                    _propagateDragForParent = GetComponents<IBeginDragHandler>().Length <= 1;
+                    if (_propagateDragForParent)
+                        ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.beginDragHandler);
+                }
+                if (_dragBegin)
+                {
+                    if (m_Clicked)
+                    {
+                        ScrollCheckUpImmediate();
+                    }
+                    if (_propagateDragForParent)
+                        ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.dragHandler);
+                }
+            }
+        }
+
+        public virtual void OnEndDrag(PointerEventData eventData)
+        {
+            if (_dragBegin)
+            {
+                if (m_Clicked)
+                {
+                    ScrollCheckUpImmediate();
+                }
+                _dragBegin = false;
+                if (_propagateDragForParent)
+                {
+                    _propagateDragForParent = false;
+                    ExecuteEvents.ExecuteHierarchy(transform.parent.gameObject, eventData, ExecuteEvents.endDragHandler);
+                }
+            }
+        }
+
 
         public void OnPointerEnter(PointerEventData eventData)
         {
@@ -483,9 +523,12 @@ namespace MaterialUI
 
             DestroyRipple();
 
-            if (!enabled || !IsInteractable()) return;
+            if (!enabled || !IsInteractable() || !gameObject.activeInHierarchy) return;
 
-            if (checkForScroll)
+            StopCoroutine(nameof(ScrollCheck));
+            StartCoroutine(nameof(ScrollCheck));
+
+            /*if (checkForScroll)
             {
                 StopCoroutine(nameof(ScrollCheck));
                 StartCoroutine(nameof(ScrollCheck));
@@ -498,25 +541,12 @@ namespace MaterialUI
                 {
                     Highlight(1);
                 }
-            }
+            }*/
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (m_CheckForScroll)
-            {
-                StopCoroutine(nameof(ScrollCheckUp));
-                StartCoroutine(nameof(ScrollCheckUp));
-                return;
-            }
-
-            DestroyRipple();
-            m_Clicked = false;
-
-            if (highlightWhen == HighlightActive.Clicked)
-            {
-                Highlight(2);
-            }
+            ScrollCheckUpImmediate();
         }
 
         public void OnPointerExit(PointerEventData eventData)
@@ -754,7 +784,7 @@ namespace MaterialUI
             {
                 var v_canvas = GetComponentInParent<Canvas>();
                 v_canvas = v_canvas.rootCanvas;
-                camera = v_canvas.renderMode == RenderMode.ScreenSpaceOverlay? null : v_canvas.worldCamera;
+                camera = v_canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : v_canvas.worldCamera;
                 //Check a camera that draw the layer
                 if (camera == null && v_canvas.renderMode != RenderMode.ScreenSpaceOverlay)
                 {
@@ -767,7 +797,7 @@ namespace MaterialUI
                             break;
                         }
                     }
-                    
+
                 }
             }
             CreateRipple(camera != null ? camera.ScreenToWorldPoint(screenPosition) : (Vector3)screenPosition, oscillate);
@@ -777,7 +807,7 @@ namespace MaterialUI
         {
             if (!m_RipplesEnabled) return;
 
-            m_CurrentRipple = RippleManager.InstanceExists()? RippleManager.Instance.GetRipple() : null;
+            m_CurrentRipple = RippleManager.InstanceExists() ? RippleManager.Instance.GetRipple() : null;
             if (m_CurrentRipple != null)
             {
                 m_CurrentRipple.Setup(rippleData, worldPosition, this, oscillate);
@@ -840,7 +870,7 @@ namespace MaterialUI
             }
             else if (m_MaskMode == MaskMode.RectMask2D)
             {
-                if(rectMask2D != null)
+                if (rectMask2D != null)
                     rectMask2D.enabled = true;
             }
         }
@@ -925,9 +955,10 @@ namespace MaterialUI
 
             yield return new WaitForSeconds(0.04f);
 
-            Vector2 endPos = input.mousePosition;
+            //Vector2 endPos = input.mousePosition;
 
-            if (Vector2.Distance(startPos, endPos) < 2f)
+            //if (Vector2.Distance(startPos, endPos) < 2f)
+            if (!_dragBegin)
             {
                 CreateRipple(startPos);
 
@@ -943,9 +974,9 @@ namespace MaterialUI
         /// Applicable only if checkForScroll is true.
         /// </summary>
         /// <returns></returns>
-        private IEnumerator ScrollCheckUp()
+        private void ScrollCheckUpImmediate()
         {
-            yield return new WaitForSeconds(0.04f);
+            StopCoroutine(nameof(ScrollCheck));
 
             DestroyRipple();
             m_Clicked = false;
