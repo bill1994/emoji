@@ -38,7 +38,6 @@ namespace MaterialUI
         private SerializedProperty m_HighlightGraphic;
         private SerializedProperty m_AutoHighlightColor;
         private SerializedProperty m_HighlightColor;
-        private SerializedProperty m_CheckForScroll;
         private SerializedProperty m_AutoHighlightBlendAmount;
 
         private SerializedProperty m_AutoMatchGraphicColor;
@@ -68,7 +67,6 @@ namespace MaterialUI
             m_HighlightGraphic = serializedObject.FindProperty("m_HighlightGraphic");
             m_AutoHighlightColor = serializedObject.FindProperty("m_AutoHighlightColor");
             m_HighlightColor = serializedObject.FindProperty("m_HighlightColor");
-            m_CheckForScroll = serializedObject.FindProperty("m_CheckForScroll");
             m_AutoHighlightBlendAmount = serializedObject.FindProperty("m_AutoHighlightBlendAmount");
 
             m_AutoMatchGraphicColor = serializedObject.FindProperty("m_AutoMatchGraphicColor");
@@ -154,7 +152,6 @@ namespace MaterialUI
                     EditorGUILayout.PropertyField(m_MoveTowardCenter);
                     EditorGUILayout.PropertyField(m_PlaceRippleBehind);
                     EditorGUILayout.PropertyField(m_MaskMode, m_MaskModeContent, true);
-                    EditorGUILayout.PropertyField(m_CheckForScroll, true);
                 }
             }
             if (EditorGUI.EndChangeCheck())
