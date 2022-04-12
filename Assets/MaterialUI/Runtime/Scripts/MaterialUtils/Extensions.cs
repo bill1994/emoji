@@ -618,29 +618,8 @@ namespace MaterialUI
 
             if (size.x == 0 && size.y == 0)
             {
-                LayoutElement layoutElement = rectTransform.GetComponent<LayoutElement>();
-
-                if (layoutElement != null)
-                {
-                    size.x = layoutElement.preferredWidth;
-                    size.y = layoutElement.preferredHeight;
-                }
-            }
-            if (size.x == 0 && size.y == 0)
-            {
-                LayoutGroup layoutGroup = rectTransform.GetComponent<LayoutGroup>();
-
-                if (layoutGroup != null)
-                {
-                    size.x = layoutGroup.preferredWidth;
-                    size.y = layoutGroup.preferredHeight;
-                }
-            }
-
-            if (size.x == 0 && size.y == 0)
-            {
-                size.x = LayoutUtility.GetPreferredWidth(rectTransform);
-                size.y = LayoutUtility.GetPreferredHeight(rectTransform);
+                size.x = LayoutUtilityEx.GetPreferredWidth(rectTransform);
+                size.y = LayoutUtilityEx.GetPreferredHeight(rectTransform);
             }
 
             return size;
