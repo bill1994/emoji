@@ -35,7 +35,7 @@ namespace Kyub.UI.Experimental
         protected List<IFastLayoutFeedback> children { get { return m_Children; } }
 
         protected HashSet<IFastLayoutFeedback> _dirtyChildren = new HashSet<IFastLayoutFeedback>();
-        protected DrivenAxis _dirtyAxis = DrivenAxis.None;
+        protected DrivenAxis _dirtyAxis = (DrivenAxis)(-1);
 
         protected float _cachedRectHeight = -1;
         protected float _cachedRectWidth = -1;
