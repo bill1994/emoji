@@ -844,6 +844,11 @@ namespace Kyub.UI
                 var group = Content.GetComponent<LayoutGroup>();
                 if (group != null)
                     group.enabled = false;
+#if FAST_LAYOUT_0_0_6_OR_NEWER
+                var fastGroup = Content.GetComponent<Kyub.UI.Experimental.FastLayoutGroup>();
+                if (fastGroup != null)
+                    fastGroup.enabled = false;
+#endif
                 //var fitter = Content.GetComponent<ContentSizeFitter>();
                 //if (fitter != null)
                 //    fitter.enabled = false;
@@ -1313,9 +1318,9 @@ namespace Kyub.UI
             return IsVertical() ? GetLocalHeight(target) : GetLocalWidth(target);
         }
 
-        #endregion
+#endregion
 
-        #region Enumerator
+#region Enumerator
 
         public IEnumerator<GameObject> GetEnumerator()
         {
@@ -1369,9 +1374,9 @@ namespace Kyub.UI
             }
         }
 
-        #endregion
+#endregion
 
-        #region Static Helper Functions
+#region Static Helper Functions
 
         public static T GetComponentInParent<T>(Component component, bool includeInactive)
         {
@@ -1463,9 +1468,9 @@ namespace Kyub.UI
             return preferredSize;
         }
 
-        #endregion
+#endregion
 
-        #region Layout Functions
+#region Layout Functions
 
         public float minWidth
         {
@@ -1558,7 +1563,7 @@ namespace Kyub.UI
 #endif
         }
 
-        #endregion
+#endregion
 
     }
 }

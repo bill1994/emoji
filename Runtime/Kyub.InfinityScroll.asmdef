@@ -4,7 +4,8 @@
         "GUID:2bafac87e7f4b9b418d9448d219b01ab",
         "GUID:0f58c067a5870e34eadeb4a2055fb4ce",
         "GUID:43f813160d15da94094b77983b7241a1",
-        "GUID:af50b871d983fd2498bf363097906a11"
+        "GUID:af50b871d983fd2498bf363097906a11",
+        "GUID:36e9a76be74c1c24da6a459835635e6b"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -13,6 +14,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.kyub.uicommons.experimental",
+            "expression": "0.0.6",
+            "define": "FAST_LAYOUT_0_0_6_OR_NEWER"
+        }
+    ],
     "noEngineReferences": false
 }
