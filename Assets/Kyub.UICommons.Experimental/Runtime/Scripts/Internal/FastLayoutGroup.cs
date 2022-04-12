@@ -35,7 +35,7 @@ namespace Kyub.UI.Experimental
         protected List<IFastLayoutFeedback> children { get { return m_Children; } }
 
         protected HashSet<IFastLayoutFeedback> _dirtyChildren = new HashSet<IFastLayoutFeedback>();
-        protected DrivenAxis _dirtyAxis = (DrivenAxis)(-1);
+        protected DrivenAxis _dirtyAxis = DrivenAxis.None;
 
         protected float _cachedRectHeight = -1;
         protected float _cachedRectWidth = -1;
@@ -232,8 +232,12 @@ namespace Kyub.UI.Experimental
         protected override void OnEnable()
         {
             base.OnEnable();
-            if (isDirty)
-                MarkLayoutForRebuild();
+
+            // Its impossible to detect if layout is dirty when object was previously disabled,
+            // as we will not receive events from unity or other hierarchy objecs.
+            // As a workaround we will assume that previously disabled objects will always be dirty
+            SetDirty();
+            MarkLayoutForRebuild();
         }
 
         protected override void OnDisable()
