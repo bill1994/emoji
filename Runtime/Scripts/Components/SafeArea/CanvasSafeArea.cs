@@ -571,7 +571,14 @@ namespace MaterialUI
             var content = new GameObject("[AUTOGEN] SafeAreaContent").GetAddComponent<RectTransform>();
 
             //Try Clone LayoutGroup
-            AddBehaviourClone(GetComponent<LayoutGroup>(), content.gameObject, true);
+            ILayoutController controller = GetComponent<LayoutGroup>();
+#if FAST_LAYOUT_0_0_6_OR_NEWER
+            if((controller as Behaviour) == null)
+            {
+                controller = GetComponent<Kyub.UI.Experimental.FastLayoutGroup>();
+            }
+#endif
+            AddBehaviourClone(controller as Behaviour, content.gameObject, true);
             //Try Clone Background Graphic
             AddBehaviourClone(GetComponent<Graphic>(), content.gameObject, true);
 
@@ -600,9 +607,9 @@ namespace MaterialUI
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region Interop Static Services
+#region Interop Static Services
 
 #if UNITY_IPHONE
         [DllImport("__Internal")]
@@ -658,6 +665,6 @@ namespace MaterialUI
             s_cachedIsStatusBarActive = null;
         }
 
-        #endregion
+#endregion
     }
 }

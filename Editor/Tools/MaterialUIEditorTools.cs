@@ -461,7 +461,7 @@ namespace MaterialUI
             shadowTransform.anchorMax = sourceRectTransform.anchorMax;
             shadowTransform.pivot = sourceRectTransform.pivot;
 
-            bool probablyHasLayout = (sourceGameObject.GetComponent<LayoutGroup>() != null || sourceGameObject.GetComponent<LayoutElement>() != null);
+            bool probablyHasLayout = ((sourceGameObject.GetComponent<ILayoutController>() as Behaviour) != null || (sourceGameObject.GetComponent<ILayoutElement>() as Behaviour) != null);
 
             GameObject newParentGameObject = new GameObject(sourceGameObject.name);
             newParentGameObject.transform.SetParent(sourceRectTransform.parent);
