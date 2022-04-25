@@ -403,11 +403,11 @@ namespace MaterialUI
         {
             get
             {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-                m_Dpi = Mathf.Round(1.445f * float.Parse(Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE").OpenSubKey("Microsoft").OpenSubKey("Windows NT").OpenSubKey("CurrentVersion").OpenSubKey("FontDPI").GetValue("LogPixels").ToString()));
-#else
+//#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+//                m_Dpi = Mathf.Round(1.445f * float.Parse(Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE").OpenSubKey("Microsoft").OpenSubKey("Windows NT").OpenSubKey("CurrentVersion").OpenSubKey("FontDPI").GetValue("LogPixels").ToString()));
+//#else
                 m_Dpi = Screen.dpi;
-#endif
+//#endif
 
                 #if UNITY_EDITOR
                     if (m_EditorForceDpi && m_EditorForceDpiValue > baseDpi / 50f)
