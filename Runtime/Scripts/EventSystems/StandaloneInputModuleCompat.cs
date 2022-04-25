@@ -194,6 +194,38 @@ namespace Kyub.EventSystems
             }
         }
 
+        protected override void ProcessDrag(PointerEventData pointerEvent)
+        {
+            if (!pointerEvent.IsPointerMoving() ||
+                Cursor.lockState == CursorLockMode.Locked ||
+                pointerEvent.pointerDrag == null)
+                return;
+
+            if (!pointerEvent.dragging
+                && ShouldStartDrag(pointerEvent.pressPosition, pointerEvent.position, eventSystem.pixelDragThreshold, pointerEvent.useDragThreshold))
+            {
+                ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.beginDragHandler);
+                pointerEvent.dragging = true;
+            }
+
+            // Drag notification
+            if (pointerEvent.dragging)
+            {
+                // Before doing drag we should cancel any pointer down state
+                // And clear selection!
+                if (pointerEvent.pointerPress != null &&
+                    ((pointerEvent.pointerPress != pointerEvent.pointerDrag) || (pointerEvent.eligibleForClick)))
+                {
+                    ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent, ExecuteEvents.pointerUpHandler);
+
+                    pointerEvent.eligibleForClick = false;
+                    pointerEvent.pointerPress = null;
+                    pointerEvent.rawPointerPress = null;
+                }
+                ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.dragHandler);
+            }
+        }
+
         #endregion
 
         #region Overriden Reflection Properties
@@ -215,6 +247,18 @@ namespace Kyub.EventSystems
                 if (m_InputPointerEventInfo != null)
                     m_InputPointerEventInfo.SetValue(this, value);
             }
+        }
+
+        #endregion
+
+        #region Static Functions
+
+        protected static bool ShouldStartDrag(Vector2 pressPos, Vector2 currentPos, float threshold, bool useDragThreshold)
+        {
+            if (!useDragThreshold)
+                return true;
+
+            return (pressPos - currentPos).sqrMagnitude >= threshold * threshold;
         }
 
         #endregion
