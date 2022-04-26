@@ -571,7 +571,7 @@ namespace MaterialUI
             enabled = true;
             _IsTransitioning = 1;
             _TransitionCurrentTime = -1;  //Time.realtimeSinceStartup;
-            EvaluateAnimationState(0);
+            //EvaluateAnimationState(0);
         }
 
         public virtual void TransitionOut()
@@ -598,7 +598,7 @@ namespace MaterialUI
             {
                 enabled = true;
                 LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
-                EvaluateAnimationState(0);
+                //EvaluateAnimationState(0);
             }
         }
 
@@ -866,11 +866,11 @@ namespace MaterialUI
                 }
                 if (fadeOut)
                 {
-                    canvasGroup.alpha = fadeOutAlpha;
+                    canvasGroup.alpha = 1f; //fadeOutAlpha; 
                 }
                 if (scaleOut)
                 {
-                    rectTransform.localScale = new Vector3(scaleOutScale, scaleOutScale, scaleOutScale);
+                    rectTransform.localScale = new Vector3(1f, 1f, 1f); //new Vector3(scaleOutScale, scaleOutScale, scaleOutScale);
                 }
                 if (slideOut)
                 {
