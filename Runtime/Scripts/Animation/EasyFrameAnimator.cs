@@ -521,104 +521,9 @@ namespace MaterialUI
                     _TransitionCurrentTime = 0;
 
                 _TransitionCurrentTime += Time.smoothDeltaTime;
-                if (transitionCurrentTime <= transitionDuration)
+                if (_TransitionCurrentTime <= transitionDuration)
                 {
-                    if (_IsTransitioning == 1)
-                    {
-                        if (_TempScreenPos == null)
-                            ConfigureAnimation(true);
-                        if (rippleIn)
-                        {
-                            Vector3 tempVector3 = _Ripple.position;
-                            tempVector3.x = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.x, _TargetRipplePos.x, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            tempVector3.y = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.y, _TargetRipplePos.y, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            tempVector3.z = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.z, _TargetRipplePos.z, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            _Ripple.position = tempVector3;
-
-                            Vector2 tempVector2 = _Ripple.sizeDelta;
-                            tempVector2.x = MaterialUI.Tween.Evaluate(rippleInTweenType, 0, _TempRippleSize.x, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            tempVector2.y = MaterialUI.Tween.Evaluate(rippleInTweenType, 0, _TempRippleSize.y, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            _Ripple.sizeDelta = tempVector2;
-
-                            rectTransform.position = _TempScreenPos.Value;
-
-                            rectTransform.localScale = new Vector3(_TempRippleScale.x / ripple.localScale.x, _TempRippleScale.y / ripple.localScale.y, _TempRippleScale.z / ripple.localScale.z);
-                        }
-                        if (fadeIn)
-                        {
-                            canvasGroup.alpha = MaterialUI.Tween.Evaluate(fadeInTweenType, fadeInAlpha, 1f, _TransitionCurrentTime,
-                                transitionDuration, fadeInCustomCurve);
-                        }
-                        if (scaleIn)
-                        {
-                            Vector3 tempVector3 = rectTransform.localScale;
-                            tempVector3.x = MaterialUI.Tween.Evaluate(scaleInTweenType, scaleInScale, 1f, _TransitionCurrentTime,
-                                transitionDuration, scaleInCustomCurve);
-                            tempVector3.y = tempVector3.x;
-                            tempVector3.z = tempVector3.x;
-                            rectTransform.localScale = tempVector3;
-                        }
-                        if (slideIn)
-                        {
-                            Vector3 tempVector3 = rectTransform.position;
-                            tempVector3.x = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.x, _TempScreenPos.Value.x, _TransitionCurrentTime,
-                                transitionDuration, slideInCustomCurve);
-                            tempVector3.y = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.y, _TempScreenPos.Value.y, _TransitionCurrentTime,
-                                transitionDuration, slideInCustomCurve);
-                            tempVector3.z = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.z, _TempScreenPos.Value.z, _TransitionCurrentTime,
-                                transitionDuration, slideInCustomCurve);
-                            rectTransform.position = tempVector3;
-                        }
-                    }
-                    else if (_IsTransitioning == 2)
-                    {
-                        if (_TempScreenPos == null)
-                            ConfigureAnimation(false);
-                        if (rippleOut)
-                        {
-                            Vector3 tempVector3 = _Ripple.position;
-                            tempVector3.x = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.x, _TargetRipplePos.x, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            tempVector3.y = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.y, _TargetRipplePos.y, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            tempVector3.z = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.z, _TargetRipplePos.z, _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            _Ripple.position = tempVector3;
-
-                            Vector2 tempVector2 = _Ripple.sizeDelta;
-                            tempVector2.x = MaterialUI.Tween.Evaluate(rippleInTweenType, _TempRippleSize.x, 0,
-                                _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            tempVector2.y = MaterialUI.Tween.Evaluate(rippleInTweenType, _TempRippleSize.y, 0,
-                                _TransitionCurrentTime, m_TransitionDuration, rippleInCustomCurve);
-                            _Ripple.sizeDelta = tempVector2;
-
-                            rectTransform.position = _TempScreenPos.Value;
-
-                            rectTransform.localScale = new Vector3(_TempRippleScale.x / ripple.localScale.x, _TempRippleScale.y / ripple.localScale.y, _TempRippleScale.z / ripple.localScale.z);
-                        }
-                        if (fadeOut)
-                        {
-                            canvasGroup.alpha = MaterialUI.Tween.Evaluate(fadeOutTweenType, 1f, fadeOutAlpha,
-                                _TransitionCurrentTime, transitionDuration, fadeOutCustomCurve);
-                        }
-                        if (scaleOut)
-                        {
-                            Vector3 tempVector3 = rectTransform.localScale;
-                            tempVector3.x = MaterialUI.Tween.Evaluate(scaleOutTweenType, 1f, scaleOutScale, _TransitionCurrentTime,
-                                transitionDuration, scaleOutCustomCurve);
-                            tempVector3.y = tempVector3.x;
-                            tempVector3.z = tempVector3.x;
-                            rectTransform.localScale = tempVector3;
-                        }
-                        if (slideOut)
-                        {
-                            Vector3 tempVector3 = rectTransform.position;
-                            tempVector3.x = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.x, _SlideScreenPos.x,
-                                _TransitionCurrentTime, transitionDuration, slideOutCustomCurve);
-                            tempVector3.y = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.y, _SlideScreenPos.y, _TransitionCurrentTime,
-                                transitionDuration, slideOutCustomCurve);
-                            tempVector3.z = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.z, _SlideScreenPos.z, _TransitionCurrentTime,
-                                transitionDuration, slideOutCustomCurve);
-                            rectTransform.position = tempVector3;
-                        }
-                    }
+                    EvaluateAnimationState(_TransitionCurrentTime);
                 }
                 else
                     InterruptAnimation();
@@ -659,13 +564,14 @@ namespace MaterialUI
                 gameObject.SetActive(true);
 
             if (_TempScreenPos == null && this.transform is RectTransform)
-                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
             _TempScreenPos = rectTransform.position;
             ConfigureAnimation(true);
 
             enabled = true;
             _IsTransitioning = 1;
             _TransitionCurrentTime = -1;  //Time.realtimeSinceStartup;
+            EvaluateAnimationState(0);
         }
 
         public virtual void TransitionOut()
@@ -679,7 +585,7 @@ namespace MaterialUI
             //canvasGroup.blocksRaycasts = false;
 
             if (_TempScreenPos == null && this.transform is RectTransform)
-                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
             _TempScreenPos = rectTransform.position;
             ConfigureAnimation(false);
 
@@ -691,7 +597,8 @@ namespace MaterialUI
             else
             {
                 enabled = true;
-                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(this.transform as RectTransform);
+                EvaluateAnimationState(0);
             }
         }
 
@@ -770,6 +677,106 @@ namespace MaterialUI
         #endregion
 
         #region Internal Helper Functions
+
+        protected virtual void EvaluateAnimationState(float currentTime)
+        {
+            if (_IsTransitioning == 1)
+            {
+                if (_TempScreenPos == null)
+                    ConfigureAnimation(true);
+                if (rippleIn)
+                {
+                    Vector3 tempVector3 = _Ripple.position;
+                    tempVector3.x = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.x, _TargetRipplePos.x, currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    tempVector3.y = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.y, _TargetRipplePos.y, currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    tempVector3.z = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.z, _TargetRipplePos.z, currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    _Ripple.position = tempVector3;
+
+                    Vector2 tempVector2 = _Ripple.sizeDelta;
+                    tempVector2.x = MaterialUI.Tween.Evaluate(rippleInTweenType, 0, _TempRippleSize.x, currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    tempVector2.y = MaterialUI.Tween.Evaluate(rippleInTweenType, 0, _TempRippleSize.y, currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    _Ripple.sizeDelta = tempVector2;
+
+                    rectTransform.position = _TempScreenPos.Value;
+
+                    rectTransform.localScale = new Vector3(_TempRippleScale.x / ripple.localScale.x, _TempRippleScale.y / ripple.localScale.y, _TempRippleScale.z / ripple.localScale.z);
+                }
+                if (fadeIn)
+                {
+                    canvasGroup.alpha = MaterialUI.Tween.Evaluate(fadeInTweenType, fadeInAlpha, 1f, currentTime,
+                        transitionDuration, fadeInCustomCurve);
+                }
+                if (scaleIn)
+                {
+                    Vector3 tempVector3 = rectTransform.localScale;
+                    tempVector3.x = MaterialUI.Tween.Evaluate(scaleInTweenType, scaleInScale, 1f, currentTime,
+                        transitionDuration, scaleInCustomCurve);
+                    tempVector3.y = tempVector3.x;
+                    tempVector3.z = tempVector3.x;
+                    rectTransform.localScale = tempVector3;
+                }
+                if (slideIn)
+                {
+                    Vector3 tempVector3 = rectTransform.position;
+                    tempVector3.x = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.x, _TempScreenPos.Value.x, currentTime,
+                        transitionDuration, slideInCustomCurve);
+                    tempVector3.y = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.y, _TempScreenPos.Value.y, currentTime,
+                        transitionDuration, slideInCustomCurve);
+                    tempVector3.z = MaterialUI.Tween.Evaluate(slideInTweenType, _SlideScreenPos.z, _TempScreenPos.Value.z, currentTime,
+                        transitionDuration, slideInCustomCurve);
+                    rectTransform.position = tempVector3;
+                }
+            }
+            else if (_IsTransitioning == 2)
+            {
+                if (_TempScreenPos == null)
+                    ConfigureAnimation(false);
+                if (rippleOut)
+                {
+                    Vector3 tempVector3 = _Ripple.position;
+                    tempVector3.x = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.x, _TargetRipplePos.x, currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    tempVector3.y = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.y, _TargetRipplePos.y, currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    tempVector3.z = MaterialUI.Tween.Evaluate(rippleInTweenType, _CurrentRipplePos.z, _TargetRipplePos.z, currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    _Ripple.position = tempVector3;
+
+                    Vector2 tempVector2 = _Ripple.sizeDelta;
+                    tempVector2.x = MaterialUI.Tween.Evaluate(rippleInTweenType, _TempRippleSize.x, 0,
+                        currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    tempVector2.y = MaterialUI.Tween.Evaluate(rippleInTweenType, _TempRippleSize.y, 0,
+                        currentTime, m_TransitionDuration, rippleInCustomCurve);
+                    _Ripple.sizeDelta = tempVector2;
+
+                    rectTransform.position = _TempScreenPos.Value;
+
+                    rectTransform.localScale = new Vector3(_TempRippleScale.x / ripple.localScale.x, _TempRippleScale.y / ripple.localScale.y, _TempRippleScale.z / ripple.localScale.z);
+                }
+                if (fadeOut)
+                {
+                    canvasGroup.alpha = MaterialUI.Tween.Evaluate(fadeOutTweenType, 1f, fadeOutAlpha,
+                        currentTime, transitionDuration, fadeOutCustomCurve);
+                }
+                if (scaleOut)
+                {
+                    Vector3 tempVector3 = rectTransform.localScale;
+                    tempVector3.x = MaterialUI.Tween.Evaluate(scaleOutTweenType, 1f, scaleOutScale, currentTime,
+                        transitionDuration, scaleOutCustomCurve);
+                    tempVector3.y = tempVector3.x;
+                    tempVector3.z = tempVector3.x;
+                    rectTransform.localScale = tempVector3;
+                }
+                if (slideOut)
+                {
+                    Vector3 tempVector3 = rectTransform.position;
+                    tempVector3.x = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.x, _SlideScreenPos.x,
+                        currentTime, transitionDuration, slideOutCustomCurve);
+                    tempVector3.y = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.y, _SlideScreenPos.y, currentTime,
+                        transitionDuration, slideOutCustomCurve);
+                    tempVector3.z = MaterialUI.Tween.Evaluate(slideOutTweenType, _TempScreenPos.Value.z, _SlideScreenPos.z, currentTime,
+                        transitionDuration, slideOutCustomCurve);
+                    rectTransform.position = tempVector3;
+                }
+            }
+        }
 
         protected virtual void ConfigureAnimation(bool isIn)
         {
@@ -965,7 +972,7 @@ namespace MaterialUI
         protected internal int InterruptAnimation(bool callEvent = true)
         {
             _TransitionCurrentTime = transitionDuration + 1;
-            int v_processedTransition = _IsTransitioning;
+            int processedTransition = _IsTransitioning;
             if (_IsTransitioning == 1)
             {
                 if (rippleIn)
@@ -1031,10 +1038,10 @@ namespace MaterialUI
             {
                 _IsTransitioning = 0;
                 enabled = false;
-                onInterruptAnimation.InvokeIfNotNull(v_processedTransition);
+                onInterruptAnimation.InvokeIfNotNull(processedTransition);
             }
 
-            return v_processedTransition;
+            return processedTransition;
         }
 
         #endregion
