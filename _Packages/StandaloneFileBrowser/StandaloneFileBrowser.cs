@@ -1,3 +1,7 @@
+#if NET_STANDARD_2_0 && UNITY_2019_1_OR_NEWER && !UNITY_2021_1_OR_NEWER
+#define UNITY_NET_STANDARD_LEGACY
+#endif
+
 using System;
 
 namespace SFB {
@@ -17,7 +21,7 @@ namespace SFB {
         static StandaloneFileBrowser() {
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             _platformWrapper = new StandaloneFileBrowserMac();
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+#elif (UNITY_STANDALONE_WIN && !UNITY_EDITOR) || (UNITY_EDITOR_WIN && (UNITY_NET_STANDARD_LEGACY || !NET_STANDARD_2_0))
             _platformWrapper = new StandaloneFileBrowserWindows();
 #elif UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX
             _platformWrapper = new StandaloneFileBrowserLinux();
