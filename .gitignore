@@ -70,4 +70,4 @@ UnityGenerated/
 /.vs
 /Logs/Packages-Update.log
 /Assets/_KYUB/KyubEngine.lib/Kyub.UnityEvents/package-lock.json
-/Packages/packages-lock.json
+/*.vsconfig
