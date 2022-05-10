@@ -12,23 +12,31 @@ namespace SFB {
     // - "PlayerSettings/Visible In Background" should be enabled, otherwise when file dialog opened app window minimizes automatically.
     public class StandaloneFileBrowserWindows : IStandaloneFileBrowser 
     {
-
         [DllImport("user32.dll")]
         private static extern IntPtr GetActiveWindow();
 
         public string[] OpenFilePanel(string title, string directory, ExtensionFilter[] extensions, bool multiselect) {
 
+            //Default Directory
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                directory = UnityEngine.Application.dataPath; //GetCachedValueOrDefault(SFB_PLAYER_PREFS_OPEN_FILE_DIALOG, UnityEngine.Application.dataPath);
+            }
+
+            string[] result = null;
             var shellFilters = GetShellFilterFromFileExtensionList(extensions);
             if (multiselect)
             {
                 var paths = ShellFileDialogs.FileOpenDialog.ShowMultiSelectDialog(GetActiveWindow(), title, directory, string.Empty, shellFilters, null);
-                return paths == null || paths.Count == 0 ? new string[0] : paths.ToArray();
+                result = paths == null || paths.Count == 0 ? new string[0] : paths.ToArray();
             }
             else
             {
                 var path = ShellFileDialogs.FileOpenDialog.ShowSingleSelectDialog(GetActiveWindow(), title, directory, string.Empty, shellFilters, null);
-                return string.IsNullOrEmpty(path) ? new string[0] : new[] { path };
+                result = string.IsNullOrEmpty(path) ? new string[0] : new[] { path };
             }
+
+            return result;
         }
 
         public void OpenFilePanelAsync(string title, string directory, ExtensionFilter[] extensions, bool multiselect, Action<string[]> cb) {
@@ -37,8 +45,15 @@ namespace SFB {
 
         public string[] OpenFolderPanel(string title, string directory, bool multiselect) {
 
+            //Default Directory
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                directory = UnityEngine.Application.dataPath;
+            }
+
             var path = ShellFileDialogs.FolderBrowserDialog.ShowDialog(GetActiveWindow(), title, directory);
-            return string.IsNullOrEmpty(path) ? new string[0] : new[] { path };
+
+            return string.IsNullOrEmpty(path) ? new string[0] : new[] { path }; ;
         }
 
         public void OpenFolderPanelAsync(string title, string directory, bool multiselect, Action<string[]> cb) {
@@ -47,11 +62,13 @@ namespace SFB {
 
         public string SaveFilePanel(string title, string directory, string defaultName, ExtensionFilter[] extensions) {
 
-            var finalFilename = "";
-            if (!string.IsNullOrEmpty(directory))
+            //Default Directory
+            if (string.IsNullOrWhiteSpace(directory))
             {
-                finalFilename = GetDirectoryPath(directory);
+                directory = UnityEngine.Application.dataPath;
             }
+
+            var finalFilename = "";
 
             if (!string.IsNullOrEmpty(defaultName))
             {
@@ -67,6 +84,7 @@ namespace SFB {
             }
             
             var path = ShellFileDialogs.FileSaveDialog.ShowDialog(GetActiveWindow(), title, directory, finalFilename, shellFilters, 0);
+
             return path;
         }
 
@@ -108,16 +126,24 @@ namespace SFB {
             return shellFilters.ToArray();
         }
 
-        private static string GetDirectoryPath(string directory) {
-            var directoryPath = Path.GetFullPath(directory);
-            if (!directoryPath.EndsWith("\\")) {
-                directoryPath += "\\";
+        /*private static string GetDirectoryPath(string directory) {
+            try
+            {
+                var directoryPath = Path.GetFullPath(directory);
+                if (!directoryPath.EndsWith("\\"))
+                {
+                    directoryPath += "\\";
+                }
+                if (Path.GetPathRoot(directoryPath) == directoryPath)
+                {
+                    return directory;
+                }
+                return Path.GetDirectoryName(directoryPath) + Path.DirectorySeparatorChar;
             }
-            if (Path.GetPathRoot(directoryPath) == directoryPath) {
-                return directory;
-            }
-            return Path.GetDirectoryName(directoryPath) + Path.DirectorySeparatorChar;
-        }
+            catch { }
+
+            return string.Empty;
+        }*/
     }
 }
 
