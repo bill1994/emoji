@@ -1,0 +1,17 @@
+{
+    "name": "ShellFileDialogs",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_EDITOR_WIN"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

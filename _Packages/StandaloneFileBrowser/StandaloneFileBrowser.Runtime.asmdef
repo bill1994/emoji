@@ -1,0 +1,15 @@
+{
+    "name": "StandaloneFileBrowser.Runtime",
+    "references": [
+        "GUID:f9dd5d81d8a07e34c9d6e3982fa91101"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
