@@ -11,21 +11,7 @@ using System.Runtime.InteropServices;
 namespace SFB {
     public class StandaloneFileBrowserEditor : IStandaloneFileBrowser  {
 
-#if UNITY_EDITOR_WIN
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetActiveWindow();
-#endif
-
         public string[] OpenFilePanel(string title, string directory, ExtensionFilter[] extensions, bool multiselect) {
-#if UNITY_EDITOR_WIN
-            if (multiselect)
-            {
-                var shellFilters = GetShellFilterFromFileExtensionList(extensions);
-                var paths = ShellFileDialogs.FileOpenDialog.ShowMultiSelectDialog(GetActiveWindow(), title, directory, string.Empty, shellFilters, null);
-
-                return paths == null || paths.Count == 0 ? new string[0] : paths.ToArray();
-            }
-#endif
             string path = "";
             if (extensions == null) {
                 path = EditorUtility.OpenFilePanel(title, directory, "");
@@ -69,43 +55,6 @@ namespace SFB {
             }
             return filters;
         }
-
-#if UNITY_EDITOR_WIN
-        private static ShellFileDialogs.Filter[] GetShellFilterFromFileExtensionList(ExtensionFilter[] extensions)
-        {
-            var shellFilters = new System.Collections.Generic.List<ShellFileDialogs.Filter>();
-            if (extensions != null)
-            {
-                foreach (var extension in extensions)
-                {
-                    if (extension.Extensions == null || extension.Extensions.Length == 0)
-                        continue;
-
-                    var displayName = extension.Name;
-                    if (string.IsNullOrEmpty(displayName))
-                    {
-                        System.Text.StringBuilder extensionFormatted = new System.Text.StringBuilder();
-                        foreach (var extensionStr in extension.Extensions)
-                        {
-                            if (extensionFormatted.Length > 0)
-                                extensionFormatted.Append(";");
-                            extensionFormatted.Append($"*.{extensionStr}");
-                        }
-                        displayName = $"({extensionFormatted})";
-                    }
-                    var filter = new ShellFileDialogs.Filter(displayName, extension.Extensions);
-                    shellFilters.Add(filter);
-                }
-            }
-            if (shellFilters.Count == 0)
-            {
-                shellFilters.AddRange(ShellFileDialogs.Filter.ParseWindowsFormsFilter(@"All files (*.*)|*.*"));
-            }
-
-            return shellFilters.ToArray();
-        }
-#endif
-
     }
 }
 
