@@ -2,7 +2,8 @@
     "name": "Kyub.Async",
     "references": [
         "GUID:af50b871d983fd2498bf363097906a11",
-        "GUID:a67e29f1d69c1394e878fb4ae191318f"
+        "GUID:a67e29f1d69c1394e878fb4ae191318f",
+        "GUID:86470716438bb424b855c05a14633b23"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -11,6 +12,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.kyub.async.image",
+            "expression": "0.0.1",
+            "define": "SUPPORT_IMAGE_ASYNC"
+        }
+    ],
     "noEngineReferences": false
 }

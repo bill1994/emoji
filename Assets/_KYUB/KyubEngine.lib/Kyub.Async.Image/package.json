@@ -1,0 +1,22 @@
+{
+  "name": "com.kyub.async.image",
+  "version": "0.0.1",
+  "displayName": "Kyub Async Image",
+  "description": "Async Image Utility Functions",
+  "unity": "2019.1",
+	"dependencies": {
+		"com.unity.burst": "1.5.4",
+		"com.unity.mathematics": "1.2.1"
+	},
+  "keywords": [
+    "ImageLoader",
+	"Async"
+  ],
+  "author": {
+    "name": "Kyub Interactive",
+    "email": "raf.csoares@kyubinteractive.com",
+    "url": "https://www.kyubinteractive.com"
+  },
+  "hideInEditor": false,
+  "type": "library"
+}

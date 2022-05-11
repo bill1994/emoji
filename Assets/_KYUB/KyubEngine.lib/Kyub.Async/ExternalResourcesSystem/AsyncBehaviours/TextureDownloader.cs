@@ -5,6 +5,7 @@ using Kyub;
 using Kyub.Extensions;
 using Kyub.Collections;
 using UnityEngine.Networking;
+using Kyub.Async.Extensions;
 
 namespace Kyub.Async
 {
@@ -73,11 +74,11 @@ namespace Kyub.Async
 
         #region Helper Functions
 
-        public virtual void RegisterCallback(TexSerWebReturnTypeEnum p_returnType, FunctionAndParams p_function)
+        public virtual void RegisterCallback(TexSerWebReturnTypeEnum returnType, FunctionAndParams function)
         {
-            if (p_function != null && (p_function.DelegatePointer != null || (p_function.Target != null && !string.IsNullOrEmpty(p_function.StringFunctionName))))
+            if (function != null && (function.DelegatePointer != null || (function.Target != null && !string.IsNullOrEmpty(function.StringFunctionName))))
             {
-                ReturnTypePerCallbackDict.Add(p_returnType, p_function);
+                ReturnTypePerCallbackDict.Add(returnType, function);
             }
         }
 
@@ -94,56 +95,80 @@ namespace Kyub.Async
                     www.timeout = RequestStackManager.RequestTimeLimit;
                     yield return www.SendWebRequest();
 
-                    ProcessWWWReturn(www);
+                    yield return ProcessWWWReturn(www);
                 }
             }
         }
 
-        protected override void ProcessWWWReturn(UnityWebRequest www)
-        {
-            try
-            {
-                var v_error = www == null ? "Request Unscheduled" : www.error;
+		protected override IEnumerator ProcessWWWReturn(UnityWebRequest www)
+		{
+			var error = www == null ? "Request Unscheduled" : www.error;
 
-                if (www == null || www.isNetworkError || www.isHttpError || !string.IsNullOrEmpty(v_error))
-                    Debug.Log("Download Failed: " + v_error + " Url: " + Url);
-                else
-                {
-                    TextureLoaded = ((DownloadHandlerTexture)www.downloadHandler).texture;
+			if (www == null || www.isNetworkError || www.isHttpError || !string.IsNullOrEmpty(error))
+				Debug.Log("Download Failed: " + error + " Url: " + Url);
+			else
+			{
+				var processing = true;
+				try
+				{
+					DownloadHandlerExtension.GetTextureContentAsync(www.downloadHandler, (textureResult) =>
+					{
+						processing = false;
+						TextureLoaded = textureResult;
+					});
+				}
+				catch
+				{
+					processing = false;
+				}
 
-                    //Remove Invalid Unity Image
-                    if (TextureLoaded != null && TextureLoaded.width <= 8 && TextureLoaded.height <= 8)
-                    {
-                        GameObject.Destroy(TextureLoaded);
-                        TextureLoaded = null;
-                    }
-                }
+				//Wait while async loader process image
+				while (processing)
+				{
+					yield return null;
+				}
 
-                AsyncRequestOperation.Sprite = TextureLoaded != null ? Sprite.Create(TextureLoaded, new Rect(0, 0, TextureLoaded.width, TextureLoaded.height), new Vector2(0.5f, 0.5f)) : null;
-                AsyncRequestOperation.Texture = TextureLoaded;
-                AsyncRequestOperation.Url = Url;
-                AsyncRequestOperation.Error = v_error;
+				if (TextureLoaded != null)
+				{
+					//Wait while finish Apply();
+					yield return new WaitForSeconds(0.2f);
+				}
 
-                //Requests callbacks (based in each parameter)
-                foreach (var v_pair in ReturnTypePerCallbackDict)
-                {
-                    var v_returnType = v_pair.Key;
-                    var v_function = v_pair.Value;
-                    if (v_function != null)
-                    {
-                        v_function.Params.Clear();
-                        if (v_returnType == TexSerWebReturnTypeEnum.ExternImgFile)
-                            v_function.Params.Add(AsyncRequestOperation);
-                        else if (v_returnType == TexSerWebReturnTypeEnum.Sprite)
-                            v_function.Params.Add(AsyncRequestOperation.Sprite);
-                        else
-                            v_function.Params.Add(AsyncRequestOperation.Texture);
-                        v_function.CallFunction();
-                    }
-                }
-            }
-            catch { }
-        }
+				//Remove Invalid Unity Image
+				if (TextureLoaded != null && TextureLoaded.width <= 8 && TextureLoaded.height <= 8)
+				{
+					GameObject.Destroy(TextureLoaded);
+					TextureLoaded = null;
+				}
+			}
+
+			try
+			{
+				AsyncRequestOperation.Sprite = TextureLoaded != null ? Sprite.Create(TextureLoaded, new Rect(0, 0, TextureLoaded.width, TextureLoaded.height), new Vector2(0.5f, 0.5f)) : null;
+				AsyncRequestOperation.Texture = TextureLoaded;
+				AsyncRequestOperation.Url = Url;
+				AsyncRequestOperation.Error = error;
+
+				//Requests callbacks (based in each parameter)
+				foreach (var pair in ReturnTypePerCallbackDict)
+				{
+					var returnType = pair.Key;
+					var function = pair.Value;
+					if (function != null)
+					{
+						function.Params.Clear();
+						if (returnType == TexSerWebReturnTypeEnum.ExternImgFile)
+							function.Params.Add(AsyncRequestOperation);
+						else if (returnType == TexSerWebReturnTypeEnum.Sprite)
+							function.Params.Add(AsyncRequestOperation.Sprite);
+						else
+							function.Params.Add(AsyncRequestOperation.Texture);
+						function.CallFunction();
+					}
+				}
+			}
+			catch { }
+		}
         
         #endregion
 
@@ -167,23 +192,23 @@ namespace Kyub.Async
 			}
 		}
 
-		public static TextureDownloader GetDownloader(string p_url)
+		public static TextureDownloader GetDownloader(string url)
 		{
-			foreach(TextureDownloader v_downloader in _downloadersInScene)
+			foreach(TextureDownloader downloader in _downloadersInScene)
 			{
-				if(v_downloader != null && !v_downloader.IsMarkedToDestroy(true) && string.Equals(v_downloader.Url, p_url))
+				if(downloader != null && !downloader.IsMarkedToDestroy(true) && string.Equals(downloader.Url, url))
 				{
-					return v_downloader;
+					return downloader;
 				}
 			}
 			return null;
 		}
 
-		public static bool IsDownloading(string p_url)
+		public static bool IsDownloading(string url)
 		{
-			foreach(TextureDownloader v_downloader in _downloadersInScene)
+			foreach(TextureDownloader downloader in _downloadersInScene)
 			{
-				if(v_downloader != null && !v_downloader.IsMarkedToDestroy(true) && string.Equals(v_downloader.Url, p_url))
+				if(downloader != null && !downloader.IsMarkedToDestroy(true) && string.Equals(downloader.Url, url))
 				{
 					return true;
 				}
@@ -191,13 +216,13 @@ namespace Kyub.Async
 			return false;
 		}
 
-		public static void CancelAllRequestsWithUrl(string p_url)
+		public static void CancelAllRequestsWithUrl(string url)
 		{
-			foreach(TextureDownloader v_downloader in _downloadersInScene)
+			foreach(TextureDownloader downloader in _downloadersInScene)
 			{
-				if(v_downloader != null && !v_downloader.IsMarkedToDestroy(true) && string.Equals(v_downloader.Url, p_url))
+				if(downloader != null && !downloader.IsMarkedToDestroy(true) && string.Equals(downloader.Url, url))
 				{
-					v_downloader.CancelRequest();
+					downloader.CancelRequest();
 				}
 			}
 		}

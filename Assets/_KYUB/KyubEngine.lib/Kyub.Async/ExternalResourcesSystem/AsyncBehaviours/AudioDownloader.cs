@@ -73,11 +73,11 @@ namespace Kyub.Async
 
         #region Helper Functions
 
-        public virtual void RegisterCallback(AudioSerWebReturnTypeEnum p_returnType, FunctionAndParams p_function)
+        public virtual void RegisterCallback(AudioSerWebReturnTypeEnum returnType, FunctionAndParams function)
         {
-            if (p_function != null && (p_function.DelegatePointer != null || (p_function.Target != null && !string.IsNullOrEmpty(p_function.StringFunctionName))))
+            if (function != null && (function.DelegatePointer != null || (function.Target != null && !string.IsNullOrEmpty(function.StringFunctionName))))
             {
-                ReturnTypePerCallbackDict.Add(p_returnType, p_function);
+                ReturnTypePerCallbackDict.Add(returnType, function);
             }
         }
 
@@ -89,31 +89,31 @@ namespace Kyub.Async
                 //MarkedToDestroy.RemoveMark(this.gameObject);
                 ClipLoaded = null;
 
-                var v_externsion = Url != null ? System.IO.Path.GetExtension(Url).ToLower() : "";
-                var v_audioType = AudioType.WAV;
-                if (v_externsion.Contains(".ogg"))
-                    v_audioType = AudioType.OGGVORBIS;
-                else if (v_externsion.Contains(".mp3") || v_externsion.Contains(".mp2"))
-                    v_audioType = AudioType.MPEG;
+                var externsion = Url != null ? System.IO.Path.GetExtension(Url).ToLower() : "";
+                var audioType = AudioType.WAV;
+                if (externsion.Contains(".ogg"))
+                    audioType = AudioType.OGGVORBIS;
+                else if (externsion.Contains(".mp3") || externsion.Contains(".mp2"))
+                    audioType = AudioType.MPEG;
 
-                using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(Url, v_audioType))
+                using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(Url, audioType))
                 {
                     www.timeout = RequestStackManager.RequestTimeLimit;
                     yield return www.SendWebRequest();
 
-                    ProcessWWWReturn(www);
+                    yield return ProcessWWWReturn(www);
                 }
             }
         }
 
-        protected override void ProcessWWWReturn(UnityWebRequest www)
+        protected override IEnumerator ProcessWWWReturn(UnityWebRequest www)
         {
             try
             {
-                var v_error = www == null ? "Request Unscheduled" : www.error;
+                var error = www == null ? "Request Unscheduled" : www.error;
 
-                if (www == null || www.isNetworkError || www.isHttpError || !string.IsNullOrEmpty(v_error))
-                    Debug.Log("Download Failed: " + v_error + " Url: " + Url);
+                if (www == null || www.isNetworkError || www.isHttpError || !string.IsNullOrEmpty(error))
+                    Debug.Log("Download Failed: " + error + " Url: " + Url);
                 else
                 {
                     ClipLoaded = DownloadHandlerAudioClip.GetContent(www);
@@ -121,25 +121,27 @@ namespace Kyub.Async
 
                 AsyncRequestOperation.Clip = ClipLoaded;
                 AsyncRequestOperation.Url = Url;
-                AsyncRequestOperation.Error = v_error;
+                AsyncRequestOperation.Error = error;
 
                 //Requests callbacks (based in each parameter)
-                foreach (var v_pair in ReturnTypePerCallbackDict)
+                foreach (var pair in ReturnTypePerCallbackDict)
                 {
-                    var v_returnType = v_pair.Key;
-                    var v_function = v_pair.Value;
-                    if (v_function != null)
+                    var returnType = pair.Key;
+                    var function = pair.Value;
+                    if (function != null)
                     {
-                        v_function.Params.Clear();
-                        if (v_returnType == AudioSerWebReturnTypeEnum.ExternAudioFile)
-                            v_function.Params.Add(AsyncRequestOperation);
+                        function.Params.Clear();
+                        if (returnType == AudioSerWebReturnTypeEnum.ExternAudioFile)
+                            function.Params.Add(AsyncRequestOperation);
                         else
-                            v_function.Params.Add(AsyncRequestOperation.Clip);
-                        v_function.CallFunction();
+                            function.Params.Add(AsyncRequestOperation.Clip);
+                        function.CallFunction();
                     }
                 }
             }
             catch { }
+
+            yield break;
         }
 
         #endregion
@@ -164,23 +166,23 @@ namespace Kyub.Async
             }
         }
 
-        public static AudioDownloader GetDownloader(string p_url)
+        public static AudioDownloader GetDownloader(string url)
         {
-            foreach (AudioDownloader v_downloader in _downloadersInScene)
+            foreach (AudioDownloader downloader in _downloadersInScene)
             {
-                if (v_downloader != null && !v_downloader.IsMarkedToDestroy(true) && string.Equals(v_downloader.Url, p_url))
+                if (downloader != null && !downloader.IsMarkedToDestroy(true) && string.Equals(downloader.Url, url))
                 {
-                    return v_downloader;
+                    return downloader;
                 }
             }
             return null;
         }
 
-        public static bool IsDownloading(string p_url)
+        public static bool IsDownloading(string url)
         {
-            foreach (AudioDownloader v_downloader in _downloadersInScene)
+            foreach (AudioDownloader downloader in _downloadersInScene)
             {
-                if (v_downloader != null && !v_downloader.IsMarkedToDestroy(true) && string.Equals(v_downloader.Url, p_url))
+                if (downloader != null && !downloader.IsMarkedToDestroy(true) && string.Equals(downloader.Url, url))
                 {
                     return true;
                 }
@@ -188,13 +190,13 @@ namespace Kyub.Async
             return false;
         }
 
-        public static void CancelAllRequestsWithUrl(string p_url)
+        public static void CancelAllRequestsWithUrl(string url)
         {
-            foreach (AudioDownloader v_downloader in _downloadersInScene)
+            foreach (AudioDownloader downloader in _downloadersInScene)
             {
-                if (v_downloader != null && !v_downloader.IsMarkedToDestroy(true) && string.Equals(v_downloader.Url, p_url))
+                if (downloader != null && !downloader.IsMarkedToDestroy(true) && string.Equals(downloader.Url, url))
                 {
-                    v_downloader.CancelRequest();
+                    downloader.CancelRequest();
                 }
             }
         }
