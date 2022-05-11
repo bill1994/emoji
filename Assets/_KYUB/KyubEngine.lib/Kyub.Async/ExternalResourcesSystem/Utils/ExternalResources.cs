@@ -974,7 +974,9 @@ namespace Kyub.Async
             }
             TextureDownloader downloader = TextureDownloader.GetDownloader(url);
             if (downloader != null)
+            {
                 RequestStackManager.StopAllRequestsFromSender(downloader);
+            }
         }
 
         private static bool TryGetImageFromDictionary(string url)

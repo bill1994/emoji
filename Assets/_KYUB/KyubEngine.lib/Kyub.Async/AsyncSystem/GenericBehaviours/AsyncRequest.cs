@@ -62,8 +62,8 @@ namespace Kyub.Async
 		protected virtual void Awake()
 		{
 			gameObject.hideFlags = HideFlags.DontSaveInBuild|HideFlags.DontSaveInBuild;
-			System.Type v_type = this.GetType();
-			gameObject.name = (v_type != null? this.GetType().Name : "AsyncRequest") + "(Dummy)";
+			System.Type type = this.GetType();
+			gameObject.name = (type != null? this.GetType().Name : "AsyncRequest") + "(Dummy)";
 		}
 		
 		protected virtual void OnEnable()
@@ -143,13 +143,13 @@ namespace Kyub.Async
             AsyncRequestOperation.Status = AsyncStatusEnum.Processing;
             yield return ProcessRequest();
             AsyncRequestOperation.Status = AsyncStatusEnum.Done;
-            foreach (var v_func in FunctionsToCallWhenFinish)
+            foreach (var func in FunctionsToCallWhenFinish)
             {
-                if (v_func != null)
+                if (func != null)
                 {
-                    v_func.Params.Clear();
-                    v_func.Params.Add(AsyncRequestOperation);
-                    v_func.CallFunction();
+                    func.Params.Clear();
+                    func.Params.Add(AsyncRequestOperation);
+                    func.CallFunction();
                 }
             }
             DestroyUtils.Destroy(this.gameObject);
@@ -190,9 +190,9 @@ namespace Kyub.Async
 			where AsyncRequestType : AsyncRequest<AsyncCallbackType>
 			where AsyncCallbackType : AsyncRequestOperation , new()
 		{
-			GameObject v_object = new GameObject();
-			AsyncRequestType v_requestBehaviour = v_object.AddComponent<AsyncRequestType>();
-			return v_requestBehaviour;
+			GameObject go = new GameObject();
+			AsyncRequestType requestBehaviour = go.AddComponent<AsyncRequestType>();
+			return requestBehaviour;
 		}
 
 		#endregion
@@ -372,14 +372,14 @@ namespace Kyub.Async
         {
             try
             {
-                System.Delegate v_tempFunctionPointer = DelegatePointer;
-                object[] v_params = Params.ToArray();
-                if (v_tempFunctionPointer != null)
+                System.Delegate tempFunctionPointer = DelegatePointer;
+                object[] paramsArray = Params.ToArray();
+                if (tempFunctionPointer != null)
                 {
                     if (Params.Count == 0)
-                        v_tempFunctionPointer.DynamicInvoke(null);
+                        tempFunctionPointer.DynamicInvoke(null);
                     else
-                        v_tempFunctionPointer.DynamicInvoke(v_params);
+                        tempFunctionPointer.DynamicInvoke(paramsArray);
                     return true;
                 }
             }
@@ -389,21 +389,21 @@ namespace Kyub.Async
 
         public System.Type[] GetFunctionParameterTypes()
         {
-            List<System.Type> v_parameters = new List<System.Type>();
+            List<System.Type> parameters = new List<System.Type>();
             if (DelegatePointer != null)
             {
-                MethodInfo v_invoke = DelegatePointer.GetType().GetMethod("Invoke");
-                if (v_invoke != null)
+                MethodInfo invoke = DelegatePointer.GetType().GetMethod("Invoke");
+                if (invoke != null)
                 {
-                    ParameterInfo[] v_params = v_invoke.GetParameters();
-                    foreach (ParameterInfo v_param in v_params)
+                    ParameterInfo[] paramsArray = invoke.GetParameters();
+                    foreach (ParameterInfo param in paramsArray)
                     {
-                        if (v_params != null)
-                            v_parameters.Add(v_param.ParameterType);
+                        if (param != null)
+                            parameters.Add(param.ParameterType);
                     }
                 }
             }
-            return v_parameters.ToArray();
+            return parameters.ToArray();
         }
 
         #endregion

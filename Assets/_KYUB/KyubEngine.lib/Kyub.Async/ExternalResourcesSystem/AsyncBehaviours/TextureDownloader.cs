@@ -108,13 +108,23 @@ namespace Kyub.Async
 				Debug.Log("Download Failed: " + error + " Url: " + Url);
 			else
 			{
+				yield return null;
 				var processing = true;
 				try
 				{
 					DownloadHandlerExtension.GetTextureContentAsync(www.downloadHandler, (textureResult) =>
 					{
 						processing = false;
-						TextureLoaded = textureResult;
+
+						if (this != null)
+						{
+							TextureLoaded = textureResult;
+						}
+						else
+                        {
+							GameObject.Destroy(textureResult);
+						}
+						
 					});
 				}
 				catch

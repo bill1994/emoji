@@ -8,13 +8,4 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: Assets/APA/Scenes/SplashScene.unity
-    guid: 478dfeec54f52d54cb55161fd548aa7a
-  - enabled: 0
-    path: Assets/APA/Scenes/LoginScene.unity
-    guid: 0f0c08f7fc8d7284f972e6f3757c4afc
-  - enabled: 0
-    path: Assets/APA/Scenes/MainScene.unity
-    guid: 9d40d4a3580680045b0a5cd4c632fb3c
   m_configObjects: {}

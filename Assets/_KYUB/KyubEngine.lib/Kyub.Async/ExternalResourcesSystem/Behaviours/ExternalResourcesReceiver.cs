@@ -24,12 +24,12 @@ namespace Kyub.Async
             }
             set
             {
-                var v_value = value == null ? "" : value;
-                if (m_key == v_value)
+                value = value == null ? "" : value;
+                if (m_key == value)
                     return;
                 if (Application.isPlaying)
                     UnregisterReceiver();
-                m_key = v_value;
+                m_key = value;
                 if (Application.isPlaying)
                     RegisterReceiver();
                 SetDirty();
