@@ -229,7 +229,7 @@ namespace Kyub.Async.Experimental
         //
         // Summary:
         //     The hash value of the Texture.
-        public Hash128 imageContentsHash
+        /*public Hash128 imageContentsHash
         {
             get { return m_Texture2D != null ? m_Texture2D.imageContentsHash : new Hash128(); }
             set
@@ -237,7 +237,7 @@ namespace Kyub.Async.Experimental
                 if (texture != null)
                     m_Texture2D.imageContentsHash = value;
             }
-        }
+        }*/
         //
         // Summary:
         //     Filtering mode of the texture.
@@ -256,7 +256,7 @@ namespace Kyub.Async.Experimental
         /// </summary>
         public TextureFormat format { get { return texture != null ? texture.format : TextureFormat.ARGB32; } }
 
-        public bool alphaIsTransparency
+        /*public bool alphaIsTransparency
         {
             get { return texture != null ? texture.alphaIsTransparency : true; }
             set
@@ -264,7 +264,7 @@ namespace Kyub.Async.Experimental
                 if (texture != null)
                     m_Texture2D.alphaIsTransparency = value;
             }
-        }
+        }*/
 
         #endregion
 

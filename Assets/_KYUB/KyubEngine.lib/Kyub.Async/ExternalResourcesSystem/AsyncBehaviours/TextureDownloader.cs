@@ -128,12 +128,6 @@ namespace Kyub.Async
 					yield return null;
 				}
 
-				if (TextureLoaded != null)
-				{
-					//Wait while finish Apply();
-					yield return new WaitForSeconds(0.2f);
-				}
-
 				//Remove Invalid Unity Image
 				if (TextureLoaded != null && TextureLoaded.width <= 8 && TextureLoaded.height <= 8)
 				{

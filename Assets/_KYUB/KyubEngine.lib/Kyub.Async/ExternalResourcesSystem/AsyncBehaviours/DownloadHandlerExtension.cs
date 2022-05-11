@@ -15,6 +15,7 @@ namespace Kyub.Async.Extensions
     {
         public static NativeArray<byte>? GetNativeDataArray(this DownloadHandler handler)
         {
+#if UNITY_2021_1_OR_NEWER
             if (handler != null)
             {
                 var nativeData = handler.GetType().GetMethod("GetNativeData", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
@@ -23,12 +24,20 @@ namespace Kyub.Async.Extensions
                     return (NativeArray<byte>)nativeData.Invoke(handler, null);
                 }
             }
+#endif
             return null;
         }
 
         public static void GetTextureContentAsync(this DownloadHandler handler, Action<Texture2D> callback)
         {
-            var useAsync = false;
+            // Prevent spike waiting small time before return texture.
+            // When Apply() is uploading the content data from CPU to GPU
+            // and we access the texture content with Image.sprite/RawImage.texture/material.texture
+            // Unity will stall the main process until upload is completed resulting in a huge spike.
+            // To prevent this problem we will delay the result a little.
+            const float GPU_UPLOAD_SPIKE_PREVENT_DELAY = 0.25f;
+            bool useAsync = false;
+
 #if SUPPORT_IMAGE_ASYNC
             useAsync = handler != null && Image.AsyncImageLoader.IsSupported();
             if (useAsync)
@@ -44,8 +53,12 @@ namespace Kyub.Async.Extensions
                 {
                     Image.AsyncImageLoader.CreateFromImageAsync(nativeArrayNullable.Value).ContinueWith((result) =>
                     {
-                        if (callback != null)
-                            callback.Invoke(result.Result);
+                        var texture = result.Result;
+                        Kyub.ApplicationContext.RunOnMainThread(() =>
+                        {
+                            if (callback != null)
+                                callback.Invoke(texture);
+                        }, GPU_UPLOAD_SPIKE_PREVENT_DELAY);
                     });
                     return;
                 }
@@ -59,8 +72,12 @@ namespace Kyub.Async.Extensions
 #endif
             if (!useAsync)
             {
-                if (callback != null)
-                    callback.Invoke(handler is DownloadHandlerTexture ? ((DownloadHandlerTexture)handler).texture : null);
+                var texture = handler is DownloadHandlerTexture ? ((DownloadHandlerTexture)handler).texture : null;
+                Kyub.ApplicationContext.RunOnMainThread(() =>
+                {
+                    if (callback != null)
+                        callback.Invoke(texture);
+                }, GPU_UPLOAD_SPIKE_PREVENT_DELAY);
             }
         }
 
