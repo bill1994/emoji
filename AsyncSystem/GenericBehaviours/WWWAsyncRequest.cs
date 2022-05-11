@@ -53,11 +53,13 @@ namespace Kyub.Async
 		/// <summary>
 		/// Override this Object for Simple Process Request Logic
 		/// </summary>
-        protected virtual void ProcessWWWReturn(UnityWebRequest www)
+        protected virtual IEnumerator ProcessWWWReturn(UnityWebRequest www)
         {
-            if (www == null || www.isNetworkError || www.isHttpError || !string.IsNullOrEmpty(www.error))
-                Debug.Log("Request Failed: " + www.error + " Url: " + Url);
-        }
+			if (www == null || www.isNetworkError || www.isHttpError || !string.IsNullOrEmpty(www.error))
+				Debug.Log("Request Failed: " + www.error + " Url: " + Url);
+
+			yield break;
+		}
 
         #endregion
 
