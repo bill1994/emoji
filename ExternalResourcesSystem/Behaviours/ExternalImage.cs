@@ -50,9 +50,9 @@ namespace Kyub.UI
             }
             set
             {
-                var v_cachedKey = m_key;
+                var cachedKey = m_key;
                 base.Key = value;
-                if(m_key != v_cachedKey)
+                if(m_key != cachedKey)
                     _canUnregisterOnDisable = true;
             }
         }
@@ -67,10 +67,10 @@ namespace Kyub.UI
 			{
 				if(m_defaultSprite == value)
 					return;
-                var v_sprite = Sprite;
-                var v_needReapply = v_sprite == m_defaultSprite || v_sprite == null;
+                var sprite = Sprite;
+                var needReapply = sprite == m_defaultSprite || sprite == null;
                 m_defaultSprite = value;
-                if (v_needReapply)
+                if (needReapply)
                     Sprite = m_defaultSprite;
             }
 		}
@@ -130,19 +130,19 @@ namespace Kyub.UI
 		{
 			if(m_imageComponent != null)
 			{
-				Image v_image = m_imageComponent as Image;
-				if(v_image != null)
+				Image image = m_imageComponent as Image;
+				if(image != null)
 				{
-					_sprite = v_image.sprite;
+					_sprite = image.sprite;
 				}
 				else
 				{
-					RawImage v_rawImage = m_imageComponent as RawImage;
-					if(v_rawImage != null)
+					RawImage rawImage = m_imageComponent as RawImage;
+					if(rawImage != null)
 					{
-						Texture2D v_texture = _sprite != null? _sprite.texture : null;
-						if(v_rawImage.texture != v_texture)
-							_sprite = v_texture != null? Sprite.Create(v_texture, new Rect(0,0, v_texture.width, v_texture.height), new Vector2(0.5f, 0.5f)) : null;
+						Texture2D texture = _sprite != null? _sprite.texture : null;
+						if(rawImage.texture != texture)
+							_sprite = texture != null? Sprite.Create(texture, new Rect(0,0, texture.width, texture.height), new Vector2(0.5f, 0.5f)) : null;
 					}
 					else
 					{
@@ -156,26 +156,26 @@ namespace Kyub.UI
 			return _sprite;
 		}
 
-		protected void SetSpriteToImageComponent(Sprite p_sprite)
+		protected void SetSpriteToImageComponent(Sprite sprite)
 		{
-            var v_oldSprite = _sprite;
+            var oldSprite = _sprite;
 			if(m_imageComponent != null)
 			{
-				Image v_image = m_imageComponent as Image;
-				if(v_image != null)
+				Image image = m_imageComponent as Image;
+				if(image != null)
 				{
-					v_image.sprite = p_sprite;
-					_sprite = p_sprite;
+					image.sprite = sprite;
+					_sprite = sprite;
 				}
 				else
 				{
-					RawImage v_rawImage = m_imageComponent as RawImage;
-					if(v_rawImage != null)
+					RawImage rawImage = m_imageComponent as RawImage;
+					if(rawImage != null)
 					{
-						Texture2D v_texture = p_sprite != null? p_sprite.texture : null;
-						v_rawImage.texture = v_texture;
-                        CalculateRawImageUVRect(v_rawImage);
-                        _sprite = p_sprite;
+						Texture2D texture = sprite != null? sprite.texture : null;
+						rawImage.texture = texture;
+                        CalculateRawImageUVRect(rawImage);
+                        _sprite = sprite;
 					}
 					else
 					{
@@ -188,7 +188,7 @@ namespace Kyub.UI
 				_sprite = null;
 
             //Apply Sprite/Texture Changed
-            if (v_oldSprite != _sprite)
+            if (oldSprite != _sprite)
             {
                 if (OnTextureChangedCallback != null)
                     OnTextureChangedCallback.Invoke(_sprite != null ? _sprite.texture : null);
@@ -229,25 +229,25 @@ namespace Kyub.UI
 
         protected virtual void OnRectTransformDimensionsChange()
         {
-            RawImage v_rawImage = m_imageComponent as RawImage;
-            if (v_rawImage != null)
-                CalculateRawImageUVRect(v_rawImage);
+            RawImage rawImage = m_imageComponent as RawImage;
+            if (rawImage != null)
+                CalculateRawImageUVRect(rawImage);
         }
 
         #endregion
 
         #region Receivers
 
-        protected virtual void HandleOnImageLoaded (ExternImgFile p_image)
+        protected virtual void HandleOnImageLoaded (ExternImgFile image)
 		{
-            if ((string.IsNullOrEmpty(Key) && (p_image == null || string.IsNullOrEmpty(p_image.Url))) ||
-                (p_image != null && string.Equals(p_image.Url, Key)))
+            if ((string.IsNullOrEmpty(Key) && (image == null || string.IsNullOrEmpty(image.Url))) ||
+                (image != null && string.Equals(image.Url, Key)))
             {
-                if (ImageComponent != null && !string.IsNullOrEmpty(Key) && (p_image.Sprite != null || string.IsNullOrEmpty(p_image.Error)))
+                if (ImageComponent != null && !string.IsNullOrEmpty(Key) && (image.Sprite != null || string.IsNullOrEmpty(image.Error)))
                 {
-                    Sprite = p_image.Sprite;
+                    Sprite = image.Sprite;
                 }
-                if (Sprite == null || !string.IsNullOrEmpty(p_image.Error))
+                if (Sprite == null || !string.IsNullOrEmpty(image.Error))
                 {
                     ApplyDefaultSpriteInImageComponent();
                 }
@@ -269,38 +269,38 @@ namespace Kyub.UI
 
         #region Helper Functions
 
-        protected virtual void CalculateRawImageUVRect(RawImage p_rawImage)
+        protected virtual void CalculateRawImageUVRect(RawImage rawImage)
         {
-            var v_textureSize = p_rawImage != null && p_rawImage.texture != null ? new Vector2(p_rawImage.texture.width, p_rawImage.texture.height) : new Vector2(0, 0);
-            if (v_textureSize.x == 0 || v_textureSize.y == 0)
+            var textureSize = rawImage != null && rawImage.texture != null ? new Vector2(rawImage.texture.width, rawImage.texture.height) : new Vector2(0, 0);
+            if (textureSize.x == 0 || textureSize.y == 0)
             {
-                var v_normalizedRect = new Rect(0, 0, 1, 1);
-                if(p_rawImage != null)
-                    p_rawImage.uvRect = v_normalizedRect;
+                var normalizedRect = new Rect(0, 0, 1, 1);
+                if(rawImage != null)
+                    rawImage.uvRect = normalizedRect;
             }
             else
             {
-                var v_localRect = new Rect(Vector2.zero, new Vector2(Mathf.Abs(p_rawImage.rectTransform.rect.width), Mathf.Abs(p_rawImage.rectTransform.rect.height)));
-                var v_normalizedRect = new Rect(0, 0, 1, 1);
+                var localRect = new Rect(Vector2.zero, new Vector2(Mathf.Abs(rawImage.rectTransform.rect.width), Mathf.Abs(rawImage.rectTransform.rect.height)));
+                var normalizedRect = new Rect(0, 0, 1, 1);
 
-                if (v_localRect.width > 0 && v_localRect.height > 0)
+                if (localRect.width > 0 && localRect.height > 0)
                 {
-                    var v_textureProportion = v_textureSize.x / v_textureSize.y;
-                    var v_localRectProportion = v_localRect.width / v_localRect.height;
-                    if (v_localRectProportion > v_textureProportion)
+                    var textureProportion = textureSize.x / textureSize.y;
+                    var localRectProportion = localRect.width / localRect.height;
+                    if (localRectProportion > textureProportion)
                     {
-                        var v_mult = v_localRect.width > 0 ? v_textureSize.x / v_localRect.width : 0;
-                        v_normalizedRect = new Rect(0, 0, 1, (v_localRect.height * v_mult) / v_textureSize.y);
-                        v_normalizedRect.y = Mathf.Max(0, (1 - v_normalizedRect.height) / 2);
+                        var mult = localRect.width > 0 ? textureSize.x / localRect.width : 0;
+                        normalizedRect = new Rect(0, 0, 1, (localRect.height * mult) / textureSize.y);
+                        normalizedRect.y = Mathf.Max(0, (1 - normalizedRect.height) / 2);
                     }
-                    else if (v_localRectProportion < v_textureProportion)
+                    else if (localRectProportion < textureProportion)
                     {
-                        var v_mult = v_localRect.height > 0 ? v_textureSize.y / v_localRect.height : 0;
-                        v_normalizedRect = new Rect(0, 0, (v_localRect.width * v_mult) / v_textureSize.x, 1);
-                        v_normalizedRect.x = Mathf.Max(0, (1 - v_normalizedRect.width) / 2);
+                        var mult = localRect.height > 0 ? textureSize.y / localRect.height : 0;
+                        normalizedRect = new Rect(0, 0, (localRect.width * mult) / textureSize.x, 1);
+                        normalizedRect.x = Mathf.Max(0, (1 - normalizedRect.width) / 2);
                     }
                 }
-                p_rawImage.uvRect = v_normalizedRect;
+                rawImage.uvRect = normalizedRect;
             }
         }
 		
@@ -327,9 +327,9 @@ namespace Kyub.UI
             DefaultSprite = null;
         }
 
-        protected virtual void ApplySprite(Sprite p_sprite)
+        protected virtual void ApplySprite(Sprite sprite)
 		{
-			Sprite = p_sprite;
+			Sprite = sprite;
 		}
 
         public virtual void ApplyEmptySpriteInImageComponent()
@@ -342,12 +342,12 @@ namespace Kyub.UI
             Sprite = DefaultSprite;
         }
 
-        public virtual void SetExternImgFile(ExternImgFile p_externImg)
+        public virtual void SetExternImgFile(ExternImgFile externImg)
         {
-            if (p_externImg != null)
+            if (externImg != null)
             {
-                Key = p_externImg.Url;
-                Sprite = p_externImg.Sprite;
+                Key = externImg.Url;
+                Sprite = externImg.Sprite;
             }
         }
 		
@@ -356,15 +356,15 @@ namespace Kyub.UI
         {
             if (ImageComponent != null)
             {
-                var v_isDownloading = ExternalResources.IsDownloading(Key);
-                if (string.IsNullOrEmpty(Key) || !v_isDownloading || 
-                    (_canUnregisterOnDisable && v_isDownloading)) //someone called this request before this external image
+                var isDownloading = ExternalResources.IsDownloading(Key);
+                if (string.IsNullOrEmpty(Key) || !isDownloading || 
+                    (_canUnregisterOnDisable && isDownloading)) //someone called this request before this external image
                 {
-                    ExternImgFile v_callback = !ExternalResources.IsLoaded(Key) ?
+                    ExternImgFile callback = !ExternalResources.IsLoaded(Key) ?
                         ExternalResources.ReloadSpriteAsync(Key, ApplySprite) : ExternalResources.LoadSpriteAsync(Key, ApplySprite);
-                    if (v_callback != null)
+                    if (callback != null)
                     {
-                        if (v_callback.IsProcessing())
+                        if (callback.IsProcessing())
                         {
                             //Reset image
                             if (/*DefaultSprite != null &&*/ Sprite != DefaultSprite)
@@ -376,7 +376,7 @@ namespace Kyub.UI
                         }
                         else
                         {
-                            HandleOnImageLoaded(v_callback);
+                            HandleOnImageLoaded(callback);
                         }
                     }
                 } 

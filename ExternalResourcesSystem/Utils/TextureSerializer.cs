@@ -9,77 +9,77 @@ namespace Kyub.Async
     {
         #region Load From Web
         
-        public static ExternImgFile DeserializeFromWeb(string p_url, object p_target, string p_callBackFunctionName, TexSerWebReturnTypeEnum p_returnType = TexSerWebReturnTypeEnum.Texture)
+        public static ExternImgFile DeserializeFromWeb(string url, object target, string callBackFunctionName, TexSerWebReturnTypeEnum returnType = TexSerWebReturnTypeEnum.Texture)
         {
-            return DeserializeFromWebInternal(p_url, null, p_target, p_callBackFunctionName, p_returnType);
+            return DeserializeFromWebInternal(url, null, target, callBackFunctionName, returnType);
         }
 
-        public static ExternImgFile DeserializeFromWeb(string p_url, System.Action<Texture2D> p_callback)
+        public static ExternImgFile DeserializeFromWeb(string url, System.Action<Texture2D> callback)
         {
-            return DeserializeFromWebInternal(p_url, p_callback, null, "", TexSerWebReturnTypeEnum.Texture);
+            return DeserializeFromWebInternal(url, callback, null, "", TexSerWebReturnTypeEnum.Texture);
         }
 
-        public static ExternImgFile DeserializeFromWeb(string p_url, System.Action<Sprite> p_callback)
+        public static ExternImgFile DeserializeFromWeb(string url, System.Action<Sprite> callback)
         {
-            return DeserializeFromWebInternal(p_url, p_callback, null, "", TexSerWebReturnTypeEnum.Sprite);
+            return DeserializeFromWebInternal(url, callback, null, "", TexSerWebReturnTypeEnum.Sprite);
         }
 
-        public static ExternImgFile DeserializeFromWeb(string p_url, System.Action<ExternImgFile> p_callback)
+        public static ExternImgFile DeserializeFromWeb(string url, System.Action<ExternImgFile> callback)
         {
-            return DeserializeFromWebInternal(p_url, p_callback, null, "", TexSerWebReturnTypeEnum.ExternImgFile);
+            return DeserializeFromWebInternal(url, callback, null, "", TexSerWebReturnTypeEnum.ExternImgFile);
         }
 
-        public static ExternImgFile DeserializeFromWeb(string p_url)
+        public static ExternImgFile DeserializeFromWeb(string url)
         {
-            return DeserializeFromWebInternal(p_url, null, null, "", TexSerWebReturnTypeEnum.ExternImgFile);
+            return DeserializeFromWebInternal(url, null, null, "", TexSerWebReturnTypeEnum.ExternImgFile);
         }
 
-        private static ExternImgFile DeserializeFromWebInternal(string p_url, System.Delegate p_callback, object p_target, string p_callBackFunctionName, TexSerWebReturnTypeEnum p_returnType)
+        private static ExternImgFile DeserializeFromWebInternal(string url, System.Delegate callback, object target, string callBackFunctionName, TexSerWebReturnTypeEnum returnType)
         {
             //Try pick previous downloader
-            TextureDownloader v_component = TextureDownloader.GetDownloader(p_url);
+            TextureDownloader component = TextureDownloader.GetDownloader(url);
             //Create new Downloader (If not downloading yet)
-            bool v_needStartRequest = false;
-            if (v_component == null)
+            bool needStartRequest = false;
+            if (component == null)
             {
-                GameObject v_dummyObject = new GameObject("RequestImageFromWWW(Dummy)");
-                v_component = v_dummyObject.AddComponent<TextureDownloader>();
-                v_component.Url = p_url;
-                v_needStartRequest = true;
+                GameObject dummyObject = new GameObject("RequestImageFromWWW(Dummy)");
+                component = dummyObject.AddComponent<TextureDownloader>();
+                component.Url = url;
+                needStartRequest = true;
             }
             //Register new Callback
-            if (p_callback != null || (p_target != null && !string.IsNullOrEmpty(p_callBackFunctionName)))
+            if (callback != null || (target != null && !string.IsNullOrEmpty(callBackFunctionName)))
             {
-                var v_function = new FunctionAndParams();
-                v_function.DelegatePointer = p_callback;
-                v_function.Target = p_target;
-                v_function.StringFunctionName = p_callBackFunctionName;
-                v_component.RegisterCallback(p_returnType, v_function);
+                var function = new FunctionAndParams();
+                function.DelegatePointer = callback;
+                function.Target = target;
+                function.StringFunctionName = callBackFunctionName;
+                component.RegisterCallback(returnType, function);
             }
             //Start Request (if not downloading)
-            if(v_needStartRequest)
-                v_component.StartRequest();
-            return v_component.AsyncRequestOperation;
+            if(needStartRequest)
+                component.StartRequest();
+            return component.AsyncRequestOperation;
         }
 
         #endregion
 
         #region Helper Functions
 
-        public static Texture2D TextureFromBytes(byte[] p_bytes)
+        public static Texture2D TextureFromBytes(byte[] bytes)
         {
-            Texture2D v_tex = null;
-            if (p_bytes != null && p_bytes.Length > 0)
+            Texture2D tex = null;
+            if (bytes != null && bytes.Length > 0)
             {
                 //Prevent Bugs in IOS
 #if UNITY_IOS && !UNITY_EDITOR
-			v_tex = new Texture2D(4, 4, TextureFormat.PVRTC_RGBA4, false);
+			tex = new Texture2D(4, 4, TextureFormat.PVRTC_RGBA4, false);
 #else
-                v_tex = new Texture2D(4, 4);
+                tex = new Texture2D(4, 4);
 #endif
-                v_tex.LoadImage(p_bytes); //..this will auto-resize the texture dimensions.
+                tex.LoadImage(bytes); //..this will auto-resize the texture dimensions.
             }
-            return v_tex;
+            return tex;
         }
 
         #endregion
@@ -174,9 +174,9 @@ namespace Kyub.Async
         {
             if (!string.IsNullOrEmpty(Error) && (m_sprite != null || m_texture != null))
             {
-                var v_texture = m_sprite != null? m_sprite.texture : null;
+                var texture = m_sprite != null? m_sprite.texture : null;
                 //Destroy SpriteTexture
-                if(v_texture != null)
+                if(texture != null)
                     DestroyUtils.DestroyImmediate(m_sprite.texture);
                 //Destroy Object Texture
                 if(m_texture != null && !MarkedToDestroy.IsMarked(m_texture))
