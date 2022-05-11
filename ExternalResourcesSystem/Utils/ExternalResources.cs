@@ -209,6 +209,7 @@ namespace Kyub.Async
 
         static ExternalResources()
         {
+            SceneManager.sceneLoaded -= HandleOnLevelLoaded;
             SceneManager.sceneLoaded += HandleOnLevelLoaded;
         }
 
@@ -460,9 +461,9 @@ namespace Kyub.Async
 
         #region Public Asset Functions
 
-        public static void UnloadAsset(string key, bool immediate = false)
+        public static void UnloadAsset(string key, bool immediate = false, UnloadMode mode = UnloadMode.DestroyIfNeeded)
         {
-            UnloadAssetInternal(key, immediate);
+            UnloadAssetInternal(key, immediate, mode);
         }
 
         public static void UnloadAssets(IEnumerable<string> keys, bool immediate = false)
@@ -566,9 +567,9 @@ namespace Kyub.Async
             if (!string.IsNullOrEmpty(url))
             {
                 if (AssetDictionary.ContainsKey(url) && AssetDictionary[url] is AudioClip)
-                    UnloadAudioInternal(url, false, UnloadMode.SkipDestroyStep);
+                    UnloadAudioInternal(url, false, mode);
                 else
-                    UnloadImageInternal(url, false, UnloadMode.SkipDestroyStep);
+                    UnloadImageInternal(url, false, mode);
             }
         }
 
@@ -930,7 +931,7 @@ namespace Kyub.Async
             }
         }
 
-        enum UnloadMode { DestroyIfNeeded, SkipDestroyStep, ForceDestroy }
+        public enum UnloadMode { DestroyIfNeeded, SkipDestroyStep, ForceDestroy }
         private static void UnloadImageInternal(string url, bool immediate = false, UnloadMode mode = UnloadMode.DestroyIfNeeded)
         {
             if (url == null)

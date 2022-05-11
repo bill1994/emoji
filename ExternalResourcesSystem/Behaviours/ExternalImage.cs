@@ -9,6 +9,8 @@ namespace Kyub.UI
 {
     public class ExternalImage : ExternalResourcesReceiver
     {
+        public enum ImageUnloadModeEnum { CancelDownload, SoftUnload, FullUnload }
+
         [System.Serializable]
         public class SpriteUnityEvent : UnityEvent<Sprite> {}
 
@@ -23,6 +25,9 @@ namespace Kyub.UI
 		MaskableGraphic m_imageComponent = null;
 		[SerializeField]
 		bool m_forceUnloadWhenRefCountEmpty = true;
+        [SerializeField]
+        ImageUnloadModeEnum m_unloadMode = ImageUnloadModeEnum.SoftUnload;
+        [Space]
         [SerializeField]
         bool m_unregisterOnDisable = true;
 
@@ -101,8 +106,22 @@ namespace Kyub.UI
 				m_forceUnloadWhenRefCountEmpty = value;
 			}
 		}
-		
-		public MaskableGraphic ImageComponent
+
+        public ImageUnloadModeEnum UnloadMode
+        {
+            get
+            {
+                return m_unloadMode;
+            }
+            set
+            {
+                if (m_unloadMode == value)
+                    return;
+                m_unloadMode = value;
+            }
+        }
+
+        public MaskableGraphic ImageComponent
 		{
 			get
 			{
@@ -307,8 +326,28 @@ namespace Kyub.UI
 		protected override void UnregisterReceiver () 
 		{
 			base.UnregisterReceiver();
-			if(ForceUnloadWhenRefCountEmpty && ExternalResources.IsUselessResources(Key))
-				ExternalResources.UnloadAsset(Key);
+            var key = Key;
+            if (ForceUnloadWhenRefCountEmpty && ExternalResources.IsUselessResources(key))
+            {
+                if (m_unloadMode == ImageUnloadModeEnum.CancelDownload)
+                {
+                    if (ExternalResources.IsDownloading(key))
+                    {
+                        if (!ExternalResources.IsLoaded(key))
+                            ExternalResources.UnloadAsset(key, false, ExternalResources.UnloadMode.SkipDestroyStep);
+                        else
+                            TextureDownloader.CancelAllRequestsWithUrl(key);
+                    }
+                }
+                else
+                {
+                    var resourcesUnloadMode = m_unloadMode == ImageUnloadModeEnum.SoftUnload ?
+                                                                ExternalResources.UnloadMode.SkipDestroyStep :
+                                                                ExternalResources.UnloadMode.DestroyIfNeeded;
+
+                    ExternalResources.UnloadAsset(key, false, resourcesUnloadMode);
+                }
+            }
 		}
 		
 		protected virtual void RegisterEvents()

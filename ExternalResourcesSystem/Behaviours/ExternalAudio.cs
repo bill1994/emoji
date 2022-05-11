@@ -9,6 +9,8 @@ namespace Kyub.UI
 {
     public class ExternalAudio : ExternalResourcesReceiver
     {
+        public enum AudioUnloadModeEnum { CancelDownload, SoftUnload, FullUnload }
+
         [System.Serializable]
         public class ClipUnityEvent : UnityEvent<AudioClip> { }
 
@@ -18,6 +20,9 @@ namespace Kyub.UI
         AudioSource m_audioSourceComponent = null;
         [SerializeField]
         bool m_forceUnloadWhenRefCountEmpty = true;
+        [SerializeField]
+        AudioUnloadModeEnum m_unloadMode = AudioUnloadModeEnum.SoftUnload;
+        [Space]
         [SerializeField]
         bool m_unregisterOnDisable = true;
 
@@ -44,9 +49,9 @@ namespace Kyub.UI
             }
             set
             {
-                var v_cachedKey = m_key;
+                var cachedKey = m_key;
                 base.Key = value;
-                if (m_key != v_cachedKey)
+                if (m_key != cachedKey)
                     _canUnregisterOnDisable = true;
             }
         }
@@ -75,6 +80,20 @@ namespace Kyub.UI
                 if (m_forceUnloadWhenRefCountEmpty == value)
                     return;
                 m_forceUnloadWhenRefCountEmpty = value;
+            }
+        }
+
+        public AudioUnloadModeEnum UnloadMode
+        {
+            get
+            {
+                return m_unloadMode;
+            }
+            set
+            {
+                if (m_unloadMode == value)
+                    return;
+                m_unloadMode = value;
             }
         }
 
@@ -113,19 +132,19 @@ namespace Kyub.UI
             return _audioClip;
         }
 
-        protected void SetClipToAudioSourceComponent(AudioClip p_audioClip)
+        protected void SetClipToAudioSourceComponent(AudioClip audioClip)
         {
-            var v_oldClip = _audioClip;
+            var oldClip = _audioClip;
             if (m_audioSourceComponent != null)
             {
-                m_audioSourceComponent.clip = p_audioClip;
-                _audioClip = p_audioClip;
+                m_audioSourceComponent.clip = audioClip;
+                _audioClip = audioClip;
             }
             else
                 _audioClip = null;
 
             //Apply Sprite/Texture Changed
-            if (v_oldClip != _audioClip)
+            if (oldClip != _audioClip)
             {
                 if (OnClipChangedCallback != null)
                     OnClipChangedCallback.Invoke(_audioClip);
@@ -165,14 +184,14 @@ namespace Kyub.UI
 
         #region Receivers
 
-        protected virtual void HandleOnAudioLoaded(ExternAudioFile p_audio)
+        protected virtual void HandleOnAudioLoaded(ExternAudioFile audio)
         {
-            if ((string.IsNullOrEmpty(Key) && (p_audio == null || string.IsNullOrEmpty(p_audio.Url))) ||
-                (p_audio != null && string.Equals(p_audio.Url, Key)))
+            if ((string.IsNullOrEmpty(Key) && (audio == null || string.IsNullOrEmpty(audio.Url))) ||
+                (audio != null && string.Equals(audio.Url, Key)))
             {
-                if (AudioSourceComponent != null && !string.IsNullOrEmpty(Key) && p_audio.Clip != null)
+                if (AudioSourceComponent != null && !string.IsNullOrEmpty(Key) && audio.Clip != null)
                 {
-                    Clip = p_audio.Clip;
+                    Clip = audio.Clip;
                 }
                 if (OnApplyClipCallback != null)
                     OnApplyClipCallback.Invoke();
@@ -190,46 +209,66 @@ namespace Kyub.UI
 
         #region Helper Functions
 
-        protected virtual void CalculateRawImageUVRect(RawImage p_rawImage)
+        protected virtual void CalculateRawImageUVRect(RawImage rawImage)
         {
-            var v_textureSize = p_rawImage != null && p_rawImage.texture != null ? new Vector2(p_rawImage.texture.width, p_rawImage.texture.height) : new Vector2(0, 0);
-            if (v_textureSize.x == 0 || v_textureSize.y == 0)
+            var textureSize = rawImage != null && rawImage.texture != null ? new Vector2(rawImage.texture.width, rawImage.texture.height) : new Vector2(0, 0);
+            if (textureSize.x == 0 || textureSize.y == 0)
             {
-                var v_normalizedRect = new Rect(0, 0, 1, 1);
-                if (p_rawImage != null)
-                    p_rawImage.uvRect = v_normalizedRect;
+                var normalizedRect = new Rect(0, 0, 1, 1);
+                if (rawImage != null)
+                    rawImage.uvRect = normalizedRect;
             }
             else
             {
-                var v_localRect = new Rect(Vector2.zero, new Vector2(Mathf.Abs(p_rawImage.rectTransform.rect.width), Mathf.Abs(p_rawImage.rectTransform.rect.height)));
-                var v_normalizedRect = new Rect(0, 0, 1, 1);
+                var localRect = new Rect(Vector2.zero, new Vector2(Mathf.Abs(rawImage.rectTransform.rect.width), Mathf.Abs(rawImage.rectTransform.rect.height)));
+                var normalizedRect = new Rect(0, 0, 1, 1);
 
-                if (v_localRect.width > 0 && v_localRect.height > 0)
+                if (localRect.width > 0 && localRect.height > 0)
                 {
-                    var v_textureProportion = v_textureSize.x / v_textureSize.y;
-                    var v_localRectProportion = v_localRect.width / v_localRect.height;
-                    if (v_localRectProportion > v_textureProportion)
+                    var textureProportion = textureSize.x / textureSize.y;
+                    var localRectProportion = localRect.width / localRect.height;
+                    if (localRectProportion > textureProportion)
                     {
-                        var v_mult = v_localRect.width > 0 ? v_textureSize.x / v_localRect.width : 0;
-                        v_normalizedRect = new Rect(0, 0, 1, (v_localRect.height * v_mult) / v_textureSize.y);
-                        v_normalizedRect.y = Mathf.Max(0, (1 - v_normalizedRect.height) / 2);
+                        var mult = localRect.width > 0 ? textureSize.x / localRect.width : 0;
+                        normalizedRect = new Rect(0, 0, 1, (localRect.height * mult) / textureSize.y);
+                        normalizedRect.y = Mathf.Max(0, (1 - normalizedRect.height) / 2);
                     }
-                    else if (v_localRectProportion < v_textureProportion)
+                    else if (localRectProportion < textureProportion)
                     {
-                        var v_mult = v_localRect.height > 0 ? v_textureSize.y / v_localRect.height : 0;
-                        v_normalizedRect = new Rect(0, 0, (v_localRect.width * v_mult) / v_textureSize.x, 1);
-                        v_normalizedRect.x = Mathf.Max(0, (1 - v_normalizedRect.width) / 2);
+                        var mult = localRect.height > 0 ? textureSize.y / localRect.height : 0;
+                        normalizedRect = new Rect(0, 0, (localRect.width * mult) / textureSize.x, 1);
+                        normalizedRect.x = Mathf.Max(0, (1 - normalizedRect.width) / 2);
                     }
                 }
-                p_rawImage.uvRect = v_normalizedRect;
+                rawImage.uvRect = normalizedRect;
             }
         }
 
         protected override void UnregisterReceiver()
         {
             base.UnregisterReceiver();
-            if (ForceUnloadWhenRefCountEmpty && ExternalResources.IsUselessResources(Key))
-                ExternalResources.UnloadAsset(Key);
+            var key = Key;
+            if (ForceUnloadWhenRefCountEmpty && ExternalResources.IsUselessResources(key))
+            {
+                if (m_unloadMode == AudioUnloadModeEnum.CancelDownload)
+                {
+                    if (ExternalResources.IsDownloading(key))
+                    {
+                        if (!ExternalResources.IsLoaded(key))
+                            ExternalResources.UnloadAsset(key, false, ExternalResources.UnloadMode.SkipDestroyStep);
+                        else
+                            TextureDownloader.CancelAllRequestsWithUrl(key);
+                    }
+                }
+                else
+                {
+                    var resourcesUnloadMode = m_unloadMode == AudioUnloadModeEnum.SoftUnload ?
+                                                                ExternalResources.UnloadMode.SkipDestroyStep :
+                                                                ExternalResources.UnloadMode.DestroyIfNeeded;
+
+                    ExternalResources.UnloadAsset(key, false, resourcesUnloadMode);
+                }
+            }
         }
 
         protected virtual void RegisterEvents()
@@ -243,9 +282,9 @@ namespace Kyub.UI
             ExternalResources.OnAudioLoaded -= HandleOnAudioLoaded;
         }
 
-        protected virtual void ApplyClip(AudioClip p_audioClip)
+        protected virtual void ApplyClip(AudioClip audioClip)
         {
-            Clip = p_audioClip;
+            Clip = audioClip;
         }
 
         public virtual void ApplyEmptyClipInAudioSourceComponent()
@@ -253,12 +292,12 @@ namespace Kyub.UI
             Clip = null;
         }
 
-        public virtual void SetExternAudioFile(ExternAudioFile p_externAudio)
+        public virtual void SetExternAudioFile(ExternAudioFile externAudio)
         {
-            if (p_externAudio != null)
+            if (externAudio != null)
             {
-                Key = p_externAudio.Url;
-                Clip = p_externAudio.Clip;
+                Key = externAudio.Url;
+                Clip = externAudio.Clip;
             }
         }
 
@@ -267,15 +306,15 @@ namespace Kyub.UI
         {
             if (AudioSourceComponent != null)
             {
-                var v_isDownloading = ExternalResources.IsDownloading(Key);
-                if (string.IsNullOrEmpty(Key) || !v_isDownloading ||
-                    (_canUnregisterOnDisable && v_isDownloading)) //someone called this request before this external image
+                var isDownloading = ExternalResources.IsDownloading(Key);
+                if (string.IsNullOrEmpty(Key) || !isDownloading ||
+                    (_canUnregisterOnDisable && isDownloading)) //someone called this request before this external image
                 {
-                    ExternAudioFile v_callback = !ExternalResources.IsLoaded(Key) ?
+                    ExternAudioFile callback = !ExternalResources.IsLoaded(Key) ?
                         ExternalResources.ReloadClipAsync(Key, ApplyClip) : ExternalResources.LoadClipAsync(Key, ApplyClip);
-                    if (v_callback != null)
+                    if (callback != null)
                     {
-                        if (v_callback.IsProcessing())
+                        if (callback.IsProcessing())
                         {
                             //Reset image
                             if (Clip != null)
@@ -287,7 +326,7 @@ namespace Kyub.UI
                         }
                         else
                         {
-                            HandleOnAudioLoaded(v_callback);
+                            HandleOnAudioLoaded(callback);
                         }
                     }
                 }
