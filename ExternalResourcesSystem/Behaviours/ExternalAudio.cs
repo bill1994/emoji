@@ -21,7 +21,7 @@ namespace Kyub.UI
         [SerializeField]
         bool m_forceUnloadWhenRefCountEmpty = true;
         [SerializeField]
-        AudioUnloadModeEnum m_unloadMode = AudioUnloadModeEnum.SoftUnload;
+        AudioUnloadModeEnum m_unloadMode = AudioUnloadModeEnum.FullUnload;
         [Space]
         [SerializeField]
         bool m_unregisterOnDisable = true;
@@ -257,7 +257,7 @@ namespace Kyub.UI
                         if (!ExternalResources.IsLoaded(key))
                             ExternalResources.UnloadAsset(key, false, ExternalResources.UnloadMode.SkipDestroyStep);
                         else
-                            TextureDownloader.CancelAllRequestsWithUrl(key);
+                            AudioDownloader.CancelAllRequestsWithUrl(key);
                     }
                 }
                 else
