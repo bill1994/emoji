@@ -30,12 +30,6 @@ namespace Kyub.Async.Extensions
 
         public static void GetTextureContentAsync(this DownloadHandler handler, Action<Texture2D> callback)
         {
-            // Prevent spike waiting small time before return texture.
-            // When Apply() is uploading the content data from CPU to GPU
-            // and we access the texture content with Image.sprite/RawImage.texture/material.texture
-            // Unity will stall the main process until upload is completed resulting in a huge spike.
-            // To prevent this problem we will delay the result a little.
-            const float GPU_UPLOAD_SPIKE_PREVENT_DELAY = 0.25f;
             bool useAsync = false;
 
 #if SUPPORT_IMAGE_ASYNC
@@ -54,11 +48,8 @@ namespace Kyub.Async.Extensions
                     Image.AsyncImageLoader.CreateFromImageAsync(nativeArrayNullable.Value).ContinueWith((result) =>
                     {
                         var texture = result.Result;
-                        Kyub.ApplicationContext.RunOnMainThread(() =>
-                        {
-                            if (callback != null)
-                                callback.Invoke(texture);
-                        }, GPU_UPLOAD_SPIKE_PREVENT_DELAY);
+                        if (callback != null)
+                            callback.Invoke(texture);
                     });
                     return;
                 }
@@ -73,11 +64,8 @@ namespace Kyub.Async.Extensions
             if (!useAsync)
             {
                 var texture = handler is DownloadHandlerTexture ? ((DownloadHandlerTexture)handler).texture : null;
-                Kyub.ApplicationContext.RunOnMainThread(() =>
-                {
-                    if (callback != null)
-                        callback.Invoke(texture);
-                }, GPU_UPLOAD_SPIKE_PREVENT_DELAY);
+                if (callback != null)
+                    callback.Invoke(texture);
             }
         }
 
