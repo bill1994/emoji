@@ -26,7 +26,7 @@ namespace Kyub.UI
 		[SerializeField]
 		bool m_forceUnloadWhenRefCountEmpty = true;
         [SerializeField]
-        ImageUnloadModeEnum m_unloadMode = ImageUnloadModeEnum.SoftUnload;
+        ImageUnloadModeEnum m_unloadMode = ImageUnloadModeEnum.FullUnload;
         [Space]
         [SerializeField]
         bool m_unregisterOnDisable = true;
