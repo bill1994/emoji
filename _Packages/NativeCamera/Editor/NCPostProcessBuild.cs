@@ -56,9 +56,16 @@ namespace NativeCameraNamespace
 				PlistDocument plist = new PlistDocument();
 				plist.ReadFromString( File.ReadAllText( plistPath ) );
 
+				string cameraUsage = !string.IsNullOrEmpty(PlayerSettings.iOS.cameraUsageDescription)? 
+					PlayerSettings.iOS.cameraUsageDescription :
+					CAMERA_USAGE_DESCRIPTION;
+				string micUsage = !string.IsNullOrEmpty(PlayerSettings.iOS.microphoneUsageDescription) ?
+					PlayerSettings.iOS.microphoneUsageDescription :
+					MICROPHONE_USAGE_DESCRIPTION;
+
 				PlistElementDict rootDict = plist.root;
-				rootDict.SetString( "NSCameraUsageDescription", CAMERA_USAGE_DESCRIPTION );
-				rootDict.SetString( "NSMicrophoneUsageDescription", MICROPHONE_USAGE_DESCRIPTION );
+				rootDict.SetString( "NSCameraUsageDescription", cameraUsage );
+				rootDict.SetString( "NSMicrophoneUsageDescription", micUsage );
 
 				File.WriteAllText( plistPath, plist.WriteToString() );
 			}
