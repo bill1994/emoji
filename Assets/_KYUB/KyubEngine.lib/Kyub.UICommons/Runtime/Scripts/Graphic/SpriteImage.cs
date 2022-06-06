@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+using Kyub.UI.Internal;
+
+using static Kyub.UI.Internal.EllipseShapeUtils.EllipseProperties;
+using static Kyub.UI.Internal.RoundedRectShapeUtils;
+using static Kyub.UI.Internal.UIGeometryUtils;
+using static Kyub.UI.Internal.UIGeometryUtils.OutlineProperties;
 
 namespace Kyub.UI
 {
@@ -13,6 +16,33 @@ namespace Kyub.UI
 
         [SerializeField]
         PreserveAspectRatioModeEnum m_PreserveAspectMode = PreserveAspectRatioModeEnum.Default;
+
+        //Shape Properties
+        [SerializeField]
+        ShapeTypeModeEnum m_ShapeType = ShapeTypeModeEnum.Default;
+        [SerializeField]
+        ShapeFillModeEnum m_ShapeFillMode = ShapeFillModeEnum.Fill;
+        [SerializeField]
+        float m_ShapeAntiAliasing = 0;
+
+        //Outline Properties
+        [SerializeField]
+        ShapeOutlineModeEnum m_OutlineType = ShapeOutlineModeEnum.Inner;
+        [SerializeField]
+        float m_OutlineThickness = 2.0f;
+
+        //Ellipse Properties
+        [SerializeField]
+        EllipseShapeFittingModeEnum m_EllipseFittingMode = EllipseShapeFittingModeEnum.Default;
+
+        //RoundedRect Properties
+        [SerializeField]
+        RoundedRectCornerModeEnum m_CornerMode = RoundedRectCornerModeEnum.Default;
+        [SerializeField]
+        RectRoundness m_CornerRoundness = new RectRoundness(15, 15, 15, 15);
+
+        UnitPositionData _ellipseCachedData;
+        RoundedCornerUnitPositionData _roundedRectCachedData;
 
         #endregion
 
@@ -34,25 +64,215 @@ namespace Kyub.UI
             }
         }
 
+        public ShapeTypeModeEnum shapeType
+        {
+            get
+            {
+                return m_ShapeType;
+            }
+            set
+            {
+                if (m_ShapeType == value)
+                    return;
+                m_ShapeType = value;
+
+                SetVerticesDirty();
+            }
+        }
+
+        public ShapeFillModeEnum shapeFillMode
+        {
+            get
+            {
+                return m_ShapeFillMode;
+            }
+            set
+            {
+                if (m_ShapeFillMode == value)
+                    return;
+                m_ShapeFillMode = value;
+
+                SetVerticesDirty();
+            }
+        }
+
+        public float shapeAntiAliasing
+        {
+            get
+            {
+                return m_ShapeAntiAliasing;
+            }
+            set
+            {
+                if (m_ShapeAntiAliasing == value)
+                    return;
+                m_ShapeAntiAliasing = value;
+
+                SetVerticesDirty();
+            }
+        }
+
+        public ShapeOutlineModeEnum outlineType
+        {
+            get
+            {
+                return m_OutlineType;
+            }
+            set
+            {
+                if (m_OutlineType == value)
+                    return;
+                m_OutlineType = value;
+
+                SetVerticesDirty();
+            }
+        }
+
+        public float outlineThickness
+        {
+            get
+            {
+                return m_OutlineThickness;
+            }
+            set
+            {
+                if (m_OutlineThickness == value)
+                    return;
+                m_OutlineThickness = value;
+
+                SetVerticesDirty();
+            }
+        }
+
+        public EllipseShapeFittingModeEnum ellipseFittingMode
+        {
+            get
+            {
+                return m_EllipseFittingMode;
+            }
+            set
+            {
+                if (m_EllipseFittingMode == value)
+                    return;
+                m_EllipseFittingMode = value;
+
+                SetVerticesDirty();
+            }
+        }
+
+        public RoundedRectCornerModeEnum cornerMode
+        {
+            get
+            {
+                return m_CornerMode;
+            }
+            set
+            {
+                if (m_CornerMode == value)
+                    return;
+                m_CornerMode = value;
+
+                SetVerticesDirty();
+            }
+        }
+
+        public RectRoundness cornerRoundness
+        {
+            get
+            {
+                if (m_CornerRoundness == null)
+                    m_CornerRoundness = new RectRoundness();
+                return m_CornerRoundness;
+            }
+            set
+            {
+                if (m_CornerRoundness == value)
+                    return;
+                m_CornerRoundness = value;
+                if (m_CornerRoundness == null)
+                    m_CornerRoundness = new RectRoundness();
+
+                SetVerticesDirty();
+            }
+        }
+
+        public float uniformRoundness
+        {
+            get
+            {
+                return m_CornerRoundness != null ? m_CornerRoundness.bottomLeft : 0;
+            }
+            set
+            {
+                if (m_CornerRoundness == null)
+                    m_CornerRoundness = new RectRoundness();
+
+                var recalculate = m_CornerRoundness.bottomLeft != value;
+
+                m_CornerRoundness.bottomLeft = value;
+                m_CornerRoundness.bottomRight = value;
+                m_CornerRoundness.topLeft = value;
+                m_CornerRoundness.topRight = value;
+
+                if (recalculate)
+                {
+                    SetVerticesDirty();
+                }
+            }
+        }
+
         #endregion
 
         #region Unity Functions
 
         protected override void OnPopulateMesh(VertexHelper toFill)
         {
-            var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
-            var preserveAspectMode = GetAspectRatioMode(size);
+            var applyDefaultLogic = true;
 
-            if (sprite != null && 
-                preserveAspect &&
-                preserveAspectMode == PreserveAspectRatioModeEnum.Envelop && 
-                type == Type.Simple)
+            //Shape Drawer Logic
+            if ((sprite == null || type == Type.Simple) &&
+                (m_ShapeType != ShapeTypeModeEnum.Default || m_ShapeFillMode != ShapeFillModeEnum.Fill))
             {
-                GenerateSimpleMesh(toFill, preserveAspect);
+                applyDefaultLogic = false;
+                var safePreserveAspect = preserveAspect && sprite != null;
+                if (m_ShapeType == ShapeTypeModeEnum.RoundedRect)
+                {
+                    GenerateRoundedMesh(toFill, safePreserveAspect);
+                }
+                else if (m_ShapeType == ShapeTypeModeEnum.Ellipse)
+                {
+                    GenerateEllipseMesh(toFill, safePreserveAspect);
+                }
+                else
+                {
+                    if (m_ShapeFillMode == ShapeFillModeEnum.Outline)
+                    {
+                        GenerateRectMesh(toFill, safePreserveAspect);
+                    }
+                    else
+                    {
+                        applyDefaultLogic = true;
+                    }
+                }
             }
-            else
+
+            //Default Drawer Logic
+            if (applyDefaultLogic)
             {
-                base.OnPopulateMesh(toFill);
+                var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
+                var preserveAspectMode = GetAspectRatioMode(size);
+
+                if (sprite != null &&
+                    preserveAspect &&
+                    preserveAspectMode == PreserveAspectRatioModeEnum.Envelop &&
+                    type == Type.Simple)
+                {
+                    GenerateSimpleMesh(toFill, preserveAspect);
+                }
+                else
+                {
+                    base.OnPopulateMesh(toFill);
+                }
             }
         }
 
@@ -107,39 +327,52 @@ namespace Kyub.UI
         /// Image's dimensions used for drawing. X = left, Y = bottom, Z = right, W = top.
         protected virtual Vector4 GetDrawingDimensions(bool shouldPreserveAspect, PreserveAspectRatioModeEnum aspectMode)
         {
-            var padding = sprite == null ? Vector4.zero : UnityEngine.Sprites.DataUtility.GetPadding(sprite);
-            var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
-
             Rect r = GetPixelAdjustedRect();
-            // Debug.Log(string.Format("r:{2}, size:{0}, padding:{1}", size, padding, r));
-
-            int spriteW = Mathf.RoundToInt(size.x);
-            int spriteH = Mathf.RoundToInt(size.y);
-
-            var v = new Vector4(
-                padding.x / spriteW,
-                padding.y / spriteH,
-                (spriteW - padding.z) / spriteW,
-                (spriteH - padding.w) / spriteH);
-
-            if (shouldPreserveAspect && size.sqrMagnitude > 0.0f && aspectMode == PreserveAspectRatioModeEnum.Default)
+            if (sprite == null)
             {
-                PreserveRectAspectRatio(ref r, size);
+                return new Vector4(
+                    r.xMin,
+                    r.yMin,
+                    r.xMax,
+                    r.yMax
+                );
             }
+            else
+            {
+                var padding = UnityEngine.Sprites.DataUtility.GetPadding(sprite);
+                var size = new Vector2(sprite.rect.width, sprite.rect.height);
 
-            v = new Vector4(
-                r.x + r.width * v.x,
-                r.y + r.height * v.y,
-                r.x + r.width * v.z,
-                r.y + r.height * v.w
-            );
+                int spriteW = Mathf.RoundToInt(size.x);
+                int spriteH = Mathf.RoundToInt(size.y);
 
-            return v;
+                var v = new Vector4(
+                    padding.x / spriteW,
+                    padding.y / spriteH,
+                    (spriteW - padding.z) / spriteW,
+                    (spriteH - padding.w) / spriteH);
+
+                if (shouldPreserveAspect && size.sqrMagnitude > 0.0f && aspectMode == PreserveAspectRatioModeEnum.Default)
+                {
+                    PreserveRectAspectRatio(ref r, size);
+                }
+
+                v = new Vector4(
+                    r.x + r.width * v.x,
+                    r.y + r.height * v.y,
+                    r.x + r.width * v.z,
+                    r.y + r.height * v.w
+                );
+
+                return v;
+            }
         }
 
         protected virtual Vector4 GetDrawingUV(Vector2 textureSize, bool shouldPreserveAspect, PreserveAspectRatioModeEnum aspectMode)
         {
-            var uv = (sprite != null) ? UnityEngine.Sprites.DataUtility.GetOuterUV(sprite) : Vector4.zero;
+            if (sprite == null)
+                return new Vector4(0, 0, 1, 1);
+
+            var uv = UnityEngine.Sprites.DataUtility.GetOuterUV(sprite);
 
             if (shouldPreserveAspect && aspectMode == PreserveAspectRatioModeEnum.Envelop && textureSize.sqrMagnitude > 0)
             {
@@ -189,6 +422,231 @@ namespace Kyub.UI
                 var oldWidth = rect.width;
                 rect.width = rect.height * spriteRatio;
                 rect.x += (oldWidth - rect.width) * rectTransform.pivot.x;
+            }
+        }
+
+        #endregion
+
+        #region Shape Generator Calc
+
+        protected virtual void GenerateRectMesh(VertexHelper vh, bool shouldPreserveAspect)
+        {
+            var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
+            var preserveAspectMode = GetAspectRatioMode(size);
+
+            Vector4 v = GetDrawingDimensions(shouldPreserveAspect, preserveAspectMode);
+            var uv = GetDrawingUV(size, shouldPreserveAspect, preserveAspectMode);
+            var color32 = color;
+            vh.Clear();
+
+            Rect pixelRect = Rect.MinMaxRect(v.x, v.y, v.z, v.w);
+            Rect uvRect = Rect.MinMaxRect(uv.x, uv.y, uv.z, uv.w);
+
+            var outlineProperties = new OutlineProperties();
+            var antiAliasingProperties = new AntiAliasingProperties();
+
+            antiAliasingProperties.AntiAliasing = 0;
+            outlineProperties.LineWeight = m_OutlineThickness;
+            outlineProperties.Type = (LineType)m_OutlineType;
+
+            outlineProperties.OnCheck();
+            antiAliasingProperties.OnCheck();
+
+            antiAliasingProperties.UpdateAdjusted(canvas);
+            outlineProperties.UpdateAdjusted();
+
+            var edgeGradientData = new UIGeometryUtils.EdgeGradientData();
+            if (antiAliasingProperties.Adjusted > 0.0f)
+            {
+                edgeGradientData.SetActiveData(
+                    1.0f,
+                    0.0f,
+                    antiAliasingProperties.Adjusted
+                );
+            }
+            else
+            {
+                edgeGradientData.Reset();
+            }
+
+            if (m_ShapeFillMode == ShapeFillModeEnum.Fill)
+            {
+                RectShapeUtils.AddRect(
+                    ref vh,
+                    pixelRect,
+                    color32,
+                    uvRect,
+                    edgeGradientData
+                );
+            }
+            else
+            {
+                RectShapeUtils.AddRectRing(
+                    ref vh,
+                    outlineProperties,
+                    pixelRect,
+                    color32,
+                    uvRect,
+                    edgeGradientData
+                );
+            }
+        }
+
+        protected virtual void GenerateRoundedMesh(VertexHelper vh, bool shouldPreserveAspect)
+        {
+            var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
+            var preserveAspectMode = GetAspectRatioMode(size);
+
+            Vector4 v = GetDrawingDimensions(shouldPreserveAspect, preserveAspectMode);
+            var uv = GetDrawingUV(size, shouldPreserveAspect, preserveAspectMode);
+            var color32 = color;
+            vh.Clear();
+
+            Rect pixelRect = Rect.MinMaxRect(v.x, v.y, v.z, v.w);
+            Rect uvRect = Rect.MinMaxRect(uv.x, uv.y, uv.z, uv.w);
+
+            var roundedProperties = new RoundedRectShapeUtils.RoundedProperties();
+            var outlineProperties = new OutlineProperties();
+            var antiAliasingProperties = new AntiAliasingProperties();
+
+            roundedProperties.Type = m_CornerMode == RoundedRectCornerModeEnum.PerCorner ?
+                RoundedRectShapeUtils.RoundedProperties.RoundedType.Individual :
+                RoundedRectShapeUtils.RoundedProperties.RoundedType.Uniform;
+
+            roundedProperties.UniformRadius = m_CornerRoundness.bottomLeft;
+            roundedProperties.BLRadius = m_CornerRoundness.bottomLeft;
+            roundedProperties.BRRadius = m_CornerRoundness.bottomRight;
+            roundedProperties.TLRadius = m_CornerRoundness.topLeft;
+            roundedProperties.TRRadius = m_CornerRoundness.topRight;
+
+            antiAliasingProperties.AntiAliasing = m_ShapeAntiAliasing;
+            outlineProperties.LineWeight = m_OutlineThickness;
+            outlineProperties.Type = (LineType)m_OutlineType;
+
+            roundedProperties.OnCheck(pixelRect);
+            outlineProperties.OnCheck();
+            antiAliasingProperties.OnCheck();
+
+            roundedProperties.UpdateAdjusted(pixelRect, 0.0f);
+            antiAliasingProperties.UpdateAdjusted(canvas);
+            outlineProperties.UpdateAdjusted();
+
+            var edgeGradientData = new UIGeometryUtils.EdgeGradientData();
+            if (antiAliasingProperties.Adjusted > 0.0f)
+            {
+                edgeGradientData.SetActiveData(
+                    1.0f,
+                    0.0f,
+                    antiAliasingProperties.Adjusted
+                );
+            }
+            else
+            {
+                edgeGradientData.Reset();
+            }
+
+            if (m_ShapeFillMode == ShapeFillModeEnum.Fill)
+            {
+                RoundedRectShapeUtils.AddRoundedRect(
+                    ref vh,
+                    pixelRect,
+                    roundedProperties,
+                    color32,
+                    uvRect,
+                    ref _roundedRectCachedData,
+                    edgeGradientData
+                );
+            }
+            else
+            {
+                RoundedRectShapeUtils.AddRoundedRectLine(
+                    ref vh,
+                    pixelRect,
+                    outlineProperties,
+                    roundedProperties,
+                    color32,
+                    uvRect,
+                    ref _roundedRectCachedData,
+                    edgeGradientData
+                );
+            }
+        }
+
+        protected virtual void GenerateEllipseMesh(VertexHelper vh, bool shouldPreserveAspect)
+        {
+            var size = sprite == null ? Vector2.zero : new Vector2(sprite.rect.width, sprite.rect.height);
+            var preserveAspectMode = GetAspectRatioMode(size);
+
+            Vector4 v = GetDrawingDimensions(shouldPreserveAspect, preserveAspectMode);
+            var uv = GetDrawingUV(size, shouldPreserveAspect, preserveAspectMode);
+            var color32 = color;
+            vh.Clear();
+
+            Rect pixelRect = Rect.MinMaxRect(v.x, v.y, v.z, v.w);
+            Rect uvRect = Rect.MinMaxRect(uv.x, uv.y, uv.z, uv.w);
+
+            var ellipseProperties = new EllipseShapeUtils.EllipseProperties();
+            var outlineProperties = new OutlineProperties();
+            var antiAliasingProperties = new AntiAliasingProperties();
+
+            antiAliasingProperties.AntiAliasing = m_ShapeAntiAliasing;
+            outlineProperties.LineWeight = m_OutlineThickness;
+            outlineProperties.Type = (LineType)m_OutlineType;
+            ellipseProperties.Fitting = (EllipseFitting)m_EllipseFittingMode;
+
+            ellipseProperties.OnCheck();
+            outlineProperties.OnCheck();
+            antiAliasingProperties.OnCheck();
+
+            var radius = new Vector2(pixelRect.size.x / 2, pixelRect.size.y / 2);
+            EllipseShapeUtils.SetRadius(ref radius, pixelRect.width, pixelRect.height, ellipseProperties);
+
+            ellipseProperties.UpdateAdjusted(radius, 0.0f);
+            antiAliasingProperties.UpdateAdjusted(canvas);
+            outlineProperties.UpdateAdjusted();
+
+            var edgeGradientData = new UIGeometryUtils.EdgeGradientData();
+            if (antiAliasingProperties.Adjusted > 0.0f)
+            {
+                edgeGradientData.SetActiveData(
+                    1.0f,
+                    0.0f,
+                    antiAliasingProperties.Adjusted
+                );
+            }
+            else
+            {
+                edgeGradientData.Reset();
+            }
+
+            var fullRect = pixelRect;
+            pixelRect = UIGeometryUtils.RectFromCenter(pixelRect.center, new Vector2(radius.x * 2, radius.y * 2));
+            if (m_ShapeFillMode == ShapeFillModeEnum.Fill)
+            {
+                EllipseShapeUtils.AddCircle(
+                    ref vh,
+                    pixelRect,
+                    ellipseProperties,
+                    color32,
+                    fullRect,
+                    uvRect,
+                    ref _ellipseCachedData,
+                    edgeGradientData
+                );
+            }
+            else
+            {
+                EllipseShapeUtils.AddRing(
+                    ref vh,
+                    pixelRect,
+                    outlineProperties,
+                    ellipseProperties,
+                    color32,
+                    fullRect,
+                    uvRect,
+                    ref _ellipseCachedData,
+                    edgeGradientData
+                );
             }
         }
 
