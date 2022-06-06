@@ -22,13 +22,13 @@ namespace Kyub.UI
         ShapeTypeModeEnum m_ShapeType = ShapeTypeModeEnum.Default;
         [SerializeField]
         ShapeFillModeEnum m_ShapeFillMode = ShapeFillModeEnum.Fill;
-        [SerializeField]
-        float m_ShapeAntiAliasing = 0;
+        [SerializeField, Range(0, 10)]
+        float m_ShapeAntiAliasing = 1.25f;
 
         //Outline Properties
         [SerializeField]
         ShapeOutlineModeEnum m_OutlineType = ShapeOutlineModeEnum.Inner;
-        [SerializeField]
+        [SerializeField, Range(0, 200)]
         float m_OutlineThickness = 2.0f;
 
         //Ellipse Properties
