@@ -326,9 +326,9 @@ namespace Kyub.PickerServices
             if (callback != null)
             {
                 System.Action<string[]> internalCallback = null;
-                internalCallback = (result) => 
+                internalCallback = (result) =>
                 {
-                    if(callback != null)
+                    if (callback != null)
                         callback.Invoke(result);
                     OnFilesPickerFinish -= internalCallback;
                 };
@@ -416,9 +416,9 @@ namespace Kyub.PickerServices
             return SaveTextureToPath_Internal(texture, Application.isEditor ? Application.temporaryCachePath : Application.persistentDataPath, fileName);
         }
 
-        public static string SaveTextureToPersistentPath(byte[] bytes, string fileName)
+        public static string SaveTextureToPersistentPath(byte[] bytes, string fileName = "")
         {
-            return SaveTextureToPath_Internal(bytes, Application.isEditor? Application.temporaryCachePath : Application.persistentDataPath, fileName);
+            return SaveTextureToPath_Internal(bytes, Application.isEditor ? Application.temporaryCachePath : Application.persistentDataPath, fileName);
         }
 
         public static string SaveTextureToTemporaryPath(Texture2D texture, string fileName = "")
@@ -426,68 +426,131 @@ namespace Kyub.PickerServices
             return SaveTextureToPath_Internal(texture, Application.temporaryCachePath, fileName);
         }
 
-        public static string SaveTextureToTemporaryPath(byte[] bytes, string fileName)
+        public static string SaveTextureToTemporaryPath(byte[] bytes, string fileName = "")
         {
             return SaveTextureToPath_Internal(bytes, Application.temporaryCachePath, fileName);
         }
 
         public static string GetUniqueImgFileName(CrossPickerServices.TextureEncoderEnum encodeOption)
         {
-            return GetUniqueImgFileName("", encodeOption);
+            return GetUniqueImgFileName(string.Empty, encodeOption);
+        }
+
+        public static string GetUniqueImgFileName(string extension)
+        {
+            return GetUniqueImgFileName(string.Empty, extension);
         }
 
         public static string GetUniqueImgFileName(string pattern, CrossPickerServices.TextureEncoderEnum encodeOption)
         {
-            if (string.IsNullOrEmpty(pattern))
-                pattern = "TempImg";
-            return pattern + System.DateTime.UtcNow.ToString("ddMMyyyy").Replace(" ", "") + "_" + UnityEngine.Random.Range(0, 99999) + "." + encodeOption.ToString().ToLower();
+            return GetUniqueImgFileName(pattern, "." + encodeOption.ToString().ToLower());
         }
 
-        protected static string SaveTextureToPath_Internal(Texture2D texture, string folderPath, string fileName = "")
+        public static string GetUniqueImgFileName(string pattern, string extension)
+        {
+            if (string.IsNullOrEmpty(extension))
+                extension = "." + CrossPickerServices.EncodeOption.ToString().ToLower();
+            if (string.IsNullOrEmpty(pattern))
+                pattern = "TempImg";
+            return pattern + System.DateTime.UtcNow.ToString("ddMMyyyy").Replace(" ", string.Empty) + "_" + UnityEngine.Random.Range(0, 99999) + extension;
+        }
+
+        protected static string SaveTextureToPath_Internal(Texture2D texture, string folderPath, string fileName)
         {
             if (texture != null)
             {
+                const string PNG_EXTENSION = ".png";
+                const string JPG_EXTENSION = ".jpg";
+                string extension;
                 if (string.IsNullOrEmpty(fileName))
                     fileName = GetUniqueImgFileName(CrossPickerServices.EncodeOption);
                 byte[] bytes = null;
-                if (fileName.Contains(".png"))
+                if (fileName.EndsWith(PNG_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    extension = PNG_EXTENSION;
                     bytes = texture.EncodeToPNG();
-                else if (fileName.Contains(".jpg"))
+                }
+                else if (fileName.EndsWith(JPG_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    extension = JPG_EXTENSION;
                     bytes = texture.EncodeToJPG();
+                }
                 else if (CrossPickerServices.EncodeOption == CrossPickerServices.TextureEncoderEnum.JPG)
                 {
+                    extension = JPG_EXTENSION;
                     bytes = texture.EncodeToJPG();
-                    fileName += ".jpg";
+                    fileName += extension;
+
                 }
                 else
                 {
+                    extension = PNG_EXTENSION;
                     bytes = texture.EncodeToPNG();
-                    fileName += ".png";
+                    fileName += extension;
                 }
-                return SaveTextureToPath_Internal(bytes, folderPath, fileName);
+                return SaveTextureToPath_ExtensionProcessing_Internal(bytes, folderPath, fileName, extension);
             }
-            return "";
+            return string.Empty;
         }
 
         protected static string SaveTextureToPath_Internal(byte[] bytes, string folderPath, string fileName)
         {
+            if (bytes != null && bytes.Length > 0)
+            {
+                const string PNG_EXTENSION = ".png";
+                const string JPG_EXTENSION = ".jpg";
+
+                string extension;
+                if (string.IsNullOrEmpty(fileName))
+                    fileName = GetUniqueImgFileName(CrossPickerServices.EncodeOption);
+                if (fileName.EndsWith(PNG_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    extension = PNG_EXTENSION;
+                }
+                else if (fileName.EndsWith(JPG_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    extension = JPG_EXTENSION;
+                }
+                else if (CrossPickerServices.EncodeOption == CrossPickerServices.TextureEncoderEnum.JPG)
+                {
+                    extension = JPG_EXTENSION;
+                    fileName += extension;
+                }
+                else
+                {
+                    extension = PNG_EXTENSION;
+                    fileName += extension;
+                }
+                return SaveTextureToPath_ExtensionProcessing_Internal(bytes, folderPath, fileName, extension);
+            }
+            return string.Empty;
+        }
+
+        protected static string SaveTextureToPath_ExtensionProcessing_Internal(byte[] bytes, string folderPath, string fileName, string extension)
+        {
             if (bytes != null)
             {
                 if (string.IsNullOrEmpty(fileName))
-                    fileName = GetUniqueImgFileName(CrossPickerServices.EncodeOption);
-                var savePath = GetSavePath_Internal(folderPath, fileName, true);
+                    fileName = GetUniqueImgFileName(extension);
+                var savePath = GetSavePath_Internal(folderPath, fileName, true, extension);
                 System.IO.File.WriteAllBytes(savePath, bytes);
                 return savePath;
             }
             return "";
         }
 
+        public static string GetPersistentSavePath(string formattedFileName)
+        {
+            var extension = "." + CrossPickerServices.EncodeOption.ToString().ToLower();
+            return GetPersistentSavePath(formattedFileName, extension);
+        }
+
         /// <summary>
         /// Combine PersistentSavePath with FormattedFileName (FileName + Extension)
         /// </summary>
-        public static string GetPersistentSavePath(string formattedFileName)
+        public static string GetPersistentSavePath(string formattedFileName, string extension)
         {
-            return GetSavePath_Internal(Application.isEditor ? Application.temporaryCachePath : Application.persistentDataPath, formattedFileName, false);
+            return GetSavePath_Internal(Application.isEditor ? Application.temporaryCachePath : Application.persistentDataPath, formattedFileName, false, extension);
         }
 
         /// <summary>
@@ -495,23 +558,28 @@ namespace Kyub.PickerServices
         /// </summary>
         public static string GetTemporarySavePath(string formattedFileName)
         {
-            return GetSavePath_Internal(Application.temporaryCachePath, formattedFileName, false);
+            var extension = "." + CrossPickerServices.EncodeOption.ToString().ToLower();
+            return GetPersistentSavePath(formattedFileName, extension);
         }
 
-        protected static string GetSavePath_Internal(string folderPath, string formattedFileName, bool canCreateDirectory)
+        public static string GetTemporarySavePath(string formattedFileName, string extension)
         {
-            var extension = "." + CrossPickerServices.EncodeOption.ToString().ToLower();
-            if (!string.IsNullOrEmpty(formattedFileName) && !formattedFileName.EndsWith(extension))
+            return GetSavePath_Internal(Application.temporaryCachePath, formattedFileName, false, extension);
+        }
+
+        protected static string GetSavePath_Internal(string folderPath, string formattedFileName, bool canCreateDirectory, string extension)
+        {
+            if (!string.IsNullOrEmpty(extension) && !string.IsNullOrEmpty(formattedFileName) && !formattedFileName.EndsWith(extension, System.StringComparison.InvariantCultureIgnoreCase))
                 formattedFileName += extension;
             if (!string.IsNullOrEmpty(formattedFileName))
             {
                 string fileName = System.IO.Path.GetFileName(formattedFileName);
-                string mainFolderPath = folderPath != null? folderPath.Replace("\\", "/") : "";
+                string mainFolderPath = folderPath != null ? folderPath.Replace("\\", "/") : "";
                 string subPath = formattedFileName.Replace("\\", "/").Replace(fileName, "").Replace(mainFolderPath, "");
                 //Prevent bug when combining a path with only "/" that will return "/" fullpath
                 while (subPath.StartsWith("/"))
                 {
-                    subPath = subPath.Length > 1? subPath.Substring(1, subPath.Length - 1) : "";
+                    subPath = subPath.Length > 1 ? subPath.Substring(1, subPath.Length - 1) : "";
                 }
                 string fullFolder = System.IO.Path.Combine(mainFolderPath, subPath).Replace("\\", "/");
                 //We have a subfolder
@@ -545,7 +613,7 @@ namespace Kyub.PickerServices
 
         public static string EncodeTo64(Texture2D texture, bool isJpg, System.Text.Encoding encoding)
         {
-            return EncodeTo64(texture != null? (isJpg? texture.EncodeToJPG() : texture.EncodeToPNG()) : null, encoding);
+            return EncodeTo64(texture != null ? (isJpg ? texture.EncodeToJPG() : texture.EncodeToPNG()) : null, encoding);
         }
 
         public static string EncodeTo64(string toEncode)
@@ -666,7 +734,7 @@ namespace Kyub.PickerServices
         private ExternImgFile GetImageFromPath(string key, System.Action<ExternImgFile> callback)
         {
             ExternImgFile wwwImage = CreateImageStruct(key);
-            if(callback != null)
+            if (callback != null)
                 callback(wwwImage);
             return wwwImage;
         }
@@ -679,7 +747,7 @@ namespace Kyub.PickerServices
                 wwwImage = new ExternImgFile();
             wwwImage.Error = null;
             wwwImage.Url = key;
-            wwwImage.Texture = !string.IsNullOrEmpty(key) && CrossFileProvider.FileExists(key)? NativeGallery.LoadImageAtPath(key, MaxImageLoadSize, false, false) : null;
+            wwwImage.Texture = !string.IsNullOrEmpty(key) && CrossFileProvider.FileExists(key) ? NativeGallery.LoadImageAtPath(key, MaxImageLoadSize, false, false) : null;
             if (wwwImage.Texture != null)
                 wwwImage.Sprite = Sprite.Create(wwwImage.Texture, new Rect(0, 0, wwwImage.Texture.width, wwwImage.Texture.height), new Vector2(0.5f, 0.5f));
             if (wwwImage.Texture == null)
