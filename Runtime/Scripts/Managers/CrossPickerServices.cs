@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using Kyub.Async;
+using System;
+using Unity.Collections;
+using System.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -411,9 +414,52 @@ namespace Kyub.PickerServices
 
         #region Helper Save Image Functions
 
+        public static void EncodeTextureAsync(Texture2D texture, TextureEncoderEnum encoderOption, Action<byte[]> callback)
+        {
+            if (callback != null)
+            {
+                if (texture == null || texture.width == 0 || texture.height == 0)
+                {
+                    callback?.Invoke(new byte[0]);
+                    return;
+                }
+
+                uint textureWidth = (uint)texture.width;
+                uint textureHeight = (uint)texture.height;
+                var textureGraphicFormat = texture.graphicsFormat;
+
+                NativeArray<byte> imageBytes = new NativeArray<byte>(texture.GetRawTextureData(), Allocator.Persistent);
+
+                Task.Run(() =>
+                {
+                    NativeArray<byte> encodedArrayNative;
+                    if (encoderOption == TextureEncoderEnum.JPG)
+                    {
+                        encodedArrayNative = ImageConversion.EncodeNativeArrayToJPG<byte>(imageBytes, textureGraphicFormat, textureWidth, textureHeight);
+                    }
+                    else
+                    {
+                        encodedArrayNative = ImageConversion.EncodeNativeArrayToPNG<byte>(imageBytes, textureGraphicFormat, textureWidth, textureHeight);
+                    }
+
+                    imageBytes.Dispose();
+
+                    ApplicationContext.RunOnMainThread(() =>
+                    {
+                        callback?.Invoke(encodedArrayNative.IsCreated ? encodedArrayNative.ToArray() : new byte[0]);
+                    });
+                });
+            }
+        }
+
         public static string SaveTextureToPersistentPath(Texture2D texture, string fileName = "")
         {
             return SaveTextureToPath_Internal(texture, Application.isEditor ? Application.temporaryCachePath : Application.persistentDataPath, fileName);
+        }
+
+        public static void SaveTextureToPersistentPathAsync(Texture2D texture, string fileName, Action<string> callback)
+        {
+            SaveTextureToPathAsync_Internal(texture, Application.isEditor ? Application.temporaryCachePath : Application.persistentDataPath, fileName, callback);
         }
 
         public static string SaveTextureToPersistentPath(byte[] bytes, string fileName = "")
@@ -424,6 +470,11 @@ namespace Kyub.PickerServices
         public static string SaveTextureToTemporaryPath(Texture2D texture, string fileName = "")
         {
             return SaveTextureToPath_Internal(texture, Application.temporaryCachePath, fileName);
+        }
+
+        public static void SaveTextureToTemporaryPathAsync(Texture2D texture, string fileName, Action<string> callback)
+        {
+            SaveTextureToPathAsync_Internal(texture, Application.temporaryCachePath, fileName, callback);
         }
 
         public static string SaveTextureToTemporaryPath(byte[] bytes, string fileName = "")
@@ -491,6 +542,55 @@ namespace Kyub.PickerServices
                 return SaveTextureToPath_ExtensionProcessing_Internal(bytes, folderPath, fileName, extension);
             }
             return string.Empty;
+        }
+
+        protected static unsafe void SaveTextureToPathAsync_Internal(Texture2D texture, string folderPath, string fileName, Action<string> callback)
+        {
+            if (texture != null)
+            {
+                const string PNG_EXTENSION = ".png";
+                const string JPG_EXTENSION = ".jpg";
+                string extension = null;
+                if (string.IsNullOrEmpty(fileName))
+                    fileName = GetUniqueImgFileName(CrossPickerServices.EncodeOption);
+
+                Action<byte[]> encodedCallback = (encodedBytes) => 
+                {
+                    var path = SaveTextureToPath_ExtensionProcessing_Internal(encodedBytes, folderPath, fileName, extension);
+                    if (callback != null)
+                    {
+                        callback.Invoke(path);
+                    }
+                
+                };
+                if (fileName.EndsWith(PNG_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    extension = PNG_EXTENSION;
+                    EncodeTextureAsync(texture, TextureEncoderEnum.PNG, encodedCallback);
+                }
+                else if (fileName.EndsWith(JPG_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    extension = JPG_EXTENSION;
+                    EncodeTextureAsync(texture, TextureEncoderEnum.JPG, encodedCallback);
+                }
+                else if (CrossPickerServices.EncodeOption == CrossPickerServices.TextureEncoderEnum.JPG)
+                {
+                    extension = JPG_EXTENSION;
+                    fileName += extension;
+                    EncodeTextureAsync(texture, TextureEncoderEnum.JPG, encodedCallback);
+
+                }
+                else
+                {
+                    extension = PNG_EXTENSION;
+                    fileName += extension;
+                    EncodeTextureAsync(texture, TextureEncoderEnum.PNG, encodedCallback);
+                }
+            }
+            else
+            {
+                callback?.Invoke(string.Empty);
+            }
         }
 
         protected static string SaveTextureToPath_Internal(byte[] bytes, string folderPath, string fileName)
