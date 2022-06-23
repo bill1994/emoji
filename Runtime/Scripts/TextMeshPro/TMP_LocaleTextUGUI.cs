@@ -535,7 +535,12 @@ namespace Kyub.Localization.UI
             //}
 
             m_AutoSizeIterationCount = 0;
+#if (TMP_2_2_0_PREVIEW_1_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_2_0_PREVIEW_1_OR_NEWER
+            TextWrappingModes wrapMode = m_TextWrappingMode == TextWrappingModes.Normal || m_TextWrappingMode == TextWrappingModes.NoWrap ? TextWrappingModes.NoWrap : TextWrappingModes.PreserveWhitespaceNoWrap;
+            float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, wrapMode).x;
+#else
             float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, false).x;
+#endif
 
             m_isPreferredWidthDirty = false;
 
@@ -584,7 +589,11 @@ namespace Kyub.Localization.UI
 
             while (m_IsAutoSizePointSizeSet == false)
             {
+#if (TMP_2_2_0_PREVIEW_1_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_2_0_PREVIEW_1_OR_NEWER
+                preferredHeight = CalculatePreferredValues(ref fontSize, margin, m_enableAutoSizing, m_TextWrappingMode).y;
+#else
                 preferredHeight = CalculatePreferredValues(ref fontSize, margin, m_enableAutoSizing, m_enableWordWrapping).y;
+#endif
                 m_AutoSizeIterationCount += 1;
             }
 
