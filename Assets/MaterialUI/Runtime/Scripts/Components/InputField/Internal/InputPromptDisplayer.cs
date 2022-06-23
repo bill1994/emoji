@@ -495,7 +495,7 @@ namespace MaterialUI.Internal
             if (!IsActive() || !IsInteractable())
                 return;
 
-            var prefabAddress = customDialogAddress == null || customDialogAddress.IsEmpty() || !customDialogAddress.IsResources() ? PrefabManager.ResourcePrefabs.dialogPrompt : (PrefabAddress) customDialogAddress;
+            var prefabAddress = customDialogAddress == null || customDialogAddress.IsEmpty() || !customDialogAddress.IsResources() ? PrefabManager.ResourcePrefabs.dialogPrompt : (PrefabAddress)customDialogAddress;
             if (prefabAddress != null)
             {
                 var materialInputField = this.GetComponent<MaterialInputField>();
@@ -611,14 +611,18 @@ namespace MaterialUI.Internal
                 if (unityInputField != null)
                     unityInputField.horizontalOverflow = HorizontalWrapMode.Overflow;
                 else
+#pragma warning disable CS0618 // Type or member is obsolete
                     tmpInputField.enableWordWrapping = false;
+#pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
                 if (unityInputField != null)
                     unityInputField.horizontalOverflow = HorizontalWrapMode.Wrap;
                 else
+#pragma warning disable CS0618 // Type or member is obsolete
                     tmpInputField.enableWordWrapping = true;
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
