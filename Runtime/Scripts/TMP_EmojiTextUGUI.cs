@@ -42,8 +42,8 @@ namespace Kyub.EmojiSearch.UI
         public new ITextPreprocessor textPreprocessor
         {
             get { return m_SecondaryPreprocessor; }
-            set 
-            { 
+            set
+            {
                 m_SecondaryPreprocessor = value;
                 InitTextPreProcessor();
             }
@@ -245,7 +245,7 @@ namespace Kyub.EmojiSearch.UI
 
             if (m_TextPreprocessor as Object != this)
             {
-                if(m_TextPreprocessor != null)
+                if (m_TextPreprocessor != null)
                     m_SecondaryPreprocessor = m_TextPreprocessor;
                 m_TextPreprocessor = this;
             }
@@ -359,9 +359,9 @@ namespace Kyub.EmojiSearch.UI
         }
 #endif
 
-#endregion
+        #endregion
 
-#region Layout Overriden Functions
+        #region Layout Overriden Functions
 
 #if (TMP_2_1_3_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_0_3_OR_NEWER
         public override float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
@@ -392,16 +392,22 @@ namespace Kyub.EmojiSearch.UI
 
             //if (IsInputParsingRequired_Internal || m_isTextTruncated)
             //{
-                m_isCalculatingPreferredValues = true;
-                ParseInputText();
+            m_isCalculatingPreferredValues = true;
+            ParseInputText();
 
-                _emojiParsingRequired = m_isRichText;
-                if (_emojiParsingRequired)
-                    ParseInputTextAndEmojiCharSequence();
+            _emojiParsingRequired = m_isRichText;
+            if (_emojiParsingRequired)
+                ParseInputTextAndEmojiCharSequence();
             //}
 
             m_AutoSizeIterationCount = 0;
+#if (TMP_2_2_0_PREVIEW_1_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_2_0_PREVIEW_1_OR_NEWER
+            TextWrappingModes wrapMode = m_TextWrappingMode == TextWrappingModes.Normal || m_TextWrappingMode == TextWrappingModes.NoWrap ? TextWrappingModes.NoWrap : TextWrappingModes.PreserveWhitespaceNoWrap;
+            float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, wrapMode).x;
+#else
             float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, false).x;
+#endif
+
 
             m_isPreferredWidthDirty = false;
 
@@ -432,12 +438,12 @@ namespace Kyub.EmojiSearch.UI
 
             //if (IsInputParsingRequired_Internal || m_isTextTruncated)
             //{
-                m_isCalculatingPreferredValues = true;
-                ParseInputText();
+            m_isCalculatingPreferredValues = true;
+            ParseInputText();
 
-                _emojiParsingRequired = m_isRichText;
-                if (_emojiParsingRequired)
-                    ParseInputTextAndEmojiCharSequence();
+            _emojiParsingRequired = m_isRichText;
+            if (_emojiParsingRequired)
+                ParseInputTextAndEmojiCharSequence();
             //}
 
             // Reset Text Auto Size iteration tracking.
@@ -450,7 +456,11 @@ namespace Kyub.EmojiSearch.UI
 
             while (m_IsAutoSizePointSizeSet == false)
             {
+#if (TMP_2_2_0_PREVIEW_1_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_2_0_PREVIEW_1_OR_NEWER
+                preferredHeight = CalculatePreferredValues(ref fontSize, margin, m_enableAutoSizing, m_TextWrappingMode).y;
+#else
                 preferredHeight = CalculatePreferredValues(ref fontSize, margin, m_enableAutoSizing, m_enableWordWrapping).y;
+#endif
                 m_AutoSizeIterationCount += 1;
             }
 
@@ -462,6 +472,6 @@ namespace Kyub.EmojiSearch.UI
         }
 #endif
 
-#endregion
+        #endregion
     }
 }
