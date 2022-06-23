@@ -88,6 +88,11 @@
         },
         {
             "name": "com.unity.textmeshpro",
+            "expression": "3.0.3",
+            "define": "TMP_3_0_3_OR_NEWER"
+        },
+        {
+            "name": "com.unity.textmeshpro",
             "expression": "3.0.4",
             "define": "TMP_3_0_4_OR_NEWER"
         },
