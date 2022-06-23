@@ -148,21 +148,24 @@ namespace Kyub.UI
                     if (!readOnly)
                         text = m_SoftKeyboard.text;
 
-                    if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.LostFocus)
+                    if (m_SoftKeyboard != null && m_SoftKeyboard.status == TouchScreenKeyboard.Status.LostFocus)
                         SendTouchScreenKeyboardStatusChanged();
 
-                    if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
+                    if (m_SoftKeyboard != null && m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
                     {
                         ReleaseBaseSelection = true;
                         WasCanceled = true;
                         SendTouchScreenKeyboardStatusChanged();
                     }
 
-                    if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Done)
+                    if (m_SoftKeyboard != null && m_SoftKeyboard.status == TouchScreenKeyboard.Status.Done)
                     {
                         ReleaseBaseSelection = true;
                         OnSubmit(null);
-                        SendTouchScreenKeyboardStatusChanged();
+                        if(m_SoftKeyboard != null)
+                        {
+                            SendTouchScreenKeyboardStatusChanged();
+                        }
                     }
                 }
 
