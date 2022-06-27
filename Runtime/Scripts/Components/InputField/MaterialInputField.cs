@@ -2440,6 +2440,8 @@ namespace MaterialUI
 
         private float GetTextPreferredHeight()
         {
+            if (m_InputText != null)
+                m_InputText.SetGraphicPreserveWhiteSpaceWrapping(true);
             return m_InputText != null && !HasIgnoreLayout(m_InputText) ? LayoutUtility.GetPreferredHeight(m_InputText.rectTransform) : 0; // textGenerator.GetPreferredHeight(layoutText, textGenerationSettings) * fontScale;
         }
 

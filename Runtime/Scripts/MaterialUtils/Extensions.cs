@@ -199,6 +199,71 @@ namespace MaterialUI
             }
         }
 
+        public static bool GetGraphicPreserveWhiteSpaceWrapping(this Graphic textGraphic)
+        {
+            if (textGraphic != null)
+            {
+#if (TMP_2_2_0_PREVIEW_1_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_2_0_PREVIEW_1_OR_NEWER
+                var tmpTextGraphic = ((TMPro.TMP_Text)textGraphic);
+                if (tmpTextGraphic)
+                {
+                    if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.PreserveWhitespace || tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.PreserveWhitespaceNoWrap)
+                    {
+                        return true;
+                    }
+                }
+#endif
+            }
+
+            return false;
+        }
+
+        public static void SetGraphicPreserveWhiteSpaceWrapping(this Graphic textGraphic, bool isOn)
+        {
+            if (textGraphic != null)
+            {
+                var changed = false;
+#if (TMP_2_2_0_PREVIEW_1_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_2_0_PREVIEW_1_OR_NEWER
+                var tmpTextGraphic = ((TMPro.TMP_Text)textGraphic);
+                if (tmpTextGraphic)
+                {
+                    if (isOn)
+                    {
+                        if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.Normal)
+                        {
+                            tmpTextGraphic.textWrappingMode = TMPro.TextWrappingModes.PreserveWhitespace;
+                            changed = true;
+                        }
+                        if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.NoWrap)
+                        {
+                            tmpTextGraphic.textWrappingMode = TMPro.TextWrappingModes.PreserveWhitespaceNoWrap;
+                            changed = true;
+                        }
+                    }
+                    else
+                    {
+                        if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.PreserveWhitespace)
+                        {
+                            tmpTextGraphic.textWrappingMode = TMPro.TextWrappingModes.Normal;
+                            changed = true;
+                        }
+                        if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.PreserveWhitespaceNoWrap)
+                        {
+                            tmpTextGraphic.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+                            changed = true;
+                        }
+                    }
+                }
+#endif
+                if (changed)
+                {
+#if UNITY_EDITOR
+                    UnityEditor.EditorUtility.SetDirty(textGraphic);
+#endif
+                }
+            }
+        }
+
         public static float GetGraphicFontAssetFontSize(this Graphic textGraphic)
         {
             if (textGraphic != null)
