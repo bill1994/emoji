@@ -93,6 +93,7 @@ namespace MaterialUI
         {
             if (textGraphic != null)
             {
+                var changed = false;
                 if (text == null)
                     text = "";
                 try
@@ -107,13 +108,21 @@ namespace MaterialUI
                     {
                         ((TMPro.TMP_Text)textGraphic).text = text;
                         ((TMPro.TMP_Text)textGraphic).SetAllDirty();
+                        changed = true;
                     }
                 }
                 else if (textGraphic is Text)
-                    ((Text)textGraphic).text = text;
+                {
+                    var oldText = ((Text)textGraphic).text;
+                    if (oldText != text)
+                    {
+                        ((Text)textGraphic).text = text;
+                        changed = true;
+                    }
+                }
 
 #if UNITY_EDITOR
-                if (!Application.isPlaying)
+                if (!Application.isPlaying && changed)
                     UnityEditor.EditorUtility.SetDirty(textGraphic);
 #endif
             }
@@ -222,7 +231,7 @@ namespace MaterialUI
         {
             if (textGraphic != null)
             {
-                var changed = false;
+                //var changed = false;
 #if (TMP_2_2_0_PREVIEW_1_OR_NEWER && !TMP_3_0_0_OR_NEWER) || TMP_3_2_0_PREVIEW_1_OR_NEWER
                 var tmpTextGraphic = ((TMPro.TMP_Text)textGraphic);
                 if (tmpTextGraphic)
@@ -232,12 +241,12 @@ namespace MaterialUI
                         if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.Normal)
                         {
                             tmpTextGraphic.textWrappingMode = TMPro.TextWrappingModes.PreserveWhitespace;
-                            changed = true;
+                            //changed = true;
                         }
                         if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.NoWrap)
                         {
                             tmpTextGraphic.textWrappingMode = TMPro.TextWrappingModes.PreserveWhitespaceNoWrap;
-                            changed = true;
+                            //changed = true;
                         }
                     }
                     else
@@ -245,22 +254,22 @@ namespace MaterialUI
                         if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.PreserveWhitespace)
                         {
                             tmpTextGraphic.textWrappingMode = TMPro.TextWrappingModes.Normal;
-                            changed = true;
+                            //changed = true;
                         }
                         if (tmpTextGraphic.textWrappingMode == TMPro.TextWrappingModes.PreserveWhitespaceNoWrap)
                         {
                             tmpTextGraphic.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
-                            changed = true;
+                            //changed = true;
                         }
                     }
                 }
 #endif
-                if (changed)
+                /*if (changed)
                 {
 #if UNITY_EDITOR
                     UnityEditor.EditorUtility.SetDirty(textGraphic);
 #endif
-                }
+                }*/
             }
         }
 
