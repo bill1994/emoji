@@ -264,7 +264,7 @@ namespace MaterialUI
                     }
                 }
 #endif
-                /*if (changed)
+                /*if (!Application.isPlaying && changed)
                 {
 #if UNITY_EDITOR
                     UnityEditor.EditorUtility.SetDirty(textGraphic);
