@@ -179,6 +179,12 @@ namespace Kyub.UI
 
         protected override void OnEnable()
         {
+            if (PendentText != base.text)
+            {
+                base.text = PendentText;
+                PendentText = null;
+            }
+
             base.OnEnable();
             CheckAsteriskChar();
             UpdateRectMaskContent(false);
@@ -1233,6 +1239,58 @@ namespace Kyub.UI
         #endregion
 
         #region INativeInputField Extra Implementations
+
+        //Prevent crashs while editing fields with native keyboard
+        protected string PendentText { get; set; }
+        string INativeInputField.text
+        {
+            get
+            {
+                if (!enabled || !gameObject.activeInHierarchy)
+                {
+                    if (PendentText == null)
+                    {
+                        if (base.text != null)
+                        {
+                            PendentText = base.text;
+                        }
+                        else
+                        {
+                            PendentText = string.Empty;
+                        }
+                    }
+
+                    return PendentText;
+                }
+                else
+                {
+                    if (PendentText != null)
+                    {
+                        if (base.text != PendentText)
+                        {
+                            base.text = PendentText;
+                        }
+                        PendentText = null;
+                    }
+                    return base.text;
+                }
+            }
+            set
+            {
+                if (!enabled || !gameObject.activeInHierarchy)
+                {
+                    PendentText = value;
+                }
+                else
+                {
+                    if (base.text != value)
+                    {
+                        base.text = value;
+                    }
+                    PendentText = null;
+                }
+            }
+        }
 
         UnityEvent<string> INativeInputField.onValueChanged
         {
