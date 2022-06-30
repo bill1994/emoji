@@ -33,6 +33,8 @@ namespace Kyub.UI
         [SerializeField]
         protected MobileInputBehaviour.ReturnKeyType m_ReturnKeyType = MobileInputBehaviour.ReturnKeyType.Done;
 
+        protected bool _UpdateLabelsOnEnable = false;
+
         #endregion
 
         #region Public Properties
@@ -50,6 +52,25 @@ namespace Kyub.UI
                 m_MonospacePassDistEm = value;
             }
         }*/
+
+        public virtual new string text
+        {
+            get
+            {
+                return base.text;
+            }
+            set
+            {
+                if (Application.isPlaying && (!enabled || !gameObject.activeInHierarchy))
+                {
+                    SetTextWithoutUpdateLabel(value, true);
+                }
+                else
+                {
+                    base.text = value;
+                }
+            }
+        }
 
         public RectTransform panContent
         {
@@ -179,10 +200,13 @@ namespace Kyub.UI
 
         protected override void OnEnable()
         {
-            if (PendentText != base.text)
+            //Force update Labels
+            if (_UpdateLabelsOnEnable)
             {
-                base.text = PendentText;
-                PendentText = null;
+                _UpdateLabelsOnEnable = false;
+                var value = m_Text;
+                m_Text = !string.IsNullOrEmpty(m_Text)? "" : " ";
+                SetTextWithoutNotify(value);
             }
 
             base.OnEnable();
@@ -1032,6 +1056,33 @@ namespace Kyub.UI
             SafeDeactivateInputFieldInternal();
         }
 
+        protected virtual void SetTextWithoutUpdateLabel(string value, bool updatePlaceholderActive)
+        {
+            if (m_Text == value)
+                return;
+
+            if (value == null)
+                value = "";
+
+            value = value.Replace("\0", string.Empty); // remove embedded nulls
+
+            m_Text = value;
+            if (m_StringPosition > m_Text.Length)
+                m_StringPosition = m_StringSelectPosition = m_Text.Length;
+            else if (m_StringSelectPosition > m_Text.Length)
+                m_StringSelectPosition = m_Text.Length;
+
+            if (updatePlaceholderActive)
+            {
+                bool isEmpty = string.IsNullOrEmpty(value);
+
+                if (m_Placeholder != null)
+                    m_Placeholder.enabled = isEmpty;
+            }
+
+            _UpdateLabelsOnEnable = true;
+        }
+
         #endregion
 
         #region Internal Important Fields
@@ -1240,55 +1291,16 @@ namespace Kyub.UI
 
         #region INativeInputField Extra Implementations
 
-        //Prevent crashs while editing fields with native keyboard
-        protected string PendentText { get; set; }
+
         string INativeInputField.text
         {
             get
             {
-                if (!enabled || !gameObject.activeInHierarchy)
-                {
-                    if (PendentText == null)
-                    {
-                        if (base.text != null)
-                        {
-                            PendentText = base.text;
-                        }
-                        else
-                        {
-                            PendentText = string.Empty;
-                        }
-                    }
-
-                    return PendentText;
-                }
-                else
-                {
-                    if (PendentText != null)
-                    {
-                        if (base.text != PendentText)
-                        {
-                            base.text = PendentText;
-                        }
-                        PendentText = null;
-                    }
-                    return base.text;
-                }
+                return this.text;
             }
             set
             {
-                if (!enabled || !gameObject.activeInHierarchy)
-                {
-                    PendentText = value;
-                }
-                else
-                {
-                    if (base.text != value)
-                    {
-                        base.text = value;
-                    }
-                    PendentText = null;
-                }
+                this.text = value;
             }
         }
 
