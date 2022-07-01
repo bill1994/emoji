@@ -145,7 +145,7 @@ namespace Kyub.Performance
                 if (canvasGroup == null)
                     canvasGroup = ConfigureLowPerformanceCanvasGroup();
 
-                if (!active && !Application.isEditor)
+                if (!active && (!Application.isEditor || SustainedPerformanceManager.UseSimulateBuildBehaviourInEditor))
                 {
                     _cachedAlphaValue = canvasGroup.alpha;
                     canvasGroup.alpha = 0;
