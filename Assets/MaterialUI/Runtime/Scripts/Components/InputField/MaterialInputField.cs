@@ -1681,9 +1681,12 @@ namespace MaterialUI
 
         protected override void OnCanvasGroupChanged()
         {
-            base.OnCanvasGroupChanged();
-            SetLayoutDirty();
-            ApplyCanvasGroupChanged();
+            if (!Kyub.Performance.SustainedPerformanceManager.IsSettingLowPerformance)
+            {
+                base.OnCanvasGroupChanged();
+                SetLayoutDirty();
+                ApplyCanvasGroupChanged();
+            }
         }
 
 #if UNITY_EDITOR

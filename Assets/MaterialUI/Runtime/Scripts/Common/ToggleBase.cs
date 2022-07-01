@@ -105,7 +105,7 @@ namespace MaterialUI
             }
             set
             {
-                if (m_ForceUseDisableColor == value) 
+                if (m_ForceUseDisableColor == value)
                     return;
                 m_ForceUseDisableColor = value;
 
@@ -143,7 +143,7 @@ namespace MaterialUI
         {
             get
             {
-                return toggle != null? toggle.isOn : false;
+                return toggle != null ? toggle.isOn : false;
             }
             set
             {
@@ -258,7 +258,7 @@ namespace MaterialUI
                     return;
                 m_ToggleOnLabel = value;
 
-                if(m_ToggleGraphic && isOn)
+                if (m_ToggleGraphic && isOn)
                     labelText = value;
             }
         }
@@ -437,7 +437,7 @@ namespace MaterialUI
                 m_Group = value;
                 if (m_Group != null && enabled && gameObject.activeInHierarchy && Application.isPlaying)
                 {
-                    if(!m_Group.allowSwitchOff && toggle != null)
+                    if (!m_Group.allowSwitchOff && toggle != null)
                         m_Toggle.enabled = !isOn;
                     m_Group.RegisterToggle(this);
                 }
@@ -571,13 +571,13 @@ namespace MaterialUI
                 }
             }
 
-            
+
         }
 
         protected bool _isChangingCanvasGroup = false;
         protected override void OnCanvasGroupChanged()
         {
-            if (!_isChangingCanvasGroup)
+            if (!_isChangingCanvasGroup && !Kyub.Performance.SustainedPerformanceManager.IsSettingLowPerformance)
             {
                 try
                 {
@@ -640,7 +640,7 @@ namespace MaterialUI
                 (m_Group == null || m_Group.CanToggleValueChange(this, value)))
             {
                 var oldValue = m_Toggle.isOn;
-                
+
                 if (!sendCallback)
                     m_Toggle.SetIsOnWithoutNotify(value);
                 else
@@ -653,7 +653,7 @@ namespace MaterialUI
 
         public virtual void SetIsOnWithoutNotify(bool value)
         {
-            if(m_Toggle.isOn != value)
+            if (m_Toggle.isOn != value)
                 SetIsOnInternal(value, false);
         }
 
@@ -736,7 +736,7 @@ namespace MaterialUI
             }
             else
             {
-                m_Graphic.SetGraphicText(m_Toggle.isOn ? m_ToggleOnLabel : m_ToggleOffLabel, m_Toggle.isOn? m_ToggleOffLabel : m_ToggleOnLabel);
+                m_Graphic.SetGraphicText(m_Toggle.isOn ? m_ToggleOnLabel : m_ToggleOffLabel, m_Toggle.isOn ? m_ToggleOffLabel : m_ToggleOnLabel);
             }
         }
 
@@ -822,8 +822,10 @@ namespace MaterialUI
 
             if (canvasGroup != null)
             {
-                canvasGroup.blocksRaycasts = true;
-                canvasGroup.interactable = true;
+                if (!canvasGroup.blocksRaycasts)
+                    canvasGroup.blocksRaycasts = true;
+                if (!canvasGroup.interactable)
+                    canvasGroup.interactable = true;
             }
         }
 
@@ -845,8 +847,10 @@ namespace MaterialUI
 
             if (canvasGroup != null)
             {
-                canvasGroup.blocksRaycasts = false;
-                canvasGroup.interactable = false;
+                if (canvasGroup.blocksRaycasts)
+                    canvasGroup.blocksRaycasts = false;
+                if (canvasGroup.interactable)
+                    canvasGroup.interactable = false;
             }
 
 #if UNITY_EDITOR
@@ -946,9 +950,14 @@ namespace MaterialUI
 
             if (canvasGroup != null)
             {
-                canvasGroup.blocksRaycasts = m_Interactable;
-                canvasGroup.interactable = m_Interactable;
-                canvasGroup.alpha = interactable || m_ForceUseDisableColor ? 1f : 0.5f;
+                if (canvasGroup.blocksRaycasts != m_Interactable)
+                    canvasGroup.blocksRaycasts = m_Interactable;
+                if (canvasGroup.interactable != m_Interactable)
+                    canvasGroup.interactable = m_Interactable;
+
+                var alpha = interactable || m_ForceUseDisableColor ? 1f : 0.5f;
+                if (canvasGroup.alpha != alpha)
+                    canvasGroup.alpha = alpha;
             }
         }
 
@@ -1103,7 +1112,7 @@ namespace MaterialUI
                 {
                     var toggleBase = sender as ToggleBase;
                     var isActive = toggleBase != null ? toggleBase.toggle.isOn : true;
-                    var isInteractable = toggleBase != null? toggleBase.IsInteractable() : true;
+                    var isInteractable = toggleBase != null ? toggleBase.IsInteractable() : true;
                     var canUseDisabledColor = m_colorMode != ColorModeEnum.ForceUseDisableColor && toggleBase != null ? toggleBase.CanUseDisabledColor() : true;
 
                     var endColor = !canUseDisabledColor || isInteractable ? (isActive ? m_colorOn : m_colorOff) : m_colorDisabled;
@@ -1120,7 +1129,7 @@ namespace MaterialUI
                                 animationDuration,
                                 0,
                                 null,
-                                false, 
+                                false,
                                 MaterialUI.Tween.TweenType.SoftEaseOutQuint
 
                             );

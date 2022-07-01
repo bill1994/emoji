@@ -33,6 +33,30 @@ namespace Kyub.Performance
 
         #region Public Static Properties
 
+        /// <summary>
+        /// Useful to know is inside OnSetLowPerformance Callback 
+        /// </summary>
+        static bool s_isSettingLowPerformance = false;
+        public static bool IsSettingLowPerformance
+        {
+            get
+            {
+                return s_isSettingLowPerformance;
+            }
+        }
+
+        /// <summary>
+        /// Useful to know is inside OnSetHighPerformance Callback 
+        /// </summary>
+        static bool s_isSettingHighPerformance = false;
+        public static bool IsSettingHighPerformance
+        {
+            get
+            {
+                return s_isSettingHighPerformance;
+            }
+        }
+
         static bool s_isEndOfFrame = false;
         public static bool IsEndOfFrame
         {
@@ -186,6 +210,18 @@ namespace Kyub.Performance
             }
         }
 
+        public static bool UseSimulateBuildBehaviourInEditor
+        {
+            get
+            {
+                var instance = GetInstanceFastSearch();
+                if (instance != null)
+                    return instance.m_simulateBuildBehaviourInEditor;
+
+                return false;
+            }
+        }
+
         #endregion
 
         #region Private Variables
@@ -219,6 +255,11 @@ namespace Kyub.Performance
         [SerializeField, Range(0.5f, 5.0f)]
         protected float m_autoDisableHighPerformanceTime = 1.0f;
 
+        [Header("Editor Debug")]
+        [Space]
+        [SerializeField, Tooltip("Force CanvasGroup Alpha to 0 to simulate build behaviour OnLowPerformance. Beware as it will make Unity SceneView to not render while in low performance")]
+        protected bool m_simulateBuildBehaviourInEditor = false;
+
         protected int _defaultInvalidCullingMask = 0;
         protected bool _performanceIsDirty = false;
         protected bool _bufferIsDirty = false;
@@ -231,6 +272,24 @@ namespace Kyub.Performance
         #endregion
 
         #region Properties
+
+        public bool SimulateBuildBehaviourInEditor
+        {
+            get
+            {
+                return m_simulateBuildBehaviourInEditor;
+            }
+            set
+            {
+                if (m_simulateBuildBehaviourInEditor == value)
+                    return;
+                m_simulateBuildBehaviourInEditor = value;
+
+                ReleaseRenderBuffers();
+                CheckBufferTextures();
+                Invalidate();
+            }
+        }
 
         public bool UseHighPrecDepthBuffer
         {   
@@ -492,6 +551,8 @@ namespace Kyub.Performance
         {
             if (s_instance == this)
             {
+                s_isSettingHighPerformance = false;
+                s_isSettingLowPerformance = false;
                 s_isEndOfFrame = false;
                 s_canGenerateLowPerformanceView = true;
                 MarkDynamicElementsDirty();
@@ -509,6 +570,8 @@ namespace Kyub.Performance
             UnregisterEvents();
             if (s_instance == this)
             {
+                s_isSettingHighPerformance = false;
+                s_isSettingLowPerformance = false;
                 s_isEndOfFrame = false;
                 s_canGenerateLowPerformanceView = false;
                 s_useRenderBuffer = false;
@@ -695,7 +758,11 @@ namespace Kyub.Performance
                 Application.targetFrameRate = -1;
 
             if (OnSetLowPerformance != null)
+            {
+                s_isSettingLowPerformance = true;
                 OnSetLowPerformance();
+                s_isSettingLowPerformance = false;
+            }
 
             ClearPendentInvalidTransforms();
 
@@ -818,7 +885,11 @@ namespace Kyub.Performance
             }
 
             if (OnSetHighPerformance != null)
+            {
+                s_isSettingHighPerformance = true;
                 OnSetHighPerformance(bufferIsDirty);
+                s_isSettingHighPerformance = false;
+            }
 
             ClearPendentInvalidTransforms();
 

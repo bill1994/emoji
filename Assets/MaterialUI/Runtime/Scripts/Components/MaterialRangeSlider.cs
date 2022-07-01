@@ -512,7 +512,7 @@ namespace MaterialUI
         protected bool _isChangingCanvasGroup = false;
         protected override void OnCanvasGroupChanged()
         {
-            if (!_isChangingCanvasGroup)
+            if (!_isChangingCanvasGroup && !Kyub.Performance.SustainedPerformanceManager.IsSettingLowPerformance)
             {
                 try
                 {
