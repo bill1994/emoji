@@ -1,6 +1,6 @@
 {
   "name": "com.kyub.emojisearch",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "displayName": "Kyub EmojiSearch API",
   "description": "TMP Emoji Char Sequence Parser",
   "unity": "2018.1",
