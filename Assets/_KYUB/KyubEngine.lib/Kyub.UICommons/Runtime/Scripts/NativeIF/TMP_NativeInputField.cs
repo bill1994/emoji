@@ -61,7 +61,9 @@ namespace Kyub.UI
             }
             set
             {
-                if (Application.isPlaying && (!enabled || !gameObject.activeInHierarchy))
+                // Unfortunally if i prevent set when !enabled false the layout recalc will not get called,
+                // because of that it is only possible when object is inactive
+                if (Application.isPlaying && (/*!enabled ||*/ !gameObject.activeInHierarchy))
                 {
                     SetTextWithoutUpdateLabel(value, true);
                 }
@@ -1290,7 +1292,6 @@ namespace Kyub.UI
         #endregion
 
         #region INativeInputField Extra Implementations
-
 
         string INativeInputField.text
         {
