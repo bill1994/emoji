@@ -28,7 +28,9 @@ namespace KyubEditor.UI
         private SerializedProperty m_ReturnKeyType;
 
         private SerializedProperty m_TextComponent;
-        
+
+        private SerializedProperty m_PasswordFontAsset;
+
         //private SerializedProperty m_MonospacePassDistEm;
 
         protected override void OnEnable()
@@ -49,6 +51,8 @@ namespace KyubEditor.UI
             m_ReturnKeyType = serializedObject.FindProperty("m_ReturnKeyType");
 
             m_TextComponent = serializedObject.FindProperty("m_TextComponent");
+
+            m_PasswordFontAsset = serializedObject.FindProperty("m_PasswordFontAsset");
         }
 
         public override void OnInspectorGUI()
@@ -76,6 +80,7 @@ namespace KyubEditor.UI
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Password Special Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(m_AsteriskChar);
+            EditorGUILayout.PropertyField(m_PasswordFontAsset);
             //EditorGUILayout.PropertyField(m_MonospacePassDistEm);
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Virtual Keyboard Layout Settings", EditorStyles.boldLabel);
