@@ -18,6 +18,8 @@ namespace Kyub.UI
         //[SerializeField]
         //protected float m_MonospacePassDistEm = 0;
         [SerializeField]
+        protected TMP_FontAsset m_PasswordFontAsset;
+        [SerializeField]
         protected RectTransform m_PanContent = null;
         [SerializeField, Tooltip("Always try drag scrollview content even when inputfield is selected")]
         protected bool m_ScrollFriendlyMode = true;
@@ -52,6 +54,18 @@ namespace Kyub.UI
                 m_MonospacePassDistEm = value;
             }
         }*/
+
+        public TMP_FontAsset passwordFontAsset
+        {
+            get { return m_PasswordFontAsset; }
+            set
+            {
+                if (m_PasswordFontAsset == value)
+                    return;
+                m_PasswordFontAsset = value;
+                UpdateLabel();
+            }
+        }
 
         public virtual new string text
         {
@@ -462,8 +476,9 @@ namespace Kyub.UI
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
+            var isPasswordWhilePlaying = Application.isPlaying && (contentType == ContentType.Password || inputType == InputType.Password);
             //Track font from textComponent
-            if (textComponent != null && textComponent.font != fontAsset)
+            if (textComponent != null && textComponent.font != fontAsset && !isPasswordWhilePlaying)
             {
                 m_GlobalFontAsset = textComponent.font;
                 UnityEditor.EditorUtility.SetDirty(this);
@@ -581,6 +596,21 @@ namespace Kyub.UI
 
         protected new void UpdateLabel()
         {
+            if (Application.isPlaying)
+            {
+                var isPassword = contentType == ContentType.Password || inputType == InputType.Password;
+                if (isPassword)
+                {
+                    if (m_TextComponent != null && m_PasswordFontAsset != null && m_TextComponent.font != m_PasswordFontAsset)
+                        m_TextComponent.font = m_PasswordFontAsset;
+                }
+                else
+                {
+                    if (m_TextComponent != null && m_GlobalFontAsset != null && m_TextComponent.font != m_GlobalFontAsset)
+                        m_TextComponent.font = m_GlobalFontAsset;
+                }
+            }
+
             base.UpdateLabel();
 
             //Require RichText
