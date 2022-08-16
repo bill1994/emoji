@@ -723,10 +723,16 @@ namespace MaterialUI
 
         public virtual MaterialScreen GetScreenWithName(string screenPrefabPath)
         {
+            if (this == null || m_MaterialScreens == null)
+                return null;
+
             MaterialScreen screenWithSameName = null;
             var partialNamePath = screenPrefabPath != null ? System.IO.Path.GetFileName(screenPrefabPath) : string.Empty;
             foreach (var screen in materialScreen)
             {
+                if (screen == null)
+                    continue;
+
                 var fullFind = screen.name == screenPrefabPath;
                 var partialFind = !fullFind && screenWithSameName == null && screenPrefabPath != null && screen.name == partialNamePath;
                 if (fullFind || partialFind)
