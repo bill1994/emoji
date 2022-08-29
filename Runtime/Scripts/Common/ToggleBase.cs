@@ -8,11 +8,12 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static UnityEngine.UI.Toggle;
 
 namespace MaterialUI
 {
     [ExecuteInEditMode]
-    public class ToggleBase : SelectableStyleElement<ToggleBase.ToggleBaseStyleProperty>
+    public class ToggleBase : SelectableStyleElement<ToggleBase.ToggleBaseStyleProperty>, IPointerUpHandler, IPointerExitHandler
     {
         #region Private Variables
 
@@ -82,6 +83,8 @@ namespace MaterialUI
         protected float m_AnimStartTime;
         protected float m_AnimDeltaTime;
 
+        protected bool _callOnValueChangedByClick = false;
+
         //protected VectorImageData m_LastIconVectorImageData;
         //protected Sprite m_LastIconSprite;
         //protected string m_LastLabelText;
@@ -93,6 +96,9 @@ namespace MaterialUI
         public UnityEvent onToggleOn = new UnityEvent();
         public UnityEvent onToggleOff = new UnityEvent();
 
+        [Space]
+        public ToggleEvent OnValueChangedByClick = new ToggleEvent();
+        
         #endregion
 
         #region Properties
@@ -497,6 +503,7 @@ namespace MaterialUI
 
         protected override void OnDisable()
         {
+            _callOnValueChangedByClick = false;
             //Only Unregister if self object disabled
             if (m_Group != null && m_Group.gameObject.activeInHierarchy && Application.isPlaying)
                 m_Group.UnregisterToggle(this);
@@ -620,6 +627,29 @@ namespace MaterialUI
             UpdateGraphicToggleState();
         }
 #endif
+
+        #endregion
+
+        #region Unity Input Functions
+
+        public virtual void OnPointerUp(PointerEventData pointerEventData)
+        {
+            if (pointerEventData.button != PointerEventData.InputButton.Left)
+                return;
+
+            if (IsActive() && (m_Toggle != null && m_Toggle.IsInteractable()))
+            {
+                _callOnValueChangedByClick = true;
+            }
+            else
+            {
+                _callOnValueChangedByClick = false;
+            }
+        }
+        public virtual void OnPointerExit(PointerEventData eventData)
+        {
+            _callOnValueChangedByClick = false;
+        }
 
         #endregion
 
@@ -1001,6 +1031,13 @@ namespace MaterialUI
             var callback = value ? onToggleOn : onToggleOff;
             if (callback != null)
                 callback.Invoke();
+
+            if (_callOnValueChangedByClick)
+            {
+                _callOnValueChangedByClick = false;
+                if (OnValueChangedByClick != null)
+                    OnValueChangedByClick.Invoke(value);
+            }
 
             EnsureGroupValidState(false, true);
         }
