@@ -9,6 +9,7 @@
     "com.unity.test-framework": "1.1.31",
     "com.unity.textmeshpro": "2.2.0-preview.3",
     "com.unity.timeline": "1.2.18",
+    "com.unity.toolchain.win-x86_64-linux-x86_64": "2.0.2",
     "com.unity.ugui": "1.0.0",
     "com.unity.vectorgraphics": "2.0.0-preview.11",
     "com.unity.xr.management": "4.0.1",
