@@ -18,6 +18,8 @@ namespace Kyub.Async
 
         #region Events
 
+        public static event System.Action<string> OnAudioUnloaded;
+        public static event System.Action<string> OnImageUnloaded;
         public static event System.Action<ExternImgFile> OnImageLoaded;
         public static event System.Action<ExternAudioFile> OnAudioLoaded;
 
@@ -743,7 +745,14 @@ namespace Kyub.Async
             }
             AudioDownloader downloader = AudioDownloader.GetDownloader(url);
             if (downloader != null)
+            {
                 RequestStackManager.StopAllRequestsFromSender(downloader);
+            }
+
+            if (OnAudioUnloaded != null)
+            {
+                OnAudioUnloaded.Invoke(url);
+            }
         }
 
         private static bool TryGetAudioFromDictionary(string url)
@@ -938,7 +947,7 @@ namespace Kyub.Async
                 url = "";
             if (AssetDictionary.ContainsKey(url))
             {
-                Object asset = null;
+                Object asset;
                 AssetDictionary.TryGetValue(url, out asset);
                 Sprite sprite = asset as Sprite;
                 Texture2D texture = null;
@@ -977,6 +986,11 @@ namespace Kyub.Async
             if (downloader != null)
             {
                 RequestStackManager.StopAllRequestsFromSender(downloader);
+            }
+
+            if (OnImageUnloaded != null)
+            {
+                OnImageUnloaded.Invoke(url);
             }
         }
 
