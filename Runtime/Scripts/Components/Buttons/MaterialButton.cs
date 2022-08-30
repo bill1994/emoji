@@ -725,63 +725,109 @@ namespace MaterialUI
 
         public void SetLayoutHorizontal()
         {
+            if (m_ContentRectTransform == null) return;
+
+            var size = m_FitWidthToContent ?
+                Kyub.UI.LayoutUtilityEx.GetPreferredWidth(rectTransform) : 
+                Mathf.Max(0, rectTransform.rect.size.x);
+            var sizeWithPadding = Mathf.Max(0, size - m_ContentPadding.x);
+            var contentSize = Kyub.UI.LayoutUtilityEx.GetPreferredWidth(m_ContentRectTransform, -1);
+            if (contentSize < 0)
+            {
+                contentSize = sizeWithPadding;
+            }
+
+            contentSize = Mathf.Min(sizeWithPadding, contentSize);
+
             if (m_FitWidthToContent)
             {
-                if (m_ContentRectTransform == null) return;
                 m_Tracker.Add(this, rectTransform, DrivenTransformProperties.SizeDeltaX);
-                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_Size.x);
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size);
                 m_Tracker.Add(this, m_ContentRectTransform, DrivenTransformProperties.SizeDeltaX);
-                m_ContentRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_ContentSize.x);
+                m_ContentRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, contentSize);
+            }
+            else
+            {
+                m_Tracker.Add(this, m_ContentRectTransform, DrivenTransformProperties.SizeDeltaX);
+                m_ContentRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, contentSize);
             }
         }
 
         public void SetLayoutVertical()
         {
+            if (m_ContentRectTransform == null) return;
+
+            var size = m_FitHeightToContent? 
+                Kyub.UI.LayoutUtilityEx.GetPreferredHeight(rectTransform) : 
+                Mathf.Max(0, rectTransform.rect.size.y);
+            var sizeWithPadding = Mathf.Max(0, size - m_ContentPadding.y);
+            var contentSize = Kyub.UI.LayoutUtilityEx.GetPreferredHeight(m_ContentRectTransform, -1);
+            if (contentSize < 0)
+            {
+                contentSize = sizeWithPadding;
+            }
+
+            contentSize = Mathf.Min(sizeWithPadding, contentSize);
+
             if (m_FitHeightToContent)
             {
-                if (m_ContentRectTransform == null) return;
                 m_Tracker.Add(this, rectTransform, DrivenTransformProperties.SizeDeltaY);
-                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, m_Size.y);
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size);
                 m_Tracker.Add(this, m_ContentRectTransform, DrivenTransformProperties.SizeDeltaY);
-                m_ContentRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, m_ContentSize.y);
+                m_ContentRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, contentSize);
+            }
+            else
+            {
+                m_Tracker.Add(this, m_ContentRectTransform, DrivenTransformProperties.SizeDeltaY);
+                m_ContentRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, contentSize);
             }
         }
 
         public void CalculateLayoutInputHorizontal()
         {
-            if (m_FitWidthToContent)
-            {
-                if (m_ContentRectTransform == null) return;
-                m_ContentSize.x = LayoutUtility.GetPreferredWidth(m_ContentRectTransform);
-                m_Size.x = m_ContentSize.x + m_ContentPadding.x;
-            }
-            else
+            //if (m_FitWidthToContent)
+            //{
+            if (m_ContentRectTransform == null)
             {
                 m_Size.x = -1;
+                return;
             }
+
+            m_ContentSize.x = LayoutUtility.GetPreferredWidth(m_ContentRectTransform);
+            m_Size.x = m_ContentSize.x + m_ContentPadding.x;
+            //}
+            //else
+            //{
+            //    m_Size.x = -1;
+            //}
         }
 
         public void CalculateLayoutInputVertical()
         {
-            if (m_FitHeightToContent)
-            {
-                if (m_ContentRectTransform == null) return;
+            //if (m_FitHeightToContent)
+            //{
+                if (m_ContentRectTransform == null)
+                {
+                    m_Size.y = -1;
+                    return;
+                }
+
                 m_ContentSize.y = LayoutUtility.GetPreferredHeight(m_ContentRectTransform);
                 m_Size.y = m_ContentSize.y + m_ContentPadding.y;
-            }
-            else
-            {
-                m_Size.y = -1;
-            }
+            //}
+            //else
+            //{
+            //    m_Size.y = -1;
+            //}
         }
 
-        public float minWidth { get { return enabled ? m_Size.x : 0; } }
-        public float preferredWidth { get { return minWidth; } }
+        public float minWidth { get { return enabled && m_FitWidthToContent ? m_Size.x : -1; } }
+        public float preferredWidth { get { return enabled ? m_Size.x : -1; } }
         public float flexibleWidth { get { return -1; } }
-        public float minHeight { get { return enabled ? m_Size.y : 0; } }
-        public float preferredHeight { get { return minHeight; } }
+        public float minHeight { get { return enabled && m_FitHeightToContent ? m_Size.y : -1; } }
+        public float preferredHeight { get { return enabled ? m_Size.y : -1; } }
         public float flexibleHeight { get { return -1; } }
-        public int layoutPriority { get { return 1; } }
+        public int layoutPriority { get { return 0; } }
 
         #endregion
 

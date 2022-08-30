@@ -96,11 +96,11 @@ namespace MaterialUI
                 {
                     m_SelectedMaterialButtons.ExecuteAction(button => button.ClearTracker());
                 }
-                if (m_FitWidthToContent.boolValue)
-                {
+                //if (m_FitWidthToContent.boolValue)
+                //{
                     EditorGUILayout.LabelField("Padding", GUILayout.Width(52));
                     LayoutStyle_PropertyField(m_ContentPaddingX, new GUIContent());
-                }
+                //}
             }
 
             using (new GUILayout.HorizontalScope())
@@ -111,11 +111,11 @@ namespace MaterialUI
                 {
                     m_SelectedMaterialButtons.ExecuteAction(button => button.ClearTracker());
                 }
-                if (m_FitHeightToContent.boolValue)
-                {
+                //if (m_FitHeightToContent.boolValue)
+                //{
                     EditorGUILayout.LabelField("Padding", GUILayout.Width(52));
                     LayoutStyle_PropertyField(m_ContentPaddingY, new GUIContent());
-                }
+                //}
             }
 
             //ConvertButtonSection();
